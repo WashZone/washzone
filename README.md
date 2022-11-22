@@ -1,25 +1,3 @@
-# Welcome to your new ignited app!
-
-[![CircleCI](https://circleci.com/gh/infinitered/ignite.svg?style=svg)](https://circleci.com/gh/infinitered/ignite)
-
-## The latest and greatest boilerplate for Infinite Red opinions
-
-This is the boilerplate that [Infinite Red](https://infinite.red) uses as a way to test bleeding-edge changes to our React Native stack.
-
-Currently includes:
-
-- React Native
-- React Navigation
-- MobX State Tree
-- TypeScript
-- And more!
-
-## Quick Start
-
-The Ignite boilerplate project's structure will look similar to this:
-
-```
-ignite-project
 ├── app
 │   ├── components
 │   ├── config
@@ -45,30 +23,19 @@ ignite-project
 │   ├── gradlew.bat
 │   ├── keystores
 │   └── settings.gradle
-├── ignite
-│   └── templates
-|       |── app-icon
-│       ├── component
-│       ├── model
-│       ├── navigator
-│       └── screen
 ├── index.js
 ├── ios
-│   ├── IgniteProject
-│   ├── IgniteProject-tvOS
-│   ├── IgniteProject-tvOSTests
-│   ├── IgniteProject.xcodeproj
-│   └── IgniteProjectTests
+│   ├── WashZone
+│   ├── WashZone-tvOS
+│   ├── WashZone-tvOSTests
+│   ├── WashZone.xcodeproj
+│   └── WashZoneTests
 ├── .env
 └── package.json
 
 ```
 
 ### ./app directory
-
-Included in an Ignite boilerplate project is the `app` directory. This is a directory you would normally have to create when using vanilla React Native.
-
-The inside of the `app` directory looks similar to the following:
 
 ```
 app
@@ -110,21 +77,4 @@ This is a great place to put miscellaneous helpers and utilities. Things like da
 
 **app.tsx** This is the entry point to your app. This is where you will find the main App component which renders the rest of the application.
 
-### ./ignite directory
-
-The `ignite` directory stores all things Ignite, including CLI and boilerplate items. Here you will find templates you can customize to help you get started with React Native.
-
-### ./test directory
-
-This directory will hold your Jest configs and mocks.
-
-## Running Detox end-to-end tests
-
-Read [Detox setup instructions](./detox/README.md).
-
-## Previous Boilerplates
-
-- [2018 aka Bowser](https://github.com/infinitered/ignite-bowser)
-- [2017 aka Andross](https://github.com/infinitered/ignite-andross)
-- [2016 aka Ignite 1.0](https://github.com/infinitered/ignite-ir-boilerplate-2016)
 
