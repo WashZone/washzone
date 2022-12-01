@@ -5,21 +5,21 @@ const ar: Translations = {
     ok: "نعم",
     cancel: "حذف",
     back: "خلف",
-    logOut: "تسجيل خروج", // @demo remove-current-line
+    logOut: "تسجيل خروج",
   },
   welcomeScreen: {
     postscript:
       "ربما لا يكون هذا هو الشكل الذي يبدو عليه تطبيقك مالم يمنحك المصمم هذه الشاشات وشحنها في هذه الحالة",
     readyForLaunch: "تطبيقك تقريبا جاهز للتشغيل",
     exciting: "اوه هذا مثير",
-    letsGo: "لنذهب", // @demo remove-current-line
+    letsGo: "لنذهب",
   },
   errorScreen: {
     title: "هناك خطأ ما",
     friendlySubtitle:
       "هذه هي الشاشة التي سيشاهدها المستخدمون في عملية الانتاج عند حدوث خطأ. سترغب في تخصيص هذه الرسالة ( الموجودة في 'ts.en/i18n/app') وربما التخطيط ايضاً ('app/screens/ErrorScreen'). إذا كنت تريد إزالة هذا بالكامل، تحقق من 'app/app.tsp' من اجل عنصر <ErrorBoundary>.",
     reset: "اعادة تعيين التطبيق",
-    traceTitle: "خطأ من مجموعة %{name}", // @demo remove-current-line
+    traceTitle: "خطأ من مجموعة %{name}",
   },
   emptyStateComponent: {
     generic: {
@@ -28,7 +28,7 @@ const ar: Translations = {
       button: "لنحاول هذا مرّة أخرى",
     },
   },
-  // @demo remove-block-start
+
   errors: {
     invalidEmail: "عنوان البريد الالكتروني غير صالح",
   },
@@ -43,7 +43,7 @@ const ar: Translations = {
     tapToSignIn: "انقر لتسجيل الدخول!",
     hint: "(: تلميح: يمكنك استخدام اي عنوان بريد الكتروني وكلمة السر المفضلة لديك",
   },
-  demoNavigator: {
+  TabNavigator: {
     componentsTab: "عناصر",
     debugTab: "تصحيح",
     communityTab: "واصل اجتماعي",

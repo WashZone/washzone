@@ -236,10 +236,11 @@ const $labelStyle: TextStyle = {
 const $inputWrapperStyle: ViewStyle = {
   flexDirection: "row",
   alignItems: "flex-start",
-  borderWidth: 1,
+  // borderWidth: 1,
+  borderBottomWidth: 1,
   borderRadius: 4,
-  backgroundColor: colors.palette.neutral200,
-  borderColor: colors.palette.neutral400,
+  // backgroundColor: colors.palette.neutral200,
+  borderColor: colors.palette.neutral100,
   overflow: "hidden",
 }
 

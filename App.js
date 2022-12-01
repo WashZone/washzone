@@ -7,9 +7,9 @@ import * as SplashScreen from "expo-splash-screen"
 
 SplashScreen.preventAutoHideAsync()
 
-function IgniteApp() {
+function WashZone() {
   return <App hideSplashScreen={SplashScreen.hideAsync} />
 }
 
-registerRootComponent(IgniteApp)
-export default IgniteApp
+registerRootComponent(WashZone)
+export default WashZone
