@@ -21,33 +21,32 @@ export const LoginView = observer(() => {
       setAuthToken,
       validationErrors,
     },
-    userStore:{
-      setUser
-    },
-    api: {mutateSignin },
+    userStore: { setUser },
+    api: { mutateSignin },
   } = useStores()
 
   async function login() {
     if (validationErrors.authEmail !== "" || validationErrors.authPassword !== "") return
-    try{const res = await mutateSignin({
-      email: authEmail,
-      password: authPassword,
-    })
-    console.log(res)
+    try {
+      const res = await mutateSignin({
+        email: authEmail,
+        password: authPassword,
+      })
+      console.log(res)
 
-    setUser({
-      name: res.signin.name,
-      email: res.signin.email,
-      first_name: res.signin.first_name,
-      last_name: res.signin.last_name,
-      picture: res.signin.picture||"https://edigitalcare.in/public/uploads/user-dummy.png",
-      socialId: res.signin.socialId,
-      type: '',
-      isSocialLogin : false,
-      _id:res.signin._id
-    })
-    setAuthToken(String(Date.now()))}
-    catch(error){
+      setUser({
+        name: res.signin.name,
+        email: res.signin.email,
+        first_name: res.signin.first_name,
+        last_name: res.signin.last_name,
+        picture: res.signin.picture || "https://edigitalcare.in/public/uploads/user-dummy.png",
+        socialId: res.signin.socialId,
+        type: "",
+        isSocialLogin: false,
+        _id: res.signin._id,
+      })
+      setAuthToken(String(Date.now()))
+    } catch (error) {
       Alert.alert("Wrong Credentials!")
     }
   }
@@ -103,7 +102,7 @@ export const LoginView = observer(() => {
         RightAccessory={PasswordRightAccessory}
         style={$inputText}
       />
-      <Text tx="loginScreen.forgotPassword" size="sm" weight="bold" style={$forgotPass} />
+      <Text tx="loginScreen.forgotPassword" size="sm" weight="bold" style={$forgotPass} onPress={() =>navigation.navigate('ForgotPassword')} />
 
       <Button
         testID="login-button"
@@ -169,5 +168,5 @@ const $inputText: TextStyle = {
 const $tapButton: ViewStyle = {
   marginTop: spacing.extraSmall,
   marginHorizontal: spacing.extraSmall,
-  height:50
+  height: 50,
 }

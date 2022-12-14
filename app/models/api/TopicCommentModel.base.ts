@@ -24,8 +24,8 @@ export const TopicCommentModelBase = ModelBase
     userId: types.union(types.undefined, types.late((): any => UserModel)),
     topicId: types.union(types.undefined, types.null, types.string),
     comment: types.union(types.undefined, types.null, types.string),
-    date: types.union(types.undefined, types.null, types.string),
-    imageUrl: types.union(types.undefined, types.null, types.string),
+    acttachmentUrl: types.union(types.undefined, types.null, types.string),
+    acttachmentType: types.union(types.undefined, types.null, types.string),
   })
   .views(self => ({
     get store() {
@@ -39,12 +39,12 @@ export class TopicCommentModelSelector extends QueryBuilder {
   get updatedAt() { return this.__attr(`updatedAt`) }
   get topicId() { return this.__attr(`topicId`) }
   get comment() { return this.__attr(`comment`) }
-  get date() { return this.__attr(`date`) }
-  get imageUrl() { return this.__attr(`imageUrl`) }
+  get acttachmentUrl() { return this.__attr(`acttachmentUrl`) }
+  get acttachmentType() { return this.__attr(`acttachmentType`) }
   userId(builder: string | UserModelSelector | ((selector: UserModelSelector) => UserModelSelector) | undefined) { return this.__child(`userId`, UserModelSelector, builder) }
 }
 export function selectFromTopicComment() {
   return new TopicCommentModelSelector()
 }
 
-export const topicCommentModelPrimitives = selectFromTopicComment()._id.createdAt.updatedAt.topicId.comment.date.imageUrl
+export const topicCommentModelPrimitives = selectFromTopicComment()._id.createdAt.updatedAt.topicId.comment.acttachmentUrl.acttachmentType

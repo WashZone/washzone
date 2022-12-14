@@ -98,5 +98,6 @@ const $container: ViewStyle = {
   backgroundColor: colors.palette.neutral100,
   flexDirection: "row",
   alignItems: "center",
-  marginBottom: 10,
+  marginVertical: 10,
+
 }

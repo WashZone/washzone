@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react"
+import React, { useMemo, useRef, useState } from "react"
 import {
   Image,
   TextInput,
@@ -19,14 +19,12 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated"
-import { useHooks } from "../hooks"
-import { uploadFile } from "../../../utils/upload/uploadFile"
-
+import { useHooks } from "../../hooks"
 
 export function CreatePost() {
   const {
     userStore: { picture, _id },
-    api: { mutateSaveUserPost, mutateUploadFile },
+    api: { mutateCreateUserPost },
   } = useStores()
   const [postContent, setPostContent] = useState<string>("")
   const [isPosting, setIsPosting] = useState<boolean>(false)
@@ -50,10 +48,10 @@ export function CreatePost() {
       // })
       // console.log(res)
       // console.log(_id)
-      const res = await mutateSaveUserPost({
-        attachmentUrl: selectedImage?.uri,
-        attachmentType: selectedImage?.type,
-        date: new Date().toISOString(),
+      console.log("ID", _id)
+      const res = await mutateCreateUserPost({
+        attachmentUrl: selectedImage?.uri || "",
+        attachmentType: selectedImage?.type || "",
         postContent,
         userId: _id,
       })
@@ -161,7 +159,6 @@ export function CreatePost() {
     return {
       height,
       width: "100%",
-      marginBottom: 10,
       justifyContent: "center",
       backgroundColor: colors.palette.neutral100,
     }
@@ -196,7 +193,12 @@ export function CreatePost() {
         <View style={$bottomActionContainer}>
           <View style={$actionButtonsContainer}>
             <Pressable onPress={onGalleryPress}>
-              <AnimatedImage source={iconRegistry.gallery} style={animatedGalleryIcon} />
+              {useMemo(
+                () => (
+                  <AnimatedImage source={iconRegistry.gallery} style={animatedGalleryIcon} />
+                ),
+                [progress],
+              )}
             </Pressable>
           </View>
           <AnimatedPressable disabled={isPosting} onPress={onPost} style={animatedPostButton}>
@@ -264,12 +266,14 @@ const $contentContainer: ViewStyle = {
 const $inputContainer: ViewStyle = {
   marginLeft: spacing.homeScreen / 2,
   flex: 1,
+  borderWidth: 0,
+  padding: 0,
 }
 
 const $inputWrapper: ViewStyle = {
-  borderWidth: 0,
   width: "100%",
   maxHeight: "100%",
+  borderBottomWidth: 0,
 }
 
 const $container: ViewStyle = {
@@ -279,4 +283,10 @@ const $container: ViewStyle = {
   paddingHorizontal: spacing.homeScreen,
   flexDirection: "row",
   alignItems: "center",
+  borderBottomWidth: 0.5,
+  borderBottomColor: colors.background,
+  shadowColor: colors.background,
+  shadowRadius: 10,
+  shadowOpacity: 0.8,
+  shadowOffset: { height: 1, width: 0 },
 }

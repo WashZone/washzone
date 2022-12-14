@@ -21,11 +21,11 @@ export const CommentsDetailModelBase = ModelBase
     _id: types.identifier,
     createdAt: types.union(types.undefined, types.frozen()),
     updatedAt: types.union(types.undefined, types.frozen()),
-    userId: types.union(types.undefined, types.late((): any => UserModel)),
+    userId: types.union(types.undefined, types.null, types.late((): any => UserModel)),
     postId: types.union(types.undefined, types.null, types.string),
     comment: types.union(types.undefined, types.null, types.string),
-    date: types.union(types.undefined, types.null, types.string),
-    imageUrl: types.union(types.undefined, types.null, types.string),
+    acttachmentUrl: types.union(types.undefined, types.null, types.string),
+    acttachmentType: types.union(types.undefined, types.null, types.string),
   })
   .views(self => ({
     get store() {
@@ -39,12 +39,12 @@ export class CommentsDetailModelSelector extends QueryBuilder {
   get updatedAt() { return this.__attr(`updatedAt`) }
   get postId() { return this.__attr(`postId`) }
   get comment() { return this.__attr(`comment`) }
-  get date() { return this.__attr(`date`) }
-  get imageUrl() { return this.__attr(`imageUrl`) }
+  get acttachmentUrl() { return this.__attr(`acttachmentUrl`) }
+  get acttachmentType() { return this.__attr(`acttachmentType`) }
   userId(builder: string | UserModelSelector | ((selector: UserModelSelector) => UserModelSelector) | undefined) { return this.__child(`userId`, UserModelSelector, builder) }
 }
 export function selectFromCommentsDetail() {
   return new CommentsDetailModelSelector()
 }
 
-export const commentsDetailModelPrimitives = selectFromCommentsDetail()._id.createdAt.updatedAt.postId.comment.date.imageUrl
+export const commentsDetailModelPrimitives = selectFromCommentsDetail()._id.createdAt.updatedAt.postId.comment.acttachmentUrl.acttachmentType

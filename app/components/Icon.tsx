@@ -128,6 +128,22 @@ export const iconRegistry = {
   emoji: require("../../assets/icons/emoji.png"),
   gif: require("../../assets/icons/gif.png"),
   camera: require("../../assets/icons/camera.png"),
+  send: require("../../assets/icons/send.png"),
+  share: require("../../assets/icons/share.png"),
+  alert: require("../../assets/icons/alert.png"),
+  save: require("../../assets/icons/save.png"),
+  offer: require("../../assets/icons/offer.png"),
+  upload: require("../../assets/icons/upload.png"),
+  dislikefill: require("../../assets/icons/dislike-fill.png"),
+  dislike: require("../../assets/icons/dislike.png"),
+  forwardfill: require("../../assets/icons/forward-fill.png"),
+  forward: require("../../assets/icons/forward.png"),
+  likefill: require("../../assets/icons/like-fill.png"),
+  like: require("../../assets/icons/like.png"),
+  save_box: require("../../assets/icons/save_box.png"),
+  add_vector: require("../../assets/icons/add-vector.png"),
+  reset: require("../../assets/icons/reset.png"),
+  key: require("../../assets/icons/key.png"),
 }
 
 const $imageStyle: ImageStyle = {

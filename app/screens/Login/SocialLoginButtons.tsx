@@ -16,6 +16,7 @@ export function SocialLogin() {
   const {
     authenticationStore: { setAuthToken },
     userStore: { setUser },
+    api: { queryGetUserBysocialId, mutateCreateUser },
   } = useStores()
   const siginGoogle = () => {
     GoogleSignin.configure({
@@ -25,8 +26,28 @@ export function SocialLogin() {
       .then((hasPlayService) => {
         if (hasPlayService) {
           GoogleSignin.signIn()
-            .then((userInfo) => {
+            .then(async (userInfo) => {
+              const resGetUserBySocialId = await queryGetUserBysocialId({
+                socialId: userInfo.user.id,
+              },{fetchPolicy:'network-only'})
+              console.log(resGetUserBySocialId)
+              const userFound = resGetUserBySocialId.getUserBysocialId.length > 0
+              let resCreateUser: { createUser: any }
+              if (!userFound) {
+                resCreateUser = await mutateCreateUser({
+                  type: "google",
+                  isSocialLogin: true,
+                  lastName: userInfo.user.name.split(" ")[1]||'',
+                  firstName: userInfo.user.name.split(" ")[0],
+                  password: "",
+                  email: userInfo?.user?.email,
+                  name: userInfo?.user?.name,
+                  picture: userInfo?.user?.photo,
+                  socialId:userInfo.user.id,
+                })
+              }
               setUser({
+                _id: userFound ? resGetUserBySocialId.getUserBysocialId[0]?._id : resCreateUser.createUser._id,
                 name: userInfo.user.name,
                 email: userInfo.user.email,
                 first_name: userInfo.user.givenName,
@@ -57,13 +78,32 @@ export function SocialLogin() {
     const profileRequest = new GraphRequest(
       "/me",
       { accessToken: token, parameters: PROFILE_REQUEST_PARAMS },
-      (error, user) => {
+      async (error, user) => {
         if (error) {
           console.log("login info has error: " + error)
         } else {
           console.log("result:", user)
           const userInfo: any = user
+
+          const resGetUserBySocialId = await queryGetUserBysocialId({ socialId: userInfo?.id},{fetchPolicy:'network-only'})
+          console.log(resGetUserBySocialId)
+          const userFound = resGetUserBySocialId.getUserBysocialId.length > 0
+          let resCreateUser: { createUser: any }
+          if (!userFound) {
+            resCreateUser = await mutateCreateUser({
+              name: userInfo?.name,
+              email: userInfo?.email,
+              firstName: userInfo?.first_name,
+              socialId: userInfo?.id,
+              lastName: userInfo?.last_name,
+              picture: userInfo?.picture.data?.url,
+              isSocialLogin: true,
+              type: "facebook",
+              password: "",
+            })
+          }
           setUser({
+            _id: userFound ? resGetUserBySocialId.getUserBysocialId[0]?._id : resCreateUser.createUser._id,
             name: userInfo?.name,
             email: userInfo?.email,
             first_name: userInfo?.first_name,
@@ -73,6 +113,7 @@ export function SocialLogin() {
             isSocialLogin: true,
             type: "facebook",
           })
+
           setAuthToken(token)
         }
       },

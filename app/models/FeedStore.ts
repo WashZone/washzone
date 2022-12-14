@@ -8,8 +8,14 @@ export const FeedStoreModel = types
   })
   .actions(withSetPropAction)
   .actions((self) => ({
-    setPosts(posts:any) {
-      self.feedPosts = posts 
+    setPosts(posts: any) {
+      self.feedPosts = posts
+    },
+    addToPosts(posts: any) {
+      self.feedPosts = [...self.feedPosts, ...posts]
+    },
+    clear() {
+      self.feedPosts = []
     },
   }))
   .views((store) => ({
@@ -17,7 +23,6 @@ export const FeedStoreModel = types
       return store.feedPosts
     },
   }))
-
 
 export interface FeedStore extends Instance<typeof FeedStoreModel> {}
 export interface FeedStoreSnapshot extends SnapshotOut<typeof FeedStoreModel> {}

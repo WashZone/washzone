@@ -14,8 +14,8 @@ const palette = {
 
   primary100: "#0060B1",
   primary200: "#0083E2",
-  primary300: "#DDA28E",
-  primary400: "#D28468",
+  primary300: "#08acec",
+  primary400: "#619acc",
   primary500: "#C76542",
   primary600: "#A54F31",
 
@@ -36,6 +36,8 @@ const palette = {
 
   overlay20: "rgba(25, 16, 21, 0.2)",
   overlay50: "rgba(25, 16, 21, 0.5)",
+
+  grey :'#e5e5eb',
 
   overlayNeutral50: "rgba(255,255,255,0.5)",
 

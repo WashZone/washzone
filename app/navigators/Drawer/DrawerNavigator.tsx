@@ -53,7 +53,7 @@ export function DrawerNavigator() {
       }}
       renderNavigationView={() => (
         <View style={[$drawer, $drawerInsets]}>
-          <DrawerOptions />
+          <DrawerOptions toggleDrawer={toggleDrawer}/>
           <View style={$versionContainer}>
             <Text tx="DrawerNavigator.version" style={$versionText} />
           </View>

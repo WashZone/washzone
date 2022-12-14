@@ -60,7 +60,8 @@ export const SignupScreen: FC<SignupProps> = observer(function LoginScreen(_prop
         picture: res.createUser.picture||"https://edigitalcare.in/public/uploads/user-dummy.png",
         socialId: res.createUser.socialId,
         type: '',
-        isSocialLogin : false
+        isSocialLogin : false,
+        _id: res.createUser._id
       })
       console.log(res)
       setIsSubmitted(false)

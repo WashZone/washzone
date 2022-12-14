@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from "react"
-import { Dimensions, Pressable, TextStyle, View, ViewStyle } from "react-native"
+import {
+  Dimensions,
+  FlatList,
+  Pressable,
+  RefreshControl,
+  TextStyle,
+  View,
+  ViewStyle,
+} from "react-native"
 import { Text } from "../../../components"
 import { colors, spacing } from "../../../theme"
 import FastImage, { ImageStyle } from "react-native-fast-image"
@@ -8,18 +16,18 @@ import { fromNow } from "../../../utils/agoFromNow"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { HomeTabParamList } from "../../../tabs"
 import { observer } from "mobx-react-lite"
-import { useHooks } from "../hooks"
+import { useHooks } from "../../hooks"
 import { useStores } from "../../../models"
+import { Stories } from "./Stories"
 
 export interface PostComponentProps {
   post: any
   navigateOnPress?: boolean
 }
 
-export const PostComponent = ({ post, navigateOnPress }:PostComponentProps) => {
+export const PostComponent = ({ post, navigateOnPress }: PostComponentProps) => {
   const [attachmentDimensions, setAttachmentDimensions] = useState({ height: 0, width: 0 })
   const navigation = useNavigation<NavigationProp<HomeTabParamList>>()
-
   const onContainerPress = () => {
     if (navigateOnPress !== undefined && navigateOnPress) {
       navigation.navigate("PostInfo", {
@@ -29,11 +37,11 @@ export const PostComponent = ({ post, navigateOnPress }:PostComponentProps) => {
   }
 
   const postDetails = {
-    picture : post?.User[0]?.picture,
-    first_name :  post?.User[0]?.first_name,
-    last_name:post?.User[0]?.last_name,
-    attachmentUrl : post?.attachmentUrl,
-    createdAt :  post?.createdAt,
+    picture: post?.UserId?.picture,
+    first_name: post?.UserId?.first_name,
+    last_name: post?.UserId?.last_name,
+    attachmentUrl: post?.attachmentUrl,
+    createdAt: post?.createdAt,
   }
 
   const windowWidth = Dimensions.get("window").width
@@ -41,7 +49,12 @@ export const PostComponent = ({ post, navigateOnPress }:PostComponentProps) => {
   return (
     <Pressable style={$postContainer} onPress={onContainerPress}>
       <View style={$publisherInfoContainer}>
-        <FastImage source={{ uri: postDetails.picture ||"https://edigitalcare.in/public/uploads/user-dummy.png"}} style={$picture} />
+        <FastImage
+          source={{
+            uri: postDetails.picture || "https://edigitalcare.in/public/uploads/user-dummy.png",
+          }}
+          style={$picture}
+        />
         <View style={$textContainer}>
           <Text
             text={formatName(postDetails.first_name + " " + postDetails.last_name)}
@@ -69,18 +82,30 @@ export const Posts = observer(() => {
   const {
     feedStore: { feedPosts },
   } = useStores()
-  const { getAndUpdatePosts } = useHooks()
+  const { refreshPosts, loadMorePosts } = useHooks()
+  const [refreshing, setRefreshing] = useState<boolean>(false)
 
   useEffect(() => {
-    getAndUpdatePosts()
+    refreshPosts()
   }, [])
 
+  const onRefresh = () => {
+    refreshPosts()
+    setRefreshing(false)
+  }
+
   return (
-    <View style={$container}>
-      {feedPosts.map((post) => (
-        <PostComponent key={post?.createdAt} post={post} navigateOnPress={true} />
-      ))}
-    </View>
+    <View style={{flex:1}}>
+      <FlatList
+        ListHeaderComponent={<Stories />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        onEndReached={loadMorePosts}
+        data={feedPosts}
+        renderItem={({ item }) => (
+          <PostComponent key={item?._id} post={item} navigateOnPress={true} />
+        )}
+      />
+      </View>
   )
 })
 
@@ -129,9 +154,4 @@ const $picture: ImageStyle = {
 const $textContainer: ViewStyle = {
   justifyContent: "space-around",
   height: "90%",
-}
-
-const $container: ViewStyle = {
-  width: "100%",
-  marginBottom: 10,
 }

@@ -1,31 +1,20 @@
-import React, { FC, useState } from "react"
+import React, { FC } from "react"
 import { HomeTabProps } from "../../tabs/Home"
 import { CreatePost } from "./partials/CreatePost"
 import { Posts } from "./partials/Posts"
-import { Stories } from "./partials/Stories"
 import { Screen } from "../../components"
-import { RefreshControl } from "react-native"
-import { useHooks } from "./hooks"
+import { ViewStyle } from "react-native"
 
 export const Feed: FC<HomeTabProps<"Feed">> = function Home(_props) {
-  const [refreshing, setRefreshing] = useState<boolean>(false)
-  const { getAndUpdatePosts } = useHooks()
-  const onRefresh = () => {
-    getAndUpdatePosts(false)
-    setRefreshing(false)
-  }
-
   return (
-    <Screen
-      preset="scroll"
-      ScrollViewProps={{
-        showsVerticalScrollIndicator: false,
-        refreshControl: <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />,
-      }}
-    >
+    <Screen preset="fixed" contentContainerStyle={$container}>
       <CreatePost />
-      <Stories />
       <Posts />
     </Screen>
   )
+}
+
+
+const $container :ViewStyle={
+  flex:1
 }

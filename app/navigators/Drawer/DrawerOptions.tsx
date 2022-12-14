@@ -1,4 +1,4 @@
-import React, { useMemo } from "react"
+import React, { useMemo, useState } from "react"
 import {
   Alert,
   Dimensions,
@@ -11,8 +11,10 @@ import {
 } from "react-native"
 import { TxKeyPath } from "../../i18n"
 import { colors } from "../../theme"
-import { Icon, IconTypes, Text } from "../../components"
+import { Icon, IconTypes, Text, Toggle } from "../../components"
 import { useStores } from "../../models"
+import { NavigationProp, useNavigation } from "@react-navigation/native"
+import { AppStackParamList } from "../AppNavigator"
 
 interface DrawerOptionType {
   icon: IconTypes
@@ -24,31 +26,38 @@ interface Action {
   action: DrawerOptionType
 }
 
-export function DrawerOptions() {
+export function DrawerOptions({toggleDrawer} : {toggleDrawer:() => void}) {
   const {
     authenticationStore: { logout },
     userStore,
   } = useStores()
+
+  const [notifications, setNotifications] = useState(false)
+
+const navigaton = useNavigation<NavigationProp<AppStackParamList>>()
+
   const drawerOptions: DrawerOptionType[] = [
     {
       icon: "notifications",
       label: "DrawerNavigator.notification",
       onPress() {
-        Alert.alert("DrawerNavigator.notifications")
+        toggleDrawer()
+        navigaton.navigate('Notifications')
       },
     },
     {
       icon: "profile",
       label: "DrawerNavigator.profile",
       onPress() {
-        Alert.alert("DrawerNavigator.profile")
+        toggleDrawer()
+        navigaton.navigate('EditProfile')
       },
     },
     {
       icon: "settings",
       label: "DrawerNavigator.settings",
       onPress() {
-        Alert.alert("DrawerNavigator.settings")
+        navigaton.navigate('Settings')
       },
     },
     {
@@ -63,6 +72,14 @@ export function DrawerOptions() {
       label: "DrawerNavigator.legal",
       onPress() {
         Alert.alert("DrawerNavigator.legal")
+      },
+    },
+    {
+      icon: 'save',
+      label: "DrawerNavigator.saved",
+      onPress() {
+        toggleDrawer()
+        navigaton.navigate('Saved')
       },
     },
     {
@@ -100,9 +117,10 @@ export function DrawerOptions() {
       </View>
       <View style={$notificationContainer}>
         <ActionComponent key={drawerOptions[0].icon} action={drawerOptions[0]} />
+        <Toggle variant='radio' editable value={notifications} onValueChange={()=> setNotifications(!notifications)}/> 
       </View>
       {drawerOptions
-        .slice(1, 6)
+        .slice(1, 7)
         .map((m) => useMemo(() => <ActionComponent key={m.icon} action={m} />, []))}
     </View>
   )
@@ -152,7 +170,9 @@ const getActionContainerStyle = (withBorder: boolean) => {
 
 const $notificationContainer: ViewStyle = {
   height: Dimensions.get("screen").height * 0.2,
-  justifyContent: "center",
+  alignItems: "center",
+  flexDirection:'row',
+  justifyContent:'space-between'
 }
 
 const $actionIcon: ImageStyle = {

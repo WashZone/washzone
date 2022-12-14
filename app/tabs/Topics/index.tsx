@@ -1,16 +1,30 @@
-import React, { FC } from "react"
-import { ViewStyle } from "react-native"
-import { Screen } from "../../components"
-import { TabScreenProps } from "../../navigators/TabNavigator"
-import { spacing } from "../../theme"
+import React from "react"
+import { createNativeStackNavigator } from "@react-navigation/native-stack"
+import { StackScreenProps } from "@react-navigation/stack"
+import { observer } from "mobx-react-lite"
+import { TopicDetails, TopicsFeed } from "../../screens"
 
-export const Topics: FC<TabScreenProps<"Topics">> = function Topics(_props) {
+export type TopicsTabParamList = {
+  TopicsFeed: undefined
+  TopicDetails: {topic:any}
+}
+
+export type TopicsTabProps<T extends keyof TopicsTabParamList> = StackScreenProps<
+  TopicsTabParamList,
+  T
+>
+
+const Stack = createNativeStackNavigator<TopicsTabParamList>()
+
+const TopicsTab = observer(function AppStack() {
   return (
-    <Screen preset="scroll" safeAreaEdges={["top"]} contentContainerStyle={$container}></Screen>
+    <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName={"TopicsFeed"}>
+      <Stack.Screen name="TopicDetails" component={TopicDetails} />
+      <Stack.Screen name="TopicsFeed" component={TopicsFeed} />
+    </Stack.Navigator>
   )
-}
+})
 
-const $container: ViewStyle = {
-  paddingTop: spacing.large + spacing.extraLarge,
-  paddingHorizontal: spacing.large,
-}
+export const Topics = observer(function AppNavigator() {
+  return <TopicsTab />
+})

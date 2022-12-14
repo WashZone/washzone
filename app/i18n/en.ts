@@ -61,6 +61,7 @@ const en = {
     support: "Contact Support",
     legal: "Legal",
     logout: "Logout",
+    saved: "Saved",
     notification: "Notifications",
     version: "Version 1.0",
   },
@@ -141,6 +142,15 @@ const en = {
       content:
         "No favorites have been added yet. Tap the heart on an episode to add it to your favorites!",
     },
+  },
+  settings: {
+    notificationToggle: "Notification",
+    reset: "Reset Password",
+  },
+  resetPassword: {
+    title: "Forgot your password?",
+    description: "Enter your email to reset your password",
+    placeholder : "Enter your E-Mail"
   },
 }
 

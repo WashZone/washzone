@@ -1,39 +1,37 @@
-/**
- * The app navigator (formerly "AppNavigator" and "MainNavigator") is used for the primary
- * navigation flows of your app.
- * Generally speaking, it will contain an auth flow (registration, login, forgot password)
- * and a "main" flow which the user will use once logged in.
- */
 import { DarkTheme, DefaultTheme, NavigationContainer } from "@react-navigation/native"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import { StackScreenProps } from "@react-navigation/stack"
 import { observer } from "mobx-react-lite"
-import React from "react"
+import React,{useEffect} from "react"
 import { useColorScheme } from "react-native"
 import Config from "../config"
 import { useStores } from "../models"
-import { LoginScreen, SignupScreen } from "../screens"
+import * as Linking from 'expo-linking'
+import {
+  EditProfile,
+  LoginScreen,
+  Notifications,
+  SignupScreen,
+  Settings,
+  ResetPassword,
+  ForgotPassword,
+  Saved,
+} from "../screens"
 import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
 import { DrawerNavigator } from "./Drawer/DrawerNavigator"
+import { ClassifiedLinked } from "../screens/ClassifiedLinked"
 
-/**
- * This type allows TypeScript to know what routes are defined in this navigator
- * as well as what properties (if any) they might take when navigating to them.
- *
- * If no params are allowed, pass through `undefined`. Generally speaking, we
- * recommend using your MobX-State-Tree store(s) to keep application state
- * rather than passing state through navigation params.
- *
- * For more information, see this documentation:
- *   https://reactnavigation.org/docs/params/
- *   https://reactnavigation.org/docs/typescript#type-checking-the-navigator
- *   https://reactnavigation.org/docs/typescript/#organizing-types
- */
 export type AppStackParamList = {
   Login: undefined
   Drawer: undefined
   Signup: undefined
-  // 🔥 Your screens go here
+  Notifications: undefined
+  EditProfile: undefined
+  Settings: undefined
+  ResetPassword: undefined
+  ForgotPassword: undefined
+  Saved: undefined
+  ClassifiedLinked: {classifiedId:string}
 }
 
 /**
@@ -52,7 +50,19 @@ const Stack = createNativeStackNavigator<AppStackParamList>()
 const AppStack = observer(function AppStack() {
   const {
     authenticationStore: { isAuthenticated },
+    // feedStore:{clear}
   } = useStores()
+  // clear()
+
+  const url = Linking.useURL()
+  const openUrl = () => {
+    console.log("RUNNING OPEN URL")
+    if (url !== null) {
+      Linking.openURL(url)
+    }
+  }
+  useEffect(() => openUrl(), [url])
+
 
   return (
     <Stack.Navigator
@@ -63,11 +73,18 @@ const AppStack = observer(function AppStack() {
         <>
           {/* <Stack.Screen name="Welcome" component={WelcomeScreen} /> */}
           <Stack.Screen name="Drawer" component={DrawerNavigator} />
+          <Stack.Screen name="EditProfile" component={EditProfile} />
+          <Stack.Screen name="Notifications" component={Notifications} />
+          <Stack.Screen name="Settings" component={Settings} />
+          <Stack.Screen name="ResetPassword" component={ResetPassword} />
+          <Stack.Screen name="Saved" component={Saved} />
+          <Stack.Screen name="ClassifiedLinked" component={ClassifiedLinked} />
         </>
       ) : (
         <>
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Signup" component={SignupScreen} />
+          <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
         </>
       )}
     </Stack.Navigator>

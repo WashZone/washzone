@@ -28,10 +28,10 @@ export const PostDetailModelBase = ModelBase
     postContent: types.union(types.undefined, types.null, types.string),
     attachmentType: types.union(types.undefined, types.null, types.string),
     attachmentUrl: types.union(types.undefined, types.null, types.string),
-    date: types.union(types.undefined, types.null, types.string),
     fileName: types.union(types.undefined, types.null, types.string),
     type: types.union(types.undefined, types.null, types.string),
     uri: types.union(types.undefined, types.null, types.string),
+    status: types.union(types.undefined, types.null, types.string),
   })
   .views(self => ({
     get store() {
@@ -46,10 +46,10 @@ export class PostDetailModelSelector extends QueryBuilder {
   get postContent() { return this.__attr(`postContent`) }
   get attachmentType() { return this.__attr(`attachmentType`) }
   get attachmentUrl() { return this.__attr(`attachmentUrl`) }
-  get date() { return this.__attr(`date`) }
   get fileName() { return this.__attr(`fileName`) }
   get type() { return this.__attr(`type`) }
   get uri() { return this.__attr(`uri`) }
+  get status() { return this.__attr(`status`) }
   userId(builder: string | UserModelSelector | ((selector: UserModelSelector) => UserModelSelector) | undefined) { return this.__child(`userId`, UserModelSelector, builder) }
   commentId(builder: string | CommentsDetailModelSelector | ((selector: CommentsDetailModelSelector) => CommentsDetailModelSelector) | undefined) { return this.__child(`commentId`, CommentsDetailModelSelector, builder) }
 }
@@ -57,4 +57,4 @@ export function selectFromPostDetail() {
   return new PostDetailModelSelector()
 }
 
-export const postDetailModelPrimitives = selectFromPostDetail()._id.createdAt.updatedAt.postContent.attachmentType.attachmentUrl.date.fileName.type.uri
+export const postDetailModelPrimitives = selectFromPostDetail()._id.createdAt.updatedAt.postContent.attachmentType.attachmentUrl.fileName.type.uri.status
