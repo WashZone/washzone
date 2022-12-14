@@ -132,12 +132,6 @@ interface HeaderActionProps {
   ActionComponent?: ReactElement
 }
 
-/**
- * Header that appears on many screens. Will hold navigation buttons and screen title.
- * The Header is meant to be used with the `screenOptions.header` option on navigators, routes, or screen components via `navigation.setOptions({ header })`.
- *
- * - [Documentation and Examples](https://github.com/infinitered/ignite/blob/master/docs/Components-Header.md)
- */
 export function Header(props: HeaderProps) {
   const {
     backgroundColor = colors.background,
@@ -185,7 +179,8 @@ export function Header(props: HeaderProps) {
 
         {!!titleContent && (
           <Text
-            weight="medium"
+          numberOfLines={1}
+            weight="bold"
             size="md"
             text={titleContent}
             style={[

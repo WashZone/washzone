@@ -5,18 +5,11 @@
  * See the [Backend API Integration](https://github.com/infinitered/ignite/blob/master/docs/Backend-API-Integration.md)
  * documentation for more details.
  */
-import {
-  ApiResponse, // @demo remove-current-line
-  ApisauceInstance,
-  create,
-} from "apisauce"
+import { ApiResponse, ApisauceInstance, create } from "apisauce"
 import Config from "../../config"
-import { GeneralApiProblem, getGeneralApiProblem } from "./apiProblem" // @demo remove-current-line
-import type {
-  ApiConfig,
-  ApiFeedResponse, // @demo remove-current-line
-} from "./api.types"
-import type { EpisodeSnapshotIn } from "../../models/Episode" // @demo remove-current-line
+import { GeneralApiProblem, getGeneralApiProblem } from "./apiProblem"
+import type { ApiConfig, ApiFeedResponse } from "./api.types"
+import type { EpisodeSnapshotIn } from "../../models/Episode"
 
 /**
  * Configuring the apisauce instance.
@@ -48,7 +41,6 @@ export class Api {
     })
   }
 
-  // @demo remove-block-start
   /**
    * Gets a list of recent React Native Radio episodes.
    */

@@ -2,6 +2,7 @@ import { useScrollToTop } from "@react-navigation/native"
 import { StatusBar, StatusBarProps } from "expo-status-bar"
 import React, { useRef, useState } from "react"
 import {
+  Dimensions,
   KeyboardAvoidingView,
   KeyboardAvoidingViewProps,
   LayoutChangeEvent,
@@ -149,7 +150,7 @@ function ScreenWithoutScrolling(props: ScreenProps) {
 function ScreenWithScrolling(props: ScreenProps) {
   const {
     children,
-    keyboardShouldPersistTaps = "handled",
+    keyboardShouldPersistTaps = 'handled',
     contentContainerStyle,
     ScrollViewProps,
     style,
@@ -188,23 +189,23 @@ function ScreenWithScrolling(props: ScreenProps) {
 }
 
 export function Screen(props: ScreenProps) {
+
   const {
     backgroundColor = colors.background,
     KeyboardAvoidingViewProps,
-    keyboardOffset = 0,
+    keyboardOffset = -Dimensions.get('screen').height*0.05,
     safeAreaEdges,
     StatusBarProps,
     statusBarStyle = "dark",
   } = props
 
   const $containerInsets = useSafeAreaInsetsStyle(safeAreaEdges)
-
   return (
     <View style={[$containerStyle, { backgroundColor }, $containerInsets]}>
       <StatusBar style={statusBarStyle} {...StatusBarProps} />
 
       <KeyboardAvoidingView
-        behavior={isIos ? "padding" : undefined}
+        behavior={isIos ? 'padding' : undefined}
         keyboardVerticalOffset={keyboardOffset}
         {...KeyboardAvoidingViewProps}
         style={[$keyboardAvoidingViewStyle, KeyboardAvoidingViewProps?.style]}

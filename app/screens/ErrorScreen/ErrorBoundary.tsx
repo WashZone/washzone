@@ -11,15 +11,6 @@ interface State {
   errorInfo: ErrorInfo | null
 }
 
-/**
- * This component handles whenever the user encounters a JS error in the
- * app. It follows the "error boundary" pattern in React. We're using a
- * class component because according to the documentation, only class
- * components can be error boundaries.
- *
- * - [Documentation and Examples](https://github.com/infinitered/ignite/blob/master/docs/Error-Boundary.md)
- * - [React Error Boundaries](https://reactjs.org/docs/error-boundaries.html)
- */
 export class ErrorBoundary extends Component<Props, State> {
   state = { error: null, errorInfo: null }
 

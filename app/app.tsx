@@ -12,7 +12,7 @@
 import "./i18n"
 import "./utils/ignoreWarnings"
 import { useFonts } from "expo-font"
-import React from "react"
+import React, { useEffect } from "react"
 import { initialWindowMetrics, SafeAreaProvider } from "react-native-safe-area-context"
 import * as Linking from "expo-linking"
 import { useInitialRootStore } from "./models"
@@ -41,13 +41,18 @@ setupReactotron({
 export const NAVIGATION_PERSISTENCE_KEY = "NAVIGATION_STATE"
 
 // Web linking configuration
-const prefix = Linking.createURL("/")
+
 const config = {
   screens: {
     Login: {
       path: "",
     },
-    Welcome: "welcome",
+    ClassifiedLinked: {
+      path: "classified/:classifiedId",
+      parse: {
+        classifiedId: (classifiedId: string) => classifiedId,
+      },
+    },
     Demo: {
       screens: {
         DemoShowroom: {
@@ -57,6 +62,9 @@ const config = {
         DemoPodcastList: "podcast",
         DemoCommunity: "community",
       },
+    },
+    ClassifiedDetails: {
+      path: "classfied",
     },
   },
 }
@@ -70,6 +78,10 @@ interface AppProps {
  */
 function App(props: AppProps) {
   const { hideSplashScreen } = props
+
+  const prefix = Linking.createURL("/")
+  console.log("PREFIXES", prefix)
+
   const {
     initialNavigationState,
     onNavigationStateChange,
@@ -87,6 +99,7 @@ function App(props: AppProps) {
     // Note: (vanilla iOS) You might notice the splash-screen logo change size. This happens in debug/development mode. Try building the app for release.
     setTimeout(hideSplashScreen, 500)
   })
+
 
   // Before we show the app, we have to wait for our state to be ready.
   // In the meantime, don't render anything. This will be the background
@@ -116,3 +129,7 @@ function App(props: AppProps) {
 }
 
 export default App
+// Access Key ID:
+// AKIAY5ERXJV4ZHSJQWFL
+// Secret Access Key:
+// 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

@@ -124,20 +124,19 @@ export function Button(props: ButtonProps) {
 }
 
 const $baseViewStyle: ViewStyle = {
-  minHeight: 56,
   borderRadius: 4,
   justifyContent: "center",
   alignItems: "center",
   flexDirection: "row",
-  paddingVertical: spacing.small,
   paddingHorizontal: spacing.small,
   overflow: "hidden",
 }
 
 const $baseTextStyle: TextStyle = {
-  fontSize: 16,
+  fontSize: 14,
   lineHeight: 20,
-  fontFamily: typography.primary.medium,
+  fontFamily: typography.fonts.helveticaNeue.medium,
+  letterSpacing: 1,
   textAlign: "center",
   flexShrink: 1,
   flexGrow: 0,
@@ -161,7 +160,7 @@ const $viewPresets = {
 
   reversed: [
     $baseViewStyle,
-    { backgroundColor: colors.palette.neutral800 },
+    { backgroundColor: colors.palette.primary200 },
   ] as StyleProp<ViewStyle>,
 }
 

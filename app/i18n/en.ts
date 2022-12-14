@@ -3,21 +3,21 @@ const en = {
     ok: "OK!",
     cancel: "Cancel",
     back: "Back",
-    logOut: "Log Out", // @demo remove-current-line
+    logOut: "Log Out",
   },
   welcomeScreen: {
     postscript:
       "psst  — This probably isn't what your app looks like. (Unless your designer handed you these screens, and in that case, ship it!)",
     readyForLaunch: "Your app, almost ready for launch!",
     exciting: "(ohh, this is exciting!)",
-    letsGo: "Let's go!", // @demo remove-current-line
+    letsGo: "Let's go!",
   },
   errorScreen: {
     title: "Something went wrong!",
     friendlySubtitle:
       "This is the screen that your users will see in production when an error is thrown. You'll want to customize this message (located in `app/i18n/en.ts`) and probably the layout as well (`app/screens/ErrorScreen`). If you want to remove this entirely, check `app/app.tsx` for the <ErrorBoundary> component.",
     reset: "RESET APP",
-    traceTitle: "Error from %{name} stack", // @demo remove-current-line
+    traceTitle: "Error from %{name} stack",
   },
   emptyStateComponent: {
     generic: {
@@ -26,26 +26,50 @@ const en = {
       button: "Let's try this again",
     },
   },
-  // @demo remove-block-start
+
   errors: {
     invalidEmail: "Invalid email address.",
   },
   loginScreen: {
-    signIn: "Sign In",
-    enterDetails:
-      "Enter your details below to unlock top secret info. You'll never guess what we've got waiting. Or maybe you will; it's not rocket science here.",
-    emailFieldLabel: "Email",
-    passwordFieldLabel: "Password",
-    emailFieldPlaceholder: "Enter your email address",
-    passwordFieldPlaceholder: "Super secret password here",
-    tapToSignIn: "Tap to sign in!",
-    hint: "Hint: you can use any email address and your favorite password :)",
+    forgotPassword: "Forgot Password?",
+    loginDescription: "Please login with your account!",
+    getStarted: "Sign Up",
+    welcomeText: "Welcome to WashZone",
+    description: "The mobile app to create, manage and navigate car wash talk and ideas.",
+    socialLoginTitle: "Quick Login",
+    tncIntro: "By continuing, you accept the ",
+    tncLink1: "EULA",
+    and: " and ",
+    tncLink2: "Privacy Policy",
+    signUp: "Sign Up",
+    signupDescription: "Create your Account!",
+    emailLabel: "Enter your email",
+    passwordLabel: "Password",
+    nameLabel: "Enter your name",
+    confirmPasswordLabel: "Confirm Password",
+    create: "Sign Up",
+    navigateToLogin: "Already have an account? ",
+    Login: "Log In",
+    noAccont: "Doesn't have an Account? ",
   },
-  demoNavigator: {
-    componentsTab: "Components",
-    debugTab: "Debug",
-    communityTab: "Community",
-    podcastListTab: "Podcast",
+  HomeSreen: {
+    createPostPlaceholder: "What's on your mind?",
+  },
+  DrawerNavigator: {
+    profile: "Edit Profile",
+    settings: "Settings",
+    support: "Contact Support",
+    legal: "Legal",
+    logout: "Logout",
+    saved: "Saved",
+    notification: "Notifications",
+    version: "Version 1.0",
+  },
+  TabNavigator: {
+    videosTab: "Videos",
+    homeTab: "Home",
+    topicsTab: "Topics",
+    ClassifiedsTab: "Classifieds",
   },
   demoCommunityScreen: {
     title: "Connect with the community",
@@ -119,7 +143,15 @@ const en = {
         "No favorites have been added yet. Tap the heart on an episode to add it to your favorites!",
     },
   },
-  // @demo remove-block-end
+  settings: {
+    notificationToggle: "Notification",
+    reset: "Reset Password",
+  },
+  resetPassword: {
+    title: "Forgot your password?",
+    description: "Enter your email to reset your password",
+    placeholder : "Enter your E-Mail"
+  },
 }
 
 export default en

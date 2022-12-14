@@ -1,9 +1,12 @@
 #import "AppDelegate.h"
 #import "RNBootSplash.h"
-
+#import <FBSDKCoreKit/FBSDKCoreKit.h>
+#import <RNGoogleSignin/RNGoogleSignin.h>
 #import <React/RCTBridge.h>
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
+#import <React/RCTLinkingManager.h>
+
 
 #import <React/RCTAppSetupUtils.h>
 
@@ -17,6 +20,7 @@
 
 #import <react/config/ReactNativeConfig.h>
 
+
 static NSString *const kRNConcurrentRoot = @"concurrentRoot";
 
 @interface AppDelegate () <RCTCxxBridgeDelegate, RCTTurboModuleManagerDelegate> {
@@ -29,6 +33,26 @@ static NSString *const kRNConcurrentRoot = @"concurrentRoot";
 #endif
 
 @implementation AppDelegate
+
+
+- (BOOL)application:(UIApplication *)application openURL:(nonnull NSURL *)url options:(nonnull NSDictionary<NSString *,id> *)options {
+  return [RCTLinkingManager application:application openURL:url options:options] || [[FBSDKApplicationDelegate sharedInstance] application:application openURL:url options:options] || [RNGoogleSignin application:application openURL:url options:options];
+}
+
+- (BOOL)application:(UIApplication *)application continueUserActivity:(nonnull NSUserActivity *)userActivity
+ restorationHandler:(nonnull void (^)(NSArray<id<UIUserActivityRestoring>> * _Nullable))restorationHandler
+{
+ return [RCTLinkingManager application:application
+                  continueUserActivity:userActivity
+                    restorationHandler:restorationHandler];
+}
+
+//- (BOOL)application:(UIApplication *)application
+//   openURL:(NSURL *)url
+//   options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options
+//{
+//  return [RCTLinkingManager application:application openURL:url options:options];
+//}
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
@@ -62,6 +86,9 @@ static NSString *const kRNConcurrentRoot = @"concurrentRoot";
   [RNBootSplash initWithStoryboard:@"BootSplash" rootView:rootView];
   return YES;
 }
+
+
+
 
 /// This method controls whether the `concurrentRoot`feature of React18 is turned on or off.
 ///
