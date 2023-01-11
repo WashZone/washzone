@@ -22,6 +22,8 @@ import * as storage from "./utils/storage"
 import { customFontsToLoad } from "./theme"
 import { setupReactotron } from "./services/reactotron"
 import Config from "./config"
+import { Platform } from "react-native"
+import AppLovinMAX from "react-native-applovin-max/src/index"
 
 // Set up Reactotron, which is a free desktop app for inspecting and debugging
 // React Native apps. Learn more here: https://github.com/infinitered/reactotron
@@ -44,28 +46,12 @@ export const NAVIGATION_PERSISTENCE_KEY = "NAVIGATION_STATE"
 
 const config = {
   screens: {
-    Login: {
-      path: "",
-    },
     ClassifiedLinked: {
       path: "classified/:classifiedId",
       parse: {
         classifiedId: (classifiedId: string) => classifiedId,
       },
-    },
-    Demo: {
-      screens: {
-        DemoShowroom: {
-          path: "showroom/:queryIndex?/:itemIndex?",
-        },
-        DemoDebug: "debug",
-        DemoPodcastList: "podcast",
-        DemoCommunity: "community",
-      },
-    },
-    ClassifiedDetails: {
-      path: "classfied",
-    },
+    },  
   },
 }
 
@@ -78,6 +64,69 @@ interface AppProps {
  */
 function App(props: AppProps) {
   const { hideSplashScreen } = props
+  const SDK_KEY =
+    "U0OTon6ehwaUryCOnQkOPUyWxZJn8XLdTl5KVBzC5ThxUuJGI2fhWbDS9XEI4ZxcI0xpCu0IRhEwZTBtarZ5Rn"
+
+  const [AppLovinSDKRegistered, setAppLovinSDKRegistered] = React.useState(false)
+  useEffect(() => {
+     // MAX Consent Flow for iOS 14.5+
+     if (Platform.OS === 'ios' && parseFloat(Platform.Version) >= 14.5) {
+      // Enable the iOS consent flow programmatically - NSUserTrackingUsageDescription must be added to the Info.plist
+      AppLovinMAX.setConsentFlowEnabled(true);
+      AppLovinMAX.setPrivacyPolicyUrl('https://magnifi.ai/privacy-policy/'); // mandatory
+    }
+
+    AppLovinMAX.initialize(SDK_KEY, (configuration) => {
+      console.log("CONFIGURATION", configuration)
+      setAppLovinSDKRegistered(true)
+      if (Platform.OS === "android") {
+        if (configuration.consentDialogState === AppLovinMAX.ConsentDialogState.APPLIES) {
+          // Show user consent dialog
+          AppLovinMAX.showConsentDialog()
+        } 
+      }
+      // MREC Ad Listeners
+      AppLovinMAX.addEventListener("OnMRecAdLoadedEvent", (adInfo) => {
+        console.log("MREC ad loaded from " + JSON.stringify(adInfo))
+      })
+      AppLovinMAX.addEventListener("OnMRecAdLoadFailedEvent", (errorInfo) => {
+        console.log(
+          "MREC ad failed to load with error code " +
+            errorInfo.code +
+            " and message: " +
+            errorInfo.message,
+        )
+      })
+      AppLovinMAX.addEventListener("OnMRecAdClickedEvent", (adInfo) => {
+        console.log("MREC ad clicked ", adInfo)
+      })
+      AppLovinMAX.addEventListener("OnMRecAdExpandedEvent", (adInfo) => {
+        console.log("MREC ad expanded ",adInfo)
+      })
+      AppLovinMAX.addEventListener("OnMRecAdCollapsedEvent", (adInfo) => {
+        console.log("MREC ad collapsed ",adInfo)
+      })
+      AppLovinMAX.addEventListener("OnMRecAdRevenuePaid", (adInfo) => {
+        console.log("MREC ad revenue paid: " + adInfo)
+      })
+    })
+
+    // Native Ad Listeners
+    AppLovinMAX.addEventListener('OnNativeAdLoadedEvent', (adInfo) => {
+      console.log('Native ad loaded from: ' + adInfo.networkName);
+    });
+    AppLovinMAX.addEventListener('OnNativeAdLoadFailedEvent', (errorInfo) => {
+      console.log(JSON.stringify(errorInfo))
+      console.log('Native ad failed to load with error code ' + JSON.stringify(errorInfo));
+    });
+    AppLovinMAX.addEventListener('OnNativeAdClickedEvent', (adInfo) => {
+      console.log('Native ad clicked ', adInfo);
+    });
+    AppLovinMAX.addEventListener('OnNativeAdRevenuePaid', (adInfo) => {
+      console.log('Native ad revenue paid: ' + adInfo.revenue);
+    });
+    setTimeout(hideSplashScreen, 2000)
+  }, [])
 
   const prefix = Linking.createURL("/")
   console.log("PREFIXES", prefix)
@@ -90,24 +139,10 @@ function App(props: AppProps) {
 
   const [areFontsLoaded] = useFonts(customFontsToLoad)
 
-  const { rehydrated } = useInitialRootStore(() => {
-    // This runs after the root store has been initialized and rehydrated.
+  const { rehydrated } = useInitialRootStore(() => console.log('Rehydrated'))
 
-    // If your initialization scripts run very fast, it's good to show the splash screen for just a bit longer to prevent flicker.
-    // Slightly delaying splash screen hiding for better UX; can be customized or removed as needed,
-    // Note: (vanilla Android) The splash-screen will not appear if you launch your app via the terminal or Android Studio. Kill the app and launch it normally by tapping on the launcher icon. https://stackoverflow.com/a/69831106
-    // Note: (vanilla iOS) You might notice the splash-screen logo change size. This happens in debug/development mode. Try building the app for release.
-    setTimeout(hideSplashScreen, 500)
-  })
-
-
-  // Before we show the app, we have to wait for our state to be ready.
-  // In the meantime, don't render anything. This will be the background
-  // color set in native by rootView's background color.
-  // In iOS: application:didFinishLaunchingWithOptions:
-  // In Android: https://stackoverflow.com/a/45838109/204044
-  // You can replace with your own loading component if you wish.
-  if (!rehydrated || !isNavigationStateRestored || !areFontsLoaded) return null
+  if (!rehydrated || !isNavigationStateRestored || !areFontsLoaded || !AppLovinSDKRegistered)
+    return null
 
   const linking = {
     prefixes: [prefix],

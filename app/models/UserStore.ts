@@ -7,6 +7,7 @@ export const UserStoreModel = types
     email: types.maybe(types.string),
     first_name: types.optional(types.string, ""),
     socialId: types.maybe(types.string),
+    description: types.maybe(types.string),
     last_name: types.optional(types.string, ""),
     name: types.optional(types.string, ""),
     picture: types.optional(types.string, ""),

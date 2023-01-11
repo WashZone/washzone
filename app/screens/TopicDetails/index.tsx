@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useState } from "react"
-import { Dimensions, RefreshControl, TextStyle, View, ViewStyle } from "react-native"
-import { Header, ListItem, Screen, Text } from "../../components"
+import { Dimensions, TextStyle, View, ViewStyle } from "react-native"
+import { Header, Screen, Text } from "../../components"
 import { colors, spacing } from "../../theme"
 
 import { NavigationProp, useNavigation } from "@react-navigation/native"
@@ -9,6 +9,7 @@ import { observer } from "mobx-react-lite"
 import { TopicsTabProps, TopicsTabParamList } from "../../tabs"
 import { formatName } from "../../utils/formatName"
 import { fromNow } from "../../utils/agoFromNow"
+import { useStores } from "../../models"
 
 const TopicInfoComponent = ({ topic }: { topic: any }) => {
   const publisher = topic?.UserId
@@ -18,12 +19,12 @@ const TopicInfoComponent = ({ topic }: { topic: any }) => {
       <View style={$publihserContainer}>
         <View style={$flexHori}>
           <FastImage style={$image} source={{ uri: publisher?.picture }} />
-          <Text text={formatName(publisher?.name)} style={$nameText} weight='medium' />
+          <Text text={formatName(publisher?.name)} style={$nameText} weight="medium" />
         </View>
         <Text text={fromNow(topic?.createdAt)} style={$fromText} />
       </View>
-      <Text text={topic?.topicHeading} style={$titleText} weight='semiBold' />
-      <Text text={topic?.topicContent} style={$titleText} weight='normal' />
+      <Text text={topic?.topicHeading} style={$titleText} weight="semiBold" />
+      <Text text={topic?.topicContent} style={$titleText} weight="normal" />
     </>
   )
 }
@@ -33,30 +34,38 @@ export const TopicDetails: FC<TopicsTabProps<"TopicDetails">> = observer(functio
 ) {
   const navigation = useNavigation<NavigationProp<TopicsTabParamList>>()
   const topic = props.route.params.topic
-  //   const { refreshSavedClassifieds, loadMoreSavedClassifieds } = useHooks()
-  const [refreshing, setRefreshing] = useState(false)
+
+  const [topicDetails, setTopicDetails] = useState<any>(topic)
+  const [loading, setLoading] = useState<boolean>(typeof topic === "string")
+  const {
+    api: { mutateGetTopicByTopicId },
+  } = useStores()
+
+  const handleStringTypeTopic = async () => {
+    if (loading) {
+      const res = await mutateGetTopicByTopicId({ topicId: topic })
+      setTopicDetails(res.getTopicByTopicId?.data.length === 1 && res.getTopicByTopicId?.data[0])
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
-    // refreshSavedClassifieds()
+    if (typeof topic === "string") {
+      handleStringTypeTopic()
+    }
   }, [])
-
-  const onRefresh = async () => {
-    setRefreshing(true)
-    // await refreshSavedClassifieds()
-    setRefreshing(false)
-  }
 
   return (
     <Screen preset="fixed" contentContainerStyle={$container}>
       <Header
         leftIcon="caretLeft"
         safeAreaEdges={[]}
-        title={topic?.topicHeading}
+        title={topicDetails?.topicHeading}
         titleStyle={$titleStyle}
         onLeftPress={() => navigation.goBack()}
         leftIconColor={colors.palette.neutral600}
       />
-      <TopicInfoComponent topic={topic} />
+      <TopicInfoComponent topic={topicDetails} />
     </Screen>
   )
 })
@@ -93,7 +102,7 @@ const $titleStyle: TextStyle = {
 const $nameText: TextStyle = {
   fontSize: 16,
   marginLeft: spacing.small,
-  color:colors.palette.primary100
+  color: colors.palette.primary100,
 }
 const $fromText: TextStyle = {
   fontSize: 14,
@@ -106,13 +115,6 @@ const $titleText: TextStyle = {
   marginHorizontal: spacing.medium,
 }
 
-
 const $container: ViewStyle = {
   flex: 1,
-}
-
-const $textContainer: ViewStyle = {
-  paddingHorizontal: spacing.medium,
-  height: 120,
-  alignSelf: "center",
 }

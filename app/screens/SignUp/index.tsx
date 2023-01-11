@@ -1,10 +1,11 @@
 import { observer } from "mobx-react-lite"
-import React, { FC, useMemo, useRef, useState } from "react"
+import React, { FC, useEffect, useMemo, useRef, useState } from "react"
 import { Pressable, TextInput, TextStyle, View, ViewStyle } from "react-native"
 import { Button, Icon, Screen, Text, TextField, TextFieldAccessoryProps } from "../../components"
 import { useStores } from "../../models"
 import { AppStackScreenProps } from "../../navigators"
 import { colors, spacing } from "../../theme"
+import { defaultImages } from "../../utils"
 import {
   validateConfirmPassword,
   validateEmail,
@@ -15,7 +16,9 @@ import {
 interface SignupProps extends AppStackScreenProps<"Signup"> {}
 
 export const SignupScreen: FC<SignupProps> = observer(function LoginScreen(_props) {
-  const authPasswordInput = useRef<TextInput>()
+  const passwordInput = useRef<TextInput>()
+  const emailInput = useRef<TextInput>()
+  const confirmPasswordInput = useRef<TextInput>()
   const [isAuthPasswordHidden, setIsAuthPasswordHidden] = useState(true)
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
@@ -31,6 +34,7 @@ export const SignupScreen: FC<SignupProps> = observer(function LoginScreen(_prop
       mutateCreateUser
     }
   } = useStores()
+
   console.log("Actual",JSON.stringify(useStores().api))
 
   async function login() {
@@ -51,13 +55,14 @@ export const SignupScreen: FC<SignupProps> = observer(function LoginScreen(_prop
         password,
         email,
         name,
+        picture: defaultImages.profile
       })
       setUser({
         name: res.createUser.name,
         email: res.createUser.email,
         first_name: res.createUser.first_name,
         last_name: res.createUser.last_name,
-        picture: res.createUser.picture||"https://edigitalcare.in/public/uploads/user-dummy.png",
+        picture: res.createUser.picture,
         socialId: res.createUser.socialId,
         type: '',
         isSocialLogin : false,
@@ -86,6 +91,8 @@ export const SignupScreen: FC<SignupProps> = observer(function LoginScreen(_prop
     [isAuthPasswordHidden],
   )
 
+ 
+
   return (
     <Screen
       preset="auto"
@@ -110,12 +117,13 @@ export const SignupScreen: FC<SignupProps> = observer(function LoginScreen(_prop
         placeholderTx="loginScreen.nameLabel"
         helper={isSubmitted ? validateName(name) : ""}
         status={validateName(name) && isSubmitted ? "error" : undefined}
-        onSubmitEditing={() => authPasswordInput.current?.focus()}
+        onSubmitEditing={() => emailInput.current?.focus()}
         style={$inputText}
       />
 
       <TextField
         value={email}
+        ref={emailInput}
         onChangeText={setEmail}
         containerStyle={$textField}
         autoCapitalize="none"
@@ -125,12 +133,12 @@ export const SignupScreen: FC<SignupProps> = observer(function LoginScreen(_prop
         placeholderTx="loginScreen.emailLabel"
         helper={isSubmitted ? validateEmail(email) : ""}
         status={validateEmail(email) && isSubmitted ? "error" : undefined}
-        onSubmitEditing={() => authPasswordInput.current?.focus()}
+        onSubmitEditing={() => passwordInput.current?.focus()}
         style={$inputText}
       />
 
       <TextField
-        ref={authPasswordInput}
+        ref={passwordInput}
         value={password}
         onChangeText={setPassword}
         containerStyle={$textField}
@@ -141,13 +149,14 @@ export const SignupScreen: FC<SignupProps> = observer(function LoginScreen(_prop
         placeholderTx="loginScreen.passwordLabel"
         helper={isSubmitted ? validatePassword(password) : ""}
         status={validatePassword(password) && isSubmitted ? "error" : undefined}
-        onSubmitEditing={login}
+        onSubmitEditing={()=>confirmPasswordInput.current.focus()}
         RightAccessory={PasswordRightAccessory}
         style={$inputText}
       />
 
       <TextField
         value={confirmPassword}
+        ref={confirmPasswordInput}
         onChangeText={setConfirmPassword}
         containerStyle={$textField}
         autoCapitalize="none"
@@ -159,7 +168,7 @@ export const SignupScreen: FC<SignupProps> = observer(function LoginScreen(_prop
         status={
           validateConfirmPassword(password, confirmPassword) && isSubmitted ? "error" : undefined
         }
-        onSubmitEditing={() => authPasswordInput.current?.focus()}
+        onSubmitEditing={login}
         style={$inputText}
       />
       <Button

@@ -18,15 +18,15 @@ interface ActionProps {
   onPress: () => void
 }
 
-const BottomActions = ({ classified }: { classified: any }) => {
-  const { saveClassified } = useHooks()
+const BottomActions = ({ classified, type }: { classified: any; type: "video" | "classified" }) => {
+  const { unSaveClassified } = useHooks()
   console.log(classified)
 
   const bottomOptions: Array<ActionProps> = [
     {
       icon: "save",
       title: "Save",
-      onPress: () => saveClassified(classified?._id),
+      onPress: () => unSaveClassified(classified?._id),
     },
     {
       icon: "share",
@@ -47,9 +47,11 @@ const BottomActions = ({ classified }: { classified: any }) => {
     },
   ]
 
+  const options = type === "video" ? bottomOptions.slice(0, 2) : bottomOptions
+
   return (
     <View style={$bottomActionsContainer}>
-      {bottomOptions.map((option) => (
+      {options.map((option) => (
         <Pressable style={$singleActionContainer} onPress={option.onPress} key={option.title}>
           <Icon icon={option.icon} size={40} />
         </Pressable>
@@ -58,10 +60,63 @@ const BottomActions = ({ classified }: { classified: any }) => {
   )
 }
 
+const SavedItem = ({ item, index }) => {
+  const videoDetails = item?.VideoDetail[0]
+  if (item?.savedType === "video") {
+    return (
+      <ListItem
+        key={index}
+        style={$listItemStyle}
+        LeftComponent={
+          <FastImage
+            style={$image}
+            source={{
+              uri: videoDetails?.thumbnailUrl,
+            }}
+          />
+        }
+        rightIcon="caretRight"
+      >
+        <View style={$textContainer}>
+          <Text text={videoDetails?.videoHeading} weight="semiBold" numberOfLines={1} />
+          <Text text={videoDetails?.description} weight='medium' size='xs'  numberOfLines={1}/>
+          <Text text={videoDetails?.users?.name} style={$byText} />
+          <BottomActions classified={item} type="video" />
+        </View>
+      </ListItem>
+    )
+  }
+
+  return (
+    <ListItem
+      key={index}
+      style={$listItemStyle}
+      LeftComponent={
+        <FastImage
+          style={$image}
+          source={{
+            uri: item?.ClassifiedFeedId?.attachmentUrl,
+          }}
+        />
+      }
+      rightIcon="caretRight"
+    >
+      <View style={$textContainer}>
+        <Text text={item?.ClassifiedFeedId?.title} weight="semiBold" numberOfLines={1} />
+        <Text text={"$ " + item?.ClassifiedFeedId?.prize} weight="medium" />
+        <Text text={item?.ClassifiedFeedId?.users?.name} style={$byText} />
+        <BottomActions classified={item} type="classified" />
+      </View>
+    </ListItem>
+  )
+}
+
 export const Saved: FC<AppStackScreenProps<"Saved">> = observer(function Saved() {
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
-  const { refreshSavedClassifieds, loadMoreSavedClassifieds } = useHooks()
-  const { saved :{savedClassifieds}} = useStores()
+  const { refreshSavedClassifieds } = useHooks()
+  const {
+    saved: { savedClassifieds },
+  } = useStores()
   const [refreshing, setRefreshing] = useState(false)
 
   useEffect(() => {
@@ -74,17 +129,8 @@ export const Saved: FC<AppStackScreenProps<"Saved">> = observer(function Saved()
     setRefreshing(false)
   }
 
-  const classified = {
-    title: "Camera",
-    price: 23,
-    publisher: { name: "Jason Quint" },
-  }
-
   return (
-    <Screen
-      preset="fixed"
-      contentContainerStyle={$container}
-    >
+    <Screen preset="fixed" contentContainerStyle={$container}>
       <Header
         leftIcon="caretLeft"
         title="Saved"
@@ -93,31 +139,9 @@ export const Saved: FC<AppStackScreenProps<"Saved">> = observer(function Saved()
         leftIconColor={colors.palette.neutral600}
       />
       <FlatList
-        onEndReached={() => loadMoreSavedClassifieds()}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         data={savedClassifieds}
-        renderItem={({ item, index }) => (
-          <ListItem
-          key={index}
-            style={$listItemStyle}
-            LeftComponent={
-              <FastImage
-                style={$image}
-                source={{
-                  uri: item?.ClassifiedFeedId?.attachmentUrl,
-                }}
-              />
-            }
-            rightIcon="caretRight"
-          >
-            <View style={$textContainer}>
-              <Text text={classified.title} weight="semiBold" />
-              <Text text={"$ " + item?.ClassifiedFeedId?.prize} weight="medium" />
-              <Text text={item?.ClassifiedFeedId?.users.name} style={$byText} />
-              <BottomActions classified={item} />
-            </View>
-          </ListItem>
-        )}
+        renderItem={SavedItem}
       />
     </Screen>
   )

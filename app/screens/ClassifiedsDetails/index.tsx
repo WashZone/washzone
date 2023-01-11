@@ -1,5 +1,13 @@
-import React, { FC } from "react"
-import { View, Pressable, TextStyle, ViewStyle, Dimensions, ScrollView } from "react-native"
+import React, { FC, useEffect, useState } from "react"
+import {
+  View,
+  Pressable,
+  TextStyle,
+  ViewStyle,
+  Dimensions,
+  ScrollView,
+  ActivityIndicator,
+} from "react-native"
 import { Text, Screen, IconTypes, Icon } from "../../components"
 import { ClassifiedsTabProps } from "../../tabs"
 import { colors, spacing } from "../../theme"
@@ -8,6 +16,8 @@ import FastImage, { ImageStyle } from "react-native-fast-image"
 import Share from "react-native-share"
 import { useNavigation } from "@react-navigation/native"
 import { useHooks } from "../hooks"
+import { Rating } from "react-native-ratings"
+import { useStores } from "../../models"
 
 // const mock = {
 //   poster:
@@ -34,15 +44,16 @@ const PublisherDetails = ({ publisher }: { publisher: any }) => {
           <FastImage style={$publisherPicture} source={{ uri: publisher?.picture }} />
           <View>
             <Text text={publisher?.name} />
+            <Rating startingValue={3} imageSize={22} tintColor={colors.backgroundGrey} style={{ backgroundColor:colors.backgroundGrey, marginTop:spacing.extraSmall}}/>
           </View>
         </View>
-        <Pressable style={$followButton}>
+        {/* <Pressable style={$followButton}>
           <Text text="Follow" weight="semiBold" />
-        </Pressable>
+        </Pressable> */}
       </View>
-      <Pressable style={$reviewsButtonContainer}>
+      {/* <Pressable style={$reviewsButtonContainer}>
         <Text text="See All Reviews" weight="semiBold" />
-      </Pressable>
+      </Pressable> */}
     </>
   )
 }
@@ -66,6 +77,7 @@ const MoreDetails = ({ classified }: { classified: any }) => {
 const BottomActions = ({ classified }: { classified: any }) => {
   const { saveClassified } = useHooks()
   console.log(classified)
+  const [isSaving, setSaving] = useState(false)
 
   const bottomOptions: Array<ActionProps> = [
     {
@@ -76,13 +88,23 @@ const BottomActions = ({ classified }: { classified: any }) => {
     {
       icon: "save",
       title: "Save",
-      onPress: () => saveClassified(classified?._id),
+      onPress: async () => {
+        if (!isSaving) {
+          setSaving(true)
+          await saveClassified(classified?._id)
+          setSaving(false)
+        }
+      },
     },
     {
       icon: "share",
       title: "Share",
       onPress: () =>
-        Share.open({ message: '', title: classified?.classifiedDetail, url: `washzone://classified/${classified._id}` })
+        Share.open({
+          message: "",
+          title: classified?.classifiedDetail,
+          url: `washzone://classified/${classified._id}`,
+        })
           .then((res) => {
             console.log(res)
           })
@@ -102,7 +124,11 @@ const BottomActions = ({ classified }: { classified: any }) => {
       {bottomOptions.map((option) => (
         <View style={$singleActionContainer} key={option.title}>
           <Pressable style={$actionIconContainer} onPress={option.onPress}>
-            <Icon icon={option.icon} />
+            {isSaving && option.icon === "save" ? (
+              <ActivityIndicator animating color={colors.palette.primary100} />
+            ) : (
+              <Icon icon={option.icon} />
+            )}
           </Pressable>
           <Text text={option.title} />
         </View>
@@ -115,18 +141,47 @@ export const ClassifiedsDetails: FC<ClassifiedsTabProps<"ClassifiedsDetails">> =
   function ClassifiedsDetails(props) {
     const classified = props.route.params.classified
     const navigation = useNavigation()
+    const [classifiedDetails, setClassifiedDetails] = useState<any>(classified)
+    const [loading, setLoading] = useState<boolean>(typeof classified === "string")
+    const {
+      api: { mutateGetClassifiedById },
+    } = useStores()
+  
+    const handleStringTypeClassified = async () => {
+      if (loading) {
+        const res = await mutateGetClassifiedById({ classifiedId: classified })
+        setClassifiedDetails(res.getClassifiedById?.data.length === 1 && res.getClassifiedById?.data[0])
+        setLoading(false)
+      }
+    }
+  
+    useEffect(() => {
+        handleStringTypeClassified()
+    }, [])
+
+    if ( loading){
+      return(
+        <Screen contentContainerStyle={$flex1}>
+          <ActivityIndicator  animating/>
+          </Screen>
+      )
+    }
 
     return (
       <Screen contentContainerStyle={$flex1}>
         <ScrollView style={$flex1}>
-          <FastImage source={{ uri: classified?.attachmentUrl }} style={$posterImage} resizeMode='contain'  />
-          <PublisherDetails publisher={classified?.UserId} />
-          <MoreDetails classified={classified} />
+          <FastImage
+            source={{ uri: classifiedDetails?.attachmentUrl }}
+            style={$posterImage}
+            resizeMode="contain"
+          />
+          <PublisherDetails publisher={classifiedDetails?.UserId} />
+          <MoreDetails classified={classifiedDetails} />
         </ScrollView>
         <Pressable style={$backContainer} onPress={() => navigation.goBack()}>
           <Icon icon="back" />
         </Pressable>
-        <BottomActions classified={classified} />
+        <BottomActions classified={classifiedDetails} />
       </Screen>
     )
   },

@@ -2,60 +2,75 @@ import { useStores } from "../models"
 
 export function useHooks() {
   const {
-    feedStore: { setPosts, feedPosts, addToPosts },
+    feedStore: {
+      setTopics: setFeedTopics,
+      topics: feedTopics,
+      addToTopics: addtoFeedTopics,
+      setStories,
+    },
     classfieds: { setClassifieds, addToClassfieds, classifieds },
     topics: { setTopics, topics, addToTopics },
-    saved: { savedClassifieds, setSavedClassifieds, addToSavedClassifieds },
+    saved: { setSavedClassifieds },
+    videos: { setVideos },
     api: {
-      queryGetAllposts,
-      mutateCommentOnPost,
-      queryGetCommentsByPostId,
-      queryGetAllpostByPageNumber,
+      queryGetAllTopics,
+      mutateCommentOnTopic,
+      queryGetCommentsByTopicId,
+      queryGetAllTopicByPageNumber,
       queryGetAllClassifiedFeed,
-      queryGetAllTopicsByPageNo,
       mutateUpdateUser,
-      mutateCreateTopic,
+      mutateCreateUserTopic,
       mutateSaveLikedClassifiedFeed,
       queryGetAllSavedClassifiedByUserId,
-      queryGetClassifiedById
+      mutateGetClassifiedById,
+      mutateUpdateDeletesavedclassified,
+      queryGetUserChannel,
+      queryGetAllStory,
+      mutateSaveLikedVideo,
     },
     userStore,
   } = useStores()
 
+
+  const loadStories = async () => {
+    const res = await queryGetAllStory()
+    setStories(res.getAllStory || [])
+  }
+
   const getAndUpdatePosts = async (cache?: boolean) => {
-    const res = await queryGetAllposts(undefined, {
+    const res = await queryGetAllTopics(undefined, {
       fetchPolicy:
         cache === undefined ? "cache-and-network" : cache ? "cache-first" : "network-only",
     })
-    setPosts(res.getAllposts)
+    setFeedTopics(res.getAllTopics)
   }
 
   const loadMorePosts = async () => {
     console.log("lOADING MORE")
-    console.log("FEEDPOSTSLENGTH", feedPosts.length)
-    const res = await queryGetAllpostByPageNumber(
-      { pageNumber: parseInt((feedPosts.length / 10).toFixed(0)) },
+    console.log("FEEDPOSTSLENGTH", feedTopics.length)
+    const res = await queryGetAllTopicByPageNumber(
+      { pageNumber: parseInt((feedTopics.length / 10).toFixed(0)) },
       { fetchPolicy: "network-only" },
     )
     console.log(res)
-    const morePosts = res.getAllpostByPageNumber?.data
+    const morePosts = res.getAllTopicByPageNumber?.data
     console.log("MOREPOSTS", morePosts.length)
-    addToPosts(morePosts)
+    addtoFeedTopics(morePosts)
   }
 
   const refreshPosts = async () => {
     console.log("REFRESHING")
-    const res = await queryGetAllpostByPageNumber(
+    const res = await queryGetAllTopicByPageNumber(
       { pageNumber: 1 },
       { fetchPolicy: "network-only" },
     )
-    console.log("refreshd", res.getAllpostByPageNumber?.data)
-    setPosts(res.getAllpostByPageNumber?.data)
+    console.log("refreshd", res.getAllTopicByPageNumber?.data)
+    setFeedTopics(res.getAllTopicByPageNumber?.data)
   }
 
   const loadMoreClassified = async () => {
     console.log("lOADING MORE")
-    console.log("FEEDPOSTSLENGTH", classifieds.length)
+    console.log("FEEDPOSTSLENGTH", classifieds?.length)
     const res = await queryGetAllClassifiedFeed(
       { pageNumber: parseInt((classifieds.length / 10).toFixed(0)) },
       { fetchPolicy: "no-cache" },
@@ -63,59 +78,62 @@ export function useHooks() {
     console.log(res)
     const moreClassified = res.getAllClassifiedFeed?.data
     console.log("moreClassified", moreClassified.length)
-    addToClassfieds(moreClassified)
+    if (res.getAllClassifiedFeed.totalCount > classifieds?.length) {
+      addToClassfieds(moreClassified)
+    }
   }
 
   const refreshClassifieds = async () => {
     console.log("REFRESHING", classifieds.length)
     const res = await queryGetAllClassifiedFeed({ pageNumber: 0 }, { fetchPolicy: "no-cache" })
-    console.log("refreshd", res.getAllClassifiedFeed?.data.length)
+    console.log("refreshd", res.getAllClassifiedFeed.totalCount)
     setClassifieds(res.getAllClassifiedFeed?.data)
   }
 
   const loadMoreTopics = async () => {
-    const res = await queryGetAllTopicsByPageNo(
+    const res = await queryGetAllTopicByPageNumber(
       { pageNumber: parseInt((topics.length / 10).toFixed(0)) },
       { fetchPolicy: "no-cache" },
     )
-    console.log(res.getAllTopicsByPageNo?.data)
-    const moreTopics = res.getAllTopicsByPageNo?.data
-    addToTopics(moreTopics)
+    console.log(res.getAllTopicByPageNumber?.data)
+    const moreTopics = res.getAllTopicByPageNumber?.data
+    if (res.getAllTopicByPageNumber.totalCount > topics?.length) {
+      addToTopics(moreTopics)
+    }
   }
 
   const refreshTopics = async () => {
-    const res = await queryGetAllTopicsByPageNo({ pageNumber: 0 }, { fetchPolicy: "no-cache" })
-    console.log("refreshd", res.getAllTopicsByPageNo?.data)
-    setTopics(res.getAllTopicsByPageNo?.data)
+    const res = await queryGetAllTopicByPageNumber({ pageNumber: 1 }, { fetchPolicy: "no-cache" })
+    console.log("refreshd", res.getAllTopicByPageNumber?.data)
+    setTopics(res.getAllTopicByPageNumber?.data)
   }
 
-  const postComment = async (comment: string, postId: string) => {
+  const postComment = async (comment: string, topicId: string) => {
     console.log(userStore._id)
-    console.log(postId)
-    const res = await mutateCommentOnPost({ userId: userStore._id, comment, postId })
+    console.log(topicId)
+    const res = await mutateCommentOnTopic({ userId: userStore._id, comment, topicId })
     console.log(res)
   }
 
-  const getCommentsOnPost = async (postId: string) => {
+  const getCommentsOnPost = async (topicId: string) => {
     console.log(userStore._id)
-    console.log(postId)
-    const res = await queryGetCommentsByPostId({ postId }, { fetchPolicy: "network-only" })
+    console.log("TOPICIDDDD", topicId)
+    const res = await queryGetCommentsByTopicId({ topicId }, { fetchPolicy: "network-only" })
 
-    return res.getCommentsByPostId[0]?.comments
+    return res.getCommentsByTopicId[0]?.comments
   }
 
-  const createTopic = async ({ heading, content, attachment }) => {
-    const res = await mutateCreateTopic({
+  const createTopic = async ({ content, attachment }) => {
+    const res = await mutateCreateUserTopic({
       attachmentUrl: attachment?.uri || "",
       attachmentType: attachment?.type || "",
-      topicHeading: heading,
       topicContent: content,
       userId: userStore._id,
     })
     console.log("CREATE TOPIC", res)
   }
 
-  const updateProfile = async (firstName:string, lastName:string, picture:string) => {
+  const updateProfile = async (firstName: string, lastName: string, picture: string) => {
     const res = await mutateUpdateUser({
       user: {
         first_name: firstName,
@@ -134,42 +152,64 @@ export function useHooks() {
   }
 
   const saveClassified = async (classifiedFeedId: string) => {
-    console.log("classifiedFeedId",classifiedFeedId)
-    console.log("userSavedId",userStore._id)
-    const res = await mutateSaveLikedClassifiedFeed({
-      classifiedFeedId,
-      usersavedId: userStore._id,
+    console.log("classifiedFeedId", classifiedFeedId)
+    console.log("userSavedId", userStore._id)
+    try {
+      const res = await mutateSaveLikedClassifiedFeed({
+        classifiedFeedId,
+        userId: userStore._id,
+      })
+      console.log("saveClassified", res)
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  const saveVideo = async(videoId: string) =>{
+    const store= useStores()
+    const res =  await mutateSaveLikedVideo({
+      userId: store.userStore._id,
+      videoId 
     })
-    console.log("saveClassified", res)
+    console.log(res)
   }
 
   const refreshSavedClassifieds = async () => {
-    const res = await queryGetAllSavedClassifiedByUserId({
-      userId: userStore._id,
-      pageNumber: 0,
-    },{fetchPolicy:'no-cache'})
-    setSavedClassifieds( res.getAllSavedClassifiedByUserId?.data)
-    console.log("saveClassified", res.getAllSavedClassifiedByUserId)
-  }
-
-  const loadMoreSavedClassifieds = async () => {
-    console.log("SAVEDCLASSLENGTH", savedClassifieds.length)
     const res = await queryGetAllSavedClassifiedByUserId(
-      { pageNumber: parseInt((savedClassifieds.length / 10).toFixed(0)), userId: userStore._id },
+      {
+        userId: userStore._id,
+      },
       { fetchPolicy: "no-cache" },
     )
-    addToSavedClassifieds(res.getAllSavedClassifiedByUserId?.data)
-    console.log("savedClassified", res.getAllSavedClassifiedByUserId.data.length)
+    setSavedClassifieds(res.getAllSavedClassifiedByUserId?.data)
+    console.log("saveClassified", JSON.stringify(res.getAllSavedClassifiedByUserId?.data))
   }
-  
-  const getClassified =async (classifiedId:string) => {
-    const res = await queryGetClassifiedById({
-      classifiedId
-    }, {fetchPolicy:'no-cache'})
+
+  const getClassified = async (classifiedId: string) => {
+    const res = await mutateGetClassifiedById({
+      classifiedId,
+    })
     return res.getClassifiedById?.data[0]
   }
 
+  const unSaveClassified = async (classifiedsavedId: string) => {
+    console.log("classifiedsavedId", classifiedsavedId)
+    const res = await mutateUpdateDeletesavedclassified({
+      classifiedsavedId,
+    })
+    console.log(res)
+    return res.UpdateDeletesavedclassified
+  }
+
+  const getVideos = async () => {
+    const res = await queryGetUserChannel()
+    setVideos(res.getUserChannel)
+    console.log("VIDEOS", res)
+    return res.getUserChannel
+  }
+
   return {
+    loadStories,
     getAndUpdatePosts,
     postComment,
     getCommentsOnPost,
@@ -183,7 +223,9 @@ export function useHooks() {
     loadMoreClassified,
     saveClassified,
     refreshSavedClassifieds,
-    loadMoreSavedClassifieds,
-    getClassified
+    getClassified,
+    unSaveClassified,
+    getVideos,
+    saveVideo
   }
 }

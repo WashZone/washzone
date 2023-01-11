@@ -152,6 +152,9 @@ const en = {
     description: "Enter your email to reset your password",
     placeholder : "Enter your E-Mail"
   },
+  profile:{
+    gallery :"GALLERY"
+  }
 }
 
 export default en

@@ -4,7 +4,7 @@ import { withSetPropAction } from "./helpers/withSetPropAction"
 export const ClassifiedStoreModel = types
   .model("ClassifiedStore")
   .props({
-    classifieds: types.frozen(),
+    classifieds: types.optional(types.frozen(),[]),
   })
   .actions(withSetPropAction)
   .actions((self) => ({

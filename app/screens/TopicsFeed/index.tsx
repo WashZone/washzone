@@ -1,6 +1,6 @@
-import React, { FC, useEffect, useState } from "react"
+import React, { FC, useState } from "react"
 import { View, Pressable, FlatList, TextStyle, ViewStyle, RefreshControl } from "react-native"
-import { Screen, Text } from "../../components"
+import { Icon, Screen, Text } from "../../components"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { TopicsTabParamList, TopicsTabProps } from "../../tabs"
 import { colors, spacing } from "../../theme"
@@ -11,8 +11,45 @@ import { useHooks } from "../hooks"
 import { observer } from "mobx-react-lite"
 import { CreateTopic } from "./CreateTopic"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
+import { MREC_AD_UNIT_ID } from "../../utils/AppLovin"
+import AppLovinMAX from "react-native-applovin-max/src/index"
+import { $flex1 } from "../styles"
+import Share from "react-native-share"
 
-export const TopicComponent = ({ topic }) => {
+const Actions = ({ itemId }: { itemId: string }) => {
+  const [status, setStatus] = useState<"liked" | "disliked" | null>(null)
+  return (
+    <View style={$actionsContainer}>
+      <Icon
+        icon={status === "liked" ? "likefill" : "like"}
+        size={20}
+        style={{ marginRight: spacing.medium }}
+        onPress={() => setStatus(status === "liked" ? null : "liked")}
+      />
+      <Icon
+        icon={status === "disliked" ? "dislikefill" : "dislike"}
+        size={20}
+        style={{ marginRight: spacing.medium }}
+        onPress={() => setStatus(status === "disliked" ? null : "disliked")}
+      />
+      <Icon
+        icon="share"
+        size={25}
+        onPress={() =>
+          Share.open({ message: "", title: "", url: `washzone://story-topic/${itemId}` })
+            .then((res) => {
+              console.log(res)
+            })
+            .catch((err) => {
+              err && console.log(err)
+            })
+        }
+      />
+    </View>
+  )
+}
+
+export const TopicComponent = ({ topic, index }) => {
   const navigation = useNavigation<NavigationProp<TopicsTabParamList>>()
 
   const topicDetails = {
@@ -21,43 +58,56 @@ export const TopicComponent = ({ topic }) => {
     last_name: topic?.UserId?.last_name,
     attachmentUrl: topic?.attachmentUrl,
     createdAt: topic?.createdAt,
-    heading: topic?.topicHeading,
     content: topic?.topicContent,
   }
 
   return (
-    <Pressable
-      style={$postContainer}
-      onPress={() => navigation.navigate("TopicDetails", { topic })}
-    >
-      <View>
-        <View style={$publisherInfoContainer}>
-          <FastImage
-            source={{
-              uri: topicDetails?.picture || "https://edigitalcare.in/public/uploads/user-dummy.png",
-            }}
-            style={$picture}
-          />
-          <View style={$textContainer}>
-            <Text
-              text={formatName(topicDetails.first_name + " " + topicDetails.last_name)}
-              preset="subheading2"
+    <>
+      <Pressable
+        style={[$postContainer, $postParentContainer]}
+        onPress={() => navigation.navigate("TopicInfo", { topic })}
+      >
+        <View style={$flex1}>
+          <View style={$publisherInfoContainer}>
+            <FastImage
+              source={{
+                uri:
+                  topicDetails?.picture || "https://edigitalcare.in/public/uploads/user-dummy.png",
+              }}
+              style={$picture}
             />
-            <Text text={fromNow(topic.createdAt)} style={$agoStamp} />
+            <View style={$textContainer}>
+              <Text
+                text={formatName(topicDetails.first_name + " " + topicDetails.last_name)}
+                preset="subheading2"
+              />
+              <Text text={fromNow(topic.createdAt)} style={$agoStamp} />
+            </View>
           </View>
+          <Text style={$postContent} text={topicDetails.content} numberOfLines={3} />
+          <Actions itemId={topic?._id} />
         </View>
-        <Text style={$postContent} text={topicDetails.heading} />
-      </View>
-      <FastImage
-        style={$attachment}
-        source={{
-          uri:
-            topic?.attachmentUrl ||
-            "https://www.classify24.com/wp-content/uploads/2015/11/no-image.png",
-        }}
-        resizeMode="cover"
-      />
-    </Pressable>
+        <View style={$contentCenter}>
+          <FastImage
+            style={$attachment}
+            source={{
+              uri:
+                topic?.attachmentUrl ||
+                "https://www.classify24.com/wp-content/uploads/2015/11/no-image.png",
+            }}
+            resizeMode="cover"
+          />
+        </View>
+      </Pressable>
+      {/* <Actions /> */}
+      {index % 5 === 0 && (
+        <AppLovinMAX.AdView
+          adUnitId={MREC_AD_UNIT_ID}
+          adFormat={AppLovinMAX.AdFormat.BANNER}
+          style={$mrecStyle}
+        />
+      )}
+    </>
   )
 }
 
@@ -72,10 +122,6 @@ export const TopicsFeed: FC<TopicsTabProps<"TopicsFeed">> = observer(function To
     setRefreshing(false)
   }
 
-  useEffect(() => {
-    refreshTopics()
-  }, [])
-
   return (
     <Screen contentContainerStyle={$container}>
       <FlatList
@@ -85,19 +131,30 @@ export const TopicsFeed: FC<TopicsTabProps<"TopicsFeed">> = observer(function To
         onEndReached={loadMoreTopics}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         data={topics.topics}
-        renderItem={({ item }) => <TopicComponent topic={item} />}
+        renderItem={({ item, index }) => <TopicComponent topic={item} index={index} />}
       />
     </Screen>
   )
 })
 
+const $contentCenter: ViewStyle = {}
+
+const $mrecStyle: ViewStyle = { marginTop: 10, alignSelf: "center" }
+
 const postContainerRadius = 10
 
 const $container: ViewStyle = { flex: 1 }
 
+const $actionsContainer: ViewStyle = {
+  flexDirection: "row",
+  padding: spacing.medium,
+  zIndex: 999,
+}
+
 const $attachment: ImageStyle = {
   height: 120,
   width: 120,
+  margin: 10,
 }
 
 const $postContent: TextStyle = {
@@ -113,17 +170,19 @@ const $agoStamp: TextStyle = {
 }
 
 const $postContainer: ViewStyle = {
+  flexDirection: "row",
+}
+
+const $postParentContainer: ViewStyle = {
   backgroundColor: colors.palette.neutral100,
   width: "100%",
   borderRadius: postContainerRadius,
   justifyContent: "space-between",
-  flexDirection: "row",
   marginTop: 10,
 }
 
 const $publisherInfoContainer: ViewStyle = {
   height: 68,
-  width: "100%",
   borderRadius: 20,
   alignItems: "center",
   flexDirection: "row",

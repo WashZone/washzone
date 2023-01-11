@@ -2,12 +2,12 @@ import React from "react"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import { StackScreenProps } from "@react-navigation/stack"
 import { observer } from "mobx-react-lite"
-import { Playlist, VideosFeed,VideoScreen } from "../../screens"
+import { Playlist, VideosFeed,VideoDetails } from "../../screens"
 
 export type VideosTabParamList = {
   VideosFeed: undefined
   Playlist:undefined
-  VideoScreen: undefined
+  VideoDetails: {data: any}
 }
 
 export type VideosTabProps<T extends keyof VideosTabParamList> = StackScreenProps<
@@ -22,7 +22,7 @@ const VideosTab = observer(function AppStack() {
     <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName={"VideosFeed"}>
       <Stack.Screen name="VideosFeed" component={VideosFeed} />
       <Stack.Screen name="Playlist" component={Playlist} />
-      <Stack.Screen name="VideoScreen" component={VideoScreen} />
+      <Stack.Screen name="VideoDetails" component={VideoDetails} />
     </Stack.Navigator>
   )
 })

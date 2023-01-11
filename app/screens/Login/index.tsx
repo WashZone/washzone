@@ -1,7 +1,7 @@
 import { useIsFocused } from "@react-navigation/native"
 import { observer } from "mobx-react-lite"
 import React, { FC, useEffect, useMemo } from "react"
-import { Image, TextStyle, View, ViewStyle } from "react-native"
+import { Image, Keyboard, TextStyle, View, ViewStyle } from "react-native"
 import Animated, {
   interpolate,
   SharedValue,
@@ -55,7 +55,8 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
       if (animVal.value === 1) {
         animVal.value = withTiming(0, { duration: 300 })
       }
-    }
+    }else{
+      Keyboard.dismiss()}
   }, [focus])
 
   function login() {

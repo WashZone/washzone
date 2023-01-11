@@ -1,11 +1,6 @@
-import React, { FC,useState } from "react"
-import {
-  ActivityIndicator,
-  TextStyle,
-  View,
-  ViewStyle,
-} from "react-native"
-import { Header, Screen, Text, TextField ,Button} from "../../components"
+import React, { FC, useState } from "react"
+import { ActivityIndicator, TextStyle, View, ViewStyle } from "react-native"
+import { Header, Screen, Text, TextField, Button } from "../../components"
 import { colors, spacing } from "../../theme"
 
 import { AppStackParamList, AppStackScreenProps } from "../../navigators"
@@ -15,22 +10,27 @@ import { MediaPicker } from "../../utils/device/MediaPicker"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { useHooks } from "../hooks"
 
+const maxBioLength = 280
+
 export const EditProfile: FC<AppStackScreenProps<"EditProfile">> = function EditProfile() {
   const { userStore } = useStores()
   const { updateProfile } = useHooks()
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
   const [firstName, setFirstName] = useState(userStore.first_name)
   const [lastName, setLastName] = useState(userStore.last_name)
+  const [bio, setBio] = useState(userStore?.description || "")
   const [picture, setPicture] = useState(userStore.picture)
   const [buttonLoading, setButtonLoading] = useState<boolean>(false)
-
+  const [justOverflowed, setJustOverflowed] = useState<boolean>(false)
 
   const isActive = firstName !== "" && lastName !== ""
 
   const onEditPP = async () => {
     const res = await MediaPicker()
     console.log(res)
-    setPicture(res?.uri)
+    if (res?.uri) {
+      setPicture(res?.uri)
+    }
   }
 
   const onChangeFirstName = (t: string) => {
@@ -42,6 +42,15 @@ export const EditProfile: FC<AppStackScreenProps<"EditProfile">> = function Edit
   const onChangeLastName = (t: string) => {
     if (t[t.length - 1] !== " ") {
       setLastName(t)
+    }
+  }
+
+  const onChangeBio = (t: string) => {
+    if (t.length > maxBioLength) {
+      setJustOverflowed(true)
+      setTimeout(() => setJustOverflowed(false), 200)
+    } else if (t.length > 0 && t.length <= maxBioLength + 1) {
+      setBio(t)
     }
   }
 
@@ -65,9 +74,8 @@ export const EditProfile: FC<AppStackScreenProps<"EditProfile">> = function Edit
       />
 
       <View style={$content}>
-
         <FastImage source={{ uri: picture }} style={$picture} />
-        
+
         <Text text="Edit Profile Picture" style={$editPP} onPress={onEditPP} />
 
         <TextField
@@ -96,6 +104,22 @@ export const EditProfile: FC<AppStackScreenProps<"EditProfile">> = function Edit
           maxLength={20}
         />
 
+        <TextField
+          value={bio}
+          onChangeText={onChangeBio}
+          containerStyle={$textField}
+          autoCapitalize="characters"
+          autoCorrect={false}
+          placeholder="Bio"
+          style={[$inputText, $bioHeight, justOverflowed && { color: colors.palette.angry500 }]}
+          inputWrapperStyle={[
+            $inputWrapperStyle,
+            { borderColor: justOverflowed ? colors.palette.angry500 : colors.palette.primary100 },
+          ]}
+          placeholderTextColor={colors.palette.overlay50}
+          multiline
+        />
+
         <Button
           onPress={onSubmit}
           disabled={!isActive || buttonLoading}
@@ -119,8 +143,9 @@ export const EditProfile: FC<AppStackScreenProps<"EditProfile">> = function Edit
   )
 }
 
-const $indicator: ViewStyle = { position: "absolute", right: 20 }
+const $bioHeight: ViewStyle = { height: 150 }
 
+const $indicator: ViewStyle = { position: "absolute", right: 20 }
 
 const $textButton: TextStyle = {
   color: colors.palette.neutral100,
@@ -130,12 +155,11 @@ const $textButton: TextStyle = {
 const $submitButton: ViewStyle = {
   height: 45,
   width: 160,
-alignItems:'center',
+  alignItems: "center",
   borderWidth: 0,
   alignSelf: "center",
   marginTop: spacing.small,
 }
-
 
 const $editPP: TextStyle = {
   alignSelf: "center",

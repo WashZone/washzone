@@ -14,7 +14,7 @@ const palette = {
 
   primary100: "#0060B1",
   primary200: "#0083E2",
-  primary300: "#08acec",
+  primary300: "#44aaf2",
   primary400: "#619acc",
   primary500: "#C76542",
   primary600: "#A54F31",
@@ -42,6 +42,7 @@ const palette = {
   overlayNeutral50: "rgba(255,255,255,0.5)",
 
   glow100: "#4EFFDF",
+
 }
 
 export const colors = {
@@ -74,7 +75,7 @@ export const colors = {
   /**
    * The main tinting color.
    */
-  tint: palette.primary200,
+  tint: palette.primary300,
   /**
    * A subtle color used for lines.
    */
@@ -82,7 +83,7 @@ export const colors = {
   /**
    * Error messages.
    */
-  error: palette.angry500,
+  error: palette.glow100,
   /**
    * Error Background.
    *

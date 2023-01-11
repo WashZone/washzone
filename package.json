@@ -31,7 +31,7 @@
     "expo:web": "expo start --web",
     "expo:build:detox": "detox build -c ios.sim.expo",
     "expo:test:detox": "./bin/downloadExpoApp.sh && detox test --configuration ios.sim.expo",
-    "generate:models": "npx mst-gql --format ts --outDir app/models/api https://d5ed-150-129-144-58.ngrok.io/graphql"
+    "generate:models": "npx mst-gql --format ts --outDir app/models/api http://3.139.81.184:3002/graphql"
   },
   "overrides": {
     "react-error-overlay": "6.0.9"
@@ -68,6 +68,7 @@
     "mst-gql": "^0.17.1",
     "react": "^18.2.0",
     "react-native": "0.69.7",
+    "react-native-applovin-max": "^4.1.3",
     "react-native-bootsplash": "4.3.2",
     "react-native-fast-image": "^8.6.3",
     "react-native-fbsdk": "^3.0.0",
@@ -75,6 +76,7 @@
     "react-native-image-picker": "^4.10.1",
     "react-native-linear-gradient": "^2.6.2",
     "react-native-media-controls": "^2.3.0",
+    "react-native-ratings": "^8.1.0",
     "react-native-reanimated": "~2.9.1",
     "react-native-safe-area-context": "4.3.4",
     "react-native-screens": "3.15.0",
@@ -82,6 +84,9 @@
     "react-native-slider": "^0.11.0",
     "react-native-upload-aws-s3": "^0.8.1",
     "react-native-video": "^5.2.1",
+    "react-native-webview": "^11.26.0",
+    "react-native-youtube": "^2.0.2",
+    "react-native-youtube-iframe": "^2.2.2",
     "reactotron-mst": "3.1.4",
     "reactotron-react-js": "^3.3.7",
     "reactotron-react-native": "5.0.3"

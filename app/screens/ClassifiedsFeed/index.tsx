@@ -8,7 +8,7 @@ import {
   RefreshControl,
   Dimensions,
 } from "react-native"
-import { Text } from "../../components"
+import { Text, Screen } from "../../components"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { ClassifiedsTabParamList, ClassifiedsTabProps } from "../../tabs"
@@ -16,6 +16,7 @@ import { colors, spacing } from "../../theme"
 import { observer } from "mobx-react-lite"
 import { useHooks } from "../hooks"
 import { useStores } from "../../models"
+import { $flex1 } from "../styles"
 
 export const ClassifiedComponent = ({ classified }) => {
   const navigation = useNavigation<NavigationProp<ClassifiedsTabParamList>>()
@@ -32,7 +33,11 @@ export const ClassifiedComponent = ({ classified }) => {
         style={$attachment}
       />
 
-      <Text style={$postContent} text={"$"+classified.prize + "  •  " + classified.title} />
+      <Text
+        style={$postContent}
+        text={"$" + classified.prize + "  •  " + classified.title}
+        numberOfLines={1}
+      />
     </Pressable>
   )
 }
@@ -55,6 +60,7 @@ export const ClassifiedsFeed: FC<ClassifiedsTabProps<"ClassifiedsFeed">> = obser
     }, [])
 
     return (
+      <Screen contentContainerStyle={$flex1}>
       <FlatList
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
@@ -64,6 +70,7 @@ export const ClassifiedsFeed: FC<ClassifiedsTabProps<"ClassifiedsFeed">> = obser
         style={$listStyle}
         ListFooterComponent={<View style={$footerSpace} />}
       />
+      </Screen>
     )
   },
 )
@@ -84,6 +91,7 @@ const $attachment: ImageStyle = {
 const $postContent: TextStyle = {
   fontSize: 13,
   lineHeight: 20,
+  marginHorizontal: spacing.small,
 }
 
 const $postContainer: ViewStyle = {

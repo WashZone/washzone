@@ -26,25 +26,24 @@ const channelDetails = {
       createdAt: 1669106599000,
       poster:
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQO_H8dD3eHwgp6oQUJTUaaWkNJVGEhDatMHA&usqp=CAU",
-        videoUrl :"https://youtu.be/awLX5qlY-Ts"
+      videoUrl: "https://youtu.be/awLX5qlY-Ts",
     },
     {
       title: "How to detail a car - Part 2 ",
       view: 736,
       createdAt: 1669109999000,
       poster:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_Q4Vx4R25zDCmtMbVLDiTa8yz8ZRyewF0fDSMwTNPGpkKQgpcQestsswhRXyhzqTjMn4&usqp=CAU",
-        videoUrl :"https://youtu.be/awLX5qlY-Ts"
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_Q4Vx4R25zDCmtMbVLDiTa8yz8ZRyewF0fDSMwTNPGpkKQgpcQestsswhRXyhzqTjMn4&usqp=CAU",
+      videoUrl: "https://youtu.be/awLX5qlY-Ts",
     },
     {
       title: "How to detail a car - Part 3 ",
       view: 736,
       createdAt: 1669109999000,
       poster:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTWhT6OhcLOjGYg2JSn87VPbLZSDoFtVktaRWRubKPYgMK0iWEN_VqATk12-nT9ZqWSA7E&usqp=CAU",
-        videoUrl :"https://youtu.be/awLX5qlY-Ts"
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTWhT6OhcLOjGYg2JSn87VPbLZSDoFtVktaRWRubKPYgMK0iWEN_VqATk12-nT9ZqWSA7E&usqp=CAU",
+      videoUrl: "https://youtu.be/awLX5qlY-Ts",
     },
-
   ],
 }
 
@@ -52,7 +51,7 @@ const VideoBlock = ({ videoDetails, index }) => {
   const navigation = useNavigation<NavigationProp<VideosTabParamList>>()
 
   return (
-    <Pressable  onPress={() => navigation.navigate('VideoScreen')} style={$backWhite}>
+    <Pressable onPress={() => navigation.navigate("VideoDetails")} style={$backWhite}>
       <View style={$videoBlockContainer}>
         <FastImage source={{ uri: videoDetails.poster }} style={$videoPoster} resizeMode="cover" />
         <View style={$videoDetailsContent}>
@@ -69,7 +68,9 @@ const VideoBlock = ({ videoDetails, index }) => {
           $seperator,
           {
             backgroundColor:
-              index === channelDetails.videos.length - 1 ? colors.palette.neutral100 : colors.separator,
+              index === channelDetails.videos.length - 1
+                ? colors.palette.neutral100
+                : colors.separator,
           },
         ]}
       />
@@ -79,15 +80,15 @@ const VideoBlock = ({ videoDetails, index }) => {
 
 const PlaylistDescription = () => {
   return (
-      <View style={$playlistDescriptionContainer}>
-        <Text style={$descriptionText} numberOfLines={2} text={channelDetails.description} />
-        <Button
-          style={$followButton}
-          LeftAccessory={() => <Icon icon="add_vector" size={20} color={colors.palette.neutral100} />}
-          text="Follow"
-          textStyle={$followText}
-        />
-      </View>
+    <View style={$playlistDescriptionContainer}>
+      <Text style={$descriptionText} numberOfLines={2} text={channelDetails.description} />
+      <Button
+        style={$followButton}
+        LeftAccessory={() => <Icon icon="add_vector" size={20} color={colors.palette.neutral100} />}
+        text="Follow"
+        textStyle={$followText}
+      />
+    </View>
   )
 }
 
@@ -112,10 +113,17 @@ const HeaderComponent = () => {
 
 export const Playlist: FC<VideosTabProps<"Playlist">> = observer(function Playlist(_props) {
   return (
-      <Screen preset="fixed" contentContainerStyle={$flex1}>
-        <HeaderComponent />
-        <FlatList style={$flex1} ListHeaderComponent={ <PlaylistDescription />} data={channelDetails.videos} renderItem={({item, index}) =>  <VideoBlock key={index} index={index} videoDetails={item} />}/>
-      </Screen>
+    <Screen preset="fixed" contentContainerStyle={$flex1}>
+      <HeaderComponent />
+      <FlatList
+        style={$flex1}
+        ListHeaderComponent={<PlaylistDescription />}
+        data={channelDetails.videos}
+        renderItem={({ item, index }) => (
+          <VideoBlock key={index} index={index} videoDetails={item} />
+        )}
+      />
+    </Screen>
   )
 })
 

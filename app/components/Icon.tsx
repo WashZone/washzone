@@ -144,6 +144,7 @@ export const iconRegistry = {
   add_vector: require("../../assets/icons/add-vector.png"),
   reset: require("../../assets/icons/reset.png"),
   key: require("../../assets/icons/key.png"),
+  arrowDown: require("../../assets/icons/arrowDown.png"),
 }
 
 const $imageStyle: ImageStyle = {

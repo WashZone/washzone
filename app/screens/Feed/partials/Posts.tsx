@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import {
   Dimensions,
   FlatList,
@@ -19,93 +19,116 @@ import { observer } from "mobx-react-lite"
 import { useHooks } from "../../hooks"
 import { useStores } from "../../../models"
 import { Stories } from "./Stories"
+import { $flex1 } from "../../styles"
+import { NATIVE_AD_UNIT_ID } from "../../../utils/AppLovin"
+import NativeAdView from "../../../utils/NativeAd"
 
-export interface PostComponentProps {
-  post: any
+export interface TopicComponentProps {
+  topic: any
   navigateOnPress?: boolean
+  index: number
 }
 
-export const PostComponent = ({ post, navigateOnPress }: PostComponentProps) => {
+export const PostComponent = ({ topic, navigateOnPress, index }: TopicComponentProps) => {
   const [attachmentDimensions, setAttachmentDimensions] = useState({ height: 0, width: 0 })
   const navigation = useNavigation<NavigationProp<HomeTabParamList>>()
   const onContainerPress = () => {
     if (navigateOnPress !== undefined && navigateOnPress) {
-      navigation.navigate("PostInfo", {
-        post,
+      navigation.navigate("TopicInfo", {
+        topic
       })
     }
   }
 
-  const postDetails = {
-    picture: post?.UserId?.picture,
-    first_name: post?.UserId?.first_name,
-    last_name: post?.UserId?.last_name,
-    attachmentUrl: post?.attachmentUrl,
-    createdAt: post?.createdAt,
+  const topicDetails = {
+    picture: topic?.UserId?.picture,
+    first_name: topic?.UserId?.first_name,
+    last_name: topic?.UserId?.last_name,
+    attachmentUrl: topic?.attachmentUrl,
+    createdAt: topic?.createdAt,
   }
 
   const windowWidth = Dimensions.get("window").width
 
+  const nativeAdViewRef = useRef<any>()
+
+  useEffect(() => {
+    if (nativeAdViewRef?.current) {
+      nativeAdViewRef.current?.loadAd()
+    }
+  }, [nativeAdViewRef.current])
   return (
-    <Pressable style={$postContainer} onPress={onContainerPress}>
-      <View style={$publisherInfoContainer}>
-        <FastImage
-          source={{
-            uri: postDetails.picture || "https://edigitalcare.in/public/uploads/user-dummy.png",
-          }}
-          style={$picture}
-        />
-        <View style={$textContainer}>
-          <Text
-            text={formatName(postDetails.first_name + " " + postDetails.last_name)}
-            preset="subheading2"
-          />
-          <Text text={fromNow(post.createdAt)} style={$agoStamp} />
+    <>
+      <Pressable style={$postContainer} onPress={onContainerPress}>
+        <View style={$publisherInfoContainer}>
+          <Pressable onPress={() => navigation.navigate("Profile", { user: topic?.UserId })}>
+            <FastImage
+              source={{
+                uri: topicDetails.picture || "https://edigitalcare.in/public/uploads/user-dummy.png",
+              }}
+              style={$picture}
+            />
+          </Pressable>
+          <View style={$textContainer}>
+            <Text
+              text={formatName(topicDetails?.first_name + " " + topicDetails?.last_name)}
+              preset="subheading2"
+            />
+            <Text text={fromNow(topic?.createdAt)} style={$agoStamp} />
+          </View>
         </View>
-      </View>
-      <Text style={$postContent} text={post.postContent} />
-      <FastImage
-        style={[{ ...attachmentDimensions }, $bottomCurve]}
-        source={{ uri: postDetails.attachmentUrl }}
-        onLoad={(res) =>
-          setAttachmentDimensions({
-            height: (windowWidth * res.nativeEvent.height) / res.nativeEvent.width,
-            width: windowWidth,
-          })
-        }
-      />
-    </Pressable>
+        <Text style={$postContent} text={topic?.topicContent} />
+        <FastImage
+          style={[{ ...attachmentDimensions }, $bottomCurve]}
+          source={{ uri: topicDetails.attachmentUrl }}
+          onLoad={(res) =>
+            setAttachmentDimensions({
+              height: (windowWidth * res.nativeEvent.height) / res.nativeEvent.width,
+              width: windowWidth,
+            })
+          }
+        />
+      </Pressable>
+      {index % 5 === 0 && (
+        <NativeAdView adUnitId={NATIVE_AD_UNIT_ID} ref={nativeAdViewRef} />
+        // <AppLovinMAX.AdView
+        //   adUnitId={MREC_AD_UNIT_ID}
+        //   adFormat={AppLovinMAX.AdFormat.BANNER}
+        //   style={$mrecStyle}
+        // />
+      )}
+    </>
   )
 }
 
 export const Posts = observer(() => {
   const {
-    feedStore: { feedPosts },
+    topics: { topics },
   } = useStores()
-  const { refreshPosts, loadMorePosts } = useHooks()
+  const { refreshTopics, loadMoreTopics } = useHooks()
   const [refreshing, setRefreshing] = useState<boolean>(false)
-
+  console.log("TOPICS LENGTH", topics?.length)
   useEffect(() => {
-    refreshPosts()
+    refreshTopics()
   }, [])
 
   const onRefresh = () => {
-    refreshPosts()
+    refreshTopics()
     setRefreshing(false)
   }
 
   return (
-    <View style={{flex:1}}>
+    <View style={$flex1}>
       <FlatList
         ListHeaderComponent={<Stories />}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-        onEndReached={loadMorePosts}
-        data={feedPosts}
-        renderItem={({ item }) => (
-          <PostComponent key={item?._id} post={item} navigateOnPress={true} />
+        onEndReached={loadMoreTopics}
+        data={topics}
+        renderItem={({ item, index }) => (
+          <PostComponent key={item?._id} topic={item} navigateOnPress={true} index={index} />
         )}
       />
-      </View>
+    </View>
   )
 })
 

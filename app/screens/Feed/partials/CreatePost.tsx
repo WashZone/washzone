@@ -20,11 +20,12 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated"
 import { useHooks } from "../../hooks"
+import { observer } from "mobx-react-lite"
 
-export function CreatePost() {
+export const CreatePost = observer(function CreatePost() {
+  const { createTopic, refreshTopics } = useHooks()
   const {
-    userStore: { picture, _id },
-    api: { mutateCreateUserPost },
+    userStore: { picture },
   } = useStores()
   const [postContent, setPostContent] = useState<string>("")
   const [isPosting, setIsPosting] = useState<boolean>(false)
@@ -32,6 +33,8 @@ export function CreatePost() {
   const inputRef = useRef<TextInput>()
   const [selectedImage, setSelectedImage] = useState<any>({ height: 1, width: 1 })
   const { getAndUpdatePosts } = useHooks()
+  // useMemo(
+  //   () =>
   const onPost = async () => {
     setIsPosting(true)
     // const data = new FormData()
@@ -48,13 +51,11 @@ export function CreatePost() {
       // })
       // console.log(res)
       // console.log(_id)
-      console.log("ID", _id)
-      const res = await mutateCreateUserPost({
-        attachmentUrl: selectedImage?.uri || "",
-        attachmentType: selectedImage?.type || "",
-        postContent,
-        userId: _id,
+      const res = await createTopic({
+        attachment: selectedImage,
+        content: postContent,
       })
+      await refreshTopics()
       console.log(res)
       await getAndUpdatePosts(false)
     } catch (error) {
@@ -67,6 +68,9 @@ export function CreatePost() {
       inputRef.current.blur()
     }
   }
+  // ,
+  //   [],
+  // )
 
   const onFocus = () => {
     if (progress.value < 0.5) {
@@ -216,7 +220,7 @@ export function CreatePost() {
       </Animated.View>
     </>
   )
-}
+})
 
 const $loadingIndicator: ViewStyle = {
   transform: [{ scaleX: 0.75 }, { scaleY: 0.75 }],

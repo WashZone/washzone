@@ -9,6 +9,8 @@ import { ClassifiedFeedModel, ClassifiedFeedModelType } from "./ClassifiedFeedMo
 import { ClassifiedFeedModelSelector } from "./ClassifiedFeedModel.base"
 import { UserModel, UserModelType } from "./UserModel"
 import { UserModelSelector } from "./UserModel.base"
+import { VideoUploadModel, VideoUploadModelType } from "./VideoUploadModel"
+import { VideoUploadModelSelector } from "./VideoUploadModel.base"
 import { RootStoreType } from "./index"
 
 
@@ -23,11 +25,10 @@ export const SaveClassifiedModelBase = ModelBase
     _id: types.identifier,
     createdAt: types.union(types.undefined, types.frozen()),
     updatedAt: types.union(types.undefined, types.frozen()),
-    usersavedId: types.union(types.undefined, types.null, types.late((): any => UserModel)),
+    userId: types.union(types.undefined, types.null, types.late((): any => UserModel)),
     ClassifiedFeedId: types.union(types.undefined, types.null, types.late((): any => ClassifiedFeedModel)),
-    description: types.union(types.undefined, types.null, types.string),
-    attachmentVedioUrl: types.union(types.undefined, types.null, types.string),
-    view: types.union(types.undefined, types.null, types.number),
+    videoId: types.union(types.undefined, types.null, types.late((): any => VideoUploadModel)),
+    savedType: types.union(types.undefined, types.null, types.string),
     status: types.union(types.undefined, types.null, types.string),
   })
   .views(self => ({
@@ -40,15 +41,14 @@ export class SaveClassifiedModelSelector extends QueryBuilder {
   get _id() { return this.__attr(`_id`) }
   get createdAt() { return this.__attr(`createdAt`) }
   get updatedAt() { return this.__attr(`updatedAt`) }
-  get description() { return this.__attr(`description`) }
-  get attachmentVedioUrl() { return this.__attr(`attachmentVedioUrl`) }
-  get view() { return this.__attr(`view`) }
+  get savedType() { return this.__attr(`savedType`) }
   get status() { return this.__attr(`status`) }
-  usersavedId(builder: string | UserModelSelector | ((selector: UserModelSelector) => UserModelSelector) | undefined) { return this.__child(`usersavedId`, UserModelSelector, builder) }
+  userId(builder: string | UserModelSelector | ((selector: UserModelSelector) => UserModelSelector) | undefined) { return this.__child(`userId`, UserModelSelector, builder) }
   ClassifiedFeedId(builder: string | ClassifiedFeedModelSelector | ((selector: ClassifiedFeedModelSelector) => ClassifiedFeedModelSelector) | undefined) { return this.__child(`ClassifiedFeedId`, ClassifiedFeedModelSelector, builder) }
+  videoId(builder: string | VideoUploadModelSelector | ((selector: VideoUploadModelSelector) => VideoUploadModelSelector) | undefined) { return this.__child(`videoId`, VideoUploadModelSelector, builder) }
 }
 export function selectFromSaveClassified() {
   return new SaveClassifiedModelSelector()
 }
 
-export const saveClassifiedModelPrimitives = selectFromSaveClassified()._id.createdAt.updatedAt.description.attachmentVedioUrl.view.status
+export const saveClassifiedModelPrimitives = selectFromSaveClassified()._id.createdAt.updatedAt.savedType.status

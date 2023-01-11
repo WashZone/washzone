@@ -15,6 +15,7 @@ import { Icon, IconTypes, Text, Toggle } from "../../components"
 import { useStores } from "../../models"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { AppStackParamList } from "../AppNavigator"
+import { observer } from "mobx-react-lite"
 
 interface DrawerOptionType {
   icon: IconTypes
@@ -26,7 +27,11 @@ interface Action {
   action: DrawerOptionType
 }
 
-export function DrawerOptions({toggleDrawer} : {toggleDrawer:() => void}) {
+export const DrawerOptions = observer(function DrawerOptions({
+  toggleDrawer,
+}: {
+  toggleDrawer: () => void
+}) {
   const {
     authenticationStore: { logout },
     userStore,
@@ -34,7 +39,7 @@ export function DrawerOptions({toggleDrawer} : {toggleDrawer:() => void}) {
 
   const [notifications, setNotifications] = useState(false)
 
-const navigaton = useNavigation<NavigationProp<AppStackParamList>>()
+  const navigaton = useNavigation<NavigationProp<AppStackParamList>>()
 
   const drawerOptions: DrawerOptionType[] = [
     {
@@ -42,7 +47,7 @@ const navigaton = useNavigation<NavigationProp<AppStackParamList>>()
       label: "DrawerNavigator.notification",
       onPress() {
         toggleDrawer()
-        navigaton.navigate('Notifications')
+        navigaton.navigate("Notifications")
       },
     },
     {
@@ -50,14 +55,14 @@ const navigaton = useNavigation<NavigationProp<AppStackParamList>>()
       label: "DrawerNavigator.profile",
       onPress() {
         toggleDrawer()
-        navigaton.navigate('EditProfile')
+        navigaton.navigate("EditProfile")
       },
     },
     {
       icon: "settings",
       label: "DrawerNavigator.settings",
       onPress() {
-        navigaton.navigate('Settings')
+        navigaton.navigate("Settings")
       },
     },
     {
@@ -75,11 +80,11 @@ const navigaton = useNavigation<NavigationProp<AppStackParamList>>()
       },
     },
     {
-      icon: 'save',
+      icon: "save",
       label: "DrawerNavigator.saved",
       onPress() {
         toggleDrawer()
-        navigaton.navigate('Saved')
+        navigaton.navigate("Saved")
       },
     },
     {
@@ -112,19 +117,25 @@ const navigaton = useNavigation<NavigationProp<AppStackParamList>>()
             uri: userStore.picture,
           }}
           style={$profileImage}
+          resizeMode="cover"
         />
         <Text text={userStore.name} style={$userName} weight="bold" numberOfLines={1} />
       </View>
       <View style={$notificationContainer}>
         <ActionComponent key={drawerOptions[0].icon} action={drawerOptions[0]} />
-        <Toggle variant='radio' editable value={notifications} onValueChange={()=> setNotifications(!notifications)}/> 
+        <Toggle
+          variant="radio"
+          editable
+          value={notifications}
+          onValueChange={() => setNotifications(!notifications)}
+        />
       </View>
       {drawerOptions
         .slice(1, 7)
         .map((m) => useMemo(() => <ActionComponent key={m.icon} action={m} />, []))}
     </View>
   )
-}
+})
 
 const $container: ViewStyle = {
   justifyContent: "center",
@@ -171,8 +182,8 @@ const getActionContainerStyle = (withBorder: boolean) => {
 const $notificationContainer: ViewStyle = {
   height: Dimensions.get("screen").height * 0.2,
   alignItems: "center",
-  flexDirection:'row',
-  justifyContent:'space-between'
+  flexDirection: "row",
+  justifyContent: "space-between",
 }
 
 const $actionIcon: ImageStyle = {

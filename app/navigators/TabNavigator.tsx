@@ -5,7 +5,12 @@ import { ImageStyle, TextStyle, ViewStyle } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { Icon } from "../components"
 import { translate } from "../i18n"
-import { Home, Topics, Classifieds, Videos } from "../tabs"
+import {
+  Home,
+  Topics,
+  Classifieds,
+  Videos,
+} from "../tabs"
 import { colors, spacing, typography } from "../theme"
 import { AppStackParamList, AppStackScreenProps } from "./AppNavigator"
 
@@ -16,11 +21,6 @@ export type TabParamList = {
   Videos: undefined
 }
 
-/**
- * Helper for automatically generating navigation prop types for each route.
- *
- * More info: https://reactnavigation.org/docs/typescript/#organizing-types
- */
 export type TabScreenProps<T extends keyof TabParamList> = CompositeScreenProps<
   BottomTabScreenProps<TabParamList, T>,
   AppStackScreenProps<keyof AppStackParamList>
@@ -30,15 +30,14 @@ const Tab = createBottomTabNavigator<TabParamList>()
 
 export function TabNavigator() {
   const { bottom } = useSafeAreaInsets()
-
   return (
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
         tabBarHideOnKeyboard: true,
-        tabBarStyle: [$tabBar, { height: bottom+70 }],
-        tabBarInactiveTintColor: colors.palette.primary200,
-        tabBarActiveTintColor: colors.palette.neutral100,
+        tabBarStyle: [$tabBar, { height: bottom + 70 }],
+        tabBarInactiveTintColor: colors.palette.neutral100,
+        tabBarActiveTintColor: colors.tint,
         tabBarLabelStyle: $tabBarLabel,
         tabBarItemStyle: $tabBarItem,
       }}
@@ -52,7 +51,7 @@ export function TabNavigator() {
             <Icon
               icon="home"
               size={26}
-              color={focused ? colors.palette.neutral100 : colors.tint}
+              color={focused ? colors.tint : colors.palette.neutral100}
               style={$iconStyle}
             />
           ),
@@ -68,7 +67,7 @@ export function TabNavigator() {
             <Icon
               icon="topics"
               size={24}
-              color={focused ? colors.palette.neutral100 : colors.tint}
+              color={focused ? colors.tint : colors.palette.neutral100}
               style={$iconStyle}
             />
           ),
@@ -84,7 +83,7 @@ export function TabNavigator() {
             <Icon
               icon="classifieds"
               size={26}
-              color={focused ? colors.palette.neutral100 : colors.tint}
+              color={focused ? colors.tint : colors.palette.neutral100}
               style={$iconStyle}
             />
           ),
@@ -100,7 +99,7 @@ export function TabNavigator() {
             <Icon
               icon="videos"
               size={28}
-              color={focused ? colors.palette.neutral100 : colors.tint}
+              color={focused ? colors.tint : colors.palette.neutral100}
               style={$iconStyle}
             />
           ),

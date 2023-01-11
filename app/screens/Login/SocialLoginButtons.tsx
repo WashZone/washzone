@@ -30,6 +30,7 @@ export function SocialLogin() {
               const resGetUserBySocialId = await queryGetUserBysocialId({
                 socialId: userInfo.user.id,
               },{fetchPolicy:'network-only'})
+              console.log('UserInfo', userInfo)
               console.log(resGetUserBySocialId)
               const userFound = resGetUserBySocialId.getUserBysocialId.length > 0
               let resCreateUser: { createUser: any }
@@ -52,7 +53,7 @@ export function SocialLogin() {
                 email: userInfo.user.email,
                 first_name: userInfo.user.givenName,
                 socialId: userInfo.user.id,
-                last_name: userInfo.user.familyName,
+                last_name: userInfo.user.familyName || '',
                 picture: userInfo.user.photo,
                 isSocialLogin: true,
                 type: "google",

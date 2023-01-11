@@ -4,24 +4,27 @@ import { withSetPropAction } from "./helpers/withSetPropAction"
 export const FeedStoreModel = types
   .model("FeedStore")
   .props({
-    feedPosts: types.frozen(),
+    topics: types.frozen(),
+    stories: types.frozen(),
   })
   .actions(withSetPropAction)
   .actions((self) => ({
-    setPosts(posts: any) {
-      self.feedPosts = posts
+    setTopics(topics: any) {
+      self.topics = topics
     },
-    addToPosts(posts: any) {
-      self.feedPosts = [...self.feedPosts, ...posts]
+    addToTopics(topics: any) {
+      self.topics = [...self.topics, ...topics]
     },
     clear() {
-      self.feedPosts = []
+      self.topics = []
+      self.stories = []
     },
-  }))
-  .views((store) => ({
-    get getPosts() {
-      return store.feedPosts
+    setStories(stories: any) {
+      self.stories = stories
     },
+    addToStories(stories: any) {
+      self.topics = [...self.stories, ...stories]
+    }
   }))
 
 export interface FeedStore extends Instance<typeof FeedStoreModel> {}

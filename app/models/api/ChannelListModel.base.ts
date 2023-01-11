@@ -7,8 +7,8 @@ import { QueryBuilder } from "mst-gql"
 import { ModelBase } from "./ModelBase"
 import { UserModel, UserModelType } from "./UserModel"
 import { UserModelSelector } from "./UserModel.base"
-import { VedioUploadModel, VedioUploadModelType } from "./VedioUploadModel"
-import { VedioUploadModelSelector } from "./VedioUploadModel.base"
+import { VideoUploadModel, VideoUploadModelType } from "./VideoUploadModel"
+import { VideoUploadModelSelector } from "./VideoUploadModel.base"
 import { RootStoreType } from "./index"
 
 
@@ -25,7 +25,7 @@ export const ChannelListModelBase = ModelBase
     updatedAt: types.union(types.undefined, types.frozen()),
     channelId: types.union(types.undefined, types.null, types.string),
     userId: types.union(types.undefined, types.null, types.late((): any => UserModel)),
-    videoId: types.union(types.undefined, types.null, types.late((): any => VedioUploadModel)),
+    videoId: types.union(types.undefined, types.null, types.late((): any => VideoUploadModel)),
     channelName: types.union(types.undefined, types.null, types.string),
     status: types.union(types.undefined, types.null, types.string),
   })
@@ -43,7 +43,7 @@ export class ChannelListModelSelector extends QueryBuilder {
   get channelName() { return this.__attr(`channelName`) }
   get status() { return this.__attr(`status`) }
   userId(builder: string | UserModelSelector | ((selector: UserModelSelector) => UserModelSelector) | undefined) { return this.__child(`userId`, UserModelSelector, builder) }
-  videoId(builder: string | VedioUploadModelSelector | ((selector: VedioUploadModelSelector) => VedioUploadModelSelector) | undefined) { return this.__child(`videoId`, VedioUploadModelSelector, builder) }
+  videoId(builder: string | VideoUploadModelSelector | ((selector: VideoUploadModelSelector) => VideoUploadModelSelector) | undefined) { return this.__child(`videoId`, VideoUploadModelSelector, builder) }
 }
 export function selectFromChannelList() {
   return new ChannelListModelSelector()

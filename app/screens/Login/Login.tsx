@@ -1,17 +1,17 @@
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { observer } from "mobx-react-lite"
 import React, { useMemo, useRef, useState } from "react"
-import { TextInput, TextStyle, ViewStyle, Pressable, View, Alert } from "react-native"
-import { Button, Icon, Text, TextField, TextFieldAccessoryProps } from "../../components"
+import { TextInput, TextStyle, ViewStyle, Pressable, Alert } from "react-native"
+import { Button, Icon, Text, TextField, TextFieldAccessoryProps, Screen } from "../../components"
 import { useStores } from "../../models"
 import { AppStackParamList } from "../../navigators"
 import { colors, spacing } from "../../theme"
+import { $flex1 } from "../styles"
 
 export const LoginView = observer(() => {
   const authPasswordInput = useRef<TextInput>()
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
   const [isAuthPasswordHidden, setIsAuthPasswordHidden] = useState(true)
-  //   const [isSubmitted, setIsSubmitted] = useState(false)
   const {
     authenticationStore: {
       authEmail,
@@ -39,7 +39,7 @@ export const LoginView = observer(() => {
         email: res.signin.email,
         first_name: res.signin.first_name,
         last_name: res.signin.last_name,
-        picture: res.signin.picture || "https://edigitalcare.in/public/uploads/user-dummy.png",
+        picture: res.signin.picture ,
         socialId: res.signin.socialId,
         type: "",
         isSocialLogin: false,
@@ -66,8 +66,15 @@ export const LoginView = observer(() => {
     [isAuthPasswordHidden],
   )
 
+
+
   return (
-    <View>
+    <Screen
+      preset="auto"
+      contentContainerStyle={$flex1}
+      safeAreaEdges={[]}
+      backgroundColor={colors.palette.primary100}
+    >
       <Text testID="login-heading" tx="loginScreen.Login" preset="heading" style={$signIn} />
       <Text tx="loginScreen.loginDescription" preset="subheading" style={$enterDetails} />
 
@@ -80,8 +87,6 @@ export const LoginView = observer(() => {
         autoCorrect={false}
         keyboardType="email-address"
         placeholderTx="loginScreen.emailLabel"
-        // helper={isSubmitted ? validateEmail(email) : ""}
-        // status={validateEmail(email) && isSubmitted ? "error" : undefined}
         onSubmitEditing={() => authPasswordInput.current?.focus()}
         style={$inputText}
       />
@@ -96,13 +101,18 @@ export const LoginView = observer(() => {
         autoCorrect={false}
         secureTextEntry={isAuthPasswordHidden}
         placeholderTx="loginScreen.passwordLabel"
-        // helper={isSubmitted ? validatePassword(password) : ""}
-        // status={validatePassword(password) && isSubmitted ? "error" : undefined}
         onSubmitEditing={login}
         RightAccessory={PasswordRightAccessory}
         style={$inputText}
       />
-      <Text tx="loginScreen.forgotPassword" size="sm" weight="bold" style={$forgotPass} onPress={() =>navigation.navigate('ForgotPassword')} />
+
+      <Text
+        tx="loginScreen.forgotPassword"
+        size="sm"
+        weight="bold"
+        style={$forgotPass}
+        onPress={() => navigation.navigate("ForgotPassword")}
+      />
 
       <Button
         testID="login-button"
@@ -115,7 +125,7 @@ export const LoginView = observer(() => {
         <Text tx="loginScreen.noAccont" size="sm" weight="light" style={$hint} />
         <Text tx="loginScreen.signUp" size="sm" weight="bold" style={$footerText} />
       </Pressable>
-    </View>
+    </Screen>
   )
 })
 
