@@ -7,6 +7,8 @@ import { MSTGQLStore, configureStoreMixin, QueryOptions, withTypedRefs } from "m
 
 import { UserModel, UserModelType } from "./UserModel"
 import { userModelPrimitives, UserModelSelector } from "./UserModel.base"
+import { LikeVideosModel, LikeVideosModelType } from "./LikeVideosModel"
+import { likeVideosModelPrimitives, LikeVideosModelSelector } from "./LikeVideosModel.base"
 import { VideoUploadModel, VideoUploadModelType } from "./VideoUploadModel"
 import { videoUploadModelPrimitives, VideoUploadModelSelector } from "./VideoUploadModel.base"
 import { SaveVideoModel, SaveVideoModelType } from "./SaveVideoModel"
@@ -25,8 +27,6 @@ import { ClassifiedFeedModel, ClassifiedFeedModelType } from "./ClassifiedFeedMo
 import { classifiedFeedModelPrimitives, ClassifiedFeedModelSelector } from "./ClassifiedFeedModel.base"
 import { SaveClassifiedModel, SaveClassifiedModelType } from "./SaveClassifiedModel"
 import { saveClassifiedModelPrimitives, SaveClassifiedModelSelector } from "./SaveClassifiedModel.base"
-import { LikeVideosModel, LikeVideosModelType } from "./LikeVideosModel"
-import { likeVideosModelPrimitives, LikeVideosModelSelector } from "./LikeVideosModel.base"
 import { VideoPlaylistModel, VideoPlaylistModelType } from "./VideoPlaylistModel"
 import { videoPlaylistModelPrimitives, VideoPlaylistModelSelector } from "./VideoPlaylistModel.base"
 import { VideoUploadPlaylistModel, VideoUploadPlaylistModelType } from "./VideoUploadPlaylistModel"
@@ -60,32 +60,37 @@ queryGetUserByEmail="queryGetUserByEmail",
 queryGetAllUsers="queryGetAllUsers",
 queryGetUserBysocialId="queryGetUserBysocialId",
 queryGetchannelUser="queryGetchannelUser",
+queryGetSearchedUser="queryGetSearchedUser",
 queryGetByvideoId="queryGetByvideoId",
 queryGetAllTopicByPageNumber="queryGetAllTopicByPageNumber",
 queryGetAllTopics="queryGetAllTopics",
 queryGetTopicByUserId="queryGetTopicByUserId",
 queryGetCommentByTopicId="queryGetCommentByTopicId",
 queryGetCommentsByTopicId="queryGetCommentsByTopicId",
+queryGetSearchedTopic="queryGetSearchedTopic",
 queryGetAllComments="queryGetAllComments",
 queryGetAllComment="queryGetAllComment",
 queryGetCommentsByUserId="queryGetCommentsByUserId",
 queryGetStoryByUserId="queryGetStoryByUserId",
 queryGetStoryByStoryId="queryGetStoryByStoryId",
 queryGetAllStory="queryGetAllStory",
+queryGetAllStoryByPage="queryGetAllStoryByPage",
 queryGetfollowingByUserId="queryGetfollowingByUserId",
 queryGetfollowerByFollowId="queryGetfollowerByFollowId",
 queryGetAllClassifiedFeedss="queryGetAllClassifiedFeedss",
 queryGetAllClassifiedFeed="queryGetAllClassifiedFeed",
 queryGetClassifiedByUserIdPage="queryGetClassifiedByUserIdPage",
+queryGetSearchedclassified="queryGetSearchedclassified",
 queryGetByClassifiedFeedId="queryGetByClassifiedFeedId",
 queryGetAllSaved="queryGetAllSaved",
-queryGetAllSavedClassified="queryGetAllSavedClassified",
-queryGetAllSavedClassifiedByUserId="queryGetAllSavedClassifiedByUserId",
+queryGetAllSavedByPage="queryGetAllSavedByPage",
+queryGetAllSavedByUserId="queryGetAllSavedByUserId",
 queryGetAllSavedByType="queryGetAllSavedByType",
 queryGetAllVideo="queryGetAllVideo",
 queryGetAllUploadedVideo="queryGetAllUploadedVideo",
 queryGetUploadedVideoByUserIdPage="queryGetUploadedVideoByUserIdPage",
 queryGetUserChannel="queryGetUserChannel",
+queryGetSearchedItem="queryGetSearchedItem",
 queryGetAllReviews="queryGetAllReviews",
 queryGetReviewOnUserId="queryGetReviewOnUserId",
 queryGetReviewByReviewId="queryGetReviewByReviewId",
@@ -141,7 +146,7 @@ mutateUpdateVideoPart="mutateUpdateVideoPart"
 */
 export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
   .named("RootStore")
-  .extend(configureStoreMixin([['User', () => UserModel], ['VideoUpload', () => VideoUploadModel], ['saveVideo', () => SaveVideoModel], ['CommentsDetail', () => CommentsDetailModel], ['TopicDetail', () => TopicDetailModel], ['storyViewerUser', () => StoryViewerUserModel], ['followUser', () => FollowUserModel], ['UserReview', () => UserReviewModel], ['classifiedFeed', () => ClassifiedFeedModel], ['saveClassified', () => SaveClassifiedModel], ['likeVideos', () => LikeVideosModel], ['VideoPlaylist', () => VideoPlaylistModel], ['VideoUploadPlaylist', () => VideoUploadPlaylistModel]], [], "js"))
+  .extend(configureStoreMixin([['User', () => UserModel], ['likeVideos', () => LikeVideosModel], ['VideoUpload', () => VideoUploadModel], ['saveVideo', () => SaveVideoModel], ['CommentsDetail', () => CommentsDetailModel], ['TopicDetail', () => TopicDetailModel], ['storyViewerUser', () => StoryViewerUserModel], ['followUser', () => FollowUserModel], ['UserReview', () => UserReviewModel], ['classifiedFeed', () => ClassifiedFeedModel], ['saveClassified', () => SaveClassifiedModel], ['VideoPlaylist', () => VideoPlaylistModel], ['VideoUploadPlaylist', () => VideoUploadPlaylistModel]], [], "js"))
   .props({
 
   })
@@ -163,6 +168,9 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     queryGetchannelUser(variables?: {  }, options: QueryOptions = {}) {
       return self.query<{ getchannelUser: any }>(`query getchannelUser { getchannelUser }`, variables, options)
     },
+    queryGetSearchedUser(variables: { searchKey: string, pageNumber: number }, options: QueryOptions = {}) {
+      return self.query<{ getSearchedUser: any }>(`query getSearchedUser($searchKey: String!, $pageNumber: Float!) { getSearchedUser(searchKey: $searchKey, pageNumber: $pageNumber) }`, variables, options)
+    },
     queryGetByvideoId(variables: { videoId: string }, options: QueryOptions = {}) {
       return self.query<{ getByvideoId: any }>(`query getByvideoId($videoId: String!) { getByvideoId(videoId: $videoId) }`, variables, options)
     },
@@ -180,6 +188,9 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     },
     queryGetCommentsByTopicId(variables: { topicId: string }, options: QueryOptions = {}) {
       return self.query<{ getCommentsByTopicId: any }>(`query getCommentsByTopicId($topicId: String!) { getCommentsByTopicId(TopicId: $topicId) }`, variables, options)
+    },
+    queryGetSearchedTopic(variables: { searchKey: string, pageNumber: number }, options: QueryOptions = {}) {
+      return self.query<{ getSearchedTopic: any }>(`query getSearchedTopic($searchKey: String!, $pageNumber: Float!) { getSearchedTopic(searchKey: $searchKey, pageNumber: $pageNumber) }`, variables, options)
     },
     queryGetAllComments(variables: { pageNumber: number }, options: QueryOptions = {}) {
       return self.query<{ getAllComments: any }>(`query getAllComments($pageNumber: Float!) { getAllComments(pageNumber: $pageNumber) }`, variables, options)
@@ -199,6 +210,9 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     queryGetAllStory(variables?: {  }, options: QueryOptions = {}) {
       return self.query<{ getAllStory: any }>(`query getAllStory { getAllStory }`, variables, options)
     },
+    queryGetAllStoryByPage(variables: { pageNumber: number }, options: QueryOptions = {}) {
+      return self.query<{ getAllStoryByPage: any }>(`query getAllStoryByPage($pageNumber: Float!) { getAllStoryByPage(pageNumber: $pageNumber) }`, variables, options)
+    },
     queryGetfollowingByUserId(variables: { userId: string }, options: QueryOptions = {}) {
       return self.query<{ getfollowingByUserId: any }>(`query getfollowingByUserId($userId: String!) { getfollowingByUserId(userId: $userId) }`, variables, options)
     },
@@ -214,20 +228,23 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     queryGetClassifiedByUserIdPage(variables: { pageNumber: number, userId: string }, options: QueryOptions = {}) {
       return self.query<{ getClassifiedByUserIdPage: any }>(`query getClassifiedByUserIdPage($pageNumber: Float!, $userId: String!) { getClassifiedByUserIdPage(pageNumber: $pageNumber, userId: $userId) }`, variables, options)
     },
+    queryGetSearchedclassified(variables: { searchKey: string, pageNumber: number }, options: QueryOptions = {}) {
+      return self.query<{ getSearchedclassified: any }>(`query getSearchedclassified($searchKey: String!, $pageNumber: Float!) { getSearchedclassified(searchKey: $searchKey, pageNumber: $pageNumber) }`, variables, options)
+    },
     queryGetByClassifiedFeedId(variables: { classifiedFeedId: string }, options: QueryOptions = {}) {
       return self.query<{ getByClassifiedFeedId: any }>(`query getByClassifiedFeedId($classifiedFeedId: String!) { getByClassifiedFeedId(ClassifiedFeedId: $classifiedFeedId) }`, variables, options)
     },
     queryGetAllSaved(variables?: {  }, options: QueryOptions = {}) {
       return self.query<{ getAllSaved: any }>(`query getAllSaved { getAllSaved }`, variables, options)
     },
-    queryGetAllSavedClassified(variables: { pageNumber: number }, options: QueryOptions = {}) {
-      return self.query<{ getAllSavedClassified: any }>(`query getAllSavedClassified($pageNumber: Float!) { getAllSavedClassified(pageNumber: $pageNumber) }`, variables, options)
+    queryGetAllSavedByPage(variables: { pageNumber: number }, options: QueryOptions = {}) {
+      return self.query<{ getAllSavedByPage: any }>(`query getAllSavedByPage($pageNumber: Float!) { getAllSavedByPage(pageNumber: $pageNumber) }`, variables, options)
     },
-    queryGetAllSavedClassifiedByUserId(variables: { userId: string }, options: QueryOptions = {}) {
-      return self.query<{ getAllSavedClassifiedByUserId: any }>(`query getAllSavedClassifiedByUserId($userId: String!) { getAllSavedClassifiedByUserId(userId: $userId) }`, variables, options)
+    queryGetAllSavedByUserId(variables: { pageNumber: number, userId: string }, options: QueryOptions = {}) {
+      return self.query<{ getAllSavedByUserId: any }>(`query getAllSavedByUserId($pageNumber: Float!, $userId: String!) { getAllSavedByUserId(pageNumber: $pageNumber, userId: $userId) }`, variables, options)
     },
-    queryGetAllSavedByType(variables: { savedType: string }, options: QueryOptions = {}) {
-      return self.query<{ getAllSavedByType: any }>(`query getAllSavedByType($savedType: String!) { getAllSavedByType(savedType: $savedType) }`, variables, options)
+    queryGetAllSavedByType(variables: { pageNumber: number, savedType: string }, options: QueryOptions = {}) {
+      return self.query<{ getAllSavedByType: any }>(`query getAllSavedByType($pageNumber: Float!, $savedType: String!) { getAllSavedByType(pageNumber: $pageNumber, savedType: $savedType) }`, variables, options)
     },
     queryGetAllVideo(variables?: {  }, options: QueryOptions = {}) {
       return self.query<{ getAllVideo: any }>(`query getAllVideo { getAllVideo }`, variables, options)
@@ -240,6 +257,9 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     },
     queryGetUserChannel(variables?: {  }, options: QueryOptions = {}) {
       return self.query<{ getUserChannel: any }>(`query getUserChannel { getUserChannel }`, variables, options)
+    },
+    queryGetSearchedItem(variables: { searchKey: string, pageNumber: number }, options: QueryOptions = {}) {
+      return self.query<{ getSearchedItem: any }>(`query getSearchedItem($searchKey: String!, $pageNumber: Float!) { getSearchedItem(searchKey: $searchKey, pageNumber: $pageNumber) }`, variables, options)
     },
     queryGetAllReviews(variables: { pageNumber: number }, options: QueryOptions = {}) {
       return self.query<{ getAllReviews: any }>(`query getAllReviews($pageNumber: Float!) { getAllReviews(pageNumber: $pageNumber) }`, variables, options)

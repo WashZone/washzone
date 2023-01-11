@@ -16,7 +16,7 @@ const TopicInfoComponent = ({ topic }: { topic: any }) => {
 
   return (
     <>
-      <View style={$publihserContainer}>
+      <View style={$publisherContainer}>
         <View style={$flexHori}>
           <FastImage style={$image} source={{ uri: publisher?.picture }} />
           <Text text={formatName(publisher?.name)} style={$nameText} weight="medium" />
@@ -81,7 +81,7 @@ const $image: ImageStyle = {
   borderRadius: 25,
 }
 
-const $publihserContainer: ViewStyle = {
+const $publisherContainer: ViewStyle = {
   height: 50 + spacing.medium * 2,
   paddingVertical: spacing.medium,
   marginHorizontal: spacing.medium,

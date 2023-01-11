@@ -25,6 +25,7 @@ export const StoryViewerUserModelBase = ModelBase
     thumbnailUrl: types.union(types.undefined, types.null, types.string),
     attachmentType: types.union(types.undefined, types.null, types.string),
     attachmentUrl: types.union(types.undefined, types.null, types.string),
+    status: types.union(types.undefined, types.null, types.string),
   })
   .views(self => ({
     get store() {
@@ -39,10 +40,11 @@ export class StoryViewerUserModelSelector extends QueryBuilder {
   get thumbnailUrl() { return this.__attr(`thumbnailUrl`) }
   get attachmentType() { return this.__attr(`attachmentType`) }
   get attachmentUrl() { return this.__attr(`attachmentUrl`) }
+  get status() { return this.__attr(`status`) }
   userId(builder: string | UserModelSelector | ((selector: UserModelSelector) => UserModelSelector) | undefined) { return this.__child(`userId`, UserModelSelector, builder) }
 }
 export function selectFromStoryViewerUser() {
   return new StoryViewerUserModelSelector()
 }
 
-export const storyViewerUserModelPrimitives = selectFromStoryViewerUser()._id.createdAt.updatedAt.thumbnailUrl.attachmentType.attachmentUrl
+export const storyViewerUserModelPrimitives = selectFromStoryViewerUser()._id.createdAt.updatedAt.thumbnailUrl.attachmentType.attachmentUrl.status

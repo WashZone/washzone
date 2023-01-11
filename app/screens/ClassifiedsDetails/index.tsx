@@ -44,7 +44,12 @@ const PublisherDetails = ({ publisher }: { publisher: any }) => {
           <FastImage style={$publisherPicture} source={{ uri: publisher?.picture }} />
           <View>
             <Text text={publisher?.name} />
-            <Rating startingValue={3} imageSize={22} tintColor={colors.backgroundGrey} style={{ backgroundColor:colors.backgroundGrey, marginTop:spacing.extraSmall}}/>
+            <Rating
+              startingValue={3}
+              imageSize={22}
+              tintColor={colors.backgroundGrey}
+              style={{ backgroundColor: colors.backgroundGrey, marginTop: spacing.extraSmall }}
+            />
           </View>
         </View>
         {/* <Pressable style={$followButton}>
@@ -139,6 +144,7 @@ const BottomActions = ({ classified }: { classified: any }) => {
 
 export const ClassifiedsDetails: FC<ClassifiedsTabProps<"ClassifiedsDetails">> = observer(
   function ClassifiedsDetails(props) {
+    console.log("classified", props.route.params)
     const classified = props.route.params.classified
     const navigation = useNavigation()
     const [classifiedDetails, setClassifiedDetails] = useState<any>(classified)
@@ -146,24 +152,29 @@ export const ClassifiedsDetails: FC<ClassifiedsTabProps<"ClassifiedsDetails">> =
     const {
       api: { mutateGetClassifiedById },
     } = useStores()
-  
+
     const handleStringTypeClassified = async () => {
-      if (loading) {
+      console.log("RUNNING")
+      if (typeof classified === "string") {
         const res = await mutateGetClassifiedById({ classifiedId: classified })
-        setClassifiedDetails(res.getClassifiedById?.data.length === 1 && res.getClassifiedById?.data[0])
+        setClassifiedDetails(
+          res.getClassifiedById?.data.length === 1 && res.getClassifiedById?.data[0],
+        )
         setLoading(false)
+      } else {
+        setClassifiedDetails(classified)
       }
     }
-  
-    useEffect(() => {
-        handleStringTypeClassified()
-    }, [])
 
-    if ( loading){
-      return(
+    useEffect(() => {
+      handleStringTypeClassified()
+    }, [classified])
+
+    if (loading) {
+      return (
         <Screen contentContainerStyle={$flex1}>
-          <ActivityIndicator  animating/>
-          </Screen>
+          <ActivityIndicator animating />
+        </Screen>
       )
     }
 
@@ -175,7 +186,7 @@ export const ClassifiedsDetails: FC<ClassifiedsTabProps<"ClassifiedsDetails">> =
             style={$posterImage}
             resizeMode="contain"
           />
-          <PublisherDetails publisher={classifiedDetails?.UserId} />
+          <PublisherDetails publisher={classifiedDetails?.UserId || classifiedDetails?.userId} />
           <MoreDetails classified={classifiedDetails} />
         </ScrollView>
         <Pressable style={$backContainer} onPress={() => navigation.goBack()}>
@@ -248,23 +259,23 @@ const $publisherPicture: ImageStyle = {
   marginRight: spacing.medium,
 }
 
-const $reviewsButtonContainer: ViewStyle = {
-  height: 40,
-  justifyContent: "center",
-  alignItems: "center",
-  marginHorizontal: spacing.medium,
-  backgroundColor: colors.palette.grey,
-  borderRadius: 10,
-}
+// const $reviewsButtonContainer: ViewStyle = {
+//   height: 40,
+//   justifyContent: "center",
+//   alignItems: "center",
+//   marginHorizontal: spacing.medium,
+//   backgroundColor: colors.palette.grey,
+//   borderRadius: 10,
+// }
 
-const $followButton: ViewStyle = {
-  height: 50,
-  width: 100,
-  backgroundColor: colors.palette.grey,
-  borderRadius: 10,
-  justifyContent: "center",
-  alignItems: "center",
-}
+// const $followButton: ViewStyle = {
+//   height: 50,
+//   width: 100,
+//   backgroundColor: colors.palette.grey,
+//   borderRadius: 10,
+//   justifyContent: "center",
+//   alignItems: "center",
+// }
 
 const $flexHori: ViewStyle = { flexDirection: "row" }
 

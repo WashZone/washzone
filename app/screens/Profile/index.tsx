@@ -1,5 +1,14 @@
 import React, { FC, useEffect, useState } from "react"
-import { Dimensions, TextStyle, ViewStyle, View, Pressable, ScrollView, ImageStyle as ImageStyleRN } from "react-native"
+import {
+  Dimensions,
+  TextStyle,
+  ViewStyle,
+  View,
+  Pressable,
+  ScrollView,
+  ImageStyle as ImageStyleRN,
+  useWindowDimensions,
+} from "react-native"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { colors, spacing } from "../../theme"
 import { HomeTabProps } from "../../tabs"
@@ -12,6 +21,9 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated"
+import { TabView } from "react-native-tab-view"
+import { ClassifiedsTabScreen, TopicsTabScreen, VideosTabScreen } from "./tabViews"
+import { $flex1 } from "../styles"
 
 const mockDescription =
   "Nulla cupidatat deserunt amet quis aliquip nostrud do adipisicing. Adipisicing excepteur elit laborum Lorem adipisicing do duis."
@@ -26,10 +38,15 @@ const mockImageData = [
 const GalleryItem = ({ uri }) => {
   console.log(uri)
   return (
-      <AutoImage source={{ uri }} maxWidth={Dimensions.get("screen").width / 2 - 30} style={$marginAutoImage} />
+    <AutoImage
+      source={{ uri }}
+      maxWidth={Dimensions.get("screen").width / 2 - 30}
+      style={$marginAutoImage}
+    />
   )
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const AnimatedGalleryView = () => {
   const [isOpen, setOpen] = useState(false)
   const open = useSharedValue(0)
@@ -114,26 +131,54 @@ const AnimatedGalleryView = () => {
 export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ route }) {
   const { user } = route.params
 
+  const layout = useWindowDimensions()
+
+  const renderScene = ({ route }) => {
+    switch (route.key) {
+      case "topic":
+        return <TopicsTabScreen userId={user?._id} />
+      case "classified":
+        return <ClassifiedsTabScreen userId={user?._id} />
+      case "video":
+        return <VideosTabScreen userId={user?._id} />
+      default:
+        return null
+    }
+  }
+
+  const [index, setIndex] = React.useState(0)
+  const [routes] = React.useState([
+    { key: "topic", title: "Topic" },
+    { key: "classified", title: "Classified" },
+    { key: "video", title: "Video" },
+  ])
+
   return (
-    <Screen style={$screenConatiner}>
+    <Screen contentContainerStyle={$flex1}>
       <View style={$topContainer}>
         <FastImage style={$profileImage} source={{ uri: user?.picture }} />
         <Text text={formatName(user?.name)} style={$publisherName} weight="semiBold" />
         <Text text={user?.description || mockDescription} style={$descriptionText} />
       </View>
-      <AnimatedGalleryView />
+      <View style={$flex1}>
+        <TabView
+          navigationState={{ index, routes }}
+          renderScene={renderScene}
+          onIndexChange={setIndex}
+          initialLayout={{ width: layout.width }}
+        />
+      </View>
     </Screen>
   )
 })
 
-const $marginAutoImage : ImageStyleRN ={margin:10}
+const $marginAutoImage: ImageStyleRN = { margin: 10 }
 
 const $flexRow: ViewStyle = {
   flexDirection: "row",
-  flex: 1,marginHorizontal:10
+  flex: 1,
+  marginHorizontal: 10,
 }
-
-const $screenConatiner: ViewStyle = { flex: 1 }
 
 const $galleryHeaderContainer: ViewStyle = {
   flexDirection: "row",
@@ -151,6 +196,7 @@ const $topContainer: ViewStyle = {
   paddingVertical: spacing.large,
   backgroundColor: colors.palette.neutral100,
   alignItems: "center",
+  height: 260,
 }
 const $descriptionText: TextStyle = {
   marginTop: spacing.extraLarge,

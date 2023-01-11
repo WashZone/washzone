@@ -3,6 +3,7 @@
 /* tslint:disable */
 
 export * from "./UserModel"
+export * from "./LikeVideosModel"
 export * from "./VideoUploadModel"
 export * from "./SaveVideoModel"
 export * from "./CommentsDetailModel"
@@ -12,7 +13,6 @@ export * from "./FollowUserModel"
 export * from "./UserReviewModel"
 export * from "./ClassifiedFeedModel"
 export * from "./SaveClassifiedModel"
-export * from "./LikeVideosModel"
 export * from "./VideoPlaylistModel"
 export * from "./VideoUploadPlaylistModel"
 export * from "./RootStore"

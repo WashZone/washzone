@@ -62,6 +62,8 @@ const BottomActions = ({ classified, type }: { classified: any; type: "video" | 
 
 const SavedItem = ({ item, index }) => {
   const videoDetails = item?.VideoDetail[0]
+  const classifiedDetails = item?.ClassifiedFeedId[0]
+
   if (item?.savedType === "video") {
     return (
       <ListItem
@@ -79,7 +81,7 @@ const SavedItem = ({ item, index }) => {
       >
         <View style={$textContainer}>
           <Text text={videoDetails?.videoHeading} weight="semiBold" numberOfLines={1} />
-          <Text text={videoDetails?.description} weight='medium' size='xs'  numberOfLines={1}/>
+          <Text text={videoDetails?.description} weight="medium" size="xs" numberOfLines={1} />
           <Text text={videoDetails?.users?.name} style={$byText} />
           <BottomActions classified={item} type="video" />
         </View>
@@ -95,17 +97,17 @@ const SavedItem = ({ item, index }) => {
         <FastImage
           style={$image}
           source={{
-            uri: item?.ClassifiedFeedId?.attachmentUrl,
+            uri: classifiedDetails?.attachmentUrl,
           }}
         />
       }
       rightIcon="caretRight"
     >
       <View style={$textContainer}>
-        <Text text={item?.ClassifiedFeedId?.title} weight="semiBold" numberOfLines={1} />
-        <Text text={"$ " + item?.ClassifiedFeedId?.prize} weight="medium" />
-        <Text text={item?.ClassifiedFeedId?.users?.name} style={$byText} />
-        <BottomActions classified={item} type="classified" />
+        <Text text={classifiedDetails?.title} weight="semiBold" numberOfLines={1} />
+        <Text text={"$ " + classifiedDetails?.prize} weight="medium" />
+        <Text text={classifiedDetails?.users?.name} style={$byText} />
+        <BottomActions classified={classifiedDetails} type="classified" />
       </View>
     </ListItem>
   )

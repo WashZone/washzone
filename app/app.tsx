@@ -51,7 +51,7 @@ const config = {
       parse: {
         classifiedId: (classifiedId: string) => classifiedId,
       },
-    },  
+    },
   },
 }
 
@@ -59,9 +59,6 @@ interface AppProps {
   hideSplashScreen: () => Promise<void>
 }
 
-/**
- * This is the root component of our app.
- */
 function App(props: AppProps) {
   const { hideSplashScreen } = props
   const SDK_KEY =
@@ -69,11 +66,11 @@ function App(props: AppProps) {
 
   const [AppLovinSDKRegistered, setAppLovinSDKRegistered] = React.useState(false)
   useEffect(() => {
-     // MAX Consent Flow for iOS 14.5+
-     if (Platform.OS === 'ios' && parseFloat(Platform.Version) >= 14.5) {
+    // MAX Consent Flow for iOS 14.5+
+    if (Platform.OS === "ios" && parseFloat(Platform.Version) >= 14.5) {
       // Enable the iOS consent flow programmatically - NSUserTrackingUsageDescription must be added to the Info.plist
-      AppLovinMAX.setConsentFlowEnabled(true);
-      AppLovinMAX.setPrivacyPolicyUrl('https://magnifi.ai/privacy-policy/'); // mandatory
+      AppLovinMAX.setConsentFlowEnabled(true)
+      AppLovinMAX.setPrivacyPolicyUrl("https://magnifi.ai/privacy-policy/") // mandatory
     }
 
     AppLovinMAX.initialize(SDK_KEY, (configuration) => {
@@ -83,7 +80,7 @@ function App(props: AppProps) {
         if (configuration.consentDialogState === AppLovinMAX.ConsentDialogState.APPLIES) {
           // Show user consent dialog
           AppLovinMAX.showConsentDialog()
-        } 
+        }
       }
       // MREC Ad Listeners
       AppLovinMAX.addEventListener("OnMRecAdLoadedEvent", (adInfo) => {
@@ -101,10 +98,10 @@ function App(props: AppProps) {
         console.log("MREC ad clicked ", adInfo)
       })
       AppLovinMAX.addEventListener("OnMRecAdExpandedEvent", (adInfo) => {
-        console.log("MREC ad expanded ",adInfo)
+        console.log("MREC ad expanded ", adInfo)
       })
       AppLovinMAX.addEventListener("OnMRecAdCollapsedEvent", (adInfo) => {
-        console.log("MREC ad collapsed ",adInfo)
+        console.log("MREC ad collapsed ", adInfo)
       })
       AppLovinMAX.addEventListener("OnMRecAdRevenuePaid", (adInfo) => {
         console.log("MREC ad revenue paid: " + adInfo)
@@ -112,19 +109,19 @@ function App(props: AppProps) {
     })
 
     // Native Ad Listeners
-    AppLovinMAX.addEventListener('OnNativeAdLoadedEvent', (adInfo) => {
-      console.log('Native ad loaded from: ' + adInfo.networkName);
-    });
-    AppLovinMAX.addEventListener('OnNativeAdLoadFailedEvent', (errorInfo) => {
+    AppLovinMAX.addEventListener("OnNativeAdLoadedEvent", (adInfo) => {
+      console.log("Native ad loaded from: " + adInfo.networkName)
+    })
+    AppLovinMAX.addEventListener("OnNativeAdLoadFailedEvent", (errorInfo) => {
       console.log(JSON.stringify(errorInfo))
-      console.log('Native ad failed to load with error code ' + JSON.stringify(errorInfo));
-    });
-    AppLovinMAX.addEventListener('OnNativeAdClickedEvent', (adInfo) => {
-      console.log('Native ad clicked ', adInfo);
-    });
-    AppLovinMAX.addEventListener('OnNativeAdRevenuePaid', (adInfo) => {
-      console.log('Native ad revenue paid: ' + adInfo.revenue);
-    });
+      console.log("Native ad failed to load with error code " + JSON.stringify(errorInfo))
+    })
+    AppLovinMAX.addEventListener("OnNativeAdClickedEvent", (adInfo) => {
+      console.log("Native ad clicked ", adInfo)
+    })
+    AppLovinMAX.addEventListener("OnNativeAdRevenuePaid", (adInfo) => {
+      console.log("Native ad revenue paid: " + adInfo.revenue)
+    })
     setTimeout(hideSplashScreen, 2000)
   }, [])
 
@@ -139,7 +136,7 @@ function App(props: AppProps) {
 
   const [areFontsLoaded] = useFonts(customFontsToLoad)
 
-  const { rehydrated } = useInitialRootStore(() => console.log('Rehydrated'))
+  const { rehydrated } = useInitialRootStore(() => console.log("Rehydrated"))
 
   if (!rehydrated || !isNavigationStateRestored || !areFontsLoaded || !AppLovinSDKRegistered)
     return null

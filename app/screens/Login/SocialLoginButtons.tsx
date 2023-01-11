@@ -27,33 +27,36 @@ export function SocialLogin() {
         if (hasPlayService) {
           GoogleSignin.signIn()
             .then(async (userInfo) => {
-              const resGetUserBySocialId = await queryGetUserBysocialId({
-                socialId: userInfo.user.id,
-              },{fetchPolicy:'network-only'})
-              console.log('UserInfo', userInfo)
-              console.log(resGetUserBySocialId)
+              const resGetUserBySocialId = await queryGetUserBysocialId(
+                {
+                  socialId: userInfo.user.id,
+                },
+                { fetchPolicy: "network-only" },
+              )
               const userFound = resGetUserBySocialId.getUserBysocialId.length > 0
               let resCreateUser: { createUser: any }
               if (!userFound) {
                 resCreateUser = await mutateCreateUser({
                   type: "google",
                   isSocialLogin: true,
-                  lastName: userInfo.user.name.split(" ")[1]||'',
+                  lastName: userInfo.user.name.split(" ")[1] || "",
                   firstName: userInfo.user.name.split(" ")[0],
                   password: "",
                   email: userInfo?.user?.email,
                   name: userInfo?.user?.name,
                   picture: userInfo?.user?.photo,
-                  socialId:userInfo.user.id,
+                  socialId: userInfo.user.id,
                 })
               }
               setUser({
-                _id: userFound ? resGetUserBySocialId.getUserBysocialId[0]?._id : resCreateUser.createUser._id,
+                _id: userFound
+                  ? resGetUserBySocialId.getUserBysocialId[0]?._id
+                  : resCreateUser.createUser._id,
                 name: userInfo.user.name,
                 email: userInfo.user.email,
                 first_name: userInfo.user.givenName,
                 socialId: userInfo.user.id,
-                last_name: userInfo.user.familyName || '',
+                last_name: userInfo.user.familyName || "",
                 picture: userInfo.user.photo,
                 isSocialLogin: true,
                 type: "google",
@@ -83,11 +86,11 @@ export function SocialLogin() {
         if (error) {
           console.log("login info has error: " + error)
         } else {
-          console.log("result:", user)
           const userInfo: any = user
-
-          const resGetUserBySocialId = await queryGetUserBysocialId({ socialId: userInfo?.id},{fetchPolicy:'network-only'})
-          console.log(resGetUserBySocialId)
+          const resGetUserBySocialId = await queryGetUserBysocialId(
+            { socialId: userInfo?.id },
+            { fetchPolicy: "network-only" },
+          )
           const userFound = resGetUserBySocialId.getUserBysocialId.length > 0
           let resCreateUser: { createUser: any }
           if (!userFound) {
@@ -104,7 +107,9 @@ export function SocialLogin() {
             })
           }
           setUser({
-            _id: userFound ? resGetUserBySocialId.getUserBysocialId[0]?._id : resCreateUser.createUser._id,
+            _id: userFound
+              ? resGetUserBySocialId.getUserBysocialId[0]?._id
+              : resCreateUser.createUser._id,
             name: userInfo?.name,
             email: userInfo?.email,
             first_name: userInfo?.first_name,
@@ -114,7 +119,6 @@ export function SocialLogin() {
             isSocialLogin: true,
             type: "facebook",
           })
-
           setAuthToken(token)
         }
       },
@@ -123,7 +127,6 @@ export function SocialLogin() {
   }
 
   const loginWithFacebook = () => {
-    // Attempt a login using the Facebook login dialog asking for default permissions.
     LoginManager.logInWithPermissions(["public_profile", "email"]).then(
       (login) => {
         if (login.isCancelled) {

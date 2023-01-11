@@ -5,6 +5,8 @@
 import { types } from "mobx-state-tree"
 import { QueryBuilder } from "mst-gql"
 import { ModelBase } from "./ModelBase"
+import { LikeVideosModel, LikeVideosModelType } from "./LikeVideosModel"
+import { LikeVideosModelSelector } from "./LikeVideosModel.base"
 import { UserModel, UserModelType } from "./UserModel"
 import { UserModelSelector } from "./UserModel.base"
 import { RootStoreType } from "./index"
@@ -23,6 +25,7 @@ export const VideoUploadModelBase = ModelBase
     updatedAt: types.union(types.undefined, types.frozen()),
     userId: types.union(types.undefined, types.null, types.late((): any => UserModel)),
     vedioPlaylistId: types.union(types.undefined, types.null, types.string),
+    LikeVideoId: types.union(types.undefined, types.null, types.late((): any => LikeVideosModel)),
     videoHeading: types.union(types.undefined, types.null, types.string),
     description: types.union(types.undefined, types.null, types.string),
     attachmentVideoUrl: types.union(types.undefined, types.null, types.string),
@@ -48,6 +51,7 @@ export class VideoUploadModelSelector extends QueryBuilder {
   get view() { return this.__attr(`view`) }
   get status() { return this.__attr(`status`) }
   userId(builder: string | UserModelSelector | ((selector: UserModelSelector) => UserModelSelector) | undefined) { return this.__child(`userId`, UserModelSelector, builder) }
+  LikeVideoId(builder: string | LikeVideosModelSelector | ((selector: LikeVideosModelSelector) => LikeVideosModelSelector) | undefined) { return this.__child(`LikeVideoId`, LikeVideosModelSelector, builder) }
 }
 export function selectFromVideoUpload() {
   return new VideoUploadModelSelector()

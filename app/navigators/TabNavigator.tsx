@@ -5,12 +5,7 @@ import { ImageStyle, TextStyle, ViewStyle } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { Icon } from "../components"
 import { translate } from "../i18n"
-import {
-  Home,
-  Topics,
-  Classifieds,
-  Videos,
-} from "../tabs"
+import { Home, Topics, Classifieds, Videos } from "../tabs"
 import { colors, spacing, typography } from "../theme"
 import { AppStackParamList, AppStackScreenProps } from "./AppNavigator"
 

@@ -35,7 +35,7 @@ export const PostComponent = ({ topic, navigateOnPress, index }: TopicComponentP
   const onContainerPress = () => {
     if (navigateOnPress !== undefined && navigateOnPress) {
       navigation.navigate("TopicInfo", {
-        topic
+        topic,
       })
     }
   }
@@ -64,7 +64,8 @@ export const PostComponent = ({ topic, navigateOnPress, index }: TopicComponentP
           <Pressable onPress={() => navigation.navigate("Profile", { user: topic?.UserId })}>
             <FastImage
               source={{
-                uri: topicDetails.picture || "https://edigitalcare.in/public/uploads/user-dummy.png",
+                uri:
+                  topicDetails.picture || "https://edigitalcare.in/public/uploads/user-dummy.png",
               }}
               style={$picture}
             />

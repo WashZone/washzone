@@ -21,16 +21,18 @@ export function useHooks() {
       mutateUpdateUser,
       mutateCreateUserTopic,
       mutateSaveLikedClassifiedFeed,
-      queryGetAllSavedClassifiedByUserId,
+      queryGetAllSavedByUserId,
       mutateGetClassifiedById,
       mutateUpdateDeletesavedclassified,
       queryGetUserChannel,
       queryGetAllStory,
       mutateSaveLikedVideo,
+      queryGetTopicByUserId,
+      mutateGetClassifiedByUserId,
+      mutateGetUploadVideoByUserId,
     },
     userStore,
   } = useStores()
-
 
   const loadStories = async () => {
     const res = await queryGetAllStory()
@@ -165,24 +167,25 @@ export function useHooks() {
     }
   }
 
-  const saveVideo = async(videoId: string) =>{
-    const store= useStores()
-    const res =  await mutateSaveLikedVideo({
+  const saveVideo = async (videoId: string) => {
+    const store = useStores()
+    const res = await mutateSaveLikedVideo({
       userId: store.userStore._id,
-      videoId 
+      videoId,
     })
     console.log(res)
   }
 
   const refreshSavedClassifieds = async () => {
-    const res = await queryGetAllSavedClassifiedByUserId(
+    const res = await queryGetAllSavedByUserId(
       {
         userId: userStore._id,
+        pageNumber: 1,
       },
       { fetchPolicy: "no-cache" },
     )
-    setSavedClassifieds(res.getAllSavedClassifiedByUserId?.data)
-    console.log("saveClassified", JSON.stringify(res.getAllSavedClassifiedByUserId?.data))
+    setSavedClassifieds(res.getAllSavedByUserId?.data)
+    console.log("saveClassified", JSON.stringify(res.getAllSavedByUserId?.data))
   }
 
   const getClassified = async (classifiedId: string) => {
@@ -208,6 +211,42 @@ export function useHooks() {
     return res.getUserChannel
   }
 
+  const getUserTopics = async (userId: string) => {
+    const res = await queryGetTopicByUserId({
+      userId,
+      pageNumber: 1,
+    })
+    console.log("USERTOPICAS", res.getTopicByUserId)
+    return res.getTopicByUserId?.data
+  }
+
+  const loadMoreUserTopics = async (userId, pageNumber) => {
+    const res = await queryGetTopicByUserId({
+      userId,
+      pageNumber,
+    })
+    console.log(res.getTopicByUserId)
+    return res.getTopicByUserId
+  }
+
+  const getUserVideos = async (userId: string) => {
+    console.log("USERID< VIDEOS", userId)
+
+    const res = await mutateGetUploadVideoByUserId({
+      userId,
+    })
+    console.log(res.getUploadVideoByUserId)
+    return res.getUploadVideoByUserId
+  }
+
+  const getUserClassifieds = async (userId: string) => {
+    const res = await mutateGetClassifiedByUserId({
+      userId,
+    })
+    console.log(res.getClassifiedByUserId)
+    return res.getClassifiedByUserId
+  }
+
   return {
     loadStories,
     getAndUpdatePosts,
@@ -226,6 +265,10 @@ export function useHooks() {
     getClassified,
     unSaveClassified,
     getVideos,
-    saveVideo
+    saveVideo,
+    getUserTopics,
+    loadMoreUserTopics,
+    getUserClassifieds,
+    getUserVideos,
   }
 }

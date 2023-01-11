@@ -20,6 +20,7 @@ import { fromNow } from "../../utils/agoFromNow"
 import { formatName } from "../../utils/formatName"
 import { useStores } from "../../models"
 import YoutubePlayer from "react-native-youtube-iframe"
+import { $loaderContainer } from "../styles"
 
 const videoDetails = {
   title: "How to detail a car - Part 1 ",
@@ -128,14 +129,26 @@ const VideoDescription = ({ data }: { data: any }) => {
     <View style={$descriptionContainer}>
       <Text style={$titleText} numberOfLines={1} text={data?.videoHeading} weight="bold" />
       <Text
-        text={data?.view || "0" + " views" + " • " + fromNow(new Date(data?.createdAt))}
+        text={
+          (data?.view || "0") +
+          ` view${data?.view > 1 ? "s" : ""}` +
+          " • " +
+          fromNow(new Date(data?.createdAt))
+        }
         numberOfLines={1}
         style={$viewsAndCreated}
       />
       <ActionButtons data={data} />
       <View style={$publisherContainer}>
-        <FastImage source={{ uri: data?.userId.length ? data?.userId[0]?.picture : data?.userId?.picture }} style={$avatar} />
-        <Text style={$publisherName} text={formatName(data?.userId.length ? data?.userId[0]?.name : data?.userId?.name)} weight="semiBold" />
+        <FastImage
+          source={{ uri: data?.userId.length ? data?.userId[0]?.picture : data?.userId?.picture }}
+          style={$avatar}
+        />
+        <Text
+          style={$publisherName}
+          text={formatName(data?.userId.length ? data?.userId[0]?.name : data?.userId?.name)}
+          weight="semiBold"
+        />
       </View>
       <Text text={data?.description} style={$descriptionText} />
     </View>
@@ -152,6 +165,10 @@ const VideoContainer = ({ uri, videoId }: { uri: string; videoId: string }) => {
     console.log(uri)
     mutateUpdateVideoViews({ videoId, userId: _id })
   }
+
+  // useEffect(() => {
+  //   onVideoLoad()
+  // }, [])
 
   return (
     <View style={[$video, $screenHeaderContainer]}>
@@ -177,18 +194,21 @@ export const VideoDetails: FC<VideosTabProps<"VideoDetails">> = observer(functio
   } = useStores()
 
   const handleDataType = async () => {
-    if (loading) {
+    if (typeof data === "string") {
       if (typeof data === "string") {
+        setLoading(true)
         const res = await mutateGetUploadVideoByVideoId({ videoId: data })
         setVideoDetails(res.getUploadVideoByVideoId?.length === 1 && res.getUploadVideoByVideoId[0])
         setLoading(false)
       }
+    } else {
+      setVideoDetails(data)
     }
   }
 
   useEffect(() => {
     handleDataType()
-  }, [])
+  }, [data])
 
   const shareVideo = () => {
     Share.open({
@@ -209,9 +229,9 @@ export const VideoDetails: FC<VideosTabProps<"VideoDetails">> = observer(functio
       <Screen
         preset="fixed"
         backgroundColor={colors.palette.neutral100}
-        contentContainerStyle={[$flex1]}
+        contentContainerStyle={$loaderContainer}
       >
-        <ActivityIndicator animating />
+        <ActivityIndicator animating color={colors.palette.primary100} />
       </Screen>
     )
   }

@@ -28,9 +28,6 @@ export const TopicDetailModelBase = ModelBase
     topicContent: types.union(types.undefined, types.null, types.string),
     attachmentType: types.union(types.undefined, types.null, types.string),
     attachmentUrl: types.union(types.undefined, types.null, types.string),
-    fileName: types.union(types.undefined, types.null, types.string),
-    type: types.union(types.undefined, types.null, types.string),
-    uri: types.union(types.undefined, types.null, types.string),
     status: types.union(types.undefined, types.null, types.string),
   })
   .views(self => ({
@@ -46,9 +43,6 @@ export class TopicDetailModelSelector extends QueryBuilder {
   get topicContent() { return this.__attr(`topicContent`) }
   get attachmentType() { return this.__attr(`attachmentType`) }
   get attachmentUrl() { return this.__attr(`attachmentUrl`) }
-  get fileName() { return this.__attr(`fileName`) }
-  get type() { return this.__attr(`type`) }
-  get uri() { return this.__attr(`uri`) }
   get status() { return this.__attr(`status`) }
   userId(builder: string | UserModelSelector | ((selector: UserModelSelector) => UserModelSelector) | undefined) { return this.__child(`userId`, UserModelSelector, builder) }
   commentId(builder: string | CommentsDetailModelSelector | ((selector: CommentsDetailModelSelector) => CommentsDetailModelSelector) | undefined) { return this.__child(`commentId`, CommentsDetailModelSelector, builder) }
@@ -57,4 +51,4 @@ export function selectFromTopicDetail() {
   return new TopicDetailModelSelector()
 }
 
-export const topicDetailModelPrimitives = selectFromTopicDetail()._id.createdAt.updatedAt.topicContent.attachmentType.attachmentUrl.fileName.type.uri.status
+export const topicDetailModelPrimitives = selectFromTopicDetail()._id.createdAt.updatedAt.topicContent.attachmentType.attachmentUrl.status

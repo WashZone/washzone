@@ -11,85 +11,37 @@ import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { useHooks } from "../hooks"
 import { useStores } from "../../models"
 
-const channels = [
-  {
-    title: "My Video Feed",
-    videos: [
-      {
-        title: "How to detail a car - 1 of 3",
-        publisher: { name: "Pete Quint" },
-        view: 736,
-        createdAt: 1669106599000,
-        poster:
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQO_H8dD3eHwgp6oQUJTUaaWkNJVGEhDatMHA&usqp=CAU",
-      },
-      {
-        title: "How to detail a car - 2 of 3 sdffds",
-        publisher: { name: "Pete Quint" },
-        view: 736,
-        createdAt: 1669109999000,
-        poster:
-          "https://d1csarkz8obe9u.cloudfront.net/posterpreviews/car-wash-video-promotion-for-instagram-poster-template-0d1d24c513c36778b79c547929a33e97_screen.jpg?ts=1567092075",
-      },
-    ],
-  },
-  {
-    title: "Channel 1",
-    videos: [
-      {
-        title: "How to detail a car - 1 of 3",
-        publisher: { name: "Pete Quint" },
-        view: 736,
-        createdAt: 1669106599000,
-        poster:
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRxWrYiTXDnTuBIRia5HFsd9-KABNfhdGwagQuPfKiExBbp9vo8-LEZ1f4HQ3uoKVMkkLU&usqp=CAU",
-      },
-      {
-        title: "How to detail a car - 2 of 3 sdffds",
-        publisher: { name: "Pete Quint" },
-        view: 736,
-        createdAt: 1669109999000,
-        poster:
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS_v3rAGigWyVlvEppr8ZP-H_jX_5bidqedQpTfstKGcHhJ_wIg7vmC0JixmsdAAsXxcmw&usqp=CAU",
-      },
-    ],
-  },
-  {
-    title: "Channel 2",
-    videos: [
-      {
-        title: "How to detail a car - 1 of 3",
-        publisher: { name: "Pete Quint" },
-        view: 736,
-        createdAt: 1669106599000,
-        poster:
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_Q4Vx4R25zDCmtMbVLDiTa8yz8ZRyewF0fDSMwTNPGpkKQgpcQestsswhRXyhzqTjMn4&usqp=CAU",
-      },
-      {
-        title: "How to detail a car - 2 of 3 sdffds",
-        publisher: { name: "Pete Quint" },
-        view: 736,
-        createdAt: 1669109999000,
-        poster:
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTWhT6OhcLOjGYg2JSn87VPbLZSDoFtVktaRWRubKPYgMK0iWEN_VqATk12-nT9ZqWSA7E&usqp=CAU",
-      },
-    ],
-  },
-]
-
-const VideoBlock = ({ videoDetails }) => {
+export const VideoBlock = ({
+  videoDetails,
+  disabled,
+}: {
+  videoDetails: any
+  disabled?: boolean
+}) => {
   const navigation = useNavigation<NavigationProp<VideosTabParamList>>()
 
   const handleOnPress = () => {
+    if (disabled) return
     navigation.navigate("VideoDetails", { data: videoDetails })
   }
 
   return (
     <Pressable style={$videoBlockContainer} onPress={handleOnPress}>
-      <FastImage source={{ uri: `https://img.youtube.com/vi/${videoDetails.attachmentVideoUrl.split('=')[1]}/0.jpg` }} style={$videoPoster} resizeMode="cover" />
+      <FastImage
+        source={{
+          uri: `https://img.youtube.com/vi/${videoDetails.attachmentVideoUrl.split("=")[1]}/0.jpg`,
+        }}
+        style={$videoPoster}
+        resizeMode="cover"
+      />
       <View style={$videoDetailsContent}>
         <View style={$flex1}>
-          <Text text={videoDetails?.videoHeading} numberOfLines={1} style={$videoTitle} weight="bold" />
+          <Text
+            text={videoDetails?.videoHeading}
+            numberOfLines={1}
+            style={$videoTitle}
+            weight="bold"
+          />
           <Text
             text={videoDetails.UserId?.name}
             numberOfLines={1}
@@ -144,7 +96,6 @@ export const VideosFeed: FC<VideosTabProps<"VideosFeed">> = observer(function Vi
     setRefreshing(true)
     await getVideos()
     setRefreshing(false)
-
   }
 
   useEffect(() => {
@@ -200,6 +151,7 @@ const $videoBlockContainer: ViewStyle = {
   borderColor: colors.palette.overlay20,
   borderWidth: 0.5,
   marginRight: spacing.medium,
+  backgroundColor: colors.palette.neutral200,
 }
 
 const $conditionContainer: ViewStyle = {
