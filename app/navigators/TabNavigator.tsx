@@ -1,13 +1,22 @@
 import { BottomTabScreenProps, createBottomTabNavigator } from "@react-navigation/bottom-tabs"
-import { CompositeScreenProps } from "@react-navigation/native"
-import React from "react"
+import { CompositeScreenProps, NavigationProp, useNavigation } from "@react-navigation/native"
+import React, { useEffect } from "react"
 import { ImageStyle, TextStyle, ViewStyle } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { Icon } from "../components"
 import { translate } from "../i18n"
-import { Home, Topics, Classifieds, Videos } from "../tabs"
+import {
+  Home,
+  Topics,
+  Classifieds,
+  Videos,
+  TopicsTabParamList,
+  VideosTabParamList,
+  ClassifiedsTabParamList,
+} from "../tabs"
 import { colors, spacing, typography } from "../theme"
 import { AppStackParamList, AppStackScreenProps } from "./AppNavigator"
+import * as Linking from "expo-linking"
 
 export type TabParamList = {
   Home: undefined
@@ -21,13 +30,59 @@ export type TabScreenProps<T extends keyof TabParamList> = CompositeScreenProps<
   AppStackScreenProps<keyof AppStackParamList>
 >
 
-const Tab = createBottomTabNavigator<TabParamList>()
+export const Tab = createBottomTabNavigator<TabParamList>()
 
 export function TabNavigator() {
   const { bottom } = useSafeAreaInsets()
+
+  const navigation = useNavigation<NavigationProp<TabParamList>>()
+  const navigationTopic = useNavigation<NavigationProp<TopicsTabParamList>>()
+  const navigationClassified = useNavigation<NavigationProp<ClassifiedsTabParamList>>()
+  const navigationVideo = useNavigation<NavigationProp<VideosTabParamList>>()
+  const url = Linking.useURL()
+
+  const handleStoryURL = (linkUrl: string) => {
+    console.log("URLURL", linkUrl)
+    if (/open-classified/.test(linkUrl)) {
+      navigation.navigate("Classifieds")
+      setTimeout(
+        () =>
+          navigationClassified.navigate("ClassifiedsDetails", {
+            classified: linkUrl?.split("/")[linkUrl?.split("/").length - 1],
+          }),
+        200,
+        Linking.openURL(null),
+      )
+    }
+    if (/open-topic/.test(linkUrl)) {
+      navigation.navigate("Topics")
+      setTimeout(() => {
+        navigationTopic.navigate("TopicInfo", {
+          topic: linkUrl?.split("/")[linkUrl?.split("/").length - 1],
+        })
+      }, 200)
+      Linking.openURL(null)
+    }
+    if (/open-video/.test(linkUrl)) {
+      navigation.navigate("Videos")
+      setTimeout(
+        () =>
+          navigationVideo.navigate("VideoDetails", {
+            data: linkUrl?.split("/")[linkUrl?.split("/").length - 1],
+          }),
+        200,
+      )
+      Linking.openURL(null)
+    }
+  }
+
+  useEffect(() => handleStoryURL(url), [url])
+
   return (
     <Tab.Navigator
+      initialRouteName={"Home"}
       screenOptions={{
+        lazy: false,
         headerShown: false,
         tabBarHideOnKeyboard: true,
         tabBarStyle: [$tabBar, { height: bottom + 70 }],

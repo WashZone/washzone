@@ -2,11 +2,11 @@ import { DarkTheme, DefaultTheme, NavigationContainer } from "@react-navigation/
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import { StackScreenProps } from "@react-navigation/stack"
 import { observer } from "mobx-react-lite"
-import React,{useEffect} from "react"
+import React, { useEffect } from "react"
 import { useColorScheme } from "react-native"
 import Config from "../config"
 import { useStores } from "../models"
-import * as Linking from 'expo-linking'
+import * as Linking from "expo-linking"
 import {
   EditProfile,
   LoginScreen,
@@ -31,7 +31,7 @@ export type AppStackParamList = {
   ResetPassword: undefined
   ForgotPassword: undefined
   Saved: undefined
-  ClassifiedLinked: {classifiedId:string}
+  ClassifiedLinked: { classifiedId: string }
 }
 
 /**
@@ -50,19 +50,16 @@ const Stack = createNativeStackNavigator<AppStackParamList>()
 const AppStack = observer(function AppStack() {
   const {
     authenticationStore: { isAuthenticated },
-    // feedStore:{clear}
   } = useStores()
-  // clear()
-
   const url = Linking.useURL()
+
   const openUrl = () => {
-    console.log("RUNNING OPEN URL")
+    console.log("RUNNING OPEN URL", url)
     if (url !== null) {
       Linking.openURL(url)
     }
   }
   useEffect(() => openUrl(), [url])
-
 
   return (
     <Stack.Navigator

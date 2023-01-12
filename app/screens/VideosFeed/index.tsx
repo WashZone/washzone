@@ -21,8 +21,7 @@ export const VideoBlock = ({
   const navigation = useNavigation<NavigationProp<VideosTabParamList>>()
 
   const handleOnPress = () => {
-    if (disabled) return
-    navigation.navigate("VideoDetails", { data: videoDetails })
+    !disabled && navigation.navigate("VideoDetails", { data: videoDetails })
   }
 
   return (

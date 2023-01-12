@@ -106,11 +106,12 @@ export const Posts = observer(() => {
   const {
     topics: { topics },
   } = useStores()
-  const { refreshTopics, loadMoreTopics } = useHooks()
+  const { refreshTopics, loadMoreTopics, loadStories } = useHooks()
   const [refreshing, setRefreshing] = useState<boolean>(false)
   console.log("TOPICS LENGTH", topics?.length)
   useEffect(() => {
     refreshTopics()
+    loadStories()
   }, [])
 
   const onRefresh = () => {

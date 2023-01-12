@@ -1,16 +1,15 @@
 import React, { useEffect } from "react"
-import { FlatList, Pressable, TextStyle, View, ViewStyle } from "react-native"
-import { Text } from "../../../components"
-import { colors, spacing } from "../../../theme"
+import { Alert, FlatList, Pressable, TextStyle, View, ViewStyle } from "react-native"
+import { NavigationProp, useNavigation } from "@react-navigation/native"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import LinearGradient from "react-native-linear-gradient"
+
+import { TopicsTabParamList, ClassifiedsTabParamList, VideosTabParamList } from "../../../tabs"
 import { useHooks } from "../../hooks"
 import { useStores } from "../../../models"
 import { formatName } from "../../../utils/formatName"
-import { openCustomUrl } from "../../../utils/navigations"
-import { NavigationProp, useNavigation } from "@react-navigation/native"
-import { ClassifiedsTabParamList, VideosTabParamList, TopicsTabParamList } from "../../../tabs"
-import { TabParamList } from "../../../navigators/TabNavigator"
+import { colors, spacing } from "../../../theme"
+import { Text } from "../../../components"
 
 interface StoryComponentProps {
   item: any
@@ -26,10 +25,50 @@ export function Stories() {
   useEffect(() => {
     loadStories()
   }, [])
-  const navigation = useNavigation<NavigationProp<TabParamList>>()
+
   const navigationTopic = useNavigation<NavigationProp<TopicsTabParamList>>()
   const navigationClassified = useNavigation<NavigationProp<ClassifiedsTabParamList>>()
   const navigationVideo = useNavigation<NavigationProp<VideosTabParamList>>()
+
+  const handleStoryURL = (linkUrl: string) => {
+    console.log("URLURL", linkUrl)
+    let valid = false
+    if (/story-classified/.test(linkUrl)) {
+      valid = true
+      setTimeout(
+        () =>
+          navigationClassified.navigate("ClassifiedsDetails", {
+            classified: linkUrl?.split("/")[linkUrl?.split("/").length - 1],
+          }),
+        200,
+      )
+    }
+    if (/story-topic/.test(linkUrl)) {
+      valid = true
+
+      setTimeout(() => {
+        navigationTopic.navigate("TopicInfo", {
+          topic: linkUrl?.split("/")[linkUrl?.split("/").length - 1],
+        })
+      }, 200)
+    }
+    if (/story-video/.test(linkUrl)) {
+      valid = true
+
+      setTimeout(
+        () =>
+          navigationVideo.navigate("VideoDetails", {
+            data: linkUrl?.split("/")[linkUrl?.split("/").length - 1],
+          }),
+        200,
+      )
+    }
+
+    // If the URL doesnt fit any of our cases, then!
+    if (!valid) {
+      Alert.alert("Something Went Wrong!", "Please ask the publisher to either Repost or Delete.")
+    }
+  }
 
   const StoryComponent = ({ item, index }: StoryComponentProps) => {
     return (
@@ -37,13 +76,7 @@ export function Stories() {
         style={$storyContainer}
         key={index}
         onPress={() => {
-          openCustomUrl(
-            item?.attachmentUrl,
-            navigation,
-            navigationTopic,
-            navigationClassified,
-            navigationVideo,
-          )
+          handleStoryURL(item?.attachmentUrl)
         }}
       >
         <FastImage source={{ uri: item?.thumbnailUrl }} resizeMode="cover" style={$story} />
