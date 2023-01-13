@@ -141,12 +141,12 @@ const VideoDescription = ({ data }: { data: any }) => {
       <ActionButtons data={data} />
       <View style={$publisherContainer}>
         <FastImage
-          source={{ uri: data?.userId.length ? data?.userId[0]?.picture : data?.userId?.picture }}
+          source={{ uri: data?.userId?.length ? data?.userId[0]?.picture : data?.userId?.picture }}
           style={$avatar}
         />
         <Text
           style={$publisherName}
-          text={formatName(data?.userId.length ? data?.userId[0]?.name : data?.userId?.name)}
+          text={formatName(data?.userId?.length ? data?.userId[0]?.name : data?.userId?.name)}
           weight="semiBold"
         />
       </View>
@@ -166,17 +166,13 @@ const VideoContainer = ({ uri, videoId }: { uri: string; videoId: string }) => {
     mutateUpdateVideoViews({ videoId, userId: _id })
   }
 
-  // useEffect(() => {
-  //   onVideoLoad()
-  // }, [])
-
   return (
     <View style={[$video, $screenHeaderContainer]}>
       <YoutubePlayer
         onReady={onVideoLoad}
         height={300}
         play={true}
-        videoId={uri.split("=")[1]}
+        videoId={uri?.split("=")[1]}
         onError={(e) => console.log(e)}
       />
     </View>
@@ -198,7 +194,10 @@ export const VideoDetails: FC<VideosTabProps<"VideoDetails">> = observer(functio
       if (typeof data === "string") {
         setLoading(true)
         const res = await mutateGetUploadVideoByVideoId({ videoId: data })
-        setVideoDetails(res.getUploadVideoByVideoId?.length === 1 && res.getUploadVideoByVideoId[0])
+        console.log("mutateGetUploadVideoByVideoId", JSON.stringify(res))
+        setVideoDetails(
+          res.getUploadVideoByVideoId?.data?.length === 1 && res.getUploadVideoByVideoId?.data[0],
+        )
         setLoading(false)
       }
     } else {

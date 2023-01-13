@@ -6,8 +6,8 @@ import { TopicDetails, TopicInfo, TopicsFeed } from "../../screens"
 
 export type TopicsTabParamList = {
   TopicsFeed: undefined
-  TopicDetails: {topic:any}
-  TopicInfo: {topic:any}
+  TopicDetails: { topic: any }
+  TopicInfo: { topic: any }
 }
 
 export type TopicsTabProps<T extends keyof TopicsTabParamList> = StackScreenProps<

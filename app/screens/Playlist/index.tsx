@@ -1,4 +1,4 @@
-import React, { FC } from "react"
+import React, { FC, useEffect, useState } from "react"
 import { View, TextStyle, ViewStyle, Pressable, FlatList } from "react-native"
 import { Button, Icon, Screen, Text } from "../../components"
 import FastImage, { ImageStyle } from "react-native-fast-image"
@@ -10,6 +10,7 @@ import { fromNow } from "../../utils/agoFromNow"
 import { formatName } from "../../utils/formatName"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { $flex1 } from "../styles"
+import { useHooks } from "../hooks"
 
 const channelDetails = {
   title: "How to detail a Car",
@@ -51,13 +52,21 @@ const VideoBlock = ({ videoDetails, index }) => {
   const navigation = useNavigation<NavigationProp<VideosTabParamList>>()
 
   return (
-    <Pressable onPress={() => navigation.navigate("VideoDetails")} style={$backWhite}>
+    <Pressable
+      onPress={() => navigation.navigate("VideoDetails", { data: videoDetails?._id.toString() })}
+      style={$backWhite}
+    >
       <View style={$videoBlockContainer}>
         <FastImage source={{ uri: videoDetails.poster }} style={$videoPoster} resizeMode="cover" />
         <View style={$videoDetailsContent}>
-          <Text text={videoDetails.title} numberOfLines={1} style={$videoTitle} weight="bold" />
           <Text
-            text={videoDetails.view + " views" + " • " + fromNow(videoDetails.createdAt)}
+            text={videoDetails?.videoHeading}
+            numberOfLines={1}
+            style={$videoTitle}
+            weight="bold"
+          />
+          <Text
+            text={videoDetails.view + " views" + " • " + fromNow(videoDetails?.createdAt)}
             numberOfLines={1}
             style={$viewsAndCreated}
           />
@@ -92,18 +101,18 @@ const PlaylistDescription = () => {
   )
 }
 
-const HeaderComponent = () => {
+const HeaderComponent = ({ playlistData }: { playlistData: any }) => {
   return (
     <View style={$screenHeaderContainer}>
       <Text
-        text={channelDetails.title.toUpperCase()}
+        text={playlistData?.playListName?.toUpperCase()}
         preset="heading"
         style={$heading}
         weight="bold"
       />
-      <FastImage style={$avatar} source={{ uri: channelDetails.publisher.avatar }} />
+      <FastImage style={$avatar} source={{ uri: playlistData?.userId?.picture }} />
       <Text
-        text={formatName(channelDetails.publisher.name)}
+        text={formatName(playlistData?.userId?.name)}
         style={$publisherName}
         weight="semiBold"
       />
@@ -111,14 +120,28 @@ const HeaderComponent = () => {
   )
 }
 
-export const Playlist: FC<VideosTabProps<"Playlist">> = observer(function Playlist(_props) {
+export const Playlist: FC<VideosTabProps<"Playlist">> = observer(function Playlist(props) {
+  const playlistId = props.route.params?.playlistId
+  const [playlistData, setPlaylistData] = useState<any>()
+
+  const { getPlaylist } = useHooks()
+
+  const syncPlaylistData = async () => {
+    const res = await getPlaylist(playlistId)
+    setPlaylistData(res)
+  }
+
+  useEffect(() => {
+    syncPlaylistData()
+  }, [])
+
   return (
     <Screen preset="fixed" contentContainerStyle={$flex1}>
-      <HeaderComponent />
+      <HeaderComponent playlistData={playlistData} />
       <FlatList
         style={$flex1}
         ListHeaderComponent={<PlaylistDescription />}
-        data={channelDetails.videos}
+        data={playlistData?.VideoDetail}
         renderItem={({ item, index }) => (
           <VideoBlock key={index} index={index} videoDetails={item} />
         )}

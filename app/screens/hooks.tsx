@@ -29,6 +29,7 @@ export function useHooks() {
       mutateSaveLikedVideo,
       queryGetTopicByUserId,
       mutateGetClassifiedByUserId,
+      queryGetVideoPlaylistByPlaylistId,
       mutateGetUploadVideoByUserId,
     },
     userStore,
@@ -36,7 +37,7 @@ export function useHooks() {
 
   const loadStories = async () => {
     const res = await queryGetAllStory()
-    setStories(res.getAllStory || [])
+    setStories(res.getAllStory?.data || [])
   }
 
   const getAndUpdatePosts = async (cache?: boolean) => {
@@ -247,7 +248,19 @@ export function useHooks() {
     return res.getClassifiedByUserId
   }
 
+  const getPlaylist = async (playlistId: string) => {
+    const res = await queryGetVideoPlaylistByPlaylistId({
+      playlistId,
+    })
+    console.log(res.getVideoPlaylistByPlaylistId)
+    return (
+      res.getVideoPlaylistByPlaylistId?.data?.length > 0 &&
+      res.getVideoPlaylistByPlaylistId?.data[0]
+    )
+  }
+
   return {
+    getPlaylist,
     loadStories,
     getAndUpdatePosts,
     postComment,

@@ -2,12 +2,12 @@ import React from "react"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import { StackScreenProps } from "@react-navigation/stack"
 import { observer } from "mobx-react-lite"
-import { Playlist, VideosFeed,VideoDetails } from "../../screens"
+import { Playlist, VideosFeed, VideoDetails } from "../../screens"
 
 export type VideosTabParamList = {
   VideosFeed: undefined
-  Playlist:undefined
-  VideoDetails: {data: any}
+  Playlist: { playlistId: string }
+  VideoDetails: { data: any }
 }
 
 export type VideosTabProps<T extends keyof VideosTabParamList> = StackScreenProps<
@@ -30,4 +30,3 @@ const VideosTab = observer(function AppStack() {
 export const Videos = observer(function AppNavigator() {
   return <VideosTab />
 })
-

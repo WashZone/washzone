@@ -21,7 +21,18 @@ export const VideoBlock = ({
   const navigation = useNavigation<NavigationProp<VideosTabParamList>>()
 
   const handleOnPress = () => {
-    !disabled && navigation.navigate("VideoDetails", { data: videoDetails })
+    if (!disabled) {
+      console.log(":IN", videoDetails)
+      if (videoDetails?.vedioPlaylistId !== "") {
+        // if (videoDetails?.vedioPlaylistId === "") {
+        //   navigation.navigate("VideoDetails", { data: videoDetails })
+        // } else {
+        navigation.navigate("Playlist", { playlistId: videoDetails?.vedioPlaylistId })
+        // }
+      } else {
+        navigation.navigate("VideoDetails", { data: videoDetails })
+      }
+    }
   }
 
   return (
@@ -98,7 +109,7 @@ export const VideosFeed: FC<VideosTabProps<"VideosFeed">> = observer(function Vi
   }
 
   useEffect(() => {
-    if (videos.length === 0) {
+    if (videos?.length === 0) {
       fetchVideos()
     }
   }, [])

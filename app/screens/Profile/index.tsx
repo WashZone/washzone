@@ -1,13 +1,5 @@
 import React, { FC, useRef } from "react"
-import {
-  Dimensions,
-  TextStyle,
-  ViewStyle,
-  View,
-  useWindowDimensions,
-  NativeSyntheticEvent,
-  NativeScrollEvent,
-} from "react-native"
+import { Dimensions, TextStyle, ViewStyle, View, useWindowDimensions } from "react-native"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { colors, spacing } from "../../theme"
 import { HomeTabProps } from "../../tabs"
@@ -18,12 +10,7 @@ import { formatName } from "../../utils/formatName"
 import { NavigationState, SceneRendererProps, TabView } from "react-native-tab-view"
 import { ClassifiedsTabScreen, GalleryTabView, TopicsTabScreen, VideosTabScreen } from "./tabViews"
 import { $flex1 } from "../styles"
-import Animated, {
-  Extrapolate,
-  interpolate,
-  useAnimatedStyle,
-  useSharedValue,
-} from "react-native-reanimated"
+import Animated, { Extrapolate } from "react-native-reanimated"
 
 const BIO_MAX_HEIGHT = 260
 const mockDescription =
@@ -69,6 +56,7 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
         return null
     }
   }
+
   const renderTabBar = (
     props: SceneRendererProps & {
       navigationState: NavigationState<any>

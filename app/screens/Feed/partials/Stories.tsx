@@ -31,14 +31,13 @@ export function Stories() {
   const navigationVideo = useNavigation<NavigationProp<VideosTabParamList>>()
 
   const handleStoryURL = (linkUrl: string) => {
-    console.log("URLURL", linkUrl)
     let valid = false
     if (/story-classified/.test(linkUrl)) {
       valid = true
       setTimeout(
         () =>
           navigationClassified.navigate("ClassifiedsDetails", {
-            classified: linkUrl?.split("/")[linkUrl?.split("/").length - 1],
+            classified: linkUrl?.split("/")[linkUrl?.split("/")?.length - 1],
           }),
         200,
       )
@@ -48,7 +47,7 @@ export function Stories() {
 
       setTimeout(() => {
         navigationTopic.navigate("TopicInfo", {
-          topic: linkUrl?.split("/")[linkUrl?.split("/").length - 1],
+          topic: linkUrl?.split("/")[linkUrl?.split("/")?.length - 1],
         })
       }, 200)
     }
@@ -58,7 +57,7 @@ export function Stories() {
       setTimeout(
         () =>
           navigationVideo.navigate("VideoDetails", {
-            data: linkUrl?.split("/")[linkUrl?.split("/").length - 1],
+            data: linkUrl?.split("/")[linkUrl?.split("/")?.length - 1],
           }),
         200,
       )
@@ -89,6 +88,8 @@ export function Stories() {
       </Pressable>
     )
   }
+
+  console.log("Storiesl,", stories)
 
   return (
     <View style={$container}>

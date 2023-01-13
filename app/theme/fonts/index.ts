@@ -1,0 +1,5 @@
+export const HelveticaNeue300Light = require("./HelveticaNeueLight.ttf")
+export const HelveticaNeue400Regular = require("./HelveticaNeueRegular.ttf")
+export const HelveticaNeue500Medium = require("./HelveticaNeueMedium.ttf")
+export const HelveticaNeue600SemiBold = require("./HelveticaNeueBd.ttf")
+export const HelveticaNeue700Bold = require("./HelveticaNeueHv.ttf")
