@@ -77,7 +77,7 @@ const VideoBlock = ({ videoDetails, index }) => {
           $seperator,
           {
             backgroundColor:
-              index === channelDetails.videos.length - 1
+              index === videoDetails.videos.length - 1
                 ? colors.palette.neutral100
                 : colors.separator,
           },

@@ -86,11 +86,6 @@ const BottomActions = ({ classified }: { classified: any }) => {
 
   const bottomOptions: Array<ActionProps> = [
     {
-      icon: "alert",
-      title: "Alert",
-      onPress: () => console.log("ALERT"),
-    },
-    {
       icon: "save",
       title: "Save",
       onPress: async () => {

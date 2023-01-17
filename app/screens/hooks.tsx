@@ -141,6 +141,7 @@ export function useHooks() {
       user: {
         first_name: firstName,
         last_name: lastName,
+        name: firstName + " " + lastName,
         picture,
       },
       userId: userStore._id,
@@ -149,6 +150,7 @@ export function useHooks() {
       ...userStore,
       first_name: firstName,
       last_name: lastName,
+      name: firstName + " " + lastName,
       picture,
     })
     console.log(res)

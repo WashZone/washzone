@@ -1,6 +1,14 @@
 import { observer } from "mobx-react-lite"
 import React, { FC, useEffect, useMemo, useRef, useState } from "react"
-import { Pressable, TextInput, TextStyle, View, ViewStyle } from "react-native"
+import {
+  ActivityIndicator,
+  Alert,
+  Pressable,
+  TextInput,
+  TextStyle,
+  View,
+  ViewStyle,
+} from "react-native"
 import { Button, Icon, Screen, Text, TextField, TextFieldAccessoryProps } from "../../components"
 import { useStores } from "../../models"
 import { AppStackScreenProps } from "../../navigators"
@@ -25,55 +33,60 @@ export const SignupScreen: FC<SignupProps> = observer(function LoginScreen(_prop
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [loading, setLoading] = useState(false)
   const [attemptsCount, setAttemptsCount] = useState(0)
 
   const {
     authenticationStore: { setAuthToken },
-    userStore:{setUser},
-    api:{
-      mutateCreateUser
-    }
+    userStore: { setUser },
+    api: { mutateCreateUser },
   } = useStores()
 
-  console.log("Actual",JSON.stringify(useStores().api))
+  console.log("Actual", JSON.stringify(useStores().api))
 
   async function login() {
     setIsSubmitted(true)
     setAttemptsCount(attemptsCount + 1)
-    
+
     if (
       validateName(name) === "" &&
       validateEmail(email) === "" &&
       validateConfirmPassword(password, confirmPassword) === "" &&
       validatePassword(password) === ""
     ) {
-      const res = await mutateCreateUser({
-        type: 'User',
-        isSocialLogin: false,
-        lastName: name.split(' ')[1],
-        firstName: name.split(' ')[0],
-        password,
-        email,
-        name,
-        picture: defaultImages.profile
-      })
-      setUser({
-        name: res.createUser.name,
-        email: res.createUser.email,
-        first_name: res.createUser.first_name,
-        last_name: res.createUser.last_name,
-        picture: res.createUser.picture,
-        socialId: res.createUser.socialId,
-        type: '',
-        isSocialLogin : false,
-        _id: res.createUser._id
-      })
-      console.log(res)
-      setIsSubmitted(false)
-      const token = new Date()
-      setAuthToken(token.toString())
+      try {
+        setLoading(true)
+        const res = await mutateCreateUser({
+          type: "User",
+          isSocialLogin: false,
+          lastName: name.split(" ")[1],
+          firstName: name.split(" ")[0],
+          password,
+          email,
+          name,
+          picture: defaultImages.profile,
+        })
+        setUser({
+          name: res.createUser.name,
+          email: res.createUser.email,
+          first_name: res.createUser.first_name,
+          last_name: res.createUser.last_name,
+          picture: res.createUser.picture,
+          socialId: res.createUser.socialId,
+          type: "",
+          isSocialLogin: false,
+          _id: res.createUser._id,
+        })
+        console.log(res)
+        setIsSubmitted(false)
+        const token = new Date()
+        setAuthToken(token.toString())
+        setLoading(false)
+      } catch (err) {
+        Alert.alert(err?.response?.errors?.length > 0 && err?.response?.errors[0].message)
+        setLoading(false)
+      }
     }
-    
   }
 
   const PasswordRightAccessory = useMemo(
@@ -90,8 +103,6 @@ export const SignupScreen: FC<SignupProps> = observer(function LoginScreen(_prop
       },
     [isAuthPasswordHidden],
   )
-
- 
 
   return (
     <Screen
@@ -149,7 +160,7 @@ export const SignupScreen: FC<SignupProps> = observer(function LoginScreen(_prop
         placeholderTx="loginScreen.passwordLabel"
         helper={isSubmitted ? validatePassword(password) : ""}
         status={validatePassword(password) && isSubmitted ? "error" : undefined}
-        onSubmitEditing={()=>confirmPasswordInput.current.focus()}
+        onSubmitEditing={() => confirmPasswordInput.current.focus()}
         RightAccessory={PasswordRightAccessory}
         style={$inputText}
       />
@@ -172,11 +183,19 @@ export const SignupScreen: FC<SignupProps> = observer(function LoginScreen(_prop
         style={$inputText}
       />
       <Button
+        RightAccessory={() => (
+          <ActivityIndicator
+            style={$loadingIndicator}
+            animating={loading}
+            color={colors.palette.neutral100}
+          />
+        )}
         testID="login-button"
         tx="loginScreen.create"
         style={$tapButton}
         preset="reversed"
         onPress={login}
+        disabled={loading}
       />
       <Pressable onPress={() => _props.navigation.navigate("Login")} style={$footer}>
         <Text tx="loginScreen.navigateToLogin" size="sm" weight="light" style={$hint} />
@@ -185,6 +204,8 @@ export const SignupScreen: FC<SignupProps> = observer(function LoginScreen(_prop
     </Screen>
   )
 })
+
+const $loadingIndicator: ViewStyle = { position: "absolute", right: spacing.medium }
 
 const $footerText: TextStyle = {
   marginTop: spacing.medium,
@@ -236,5 +257,5 @@ const $inputText: TextStyle = {
 
 const $tapButton: ViewStyle = {
   marginTop: spacing.extraSmall,
-  height:50
+  height: 50,
 }

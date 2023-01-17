@@ -22,48 +22,46 @@ import { useStores } from "../../models"
 import YoutubePlayer from "react-native-youtube-iframe"
 import { $loaderContainer } from "../styles"
 
-const videoDetails = {
-  title: "How to detail a car - Part 1 ",
-  view: 736,
-  createdAt: 1669106599000,
-  poster:
-    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQO_H8dD3eHwgp6oQUJTUaaWkNJVGEhDatMHA&usqp=CAU",
-  videoUrl: "https://www.youtube.com/watch?v=awLX5qlY-Ts",
-  publisher: {
-    name: "Pete Quint",
-    avatar:
-      "https://media.istockphoto.com/id/1309328823/photo/headshot-portrait-of-smiling-male-employee-in-office.jpg?b=1&s=170667a&w=0&k=20&c=MRMqc79PuLmQfxJ99fTfGqHL07EDHqHLWg0Tb4rPXQc=",
-  },
-  description: `Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.`,
-  liked: true,
-}
+// const videoDetails = {
+//   title: "How to detail a car - Part 1 ",
+//   view: 736,
+//   createdAt: 1669106599000,
+//   poster:
+//     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQO_H8dD3eHwgp6oQUJTUaaWkNJVGEhDatMHA&usqp=CAU",
+//   videoUrl: "https://www.youtube.com/watch?v=awLX5qlY-Ts",
+//   publisher: {
+//     name: "Pete Quint",
+//     avatar:
+//       "https://media.istockphoto.com/id/1309328823/photo/headshot-portrait-of-smiling-male-employee-in-office.jpg?b=1&s=170667a&w=0&k=20&c=MRMqc79PuLmQfxJ99fTfGqHL07EDHqHLWg0Tb4rPXQc=",
+//   },
+//   description: `Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.`,
+//   liked: true,
+// }
 
 const ActionButtons = ({ data }: { data: any }) => {
   const {
     api: { mutateSaveLikedVideo },
     userStore: { _id },
   } = useStores()
+  const [status, setStatus] = useState<"liked" | "disliked" | null>(null)
 
   const options: Array<{
     label: string
     icon: IconTypes
     onPress: () => void
     status?: boolean
-    iconFill?: IconTypes
   }> = [
     {
       label: "Like",
-      icon: "like",
-      onPress: () => console.log("API RUNING"),
+      icon: status === "liked" ? "likefill" : "like",
+      onPress: () => (status === "liked" ? setStatus(null) : setStatus("liked")),
       status: true,
-      iconFill: "likefill",
     },
     {
       label: "Dislike",
-      icon: "dislike",
-      onPress: () => console.log("API RUNING"),
+      icon: status === "disliked" ? "dislikefill" : "dislike",
+      onPress: () => (status === "disliked" ? setStatus(null) : setStatus("disliked")),
       status: false,
-      iconFill: "dislikefill",
     },
     {
       label: "Share",
@@ -93,30 +91,17 @@ const ActionButtons = ({ data }: { data: any }) => {
       },
     },
   ]
-
-  const [liked, setLiked] = useState<boolean>(videoDetails.liked)
-  const [disliked, setDisliked] = useState<boolean>(videoDetails.liked)
   return (
     <View style={$actionButtonsContainer}>
       {options.map((option) => (
         <Pressable
           onPress={() => {
             option.onPress()
-            option.icon === "like" ? setLiked(!liked) : setDisliked(!disliked)
           }}
           style={$pressableAction}
           key={option.label}
         >
-          <Icon
-            icon={
-              option.icon !== "forward" && option.icon !== "save_box"
-                ? (liked && option.icon === "like") || (disliked && option.icon === "dislike")
-                  ? option.icon
-                  : option.iconFill
-                : option.icon
-            }
-            size={22}
-          />
+          <Icon icon={option.icon} size={22} />
           <Text text={option.label} style={$actionLabel} />
         </Pressable>
       ))}
@@ -174,6 +159,7 @@ const VideoContainer = ({ uri, videoId }: { uri: string; videoId: string }) => {
         play={true}
         videoId={uri?.split("=")[1]}
         onError={(e) => console.log(e)}
+        allowWebViewZoom={false}
       />
     </View>
   )

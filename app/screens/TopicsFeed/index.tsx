@@ -51,11 +51,11 @@ const Actions = ({ itemId }: { itemId: string }) => {
 
 export const TopicComponent = ({ topic, index }) => {
   const navigation = useNavigation<NavigationProp<TopicsTabParamList>>()
-
+  console.log("TOPICTOPCITOPCI", topic)
   const topicDetails = {
-    picture: topic?.UserId?.picture,
-    first_name: topic?.UserId?.first_name,
-    last_name: topic?.UserId?.last_name,
+    picture: topic?.userId?.picture,
+    first_name: topic?.userId?.first_name,
+    last_name: topic?.userId?.last_name,
     attachmentUrl: topic?.attachmentUrl,
     createdAt: topic?.createdAt,
     content: topic?.topicContent,

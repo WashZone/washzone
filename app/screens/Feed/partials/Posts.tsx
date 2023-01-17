@@ -41,9 +41,9 @@ export const PostComponent = ({ topic, navigateOnPress, index }: TopicComponentP
   }
 
   const topicDetails = {
-    picture: topic?.UserId?.picture,
-    first_name: topic?.UserId?.first_name,
-    last_name: topic?.UserId?.last_name,
+    picture: topic?.userId?.picture,
+    first_name: topic?.userId?.first_name,
+    last_name: topic?.userId?.last_name,
     attachmentUrl: topic?.attachmentUrl,
     createdAt: topic?.createdAt,
   }
