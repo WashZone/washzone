@@ -12,8 +12,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated"
 import { AutoImage } from "../../components"
-import { $flex1 } from "../styles"
-import * as Linking from "expo-linking"
+
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList)
 
 const mockImageData = [
@@ -95,7 +94,7 @@ export const GalleryTabView = () => {
         </Animated.View>
       </Pressable> */}
 
-      <ScrollView style={$flex1}>
+      <ScrollView style={$screenContainer}>
         <View style={$flexRow}>
           <View style={{ flex: 1 / 2 }}>
             {imageData.left.map((e, index) => (
@@ -216,6 +215,7 @@ const $classifiedBlockContainer: ViewStyle = {
 
 const $screenContainer: ViewStyle = {
   flex: 1,
+  backgroundColor: colors.backgroundGrey,
 }
 
 const $marginAutoImage: ImageStyle = { margin: 10 }

@@ -24,6 +24,7 @@ import { setupReactotron } from "./services/reactotron"
 import Config from "./config"
 import { Platform } from "react-native"
 import AppLovinMAX from "react-native-applovin-max/src/index"
+import { useHooks } from "./screens/hooks"
 
 // Set up Reactotron, which is a free desktop app for inspecting and debugging
 // React Native apps. Learn more here: https://github.com/infinitered/reactotron
@@ -61,16 +62,18 @@ interface AppProps {
 
 function App(props: AppProps) {
   const { hideSplashScreen } = props
+  const { syncInteractedVideosAndTopics } = useHooks()
   const SDK_KEY =
     "U0OTon6ehwaUryCOnQkOPUyWxZJn8XLdTl5KVBzC5ThxUuJGI2fhWbDS9XEI4ZxcI0xpCu0IRhEwZTBtarZ5Rn"
 
   const [AppLovinSDKRegistered, setAppLovinSDKRegistered] = React.useState(false)
   useEffect(() => {
     // MAX Consent Flow for iOS 14.5+
+    syncInteractedVideosAndTopics()
     if (Platform.OS === "ios" && parseFloat(Platform.Version) >= 14.5) {
       // Enable the iOS consent flow programmatically - NSUserTrackingUsageDescription must be added to the Info.plist
       AppLovinMAX.setConsentFlowEnabled(true)
-      AppLovinMAX.setPrivacyPolicyUrl("https://magnifi.ai/privacy-policy/") // mandatory
+      AppLovinMAX.setPrivacyPolicyUrl("https://www.freeprivacypolicy.com/blog/privacy-policy-url/") // mandatory
     }
 
     AppLovinMAX.initialize(SDK_KEY, (configuration) => {

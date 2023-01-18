@@ -1,4 +1,5 @@
 import { useStores } from "../models"
+import { Interaction } from "../utils/enums"
 
 export function useHooks() {
   const {
@@ -12,6 +13,18 @@ export function useHooks() {
     topics: { setTopics, topics, addToTopics },
     saved: { setSavedClassifieds },
     videos: { setVideos },
+    interaction: {
+      addToDislikedTopics,
+      addToLikedTopics,
+      addToLikedVideos,
+      addToDislikedVideos,
+      removefromDislikedTopics,
+      removefromDislikedVideos,
+      removefromLikedTopics,
+      removefromLikedVideos,
+      getInteractionOnVideo,
+      getInteractionOnTopic,
+    },
     api: {
       queryGetAllTopics,
       mutateCommentOnTopic,
@@ -31,6 +44,10 @@ export function useHooks() {
       mutateGetClassifiedByUserId,
       queryGetVideoPlaylistByPlaylistId,
       mutateGetUploadVideoByUserId,
+      queryGetlikesVideoByUserId,
+      queryGetlikesTopicByUserId,
+      mutateLikeDislikeTopic,
+      mutateLikeDislikeVideo,
     },
     userStore,
   } = useStores()
@@ -261,6 +278,130 @@ export function useHooks() {
     )
   }
 
+  const interactWithVideo = async (videoId: string, buttonType: "like" | "dislike") => {
+    console.log("VIDEOID IN HOOK", videoId)
+    console.log("INPUT INTERACTION", getInteractionOnVideo(videoId))
+
+    const getInputInteraction = () => {
+      if (buttonType === "like") {
+        if (getInteractionOnVideo(videoId) === Interaction.like) return Interaction.null
+        else return Interaction.like
+      } else {
+        if (getInteractionOnVideo(videoId) === Interaction.dislike) return Interaction.null
+        else return Interaction.dislike
+      }
+    }
+    const inputInteraction = getInputInteraction()
+    console.log("INPUT INTERACTION", inputInteraction)
+    try {
+      await mutateLikeDislikeVideo({
+        videoId,
+        userId: userStore._id,
+        status: inputInteraction,
+      })
+      if (inputInteraction === Interaction.like) {
+        console.log("LIKING")
+        addToLikedVideos(videoId)
+        removefromDislikedVideos(videoId)
+      }
+      if (inputInteraction === Interaction.dislike) {
+        console.log("DIS-LIKING")
+        addToDislikedVideos(videoId)
+        removefromLikedVideos(videoId)
+      }
+      if (inputInteraction === Interaction.null) {
+        console.log("SETTING TO NULL")
+        removefromDislikedVideos(videoId)
+        removefromLikedVideos(videoId)
+      }
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  const interactWithTopic = async (topicId: string, buttonType: "like" | "dislike") => {
+    console.log("topicId IN HOOK", topicId)
+    console.log("INPUT INTERACTION", getInteractionOnTopic(topicId))
+
+    const getInputInteraction = () => {
+      if (buttonType === "like") {
+        if (getInteractionOnTopic(topicId) === Interaction.like) return Interaction.null
+        else return Interaction.like
+      } else {
+        if (getInteractionOnTopic(topicId) === Interaction.dislike) return Interaction.null
+        else return Interaction.dislike
+      }
+    }
+    const inputInteraction = getInputInteraction()
+    console.log("INPUT INTERACTION", inputInteraction)
+    try {
+      await mutateLikeDislikeTopic({
+        topicId,
+        userId: userStore._id,
+        status: inputInteraction,
+      })
+      if (inputInteraction === Interaction.like) {
+        console.log("LIKING")
+        addToLikedTopics(topicId)
+        removefromDislikedTopics(topicId)
+      }
+      if (inputInteraction === Interaction.dislike) {
+        console.log("DIS-LIKING")
+        addToDislikedTopics(topicId)
+        removefromLikedTopics(topicId)
+      }
+      if (inputInteraction === Interaction.null) {
+        console.log("SETTING TO NULL")
+        removefromDislikedTopics(topicId)
+        removefromLikedTopics(topicId)
+      }
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  const syncInteractedVideosAndTopics = async () => {
+    const likedTopics = []
+    const disLikedTopics = []
+    const likedVideos = []
+    const disLikedVideos = []
+
+    // Getting Liked Topics and Mapping to just get the Ids
+    try {
+      const resStatusOnTopics = await queryGetlikesTopicByUserId({
+        userId: userStore._id,
+      })
+      // eslint-disable-next-line array-callback-return
+      resStatusOnTopics.getlikesTopicByUserId.map((item: any) => {
+        if (item?.status === Interaction.like) likedTopics.push(item._id)
+        if (item?.status === Interaction.dislike) disLikedTopics.push(item._id)
+      })
+    } catch (err) {}
+
+    // Getting Liked Videos and Mapping to just get the Ids
+    try {
+      const resStatusOnVideos = await queryGetlikesVideoByUserId({
+        userId: userStore._id,
+      })
+      // eslint-disable-next-line array-callback-return
+      resStatusOnVideos.getlikesVideoByUserId.map((item: any) => {
+        if (item?.status === Interaction.like) likedVideos.push(item._id)
+        if (item?.status === Interaction.dislike) disLikedVideos.push(item._id)
+      })
+    } catch (err) {}
+
+    return {
+      videos: {
+        liked: likedVideos,
+        disliked: disLikedVideos,
+      },
+      topics: {
+        liked: likedTopics,
+        disliked: disLikedTopics,
+      },
+    }
+  }
+
   return {
     getPlaylist,
     loadStories,
@@ -285,5 +426,8 @@ export function useHooks() {
     loadMoreUserTopics,
     getUserClassifieds,
     getUserVideos,
+    syncInteractedVideosAndTopics,
+    interactWithVideo,
+    interactWithTopic,
   }
 }

@@ -9,6 +9,7 @@ import { ClassifiedStoreModel } from "./ClassifiedStore"
 import { VideosStoreModel } from "./VideosStore"
 import { SavedStoreModel } from "./SavedStore"
 import { SettingsStoreModel } from "./SettingsStore"
+import { InteractionStoreModel } from "./InteractionStore"
 
 const baseURL = "http://3.139.81.184:3002"
 
@@ -25,6 +26,7 @@ export const RootStoreModel = types.model("RootStore").props({
   videos: types.optional(VideosStoreModel, {}),
   saved: types.optional(SavedStoreModel, {}),
   settings: types.optional(SettingsStoreModel, {}),
+  interaction: types.optional(InteractionStoreModel, {}),
   api: types.optional(APIRootStore, {}),
 })
 

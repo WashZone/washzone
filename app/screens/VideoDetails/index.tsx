@@ -21,6 +21,8 @@ import { formatName } from "../../utils/formatName"
 import { useStores } from "../../models"
 import YoutubePlayer from "react-native-youtube-iframe"
 import { $loaderContainer } from "../styles"
+import { useHooks } from "../hooks"
+import { getIconForInteraction } from "../../utils/helpers"
 
 // const videoDetails = {
 //   title: "How to detail a car - Part 1 ",
@@ -38,13 +40,15 @@ import { $loaderContainer } from "../styles"
 //   liked: true,
 // }
 
-const ActionButtons = ({ data }: { data: any }) => {
+const ActionButtons = observer(function TopicsFeed({ data }: { data: any }) {
   const {
     api: { mutateSaveLikedVideo },
     userStore: { _id },
+    interaction: { getInteractionOnVideo, videos },
   } = useStores()
-  const [status, setStatus] = useState<"liked" | "disliked" | null>(null)
-
+  const [loading, setLoading] = useState<boolean>(false)
+  const { interactWithVideo } = useHooks()
+  console.log("Interaction", videos)
   const options: Array<{
     label: string
     icon: IconTypes
@@ -53,14 +57,22 @@ const ActionButtons = ({ data }: { data: any }) => {
   }> = [
     {
       label: "Like",
-      icon: status === "liked" ? "likefill" : "like",
-      onPress: () => (status === "liked" ? setStatus(null) : setStatus("liked")),
+      icon: getIconForInteraction(getInteractionOnVideo(data?._id), "liked"),
+      onPress: async () => {
+        setLoading(true)
+        await interactWithVideo(data?._id, "like")
+        setLoading(false)
+      },
       status: true,
     },
     {
       label: "Dislike",
-      icon: status === "disliked" ? "dislikefill" : "dislike",
-      onPress: () => (status === "disliked" ? setStatus(null) : setStatus("disliked")),
+      icon: getIconForInteraction(getInteractionOnVideo(data?._id), "disliked"),
+      onPress: async () => {
+        setLoading(true)
+        await interactWithVideo(data?._id, "dislike")
+        setLoading(false)
+      },
       status: false,
     },
     {
@@ -96,7 +108,7 @@ const ActionButtons = ({ data }: { data: any }) => {
       {options.map((option) => (
         <Pressable
           onPress={() => {
-            option.onPress()
+            !loading && option.onPress()
           }}
           style={$pressableAction}
           key={option.label}
@@ -107,7 +119,7 @@ const ActionButtons = ({ data }: { data: any }) => {
       ))}
     </View>
   )
-}
+})
 
 const VideoDescription = ({ data }: { data: any }) => {
   return (
@@ -285,6 +297,7 @@ const $detailsContainer: ViewStyle = {
   paddingHorizontal: spacing.medium,
   paddingBottom: spacing.massive,
   flex: 1,
+  backgroundColor: colors.palette.neutral100,
 }
 
 const $video: ViewStyle = {
@@ -304,7 +317,7 @@ const $descriptionText: TextStyle = {
 const $descriptionContainer: ViewStyle = {
   paddingVertical: spacing.medium,
   paddingBottom: 100, // cover the share button
-  backgroundColor:colors.palette.neutral100
+  backgroundColor: colors.palette.neutral100,
 }
 
 const $avatar: ImageStyle = {

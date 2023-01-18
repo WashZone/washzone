@@ -1,5 +1,12 @@
 import React, { FC, useRef } from "react"
-import { Dimensions, TextStyle, ViewStyle, View, useWindowDimensions } from "react-native"
+import {
+  Dimensions,
+  TextStyle,
+  ViewStyle,
+  View,
+  useWindowDimensions,
+  Pressable,
+} from "react-native"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { colors, spacing } from "../../theme"
 import { HomeTabProps } from "../../tabs"
@@ -63,7 +70,23 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
     },
   ) => {
     console.log("TAB BAR PROPS", JSON.stringify(props))
-    return <View></View>
+    return (
+      <View style={$tabBar}>
+        {props.navigationState.routes.map((route, indexR) => (
+          <Pressable
+            key={route?.key}
+            style={$tab}
+            onPress={() => index !== indexR && setIndex(indexR)}
+          >
+            <Text
+              style={$tabHeading}
+              weight={index === indexR ? "bold" : "light"}
+              text={route.key.toUpperCase()}
+            />
+          </Pressable>
+        ))}
+      </View>
+    )
   }
 
   return (
@@ -77,7 +100,7 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
         <TabView
           navigationState={{ index, routes }}
           renderScene={renderScene}
-          // renderTabBar={renderTabBar}
+          renderTabBar={renderTabBar}
           onIndexChange={setIndex}
           initialLayout={{ width: layout.width }}
         />
@@ -86,8 +109,18 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
   )
 })
 
+const $tabHeading: TextStyle = {
+  color: colors.palette.neutral100,
+}
+
+const $tab: ViewStyle = {
+  flex: 1,
+  height: 50,
+  alignItems: "center",
+  justifyContent: "center",
+}
+
 const $topContainer: ViewStyle = {
-  // paddingVertical: spacing.large,
   backgroundColor: colors.palette.neutral100,
   alignItems: "center",
   height: 260,
@@ -99,6 +132,11 @@ const $descriptionText: TextStyle = {
   lineHeight: 17,
   textAlign: "justify",
   alignSelf: "center",
+}
+
+const $tabBar: ViewStyle = {
+  flexDirection: "row",
+  backgroundColor: colors.palette.primary100,
 }
 
 const $publisherName: TextStyle = {

@@ -15,22 +15,39 @@ import { MREC_AD_UNIT_ID } from "../../utils/AppLovin"
 import AppLovinMAX from "react-native-applovin-max/src/index"
 import { $flex1 } from "../styles"
 import Share from "react-native-share"
+import { getIconForInteraction } from "../../utils/helpers"
 
-const Actions = ({ itemId }: { itemId: string }) => {
-  const [status, setStatus] = useState<"liked" | "disliked" | null>(null)
+const Actions = observer(function ActionButtons({ itemId }: { itemId: string }) {
+  const [loading, setLoading] = useState<boolean>(false)
+  const { interactWithTopic } = useHooks()
+  const {
+    interaction: { getInteractionOnTopic },
+  } = useStores()
   return (
     <View style={$actionsContainer}>
       <Icon
-        icon={status === "liked" ? "likefill" : "like"}
+        icon={getIconForInteraction(getInteractionOnTopic(itemId), "liked")}
         size={20}
         style={{ marginRight: spacing.medium }}
-        onPress={() => setStatus(status === "liked" ? null : "liked")}
+        onPress={async () => {
+          if (!loading) {
+            setLoading(true)
+            await interactWithTopic(itemId, "like")
+            setLoading(false)
+          }
+        }}
       />
       <Icon
-        icon={status === "disliked" ? "dislikefill" : "dislike"}
+        icon={getIconForInteraction(getInteractionOnTopic(itemId), "disliked")}
         size={20}
         style={{ marginRight: spacing.medium }}
-        onPress={() => setStatus(status === "disliked" ? null : "disliked")}
+        onPress={async () => {
+          if (!loading) {
+            setLoading(true)
+            await interactWithTopic(itemId, "dislike")
+            setLoading(false)
+          }
+        }}
       />
       <Icon
         icon="share"
@@ -47,7 +64,7 @@ const Actions = ({ itemId }: { itemId: string }) => {
       />
     </View>
   )
-}
+})
 
 export const TopicComponent = ({ topic, index }) => {
   const navigation = useNavigation<NavigationProp<TopicsTabParamList>>()
