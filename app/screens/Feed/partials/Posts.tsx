@@ -61,7 +61,7 @@ export const PostComponent = ({ topic, navigateOnPress, index }: TopicComponentP
     <>
       <Pressable style={$postContainer} onPress={onContainerPress}>
         <View style={$publisherInfoContainer}>
-          <Pressable onPress={() => navigation.navigate("Profile", { user: topic?.UserId })}>
+          <Pressable onPress={() => navigation.navigate("Profile", { user: topic?.userId })}>
             <FastImage
               source={{
                 uri:

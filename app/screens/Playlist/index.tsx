@@ -76,10 +76,7 @@ const VideoBlock = ({ videoDetails, index }) => {
         style={[
           $seperator,
           {
-            backgroundColor:
-              index === videoDetails.videos.length - 1
-                ? colors.palette.neutral100
-                : colors.separator,
+            backgroundColor: colors.separator,
           },
         ]}
       />
@@ -128,6 +125,7 @@ export const Playlist: FC<VideosTabProps<"Playlist">> = observer(function Playli
 
   const syncPlaylistData = async () => {
     const res = await getPlaylist(playlistId)
+
     setPlaylistData(res)
   }
 

@@ -304,6 +304,7 @@ const $descriptionText: TextStyle = {
 const $descriptionContainer: ViewStyle = {
   paddingVertical: spacing.medium,
   paddingBottom: 100, // cover the share button
+  backgroundColor:colors.palette.neutral100
 }
 
 const $avatar: ImageStyle = {
