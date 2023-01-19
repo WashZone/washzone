@@ -1,11 +1,13 @@
 import React, { FC, useState } from "react"
 import { ActivityIndicator, TextStyle, View, ViewStyle } from "react-native"
-import { Button, Header, Screen,  TextField } from "../../components"
+import { Button, Header, Screen, TextField } from "../../components"
 import { colors, spacing } from "../../theme"
 
 import { AppStackParamList, AppStackScreenProps } from "../../navigators"
 import { useStores } from "../../models"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
+import Toast from "react-native-toast-message"
+import { toastMessages } from "../../utils/toastMessages"
 
 export const ResetPassword: FC<AppStackScreenProps<"ResetPassword">> = function ResetPassword() {
   const {
@@ -22,15 +24,19 @@ export const ResetPassword: FC<AppStackScreenProps<"ResetPassword">> = function 
 
   const onSave = async () => {
     setButtonLoading(true)
-   try{ const res = await mutateResetPassword({
-      userId: _id,
-      newPassword: confirmPass,
-      oldPassword: currentPass,
-    })
-    console.log(res)}
-    catch(e){
-        console.log('erroer',e)
-        setButtonLoading(false)
+    try {
+      const res = await mutateResetPassword({
+        userId: _id,
+        newPassword: confirmPass,
+        oldPassword: currentPass,
+      })
+      Toast.show({ ...toastMessages.passwordResetSuccess })
+      console.log(res)
+      setButtonLoading(false)
+    } catch (e) {
+      Toast.show({ ...toastMessages.incorrectCredentials })
+      console.log("errror", e)
+      setButtonLoading(false)
     }
   }
 
@@ -84,8 +90,8 @@ export const ResetPassword: FC<AppStackScreenProps<"ResetPassword">> = function 
           maxLength={20}
         />
 
-        <Button 
-        onPress={onSave}
+        <Button
+          onPress={onSave}
           disabled={!isActive || buttonLoading}
           style={[
             $submitButton,
@@ -93,18 +99,21 @@ export const ResetPassword: FC<AppStackScreenProps<"ResetPassword">> = function 
           ]}
           text={"Save"}
           textStyle={$textButton}
-          RightAccessory={() =>
-            <ActivityIndicator animating={buttonLoading} size={20} style={$indicator} color={colors.palette.neutral100}/>
-        }
+          RightAccessory={() => (
+            <ActivityIndicator
+              animating={buttonLoading}
+              size={20}
+              style={$indicator}
+              color={colors.palette.neutral100}
+            />
+          )}
         />
-        
       </View>
     </Screen>
   )
 }
 
 const $indicator: ViewStyle = { position: "absolute", right: 20 }
-
 
 const $textButton: TextStyle = {
   color: colors.palette.neutral100,
@@ -114,7 +123,7 @@ const $textButton: TextStyle = {
 const $submitButton: ViewStyle = {
   height: 45,
   width: 160,
-alignItems:'center',
+  alignItems: "center",
   borderWidth: 0,
   alignSelf: "center",
   marginTop: spacing.small,

@@ -7,7 +7,7 @@ import { fromNow } from "../../utils/agoFromNow"
 import { formatName } from "../../utils/formatName"
 
 export const CommentComponent = ({ comment }: { comment: any }) => {
-    console.log('CommentComponent', comment)
+  console.log("CommentComponent", comment)
   return (
     <View style={$commentContainer}>
       <FastImage
@@ -27,7 +27,7 @@ export const CommentComponent = ({ comment }: { comment: any }) => {
   )
 }
 
-const $nameView : ViewStyle={flexDirection: "row", marginBottom: 5 }
+const $nameView: ViewStyle = { flexDirection: "row", marginBottom: 5 }
 
 const $fromNow: TextStyle = {
   fontSize: 10,

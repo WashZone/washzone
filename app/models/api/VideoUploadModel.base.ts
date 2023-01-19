@@ -9,6 +9,8 @@ import { LikeVideosModel, LikeVideosModelType } from "./LikeVideosModel"
 import { LikeVideosModelSelector } from "./LikeVideosModel.base"
 import { UserModel, UserModelType } from "./UserModel"
 import { UserModelSelector } from "./UserModel.base"
+import { VideoPlaylistModel, VideoPlaylistModelType } from "./VideoPlaylistModel"
+import { VideoPlaylistModelSelector } from "./VideoPlaylistModel.base"
 import { RootStoreType } from "./index"
 
 
@@ -24,7 +26,7 @@ export const VideoUploadModelBase = ModelBase
     createdAt: types.union(types.undefined, types.frozen()),
     updatedAt: types.union(types.undefined, types.frozen()),
     userId: types.union(types.undefined, types.null, types.late((): any => UserModel)),
-    vedioPlaylistId: types.union(types.undefined, types.null, types.string),
+    vedioPlaylistId: types.union(types.undefined, types.null, types.late((): any => VideoPlaylistModel)),
     LikeVideoId: types.union(types.undefined, types.null, types.late((): any => LikeVideosModel)),
     videoHeading: types.union(types.undefined, types.null, types.string),
     description: types.union(types.undefined, types.null, types.string),
@@ -43,7 +45,6 @@ export class VideoUploadModelSelector extends QueryBuilder {
   get _id() { return this.__attr(`_id`) }
   get createdAt() { return this.__attr(`createdAt`) }
   get updatedAt() { return this.__attr(`updatedAt`) }
-  get vedioPlaylistId() { return this.__attr(`vedioPlaylistId`) }
   get videoHeading() { return this.__attr(`videoHeading`) }
   get description() { return this.__attr(`description`) }
   get attachmentVideoUrl() { return this.__attr(`attachmentVideoUrl`) }
@@ -51,10 +52,11 @@ export class VideoUploadModelSelector extends QueryBuilder {
   get view() { return this.__attr(`view`) }
   get status() { return this.__attr(`status`) }
   userId(builder: string | UserModelSelector | ((selector: UserModelSelector) => UserModelSelector) | undefined) { return this.__child(`userId`, UserModelSelector, builder) }
+  vedioPlaylistId(builder: string | VideoPlaylistModelSelector | ((selector: VideoPlaylistModelSelector) => VideoPlaylistModelSelector) | undefined) { return this.__child(`vedioPlaylistId`, VideoPlaylistModelSelector, builder) }
   LikeVideoId(builder: string | LikeVideosModelSelector | ((selector: LikeVideosModelSelector) => LikeVideosModelSelector) | undefined) { return this.__child(`LikeVideoId`, LikeVideosModelSelector, builder) }
 }
 export function selectFromVideoUpload() {
   return new VideoUploadModelSelector()
 }
 
-export const videoUploadModelPrimitives = selectFromVideoUpload()._id.createdAt.updatedAt.vedioPlaylistId.videoHeading.description.attachmentVideoUrl.thumbnailUrl.view.status
+export const videoUploadModelPrimitives = selectFromVideoUpload()._id.createdAt.updatedAt.videoHeading.description.attachmentVideoUrl.thumbnailUrl.view.status

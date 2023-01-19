@@ -43,7 +43,7 @@ export function TabNavigator() {
 
   const handleStoryURL = (linkUrl: string) => {
     console.log("URLURL", linkUrl)
-    if (/open-classified/.test(linkUrl)) {
+    if (/shared-classified/.test(linkUrl)) {
       navigation.navigate("Classifieds")
       setTimeout(
         () =>
@@ -54,7 +54,7 @@ export function TabNavigator() {
         Linking.openURL(null),
       )
     }
-    if (/open-topic/.test(linkUrl)) {
+    if (/shared-topic/.test(linkUrl)) {
       navigation.navigate("Topics")
       setTimeout(() => {
         navigationTopic.navigate("TopicInfo", {
@@ -63,7 +63,7 @@ export function TabNavigator() {
       }, 200)
       Linking.openURL(null)
     }
-    if (/open-video/.test(linkUrl)) {
+    if (/shared-video/.test(linkUrl)) {
       navigation.navigate("Videos")
       setTimeout(
         () =>

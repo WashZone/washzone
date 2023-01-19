@@ -11,6 +11,10 @@ import { observer } from "mobx-react-lite"
 export const Settings: FC<AppStackScreenProps<"Settings">> = observer(function Settings() {
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
   const {
+    userStore: { isSocialLogin },
+  } = useStores()
+  console.log()
+  const {
     settings: { toggleNotification, notifications },
   } = useStores()
   return (
@@ -32,13 +36,15 @@ export const Settings: FC<AppStackScreenProps<"Settings">> = observer(function S
             <Toggle variant="switch" value={notifications} onPress={() => toggleNotification()} />
           }
         />
-        <ListItem
-          onPress={() => navigation.navigate("ResetPassword")}
-          style={$listItemStyle}
-          leftIcon="reset"
-          tx="settings.reset"
-          rightIcon="caretRight"
-        />
+        {!isSocialLogin && (
+          <ListItem
+            onPress={() => navigation.navigate("ResetPassword")}
+            style={$listItemStyle}
+            leftIcon="reset"
+            tx="settings.reset"
+            rightIcon="caretRight"
+          />
+        )}
       </View>
     </Screen>
   )

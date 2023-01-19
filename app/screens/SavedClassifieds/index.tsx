@@ -19,20 +19,24 @@ interface ActionProps {
 }
 
 const BottomActions = ({ classified, type }: { classified: any; type: "video" | "classified" }) => {
-  const { unSaveClassified } = useHooks()
+  const { interactWithSaveOnClassified } = useHooks()
   console.log(classified)
 
   const bottomOptions: Array<ActionProps> = [
     {
       icon: "save",
       title: "Save",
-      onPress: () => unSaveClassified(classified?._id),
+      onPress: async () => await interactWithSaveOnClassified(classified?._id),
     },
     {
       icon: "share",
       title: "Share",
       onPress: () =>
-        Share.open({ message: "", title: "", url: "" })
+        Share.open({
+          message: `washzone://shared-classified/${classified?._id}`,
+          title: "",
+          url: "",
+        })
           .then((res) => {
             console.log(res)
           })

@@ -150,11 +150,41 @@ const en = {
   resetPassword: {
     title: "Forgot your password?",
     description: "Enter your email to reset your password",
-    placeholder : "Enter your E-Mail"
+    placeholder: "Enter your E-Mail",
   },
-  profile:{
-    gallery :"GALLERY"
-  }
+  profile: {
+    gallery: "GALLERY",
+  },
+  toastMessages: {
+    videoSavedSuccessfully: {
+      text1: "Video Successfully Saved!",
+      text2: "Head over to Saved to view your saved items.",
+    },
+    classifiedSavedSuccessfully: {
+      text1: "Classified Successfully Saved!",
+      text2: "Head over to Saved to view your saved items.",
+    },
+    classifiedUnsavedSuccessfully: {
+      text1: "Classified Successfully Removed from Saved!",
+      // text2: "Head over to Saved to view your saved items.",
+    },
+    videoUnsavedSuccessfully: {
+      text1: "Video Successfully Removed from Saved!",
+    },
+    somethingWentWrong: {
+      text1: "Something went Wrong!",
+    },
+    passwordResetSuccess: {
+      text1: "Password Changed!",
+    },
+    incorrectCredentials: {
+      text1: "Incorrect Credentials!",
+    },
+    emailAlreadyExists: {
+      text1: "Email already Registered!",
+      text2: "Please choose another email as this one seems to be already registered.",
+    },
+  },
 }
 
 export default en

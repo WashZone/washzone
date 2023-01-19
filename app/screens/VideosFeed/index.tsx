@@ -20,6 +20,8 @@ export const VideoBlock = ({
 }) => {
   const navigation = useNavigation<NavigationProp<VideosTabParamList>>()
 
+  console.log("videoDetails", videoDetails)
+
   const handleOnPress = () => {
     if (!disabled) {
       console.log(":IN", videoDetails)
@@ -59,7 +61,12 @@ export const VideoBlock = ({
             weight="medium"
           />
           <Text
-            text={videoDetails.views || 0 + " views" + " • " + fromNow(videoDetails.createdAt)}
+            text={
+              (videoDetails?.view || 0) +
+              ` view${videoDetails?.view > 1 ? "s" : ""}` +
+              " • " +
+              fromNow(videoDetails.createdAt)
+            }
             numberOfLines={1}
             style={$viewsAndCreated}
           />

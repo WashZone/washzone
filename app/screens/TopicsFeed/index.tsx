@@ -53,7 +53,7 @@ const Actions = observer(function ActionButtons({ itemId }: { itemId: string }) 
         icon="share"
         size={25}
         onPress={() =>
-          Share.open({ message: "", title: "", url: `washzone://story-topic/${itemId}` })
+          Share.open({ message: "", title: "", url: `washzone://shared-topic/${itemId}` })
             .then((res) => {
               console.log(res)
             })

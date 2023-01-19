@@ -5,7 +5,6 @@ import {
   ViewStyle,
   Dimensions,
   Alert,
-  Pressable,
   ScrollView,
   ActivityIndicator,
 } from "react-native"
@@ -42,12 +41,11 @@ import { getIconForInteraction } from "../../utils/helpers"
 
 const ActionButtons = observer(function TopicsFeed({ data }: { data: any }) {
   const {
-    api: { mutateSaveLikedVideo },
     userStore: { _id },
     interaction: { getInteractionOnVideo, videos },
   } = useStores()
   const [loading, setLoading] = useState<boolean>(false)
-  const { interactWithVideo } = useHooks()
+  const { interactWithVideo, interactWithSaveOnVideo } = useHooks()
   console.log("Interaction", videos)
   const options: Array<{
     label: string
@@ -80,9 +78,9 @@ const ActionButtons = observer(function TopicsFeed({ data }: { data: any }) {
       icon: "forward",
       onPress: () =>
         Share.open({
-          message: data?.videoHeading,
+          message: `washzone://shared-video/${data?._id}`,
           title: "",
-          url: data?.attachmentVideoUrl,
+          url: "",
         })
           .then((res) => {
             console.log(res)
@@ -95,27 +93,25 @@ const ActionButtons = observer(function TopicsFeed({ data }: { data: any }) {
       label: "Save",
       icon: "save_box",
       onPress: async () => {
-        try {
-          await mutateSaveLikedVideo({ userId: _id, videoId: data?._id })
-        } catch (err) {
-          Alert.alert("VIDEO ALREADY SAVED")
-        }
+        setLoading(true)
+        await interactWithSaveOnVideo(data?._id)
+        setLoading(false)
       },
     },
   ]
   return (
     <View style={$actionButtonsContainer}>
       {options.map((option) => (
-        <Pressable
-          onPress={() => {
-            !loading && option.onPress()
-          }}
-          style={$pressableAction}
-          key={option.label}
-        >
-          <Icon icon={option.icon} size={22} />
+        <View style={$pressableAction} key={option.label}>
+          <Icon
+            icon={option.icon}
+            size={22}
+            onPress={() => {
+              !loading && option.onPress()
+            }}
+          />
           <Text text={option.label} style={$actionLabel} />
-        </Pressable>
+        </View>
       ))}
     </View>
   )
@@ -160,7 +156,8 @@ const VideoContainer = ({ uri, videoId }: { uri: string; videoId: string }) => {
 
   const onVideoLoad = async () => {
     console.log(uri)
-    mutateUpdateVideoViews({ videoId, userId: _id })
+    const res = await mutateUpdateVideoViews({ videoId, userId: _id })
+    console.log("onVideoLoad", res)
   }
 
   return (
@@ -210,8 +207,8 @@ export const VideoDetails: FC<VideosTabProps<"VideoDetails">> = observer(functio
   const shareVideo = () => {
     Share.open({
       message: "",
-      title: data?.videoHeading,
-      url: data?.attachmentVideoUrl,
+      title: `washzone://shared-video/${data?._id}`,
+      url: `washzone://shared-video/${data?._id}`,
     })
       .then((res) => {
         console.log(res)

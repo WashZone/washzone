@@ -2,16 +2,25 @@ import { Instance, SnapshotOut, types } from "mobx-state-tree"
 import { Interaction } from "../utils/enums"
 import { withSetPropAction } from "./helpers/withSetPropAction"
 
-const InteractionVariants = types.model({
+const InteractionVariantsTopics = types.model({
   liked: types.array(types.string),
   disliked: types.array(types.string),
+})
+const InteractionVariantsVideos = types.model({
+  liked: types.array(types.string),
+  disliked: types.array(types.string),
+  saved: types.array(types.string),
+})
+const InteractionVariantsClassified = types.model({
+  saved: types.array(types.string),
 })
 
 export const InteractionStoreModel = types
   .model("InteractionStore")
   .props({
-    videos: types.optional(InteractionVariants, {}),
-    topics: types.optional(InteractionVariants, {}),
+    videos: types.optional(InteractionVariantsVideos, {}),
+    topics: types.optional(InteractionVariantsTopics, {}),
+    classified: types.optional(InteractionVariantsClassified, {}),
   })
   .actions(withSetPropAction)
   .actions((self) => ({
@@ -21,6 +30,17 @@ export const InteractionStoreModel = types
     }) {
       self.setProp("videos", data.videos)
       self.setProp("topics", data.topics)
+    },
+    async syncSavedInteractions(data: { savedVideos: string[]; savedClassifieds: string[] }) {
+      console.log("SAVEINTERACTIONS", data.savedVideos)
+      console.log("SAVEINTERACTIONS", data.savedClassifieds)
+      self.setProp("videos", {
+        liked: [...self.videos.liked],
+        disliked: [...self.videos.disliked],
+        saved: [...data.savedVideos],
+      })
+      console.log("SAVEINTERACTIONS", { saved: [...data.savedClassifieds] })
+      self.setProp("classified", { saved: [...data.savedClassifieds] })
     },
     addToLikedTopics(id: string) {
       self.setProp("topics", { liked: [...self.topics.liked, id], disliked: self.topics.disliked })
@@ -64,19 +84,41 @@ export const InteractionStoreModel = types
         liked: self.videos.liked,
       })
     },
+    removeFromSavedClassifieds(id: string) {
+      self.setProp("classified", {
+        saved: self.classified.saved.filter((i) => i !== id),
+      })
+    },
+    addToSavedClassified(id: string) {
+      !self.classified.saved.includes(id) && self.classified.saved.push(id)
+    },
+    removeFromSavedVideos(id: string) {
+      self.setProp("videos", {
+        saved: self.videos.saved.filter((i) => i !== id),
+      })
+    },
+    addToSavedVideos(id: string) {
+      !self.videos.saved.includes(id) && self.videos.saved.push(id)
+    },
   }))
   .views((store) => ({
     getInteractionOnVideo(id: string) {
-      console.log("VIDEOID", id)
-      console.log("INTERACTION STORE", JSON.stringify(store))
       if (store.videos.liked.includes(id)) return Interaction.like
       if (store.videos.disliked.includes(id)) return Interaction.dislike
       return Interaction.null
+    },
+    getSavedInteractionOnVideo(id: string) {
+      if (store.videos.saved.includes(id)) return Interaction.saved
+      return Interaction.notSaved
     },
     getInteractionOnTopic(id: string) {
       if (store.topics.liked.includes(id)) return Interaction.like
       if (store.topics.disliked.includes(id)) return Interaction.dislike
       return Interaction.null
+    },
+    getInteractionOnClassified(id: string) {
+      if (store.classified.saved.includes(id)) return Interaction.saved
+      return Interaction.notSaved
     },
   }))
 

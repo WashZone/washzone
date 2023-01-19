@@ -84,6 +84,7 @@
     "react-native-share": "^8.0.1",
     "react-native-slider": "^0.11.0",
     "react-native-tab-view": "^3.3.4",
+    "react-native-toast-message": "^2.1.5",
     "react-native-upload-aws-s3": "^0.8.1",
     "react-native-video": "^5.2.1",
     "react-native-webview": "^11.26.0",

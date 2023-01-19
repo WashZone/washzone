@@ -18,6 +18,7 @@ import { useNavigation } from "@react-navigation/native"
 import { useHooks } from "../hooks"
 import { Rating } from "react-native-ratings"
 import { useStores } from "../../models"
+import { Interaction } from "../../utils/enums"
 
 // const mock = {
 //   poster:
@@ -80,7 +81,7 @@ const MoreDetails = ({ classified }: { classified: any }) => {
 }
 
 const BottomActions = ({ classified }: { classified: any }) => {
-  const { saveClassified } = useHooks()
+  const { interactWithSaveOnClassified } = useHooks()
   console.log(classified)
   const [isSaving, setSaving] = useState(false)
 
@@ -91,7 +92,7 @@ const BottomActions = ({ classified }: { classified: any }) => {
       onPress: async () => {
         if (!isSaving) {
           setSaving(true)
-          await saveClassified(classified?._id)
+          await interactWithSaveOnClassified(classified?._id)
           setSaving(false)
         }
       },
@@ -103,7 +104,7 @@ const BottomActions = ({ classified }: { classified: any }) => {
         Share.open({
           message: "",
           title: classified?.classifiedDetail,
-          url: `washzone://classified/${classified._id}`,
+          url: `washzone://shared-classified/${classified._id}`,
         })
           .then((res) => {
             console.log(res)
@@ -146,15 +147,15 @@ export const ClassifiedsDetails: FC<ClassifiedsTabProps<"ClassifiedsDetails">> =
     const [loading, setLoading] = useState<boolean>(typeof classified === "string")
     const {
       api: { mutateGetClassifiedById },
+      interaction: { getInteractionOnClassified },
     } = useStores()
 
     const handleStringTypeClassified = async () => {
       console.log("RUNNING")
       if (typeof classified === "string") {
         const res = await mutateGetClassifiedById({ classifiedId: classified })
-        setClassifiedDetails(
-          res.getClassifiedById?.data.length === 1 && res.getClassifiedById?.data[0],
-        )
+        console.log("RES CLASSFIED", res)
+        setClassifiedDetails(res.getClassifiedById?.length === 1 && res.getClassifiedById[0])
         setLoading(false)
       } else {
         setClassifiedDetails(classified)
@@ -185,7 +186,14 @@ export const ClassifiedsDetails: FC<ClassifiedsTabProps<"ClassifiedsDetails">> =
           <MoreDetails classified={classifiedDetails} />
         </ScrollView>
         <Pressable style={$backContainer} onPress={() => navigation.goBack()}>
-          <Icon icon="back" />
+          <Icon
+            icon="back"
+            color={
+              getInteractionOnClassified(classifiedDetails?._id) === Interaction.saved
+                ? colors.palette.primary100
+                : colors.transparent
+            }
+          />
         </Pressable>
         <BottomActions classified={classifiedDetails} />
       </Screen>

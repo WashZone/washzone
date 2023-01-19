@@ -23,19 +23,16 @@ export const TopicInfo: FC<HomeTabProps<"TopicInfo">> = function PostInfo(props)
   } = useStores()
 
   const handleTopic = async () => {
-    if (loading) {
-      if (typeof topic === "string") {
-        console.log("TOPIC--ID", topic)
-        const res = await mutateGetTopicByTopicId({ topicId: topic })
-        console.log("RES", res)
-        setTopicDetails(res.getTopicByTopicId?.data.length === 1 && res.getTopicByTopicId?.data[0])
-        setLoading(false)
-        await syncComments(
-          res.getTopicByTopicId?.data.length === 1 && res.getTopicByTopicId?.data[0]?._id,
-        )
-      } else {
-        await syncComments(topicDetails?._id)
-      }
+    if (loading && typeof topic === "string") {
+      console.log("TOPIC--ID", topic)
+      const res = await mutateGetTopicByTopicId({ topicId: topic })
+      console.log("RES", res)
+      const topicData = res.getTopicByTopicId?.data.length === 1 && res.getTopicByTopicId?.data[0]
+      setTopicDetails(topicData)
+      setLoading(false)
+      await syncComments(topicData?._id)
+    } else {
+      await syncComments(topicDetails?._id)
     }
   }
 
@@ -45,7 +42,7 @@ export const TopicInfo: FC<HomeTabProps<"TopicInfo">> = function PostInfo(props)
 
   async function syncComments(id: string) {
     const data = await getCommentsOnPost(id)
-    setComments(data)
+    setComments(data || [])
   }
 
   const onComment = async () => {
@@ -55,10 +52,12 @@ export const TopicInfo: FC<HomeTabProps<"TopicInfo">> = function PostInfo(props)
     setCommentText("")
     setIsCommenting(false)
   }
-  if(loading){
-    return <View style={$loadingScreen}>
-      <ActivityIndicator animating/>
-    </View>
+  if (loading) {
+    return (
+      <View style={$loadingScreen}>
+        <ActivityIndicator animating />
+      </View>
+    )
   }
 
   return (
@@ -95,10 +94,10 @@ export const TopicInfo: FC<HomeTabProps<"TopicInfo">> = function PostInfo(props)
   )
 }
 
-
-const $loadingScreen : ViewStyle={
-  flex:1, alignItems:'center',
-  justifyContent:'center'
+const $loadingScreen: ViewStyle = {
+  flex: 1,
+  alignItems: "center",
+  justifyContent: "center",
 }
 const $rightIconContainer: ViewStyle = {
   width: 28,

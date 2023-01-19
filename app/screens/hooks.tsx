@@ -1,5 +1,7 @@
 import { useStores } from "../models"
 import { Interaction } from "../utils/enums"
+import Toast from "react-native-toast-message"
+import { toastMessages } from "../utils/toastMessages"
 
 export function useHooks() {
   const {
@@ -24,6 +26,14 @@ export function useHooks() {
       removefromLikedVideos,
       getInteractionOnVideo,
       getInteractionOnTopic,
+      getInteractionOnClassified,
+      getSavedInteractionOnVideo,
+      addToSavedClassified,
+      addToSavedVideos,
+      removeFromSavedClassifieds,
+      removeFromSavedVideos,
+      syncSavedInteractions,
+      syncInteractions,
     },
     api: {
       queryGetAllTopics,
@@ -48,12 +58,14 @@ export function useHooks() {
       queryGetlikesTopicByUserId,
       mutateLikeDislikeTopic,
       mutateLikeDislikeVideo,
+      mutateUpdateDeletesavedVideo,
+      queryGetAllSavedByUserIdpageNumber,
     },
     userStore,
   } = useStores()
 
   const loadStories = async () => {
-    const res = await queryGetAllStory()
+    const res = await queryGetAllStory({ fetchPolicy: "network-only" })
     setStories(res.getAllStory?.data || [])
   }
 
@@ -139,8 +151,9 @@ export function useHooks() {
     console.log(userStore._id)
     console.log("TOPICIDDDD", topicId)
     const res = await queryGetCommentsByTopicId({ topicId }, { fetchPolicy: "network-only" })
+    console.log("TOPIC COMMENTS", JSON.stringify(res.getCommentsByTopicId[0].comments))
 
-    return res.getCommentsByTopicId[0]?.comments
+    return res.getCommentsByTopicId.length === 1 && res.getCommentsByTopicId[0]?.comments
   }
 
   const createTopic = async ({ content, attachment }) => {
@@ -173,16 +186,88 @@ export function useHooks() {
     console.log(res)
   }
 
-  const saveClassified = async (classifiedFeedId: string) => {
-    console.log("classifiedFeedId", classifiedFeedId)
-    console.log("userSavedId", userStore._id)
+  const syncSavedInteractionsHook = async () => {
+    console.log("USERIDDD=>>", userStore?._id)
+    const res = await queryGetAllSavedByUserId(
+      { userId: userStore?._id },
+      { fetchPolicy: "no-cache" },
+    )
+    const savedVideoIds: Array<string> = []
+    const savedClassifiedIds: Array<string> = []
+    // eslint-disable-next-line array-callback-return
+    res.getAllSavedByUserId?.data?.map((item: any) => {
+      if (item?.savedType === "classified") {
+        savedClassifiedIds.push(
+          item?.ClassifiedFeedId?.length &&
+            typeof item?.ClassifiedFeedId[0]?._id === "string" &&
+            item?.ClassifiedFeedId[0]?._id,
+        )
+      }
+      if (item?.savedType === "video") {
+        savedVideoIds.push(
+          item?.VideoDetail?.length &&
+            typeof item?.VideoDetail[0]?._id === "string" &&
+            item?.VideoDetail[0]?._id,
+        )
+      }
+    })
+    console.log("SAVEDVIDEOS", savedVideoIds)
+    console.log("savedClassifiedIds", savedClassifiedIds)
+
+    syncSavedInteractions({
+      savedClassifieds: [...savedClassifiedIds],
+      savedVideos: [...savedVideoIds],
+    })
+  }
+
+  const interactWithSaveOnClassified = async (classifiedFeedId: string) => {
+    console.log("getInteractionOnClassified", getInteractionOnClassified(classifiedFeedId))
     try {
-      const res = await mutateSaveLikedClassifiedFeed({
-        classifiedFeedId,
-        userId: userStore._id,
-      })
-      console.log("saveClassified", res)
+      if (getInteractionOnClassified(classifiedFeedId) === Interaction.notSaved) {
+        const res = await mutateSaveLikedClassifiedFeed({
+          classifiedFeedId,
+          userId: userStore._id,
+        })
+        console.log("saveClassified", res)
+        addToSavedClassified(classifiedFeedId)
+        Toast.show(toastMessages.classifiedSavedSuccessfully)
+      } else {
+        const res = await mutateUpdateDeletesavedclassified({
+          classifiedsavedId: classifiedFeedId,
+          userId: userStore?._id,
+        })
+        removeFromSavedClassifieds(classifiedFeedId)
+        Toast.show(toastMessages.classifiedUnsavedSuccessfully)
+      }
     } catch (err) {
+      Toast.show(toastMessages.somethingWentWrong)
+
+      console.log(err)
+    }
+  }
+
+  const interactWithSaveOnVideo = async (videoId: string) => {
+    console.log("getSavedInteractionOnVideo", getSavedInteractionOnVideo(videoId))
+    try {
+      if (getInteractionOnClassified(videoId) === Interaction.notSaved) {
+        const res = await mutateSaveLikedVideo({
+          videoId,
+          userId: userStore._id,
+        })
+        console.log("saveClassified", res)
+        addToSavedVideos(videoId)
+        Toast.show(toastMessages.videoSavedSuccessfully)
+      } else {
+        const res = await mutateUpdateDeletesavedVideo({
+          videosavedId: videoId,
+          userId: userStore._id,
+        })
+        console.log("UNSAVING", res)
+        removeFromSavedVideos(videoId)
+        Toast.show(toastMessages.videoUnsavedSuccessfully)
+      }
+    } catch (err) {
+      Toast.show(toastMessages.somethingWentWrong)
       console.log(err)
     }
   }
@@ -197,15 +282,15 @@ export function useHooks() {
   }
 
   const refreshSavedClassifieds = async () => {
-    const res = await queryGetAllSavedByUserId(
+    const res = await queryGetAllSavedByUserIdpageNumber(
       {
         userId: userStore._id,
         pageNumber: 1,
       },
       { fetchPolicy: "no-cache" },
     )
-    setSavedClassifieds(res.getAllSavedByUserId?.data)
-    console.log("saveClassified", JSON.stringify(res.getAllSavedByUserId?.data))
+    setSavedClassifieds(res.getAllSavedByUserIdpageNumber?.data)
+    console.log("saveClassified", JSON.stringify(res.getAllSavedByUserIdpageNumber?.data))
   }
 
   const getClassified = async (classifiedId: string) => {
@@ -213,15 +298,6 @@ export function useHooks() {
       classifiedId,
     })
     return res.getClassifiedById?.data[0]
-  }
-
-  const unSaveClassified = async (classifiedsavedId: string) => {
-    console.log("classifiedsavedId", classifiedsavedId)
-    const res = await mutateUpdateDeletesavedclassified({
-      classifiedsavedId,
-    })
-    console.log(res)
-    return res.UpdateDeletesavedclassified
   }
 
   const getVideos = async () => {
@@ -366,8 +442,8 @@ export function useHooks() {
     const likedVideos = []
     const disLikedVideos = []
 
-    // Getting Liked Topics and Mapping to just get the Ids
     try {
+      // Getting Liked Topics and Mapping to just get the Ids
       const resStatusOnTopics = await queryGetlikesTopicByUserId({
         userId: userStore._id,
       })
@@ -376,10 +452,7 @@ export function useHooks() {
         if (item?.status === Interaction.like) likedTopics.push(item._id)
         if (item?.status === Interaction.dislike) disLikedTopics.push(item._id)
       })
-    } catch (err) {}
-
-    // Getting Liked Videos and Mapping to just get the Ids
-    try {
+      // Getting Liked Videos and Mapping to just get the Ids
       const resStatusOnVideos = await queryGetlikesVideoByUserId({
         userId: userStore._id,
       })
@@ -388,18 +461,22 @@ export function useHooks() {
         if (item?.status === Interaction.like) likedVideos.push(item._id)
         if (item?.status === Interaction.dislike) disLikedVideos.push(item._id)
       })
+      syncInteractions({
+        videos: {
+          liked: likedVideos,
+          disliked: disLikedVideos,
+        },
+        topics: {
+          liked: likedTopics,
+          disliked: disLikedTopics,
+        },
+      })
     } catch (err) {}
+  }
 
-    return {
-      videos: {
-        liked: likedVideos,
-        disliked: disLikedVideos,
-      },
-      topics: {
-        liked: likedTopics,
-        disliked: disLikedTopics,
-      },
-    }
+  const onBoot = async () => {
+    await syncSavedInteractionsHook()
+    await syncInteractedVideosAndTopics()
   }
 
   return {
@@ -416,10 +493,9 @@ export function useHooks() {
     createTopic,
     refreshClassifieds,
     loadMoreClassified,
-    saveClassified,
+    interactWithSaveOnClassified,
     refreshSavedClassifieds,
     getClassified,
-    unSaveClassified,
     getVideos,
     saveVideo,
     getUserTopics,
@@ -429,5 +505,9 @@ export function useHooks() {
     syncInteractedVideosAndTopics,
     interactWithVideo,
     interactWithTopic,
+    interactWithSaveOnVideo,
+    syncSavedInteractions,
+    syncSavedInteractionsHook,
+    onBoot,
   }
 }

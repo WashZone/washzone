@@ -1,12 +1,14 @@
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { observer } from "mobx-react-lite"
 import React, { useMemo, useRef, useState } from "react"
-import { TextInput, TextStyle, ViewStyle, Pressable, Alert } from "react-native"
+import { TextInput, TextStyle, ViewStyle, Pressable } from "react-native"
 import { Button, Icon, Text, TextField, TextFieldAccessoryProps, Screen } from "../../components"
 import { useStores } from "../../models"
 import { AppStackParamList } from "../../navigators"
 import { colors, spacing } from "../../theme"
 import { $flex1 } from "../styles"
+import Toast from "react-native-toast-message"
+import { toastMessages } from "../../utils/toastMessages"
 
 export const LoginView = observer(() => {
   const authPasswordInput = useRef<TextInput>()
@@ -39,7 +41,7 @@ export const LoginView = observer(() => {
         email: res.signin.email,
         first_name: res.signin.first_name,
         last_name: res.signin.last_name,
-        picture: res.signin.picture ,
+        picture: res.signin.picture,
         socialId: res.signin.socialId,
         type: "",
         isSocialLogin: false,
@@ -47,7 +49,7 @@ export const LoginView = observer(() => {
       })
       setAuthToken(String(Date.now()))
     } catch (error) {
-      Alert.alert("Wrong Credentials!")
+      Toast.show({ ...toastMessages.incorrectCredentials })
     }
   }
 
@@ -65,8 +67,6 @@ export const LoginView = observer(() => {
       },
     [isAuthPasswordHidden],
   )
-
-
 
   return (
     <Screen
