@@ -33,7 +33,7 @@ const GalleryItem = ({ uri }) => {
   )
 }
 
-export const GalleryTabView = () => {
+export const GalleryTabView = ({ galleryItems }: { galleryItems: Array<any> }) => {
   const [isOpen, setOpen] = useState(false)
   const open = useSharedValue(0)
   const [imageData, setImageData] = useState<{ left: Array<any>; right: Array<any> }>({
@@ -45,7 +45,7 @@ export const GalleryTabView = () => {
     const left = []
     const right = []
 
-    mockImageData.map((data, index) => {
+    galleryItems.map((data, index) => {
       if (index % 2 === 0) {
         left.push(data)
       } else {
@@ -60,7 +60,7 @@ export const GalleryTabView = () => {
     })
     console.log(left)
     console.log(right)
-  }, [mockImageData])
+  }, [galleryItems])
 
   const animatedContainer = useAnimatedStyle(() => {
     const height = interpolate(open.value, [0, 1], [0, 400])
@@ -98,12 +98,12 @@ export const GalleryTabView = () => {
         <View style={$flexRow}>
           <View style={{ flex: 1 / 2 }}>
             {imageData.left.map((e, index) => (
-              <GalleryItem uri={e?.uri} key={index} />
+              <GalleryItem uri={e?.attachmentUrl || e.thumbnailUrl} key={index} />
             ))}
           </View>
           <View style={{ flex: 1 / 2 }}>
             {imageData.right.map((e, index) => (
-              <GalleryItem uri={e?.uri} key={index} />
+              <GalleryItem uri={e?.attachmentUrl || e.thumbnailUrl} key={index} />
             ))}
           </View>
         </View>
@@ -115,9 +115,11 @@ export const GalleryTabView = () => {
 export const TopicsTabScreen = ({
   userId,
   bioHeightRef,
+  addToGallery,
 }: {
   userId: string
   bioHeightRef: any
+  addToGallery: (toAdd: Array<any>) => void
 }) => {
   const [userTopics, setUserTopics] = React.useState([])
   const { getUserTopics } = useHooks()
@@ -125,6 +127,7 @@ export const TopicsTabScreen = ({
   const fetchUserTopics = async () => {
     const res = await getUserTopics(userId)
     setUserTopics(res)
+    addToGallery(res)
   }
 
   useEffect(() => {
@@ -146,13 +149,20 @@ export const TopicsTabScreen = ({
   )
 }
 
-export const ClassifiedsTabScreen = ({ userId }: { userId: string }) => {
+export const ClassifiedsTabScreen = ({
+  userId,
+  addToGallery,
+}: {
+  userId: string
+  addToGallery: (toAdd: Array<any>) => void
+}) => {
   const [userClassifieds, setUserClassifieds] = React.useState([])
   const { getUserClassifieds } = useHooks()
 
   const fetchUserClassifieds = async () => {
     const res = await getUserClassifieds(userId)
     setUserClassifieds(res)
+    addToGallery(res)
   }
 
   useEffect(() => {
@@ -174,13 +184,20 @@ export const ClassifiedsTabScreen = ({ userId }: { userId: string }) => {
   )
 }
 
-export const VideosTabScreen = ({ userId }: { userId: string }) => {
+export const VideosTabScreen = ({
+  userId,
+  addToGallery,
+}: {
+  userId: string
+  addToGallery: (toAdd: Array<any>) => void
+}) => {
   const [userVideos, setUserVideos] = React.useState([])
   const { getUserVideos } = useHooks()
 
   const fetchUserVideos = async () => {
     const res = await getUserVideos(userId)
     setUserVideos(res)
+    addToGallery(res)
   }
 
   useEffect(() => {

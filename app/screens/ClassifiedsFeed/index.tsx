@@ -42,6 +42,7 @@ export const ClassifiedComponent = ({
         style={$postContent}
         text={"$" + classified.prize + "  •  " + classified.title}
         numberOfLines={1}
+        weight="semiBold"
       />
     </Pressable>
   )
@@ -65,14 +66,14 @@ export const ClassifiedsFeed: FC<ClassifiedsTabProps<"ClassifiedsFeed">> = obser
     }, [])
 
     return (
-      <Screen contentContainerStyle={$flex1}>
+      <Screen contentContainerStyle={$flex1} backgroundColor={colors.palette.neutral100}>
         <FlatList
           showsVerticalScrollIndicator={false}
+          contentContainerStyle={$flatlistContentContainer}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
           data={classifieds}
           renderItem={({ item }) => <ClassifiedComponent classified={item} />}
           numColumns={2}
-          style={$listStyle}
           ListFooterComponent={<View style={$footerSpace} />}
         />
       </Screen>
@@ -82,33 +83,31 @@ export const ClassifiedsFeed: FC<ClassifiedsTabProps<"ClassifiedsFeed">> = obser
 
 const $footerSpace: ViewStyle = { marginVertical: 5 }
 
-const postContainerRadius = 10
+const componentWidth = Dimensions.get("screen").width / 2 - 3
 
-const $listStyle: ViewStyle = {
-  marginHorizontal: 5,
+const $flatlistContentContainer: ViewStyle = {
+  justifyContent: "space-between",
+  marginBottom: spacing.extraSmall,
 }
 
 const $attachment: ImageStyle = {
-  height: 120,
-  width: 120,
+  height: componentWidth,
+  width: componentWidth,
 }
 
 const $postContent: TextStyle = {
   fontSize: 13,
   lineHeight: 20,
   marginHorizontal: spacing.small,
+  marginVertical: spacing.extraSmall,
 }
 
 const $postContainer: ViewStyle = {
   backgroundColor: colors.palette.neutral100,
-  marginTop: 10,
-  width: Dimensions.get("screen").width / 2 - 15,
-  borderRadius: postContainerRadius,
-  paddingVertical: spacing.medium,
+  width: Dimensions.get("screen").width / 2 - 5,
   alignItems: "center",
-  marginHorizontal: 5,
-  shadowRadius: 10,
-  shadowOffset: { height: 4, width: 0 },
-  shadowColor: colors.palette.neutral700,
-  shadowOpacity: 0.3,
+  // shadowRadius: 10,
+  // shadowOffset: { height: 4, width: 0 },
+  // shadowColor: colors.palette.neutral700,
+  // shadowOpacity: 0.3,
 }

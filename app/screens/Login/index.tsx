@@ -1,6 +1,6 @@
 import { useIsFocused } from "@react-navigation/native"
 import { observer } from "mobx-react-lite"
-import React, { FC, useEffect, useMemo } from "react"
+import React, { FC, useEffect, useMemo, useState } from "react"
 import { Image, Keyboard, TextStyle, View, ViewStyle } from "react-native"
 import Animated, {
   interpolate,
@@ -49,14 +49,17 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
   const { navigation } = _props
   const focus = useIsFocused()
   const animVal = useSharedValue(0)
+  const [firstLoad, setFirstLoad] = useState(false)
 
   useEffect(() => {
     if (focus) {
-      if (animVal.value === 1) {
-        animVal.value = withTiming(0, { duration: 300 })
+      if (firstLoad && animVal.value === 0) {
+        animVal.value = withTiming(1, { duration: 300 })
       }
-    }else{
-      Keyboard.dismiss()}
+    } else {
+      Keyboard.dismiss()
+    }
+    setFirstLoad(true)
   }, [focus])
 
   function login() {
@@ -215,5 +218,5 @@ const $tapButton: ViewStyle = {
   marginTop: spacing.extraSmall,
   marginBottom: spacing.extraLarge,
   marginHorizontal: 10,
-  height:50
+  height: 50,
 }

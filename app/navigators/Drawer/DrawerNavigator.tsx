@@ -34,6 +34,7 @@ export function DrawerNavigator() {
 
   return (
     <DrawerLayout
+      drawerLockMode="locked-closed"
       ref={drawerRef}
       drawerWidth={Platform.select({ default: 326, web: Dimensions.get("screen").width * 0.3 })}
       drawerType={"slide"}
@@ -53,7 +54,7 @@ export function DrawerNavigator() {
       }}
       renderNavigationView={() => (
         <View style={[$drawer, $drawerInsets]}>
-          <DrawerOptions toggleDrawer={toggleDrawer}/>
+          <DrawerOptions toggleDrawer={toggleDrawer} />
           <View style={$versionContainer}>
             <Text tx="DrawerNavigator.version" style={$versionText} />
           </View>

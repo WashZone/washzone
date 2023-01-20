@@ -1,4 +1,4 @@
-import React, { FC, useRef } from "react"
+import React, { FC, useRef, useState } from "react"
 import {
   Dimensions,
   TextStyle,
@@ -25,14 +25,19 @@ const mockDescription =
 
 export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ route }) {
   const { user } = route.params
+  const [galleryItems, setGalleryItems] = useState([])
+
+  const addToGallery = (additionalItems: Array<any>) => {
+    setGalleryItems([...galleryItems, ...additionalItems])
+  }
 
   const layout = useWindowDimensions()
 
   const [index, setIndex] = React.useState(0)
   const [routes] = React.useState([
-    { key: "topic", title: "Topic" },
-    { key: "classified", title: "Classified" },
-    { key: "video", title: "Video" },
+    { key: "topic", title: "Topics" },
+    { key: "classified", title: "Classifieds" },
+    { key: "video", title: "Videos" },
     { key: "gallery", title: "Gallery" },
   ])
   const bioHeightRef = useRef(new Animated.Value(0)).current
@@ -52,13 +57,19 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
   const renderScene = ({ route }) => {
     switch (route.key) {
       case "topic":
-        return <TopicsTabScreen userId={user?._id} bioHeightRef={bioHeightRef} />
+        return (
+          <TopicsTabScreen
+            userId={user?._id}
+            bioHeightRef={bioHeightRef}
+            addToGallery={addToGallery}
+          />
+        )
       case "classified":
-        return <ClassifiedsTabScreen userId={user?._id} />
+        return <ClassifiedsTabScreen userId={user?._id} addToGallery={addToGallery} />
       case "video":
-        return <VideosTabScreen userId={user?._id} />
+        return <VideosTabScreen userId={user?._id} addToGallery={addToGallery} />
       case "gallery":
-        return <GalleryTabView />
+        return <GalleryTabView galleryItems={galleryItems} />
       default:
         return null
     }
@@ -81,7 +92,7 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
             <Text
               style={$tabHeading}
               weight={index === indexR ? "bold" : "light"}
-              text={route.key.toUpperCase()}
+              text={route.title.toUpperCase()}
             />
           </Pressable>
         ))}
@@ -111,6 +122,7 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
 
 const $tabHeading: TextStyle = {
   color: colors.palette.neutral100,
+  fontSize: 14,
 }
 
 const $tab: ViewStyle = {
