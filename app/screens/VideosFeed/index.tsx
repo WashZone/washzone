@@ -25,12 +25,8 @@ export const VideoBlock = ({
   const handleOnPress = () => {
     if (!disabled) {
       console.log(":IN", videoDetails)
-      if (videoDetails?.vedioPlaylistId !== "") {
-        // if (videoDetails?.vedioPlaylistId === "") {
-        //   navigation.navigate("VideoDetails", { data: videoDetails })
-        // } else {
+      if (videoDetails?.vedioPlaylistId && videoDetails?.vedioPlaylistId!=='') {
         navigation.navigate("Playlist", { playlistId: videoDetails?.vedioPlaylistId })
-        // }
       } else {
         navigation.navigate("VideoDetails", { data: videoDetails })
       }
@@ -83,7 +79,7 @@ export const VideoRowList = ({ channelDetails }) => {
       <View style={$containerCondition}>
         <View style={$conditionContainer}>
           <Text
-            text={channelDetails[0]?.UserId?.first_name + `'s Channel`}
+            text={channelDetails[0]?.userId?.first_name + `'s Channel`}
             weight="bold"
             style={$titleText}
           />

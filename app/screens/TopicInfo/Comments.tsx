@@ -13,12 +13,12 @@ export const CommentComponent = ({ comment }: { comment: any }) => {
       <FastImage
         style={$profileImage}
         source={{
-          uri: comment?.users?.picture,
+          uri: comment?.userId?.picture,
         }}
       />
       <View>
         <View style={$nameView}>
-          <Text text={formatName(comment?.users?.name)} style={$publisherName} weight="medium" />
+          <Text text={formatName(comment?.userId?.name)} style={$publisherName} weight="medium" />
           <Text text={fromNow(comment?.createdAt)} style={$fromNow} />
         </View>
         <Text text={comment?.comment} style={$commentText} />
