@@ -37,4 +37,24 @@ export const toastMessages = {
     type: "error",
     ...en.toastMessages.emailAlreadyExists,
   },
+  inputYTURL: {
+    type: "error",
+    ...en.toastMessages.ytUrlNotValid,
+  },
+  inputVideoTitle: {
+    type: "error",
+    ...en.toastMessages.invalidVideoTitle,
+  },
+  inputVideoDescription: {
+    type: "error",
+    ...en.toastMessages.emptyVideoDescription,
+  },
+  acceptTNC: {
+    type: "error",
+    ...en.toastMessages.acceptTNC,
+  },
+  videoUploadedSuccessfully: {
+    type: "error",
+    ...en.toastMessages.videoUploadedSuccessfully,
+  },
 }

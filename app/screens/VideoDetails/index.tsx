@@ -1,13 +1,5 @@
 import React, { FC, useEffect, useState } from "react"
-import {
-  View,
-  TextStyle,
-  ViewStyle,
-  Dimensions,
-  Alert,
-  ScrollView,
-  ActivityIndicator,
-} from "react-native"
+import { View, TextStyle, ViewStyle, Dimensions, ScrollView, ActivityIndicator } from "react-native"
 import { Button, Icon, IconTypes, Screen, Text } from "../../components"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { VideosTabProps } from "../../tabs"
@@ -22,22 +14,6 @@ import YoutubePlayer from "react-native-youtube-iframe"
 import { $loaderContainer } from "../styles"
 import { useHooks } from "../hooks"
 import { getIconForInteraction } from "../../utils/helpers"
-
-// const videoDetails = {
-//   title: "How to detail a car - Part 1 ",
-//   view: 736,
-//   createdAt: 1669106599000,
-//   poster:
-//     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQO_H8dD3eHwgp6oQUJTUaaWkNJVGEhDatMHA&usqp=CAU",
-//   videoUrl: "https://www.youtube.com/watch?v=awLX5qlY-Ts",
-//   publisher: {
-//     name: "Pete Quint",
-//     avatar:
-//       "https://media.istockphoto.com/id/1309328823/photo/headshot-portrait-of-smiling-male-employee-in-office.jpg?b=1&s=170667a&w=0&k=20&c=MRMqc79PuLmQfxJ99fTfGqHL07EDHqHLWg0Tb4rPXQc=",
-//   },
-//   description: `Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.`,
-//   liked: true,
-// }
 
 const ActionButtons = observer(function TopicsFeed({ data }: { data: any }) {
   const {
@@ -95,7 +71,7 @@ const ActionButtons = observer(function TopicsFeed({ data }: { data: any }) {
       onPress: async () => {
         setLoading(true)
         await interactWithSaveOnVideo(data?._id)
-        setLoading(false)
+        setLoading(true)
       },
     },
   ]

@@ -60,6 +60,7 @@ export function useHooks() {
       mutateLikeDislikeVideo,
       mutateUpdateDeletesavedVideo,
       queryGetAllSavedByUserIdpageNumber,
+      mutateUploadVideoByUser,
     },
     userStore,
   } = useStores()
@@ -474,6 +475,30 @@ export function useHooks() {
     } catch (err) {}
   }
 
+  const uploadVideo = async ({
+    videoHeading,
+    thumbnailUrl,
+    attachmentVideoUrl,
+    vedioPlaylistId,
+  }: {
+    videoHeading: string
+    thumbnailUrl: string
+    attachmentVideoUrl: string
+    vedioPlaylistId?: string
+  }) => {
+    let body = {
+      videoHeading,
+      thumbnailUrl,
+      attachmentVideoUrl,
+      userId: userStore._id,
+    }
+    if (vedioPlaylistId) {
+      body = { ...body, vedioPlaylistId }
+    }
+    const res = await mutateUploadVideoByUser(body)
+    console.log("VIDEO UPLOAD STATUS : ", res.uploadVideoByUser)
+  }
+
   const onBoot = async () => {
     await syncSavedInteractionsHook()
     await syncInteractedVideosAndTopics()
@@ -509,5 +534,6 @@ export function useHooks() {
     syncSavedInteractions,
     syncSavedInteractionsHook,
     onBoot,
+    uploadVideo,
   }
 }

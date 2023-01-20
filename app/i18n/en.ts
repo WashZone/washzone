@@ -155,6 +155,9 @@ const en = {
   profile: {
     gallery: "GALLERY",
   },
+  addAVideo: {
+    acceptTNC: "I agree to the terms of service",
+  },
   toastMessages: {
     videoSavedSuccessfully: {
       text1: "Video Successfully Saved!",
@@ -183,6 +186,21 @@ const en = {
     emailAlreadyExists: {
       text1: "Email already Registered!",
       text2: "Please choose another email as this one seems to be already registered.",
+    },
+    ytUrlNotValid: {
+      text1: "Enter a valid Youtube URL!",
+    },
+    emptyVideoDescription: {
+      text1: "Video Description cannot be empty!",
+    },
+    invalidVideoTitle: {
+      text1: "Video Title cannot be empty!",
+    },
+    acceptTNC: {
+      text1: "Please Accept the terms and Conditions!",
+    },
+    videoUploadedSuccessfully: {
+      text1: "Video Successfully Uploaded!",
     },
   },
 }

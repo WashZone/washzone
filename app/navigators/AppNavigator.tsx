@@ -16,6 +16,7 @@ import {
   ResetPassword,
   ForgotPassword,
   Saved,
+  UploadVideo,
 } from "../screens"
 import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
 import { DrawerNavigator } from "./Drawer/DrawerNavigator"
@@ -32,12 +33,9 @@ export type AppStackParamList = {
   ForgotPassword: undefined
   Saved: undefined
   ClassifiedLinked: { classifiedId: string }
+  UploadVideo: undefined
 }
 
-/**
- * This is a list of all the route names that will exit the app if the back button
- * is pressed while in that screen. Only affects Android.
- */
 const exitRoutes = Config.exitRoutes
 
 export type AppStackScreenProps<T extends keyof AppStackParamList> = StackScreenProps<
@@ -76,6 +74,11 @@ const AppStack = observer(function AppStack() {
           <Stack.Screen name="ResetPassword" component={ResetPassword} />
           <Stack.Screen name="Saved" component={Saved} />
           <Stack.Screen name="ClassifiedLinked" component={ClassifiedLinked} />
+          <Stack.Screen
+            name="UploadVideo"
+            component={UploadVideo}
+            options={{ presentation: "containedModal" }}
+          />
         </>
       ) : (
         <>

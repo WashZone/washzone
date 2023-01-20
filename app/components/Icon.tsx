@@ -145,6 +145,7 @@ export const iconRegistry = {
   reset: require("../../assets/icons/reset.png"),
   key: require("../../assets/icons/key.png"),
   arrowDown: require("../../assets/icons/arrowDown.png"),
+  plus: require("../../assets/icons/plus.png"),
 }
 
 const $imageStyle: ImageStyle = {

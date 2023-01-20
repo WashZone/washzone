@@ -57,7 +57,11 @@ const VideoBlock = ({ videoDetails, index }) => {
       style={$backWhite}
     >
       <View style={$videoBlockContainer}>
-        <FastImage source={{ uri: videoDetails.poster }} style={$videoPoster} resizeMode="cover" />
+        <FastImage
+          source={{ uri: videoDetails?.thumbnailUrl }}
+          style={$videoPoster}
+          resizeMode="cover"
+        />
         <View style={$videoDetailsContent}>
           <Text
             text={videoDetails?.videoHeading}
@@ -88,12 +92,12 @@ const PlaylistDescription = () => {
   return (
     <View style={$playlistDescriptionContainer}>
       <Text style={$descriptionText} numberOfLines={2} text={channelDetails.description} />
-      <Button
+      {/* <Button
         style={$followButton}
         LeftAccessory={() => <Icon icon="add_vector" size={20} color={colors.palette.neutral100} />}
         text="Follow"
         textStyle={$followText}
-      />
+      /> */}
     </View>
   )
 }

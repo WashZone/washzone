@@ -10,6 +10,7 @@ import { fromNow } from "../../utils/agoFromNow"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { useHooks } from "../hooks"
 import { useStores } from "../../models"
+import { AppStackParamList } from "../../navigators"
 
 export const VideoBlock = ({
   videoDetails,
@@ -25,7 +26,7 @@ export const VideoBlock = ({
   const handleOnPress = () => {
     if (!disabled) {
       console.log(":IN", videoDetails)
-      if (videoDetails?.vedioPlaylistId && videoDetails?.vedioPlaylistId!=='') {
+      if (videoDetails?.vedioPlaylistId && videoDetails?.vedioPlaylistId !== "") {
         navigation.navigate("Playlist", { playlistId: videoDetails?.vedioPlaylistId })
       } else {
         navigation.navigate("VideoDetails", { data: videoDetails })
@@ -101,6 +102,7 @@ export const VideoRowList = ({ channelDetails }) => {
 export const VideosFeed: FC<VideosTabProps<"VideosFeed">> = observer(function VideosFeed(_props) {
   const { getVideos } = useHooks()
   const [refreshing, setRefreshing] = useState<boolean>(false)
+  const navigation = useNavigation<NavigationProp<AppStackParamList>>()
   const {
     videos: { videos },
   } = useStores()
@@ -129,7 +131,7 @@ export const VideosFeed: FC<VideosTabProps<"VideosFeed">> = observer(function Vi
           renderItem={({ item }) => <VideoRowList channelDetails={item} />}
         />
       </Screen>
-      <Pressable style={$uploadContainer}>
+      <Pressable style={$uploadContainer} onPress={() => navigation.navigate("UploadVideo")}>
         <Icon icon="upload" size={20} />
         <Text text="Upload" style={$uploadText} weight="bold" />
       </Pressable>
