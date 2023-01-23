@@ -41,13 +41,13 @@ export const toastMessages = {
     type: "error",
     ...en.toastMessages.ytUrlNotValid,
   },
-  inputVideoTitle: {
+  inputTitle: {
     type: "error",
-    ...en.toastMessages.invalidVideoTitle,
+    ...en.toastMessages.invalidTitle,
   },
-  inputVideoDescription: {
+  inputDescription: {
     type: "error",
-    ...en.toastMessages.emptyVideoDescription,
+    ...en.toastMessages.emptyDescription,
   },
   acceptTNC: {
     type: "error",
@@ -56,5 +56,9 @@ export const toastMessages = {
   videoUploadedSuccessfully: {
     type: "error",
     ...en.toastMessages.videoUploadedSuccessfully,
+  },
+  selectionCondition: {
+    type: "error",
+    ...en.toastMessages.selectCondition,
   },
 }

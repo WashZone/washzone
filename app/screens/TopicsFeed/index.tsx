@@ -17,51 +17,64 @@ import { $flex1 } from "../styles"
 import Share from "react-native-share"
 import { getIconForInteraction } from "../../utils/helpers"
 
-const Actions = observer(function ActionButtons({ itemId }: { itemId: string }) {
+const Actions = observer(function ActionButtons({ item }: { item: any }) {
   const [loading, setLoading] = useState<boolean>(false)
   const { interactWithTopic } = useHooks()
   const {
-    interaction: { getInteractionOnTopic },
+    interaction: { getInteractionOnTopic, getTopicInteractionOffset },
   } = useStores()
   return (
     <View style={$actionsContainer}>
-      <Icon
-        icon={getIconForInteraction(getInteractionOnTopic(itemId), "liked")}
-        size={20}
-        style={{ marginRight: spacing.medium }}
-        onPress={async () => {
-          if (!loading) {
-            setLoading(true)
-            await interactWithTopic(itemId, "like")
-            setLoading(false)
+      <View style={$actionContainer}>
+        <Icon
+          icon={getIconForInteraction(getInteractionOnTopic(item?._id), "liked")}
+          size={20}
+          style={{ marginRight: spacing.extraSmall }}
+          onPress={async () => {
+            if (!loading) {
+              setLoading(true)
+              await interactWithTopic(item?._id, "like")
+              setLoading(false)
+            }
+          }}
+        />
+        <Text>
+          {item?.likeviews && item?.likeviews - getTopicInteractionOffset(item?._id).likedOffset}
+        </Text>
+      </View>
+      <View style={$actionContainer}>
+        <Icon
+          icon={getIconForInteraction(getInteractionOnTopic(item?._id), "disliked")}
+          size={20}
+          style={{ marginRight: spacing.extraSmall }}
+          onPress={async () => {
+            if (!loading) {
+              setLoading(true)
+              await interactWithTopic(item?._id, "dislike")
+              setLoading(false)
+            }
+          }}
+        />
+        <Text>
+          {item?.dislikeviews &&
+            item?.dislikeviews - getTopicInteractionOffset(item?._id).dislikedOffset}
+        </Text>
+      </View>
+      <View style={$actionContainer}>
+        <Icon
+          icon="share"
+          size={25}
+          onPress={() =>
+            Share.open({ message: "", title: "", url: `washzone://shared-topic/${item?._id}` })
+              .then((res) => {
+                console.log(res)
+              })
+              .catch((err) => {
+                err && console.log(err)
+              })
           }
-        }}
-      />
-      <Icon
-        icon={getIconForInteraction(getInteractionOnTopic(itemId), "disliked")}
-        size={20}
-        style={{ marginRight: spacing.medium }}
-        onPress={async () => {
-          if (!loading) {
-            setLoading(true)
-            await interactWithTopic(itemId, "dislike")
-            setLoading(false)
-          }
-        }}
-      />
-      <Icon
-        icon="share"
-        size={25}
-        onPress={() =>
-          Share.open({ message: "", title: "", url: `washzone://shared-topic/${itemId}` })
-            .then((res) => {
-              console.log(res)
-            })
-            .catch((err) => {
-              err && console.log(err)
-            })
-        }
-      />
+        />
+      </View>
     </View>
   )
 })
@@ -98,11 +111,11 @@ export const TopicComponent = ({ topic, index }) => {
                 text={formatName(topicDetails.first_name + " " + topicDetails.last_name)}
                 preset="subheading2"
               />
-              <Text text={fromNow(topic.createdAt)} style={$agoStamp} />
+              <Text text={fromNow(topicDetails.createdAt)} style={$agoStamp} />
             </View>
           </View>
           <Text style={$postContent} text={topicDetails.content} numberOfLines={3} />
-          <Actions itemId={topic?._id} />
+          <Actions item={topic} />
         </View>
         <View style={$contentCenter}>
           <FastImage
@@ -116,7 +129,6 @@ export const TopicComponent = ({ topic, index }) => {
           />
         </View>
       </Pressable>
-      {/* <Actions /> */}
       {index % 5 === 0 && (
         <AppLovinMAX.AdView
           adUnitId={MREC_AD_UNIT_ID}
@@ -153,6 +165,12 @@ export const TopicsFeed: FC<TopicsTabProps<"TopicsFeed">> = observer(function To
     </Screen>
   )
 })
+const $actionContainer: ViewStyle = {
+  width: 60,
+  alignItems: "center",
+  justifyContent: "flex-start",
+  flexDirection: "row",
+}
 
 const $contentCenter: ViewStyle = {}
 

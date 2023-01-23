@@ -8,7 +8,7 @@ import {
   RefreshControl,
   Dimensions,
 } from "react-native"
-import { Text, Screen } from "../../components"
+import { Text, Screen, Icon } from "../../components"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { ClassifiedsTabParamList, ClassifiedsTabProps } from "../../tabs"
@@ -17,6 +17,7 @@ import { observer } from "mobx-react-lite"
 import { useHooks } from "../hooks"
 import { useStores } from "../../models"
 import { $flex1 } from "../styles"
+import { AppStackParamList } from "../../navigators"
 
 export const ClassifiedComponent = ({
   classified,
@@ -55,6 +56,7 @@ export const ClassifiedsFeed: FC<ClassifiedsTabProps<"ClassifiedsFeed">> = obser
       classfieds: { classifieds },
     } = useStores()
     const [refreshing, setRefreshing] = useState(false)
+    const navigationApp = useNavigation<NavigationProp<AppStackParamList>>()
 
     const onRefresh = () => {
       refreshClassifieds()
@@ -69,17 +71,49 @@ export const ClassifiedsFeed: FC<ClassifiedsTabProps<"ClassifiedsFeed">> = obser
       <Screen contentContainerStyle={$flex1} backgroundColor={colors.palette.neutral100}>
         <FlatList
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={$flatlistContentContainer}
+          columnWrapperStyle={$flatlistContentContainer}
+          ListHeaderComponent={<View style={$headerSpace} />}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
           data={classifieds}
           renderItem={({ item }) => <ClassifiedComponent classified={item} />}
           numColumns={2}
           ListFooterComponent={<View style={$footerSpace} />}
         />
+        <Pressable
+          style={$createContainer}
+          onPress={() => navigationApp.navigate("AddAClassified")}
+        >
+          <Icon icon="upload" size={20} />
+          <Text text="Create" style={$createText} weight="bold" />
+        </Pressable>
       </Screen>
     )
   },
 )
+
+const $headerSpace: ViewStyle = {
+  height: spacing.large,
+}
+
+const $createText: TextStyle = {
+  fontSize: 13,
+  color: colors.palette.neutral100,
+  lineHeight: 20,
+}
+
+const $createContainer: ViewStyle = {
+  position: "absolute",
+  backgroundColor: colors.palette.primary300,
+  height: 36,
+  width: 100,
+  right: spacing.medium,
+  top: spacing.medium,
+  borderRadius: 10,
+  flexDirection: "row",
+  alignItems: "center",
+  padding: spacing.medium / 2,
+  justifyContent: "space-around",
+}
 
 const $footerSpace: ViewStyle = { marginVertical: 5 }
 
@@ -103,11 +137,6 @@ const $postContent: TextStyle = {
 }
 
 const $postContainer: ViewStyle = {
-  backgroundColor: colors.palette.neutral100,
   width: Dimensions.get("screen").width / 2 - 5,
   alignItems: "center",
-  // shadowRadius: 10,
-  // shadowOffset: { height: 4, width: 0 },
-  // shadowColor: colors.palette.neutral700,
-  // shadowOpacity: 0.3,
 }

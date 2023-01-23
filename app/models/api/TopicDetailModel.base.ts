@@ -7,6 +7,8 @@ import { QueryBuilder } from "mst-gql"
 import { ModelBase } from "./ModelBase"
 import { CommentsDetailModel, CommentsDetailModelType } from "./CommentsDetailModel"
 import { CommentsDetailModelSelector } from "./CommentsDetailModel.base"
+import { LikeTopicsModel, LikeTopicsModelType } from "./LikeTopicsModel"
+import { LikeTopicsModelSelector } from "./LikeTopicsModel.base"
 import { UserModel, UserModelType } from "./UserModel"
 import { UserModelSelector } from "./UserModel.base"
 import { RootStoreType } from "./index"
@@ -25,10 +27,13 @@ export const TopicDetailModelBase = ModelBase
     updatedAt: types.union(types.undefined, types.frozen()),
     userId: types.union(types.undefined, types.late((): any => UserModel)),
     commentId: types.union(types.undefined, types.late((): any => CommentsDetailModel)),
+    topiclikeId: types.union(types.undefined, types.late((): any => LikeTopicsModel)),
     topicContent: types.union(types.undefined, types.null, types.string),
     attachmentType: types.union(types.undefined, types.null, types.string),
     attachmentUrl: types.union(types.undefined, types.null, types.string),
     status: types.union(types.undefined, types.null, types.string),
+    likeviews: types.union(types.undefined, types.null, types.number),
+    dislikeviews: types.union(types.undefined, types.null, types.number),
   })
   .views(self => ({
     get store() {
@@ -44,11 +49,14 @@ export class TopicDetailModelSelector extends QueryBuilder {
   get attachmentType() { return this.__attr(`attachmentType`) }
   get attachmentUrl() { return this.__attr(`attachmentUrl`) }
   get status() { return this.__attr(`status`) }
+  get likeviews() { return this.__attr(`likeviews`) }
+  get dislikeviews() { return this.__attr(`dislikeviews`) }
   userId(builder: string | UserModelSelector | ((selector: UserModelSelector) => UserModelSelector) | undefined) { return this.__child(`userId`, UserModelSelector, builder) }
   commentId(builder: string | CommentsDetailModelSelector | ((selector: CommentsDetailModelSelector) => CommentsDetailModelSelector) | undefined) { return this.__child(`commentId`, CommentsDetailModelSelector, builder) }
+  topiclikeId(builder: string | LikeTopicsModelSelector | ((selector: LikeTopicsModelSelector) => LikeTopicsModelSelector) | undefined) { return this.__child(`topiclikeId`, LikeTopicsModelSelector, builder) }
 }
 export function selectFromTopicDetail() {
   return new TopicDetailModelSelector()
 }
 
-export const topicDetailModelPrimitives = selectFromTopicDetail()._id.createdAt.updatedAt.topicContent.attachmentType.attachmentUrl.status
+export const topicDetailModelPrimitives = selectFromTopicDetail()._id.createdAt.updatedAt.topicContent.attachmentType.attachmentUrl.status.likeviews.dislikeviews

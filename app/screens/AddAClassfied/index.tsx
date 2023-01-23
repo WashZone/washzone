@@ -1,10 +1,11 @@
 import React, { FC, useEffect, useState } from "react"
 import {
   ActivityIndicator,
+  Dimensions,
   ImageStyle,
   TextStyle,
   TouchableOpacity,
-  View,
+  ScrollView,
   ViewStyle,
 } from "react-native"
 import { TextInput } from "react-native-paper"
@@ -19,46 +20,101 @@ import { NavigationProp, useNavigation } from "@react-navigation/native"
 import Toast from "react-native-toast-message"
 import { toastMessages } from "../../utils/toastMessages"
 import { useHooks } from "../hooks"
+import en from "../../i18n/en"
+import { MediaPicker } from "../../utils/device/MediaPicker"
+import FastImage, { ImageStyle as FastImageStyle } from "react-native-fast-image"
 
-export const UploadVideo: FC<AppStackScreenProps<"UploadVideo">> = function UploadVideo() {
+const data = [
+  { label: "New", value: "New" },
+  { label: "Used", value: "Used" },
+  { label: "Like New", value: "Like New" },
+  { label: "Excellent", value: "Excellent" },
+  { label: "Good", value: "Good" },
+  { label: "Fair", value: "Fair" },
+  { label: "Poor", value: "Poor" },
+]
+
+const MediaHandlerComponent = ({ selectedMedia, setSelectedMedia }) => {
+  const [loading, setLoading] = useState(true)
+  const selectClassifiedMedia = async () => {
+    const res = await MediaPicker()
+    console.log("MediaHandlerComponent", res)
+    setSelectedMedia(res)
+  }
+  return (
+    <TouchableOpacity
+      style={[
+        $containerUploadMedia,
+        !selectedMedia && {
+          paddingRight: spacing.small,
+        },
+      ]}
+      onPress={selectClassifiedMedia}
+    >
+      {selectedMedia ? (
+        <>
+          <FastImage
+            onLoad={() => setLoading(false)}
+            source={{ uri: selectedMedia.uri }}
+            style={$mediaImage}
+          />
+          <ActivityIndicator
+            color={colors.palette.primary100}
+            style={$imageLoadingIndicator}
+            animating={loading}
+          />
+        </>
+      ) : (
+        <>
+          <Icon icon="uploadCloud" size={24} />
+          <Text text="Upload" style={$createPlaylistText} weight="medium" />
+        </>
+      )}
+      {selectedMedia && (
+        <TouchableOpacity
+          style={$removeMedia}
+          onPress={() => {
+            setSelectedMedia(undefined)
+            setLoading(true)
+          }}
+        >
+          <Icon icon="x" size={20} />
+        </TouchableOpacity>
+      )}
+    </TouchableOpacity>
+  )
+}
+
+export const AddAClassified: FC<AppStackScreenProps<"AddAClassified">> = function AddAClassified() {
   const {
-    api: { queryGetVideoPlaylistByUserId },
     userStore: { _id },
   } = useStores()
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
   const [buttonLoading, setButtonLoading] = useState<boolean>(false)
+  const [selectedMedia, setSelectedMedia] = useState<any>(undefined)
   const [isFocus, setIsFocus] = useState<boolean>(false)
   const [TNCAccepted, setTNCAccepted] = useState<boolean>(false)
   const [value, setValue] = useState("")
-  const [allPlaylists, setAllPlaylist] = useState([])
   const [title, setTitle] = useState("")
+  const [price, setPrice] = useState("")
   const [description, setDescription] = useState("")
-  const [youtubeUrl, setYoutubeUrl] = useState("")
-  const { uploadVideo } = useHooks()
+  const { createClassified } = useHooks()
 
-  const syncAllPlaylists = async () => {
-    const allPlaylistDropDownData = []
-    const res = await queryGetVideoPlaylistByUserId({ userId: _id })
-    console.log("ALL PLAYLIST", res.getVideoPlaylistByUserId?.data)
-    if (res.getVideoPlaylistByUserId?.data) {
-      res.getVideoPlaylistByUserId?.data.map((playlist) =>
-        allPlaylistDropDownData.push({ label: playlist?.playListName, value: playlist?._id }),
-      )
-    }
-    setAllPlaylist(allPlaylistDropDownData)
-  }
-
-  const createVideo = async () => {
+  const handleCreatePress = async () => {
     if (title.length === 0) {
       Toast.show({ ...toastMessages.inputTitle })
       return
     }
-    if (youtubeUrl.split("=").length !== 2) {
-      Toast.show({ ...toastMessages.inputYTURL })
-      return
-    }
     if (description.length === 0) {
       Toast.show({ ...toastMessages.inputDescription })
+      return
+    }
+    if (value.length === 0) {
+      Toast.show({ ...toastMessages.selectionCondition })
+      return
+    }
+    if (!selectedMedia) {
+      Toast.show({ ...toastMessages.minimumOnePhotoRequired })
       return
     }
     if (!TNCAccepted) {
@@ -67,11 +123,11 @@ export const UploadVideo: FC<AppStackScreenProps<"UploadVideo">> = function Uplo
     }
     try {
       setButtonLoading(true)
-      await uploadVideo({
-        videoHeading: title,
-        thumbnailUrl: `https://img.youtube.com/vi/${youtubeUrl.split("=")[1]}/default.jpg`,
-        attachmentVideoUrl: youtubeUrl,
-        vedioPlaylistId: value,
+      await createClassified({
+        attachmentUrl: selectedMedia.uri,
+        title,
+        prize: price,
+        classifiedDetail: description,
       })
       setButtonLoading(false)
     } catch (err) {
@@ -79,10 +135,6 @@ export const UploadVideo: FC<AppStackScreenProps<"UploadVideo">> = function Uplo
       setButtonLoading(false)
     }
   }
-
-  useEffect(() => {
-    syncAllPlaylists()
-  }, [])
 
   return (
     <Screen
@@ -92,13 +144,13 @@ export const UploadVideo: FC<AppStackScreenProps<"UploadVideo">> = function Uplo
     >
       <Header
         leftIcon="caretLeft"
-        title="Add a Video"
+        title={en.headerTitle.addClassfied}
         titleStyle={$titleStyle}
         onLeftPress={() => navigation.goBack()}
         leftIconColor={colors.palette.neutral600}
       />
 
-      <View style={$content}>
+      <ScrollView showsVerticalScrollIndicator={false} style={$content}>
         <TextInput
           value={title}
           style={$inputContainer}
@@ -107,8 +159,20 @@ export const UploadVideo: FC<AppStackScreenProps<"UploadVideo">> = function Uplo
           label={"Title"}
           theme={$theme}
         />
+
         <TextInput
+          value={price}
+          onChangeText={setPrice}
+          style={$inputContainer}
+          mode="outlined"
+          label={"Price"}
+          theme={$theme}
+          maxLength={240}
+          placeholder="Enter a short description here!"
           multiline
+        />
+
+        <TextInput
           value={description}
           onChangeText={setDescription}
           style={[$inputContainer, $descriptionContainer]}
@@ -117,23 +181,18 @@ export const UploadVideo: FC<AppStackScreenProps<"UploadVideo">> = function Uplo
           theme={$theme}
           maxLength={240}
           placeholder="Enter a short description here!"
+          multiline
         />
-        <TextInput
-          value={youtubeUrl}
-          onChangeText={setYoutubeUrl}
-          style={$inputContainer}
-          mode="outlined"
-          label={"Youtube URL"}
-          theme={$theme}
-        />
+
         <Dropdown
-          data={allPlaylists}
+          data={data}
           search
           maxHeight={300}
-          style={[$dropdown, isFocus && { borderColor: colors.palette.primary100 }]}
+          // eslint-disable-next-line react-native/no-inline-styles
+          style={[$dropdown, isFocus && { borderColor: colors.palette.primary100, borderWidth: 2 }]}
           labelField="label"
           valueField="value"
-          placeholder={"Choose Playlist"}
+          placeholder={"Condition"}
           searchPlaceholder="Search..."
           value={value}
           onFocus={() => setIsFocus(true)}
@@ -144,16 +203,16 @@ export const UploadVideo: FC<AppStackScreenProps<"UploadVideo">> = function Uplo
           }}
           renderLeftIcon={() => <Icon icon="arrowDown" />}
         />
-        <TouchableOpacity style={$flexRow}>
-          <Icon icon="plus" size={20} />
-          <Text text="Create a playlist" style={$createPlaylistText} weight="medium" />
-        </TouchableOpacity>
+
+        <MediaHandlerComponent selectedMedia={selectedMedia} setSelectedMedia={setSelectedMedia} />
+
         <TouchableOpacity onPress={() => setTNCAccepted(!TNCAccepted)} style={$flexRow}>
           <Toggle onPress={() => setTNCAccepted(!TNCAccepted)} value={TNCAccepted} />
           <Text style={$tnc} tx="addAVideo.acceptTNC" weight="medium" />
         </TouchableOpacity>
+
         <Button
-          onPress={createVideo}
+          onPress={handleCreatePress}
           disabled={buttonLoading}
           style={[$submitButton, { backgroundColor: colors.palette.primary100 }]}
           RightAccessory={() => (
@@ -167,7 +226,7 @@ export const UploadVideo: FC<AppStackScreenProps<"UploadVideo">> = function Uplo
         >
           <Icon icon="caretRight" color={colors.palette.neutral100} size={30} style={$iconCaret} />
         </Button>
-      </View>
+      </ScrollView>
     </Screen>
   )
 }
@@ -182,6 +241,7 @@ const $inputContainer: ViewStyle = {
 }
 
 const $descriptionContainer: ViewStyle = { height: 120, paddingBottom: spacing.extraSmall }
+
 const $flexRow: ViewStyle = {
   flexDirection: "row",
   alignItems: "center",
@@ -228,14 +288,46 @@ const $container: ViewStyle = {
 
 const $content: ViewStyle = {
   margin: spacing.extraLarge,
+  flex: 1,
 }
 
 const $dropdown: ViewStyle = {
   height: 50,
   borderColor: "gray",
-  borderWidth: 2,
+  borderWidth: 1,
   borderRadius: 5,
   paddingHorizontal: 8,
   backgroundColor: colors.palette.neutral100,
   marginVertical: spacing.extraSmall,
+}
+
+const $containerUploadMedia: ViewStyle = {
+  borderColor: colors.palette.primary100,
+  borderStyle: "dotted",
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "center",
+  borderWidth: 1,
+  borderRadius: 10,
+  paddingVertical: spacing.small,
+  marginVertical: spacing.small,
+}
+
+const $mediaImage: FastImageStyle = {
+  height: Dimensions.get("window").width - 2 * spacing.extraLarge,
+  width: Dimensions.get("window").width - 2 * spacing.extraLarge - 2 * spacing.small,
+  borderRadius: 8,
+}
+
+const $removeMedia: ViewStyle = {
+  position: "absolute",
+  right: spacing.medium,
+  top: spacing.medium,
+  backgroundColor: colors.palette.overlayNeutral50,
+  padding: spacing.micro,
+  borderRadius: spacing.micro,
+}
+
+const $imageLoadingIndicator: View = {
+  position: "absolute",
 }

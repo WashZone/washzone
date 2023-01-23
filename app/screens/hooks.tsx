@@ -61,6 +61,7 @@ export function useHooks() {
       mutateUpdateDeletesavedVideo,
       queryGetAllSavedByUserIdpageNumber,
       mutateUploadVideoByUser,
+      mutateCreateClassifiedDetail,
     },
     userStore,
   } = useStores()
@@ -233,7 +234,7 @@ export function useHooks() {
         addToSavedClassified(classifiedFeedId)
         Toast.show(toastMessages.classifiedSavedSuccessfully)
       } else {
-        const res = await mutateUpdateDeletesavedclassified({
+        await mutateUpdateDeletesavedclassified({
           classifiedsavedId: classifiedFeedId,
           userId: userStore?._id,
         })
@@ -486,7 +487,7 @@ export function useHooks() {
     attachmentVideoUrl: string
     vedioPlaylistId?: string
   }) => {
-    let body = {
+    let body: any = {
       videoHeading,
       thumbnailUrl,
       attachmentVideoUrl,
@@ -499,9 +500,26 @@ export function useHooks() {
     console.log("VIDEO UPLOAD STATUS : ", res.uploadVideoByUser)
   }
 
+  const createClassified = async ({ attachmentUrl, title, prize, classifiedDetail }) => {
+    const res = await mutateCreateClassifiedDetail({
+      attachmentUrl,
+      attachmentType: "image",
+      title,
+      prize,
+      classifiedDetail,
+      userId: userStore._id,
+    })
+    console.log("CREATE TOPIC", res)
+  }
+
   const onBoot = async () => {
     await syncSavedInteractionsHook()
     await syncInteractedVideosAndTopics()
+    await refreshTopics()
+    await refreshPosts()
+    await refreshClassifieds()
+    await getVideos()
+    await loadStories()
   }
 
   return {
@@ -535,5 +553,6 @@ export function useHooks() {
     syncSavedInteractionsHook,
     onBoot,
     uploadVideo,
+    createClassified,
   }
 }

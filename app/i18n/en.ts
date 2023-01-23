@@ -1,4 +1,8 @@
 const en = {
+  headerTitle: {
+    addClassfied: "Add a Classfied",
+    uploadVideo: "Add a Video",
+  },
   common: {
     ok: "OK!",
     cancel: "Cancel",
@@ -190,17 +194,23 @@ const en = {
     ytUrlNotValid: {
       text1: "Enter a valid Youtube URL!",
     },
-    emptyVideoDescription: {
-      text1: "Video Description cannot be empty!",
+    emptyDescription: {
+      text1: "Description cannot be empty!",
     },
-    invalidVideoTitle: {
-      text1: "Video Title cannot be empty!",
+    invalidTitle: {
+      text1: "Title cannot be empty!",
     },
     acceptTNC: {
       text1: "Please Accept the terms and Conditions!",
     },
     videoUploadedSuccessfully: {
       text1: "Video Successfully Uploaded!",
+    },
+    selectCondition: {
+      text1: "Please select an appropriate condition for the item!",
+    },
+    minimumOnePhotoRequired: {
+      text1: "Please Upload atleast one image!",
     },
   },
 }

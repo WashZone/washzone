@@ -5,11 +5,15 @@ import { withSetPropAction } from "./helpers/withSetPropAction"
 const InteractionVariantsTopics = types.model({
   liked: types.array(types.string),
   disliked: types.array(types.string),
+  lastSyncedLiked: types.array(types.string),
+  lastSyncedDisliked: types.array(types.string),
 })
 const InteractionVariantsVideos = types.model({
   liked: types.array(types.string),
   disliked: types.array(types.string),
   saved: types.array(types.string),
+  lastSyncedLiked: types.array(types.string),
+  lastSyncedDisliked: types.array(types.string),
 })
 const InteractionVariantsClassified = types.model({
   saved: types.array(types.string),
@@ -28,8 +32,16 @@ export const InteractionStoreModel = types
       videos: { liked: string[]; disliked: string[] }
       topics: { liked: string[]; disliked: string[] }
     }) {
-      self.setProp("videos", data.videos)
-      self.setProp("topics", data.topics)
+      self.setProp("videos", {
+        ...data.videos,
+        lastSyncedLiked: data.videos.liked,
+        lastSyncedDisliked: data.videos.disliked,
+      })
+      self.setProp("topics", {
+        ...data.topics,
+        lastSyncedLiked: data.topics.liked,
+        lastSyncedDisliked: data.topics.disliked,
+      })
     },
     async syncSavedInteractions(data: { savedVideos: string[]; savedClassifieds: string[] }) {
       console.log("SAVEINTERACTIONS", data.savedVideos)
@@ -119,6 +131,30 @@ export const InteractionStoreModel = types
     getInteractionOnClassified(id: string) {
       if (store.classified.saved.includes(id)) return Interaction.saved
       return Interaction.notSaved
+    },
+    getTopicInteractionOffset(id: string) {
+      const val = { likedOffset: 0, dislikedOffset: 0 }
+      if (store.topics.liked.includes(id) && !store.topics.lastSyncedLiked.includes(id))
+        val.likedOffset = -1
+      if (!store.topics.liked.includes(id) && store.topics.lastSyncedLiked.includes(id))
+        val.likedOffset = 1
+      if (store.topics.disliked.includes(id) && !store.topics.lastSyncedDisliked.includes(id))
+        val.dislikedOffset = -1
+      if (!store.topics.disliked.includes(id) && store.topics.lastSyncedDisliked.includes(id))
+        val.dislikedOffset = 1
+      return val
+    },
+    getVideoInteractionOffset(id: string) {
+      const val = { likedOffset: 0, dislikedOffset: 0 }
+      if (store.videos.liked.includes(id) && !store.videos.lastSyncedLiked.includes(id))
+        val.likedOffset = -1
+      if (!store.videos.liked.includes(id) && store.videos.lastSyncedLiked.includes(id))
+        val.likedOffset = 1
+      if (store.videos.disliked.includes(id) && !store.videos.lastSyncedDisliked.includes(id))
+        val.dislikedOffset = -1
+      if (!store.videos.disliked.includes(id) && store.videos.lastSyncedDisliked.includes(id))
+        val.dislikedOffset = 1
+      return val
     },
   }))
 

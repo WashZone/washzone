@@ -17,6 +17,7 @@ import {
   ForgotPassword,
   Saved,
   UploadVideo,
+  AddAClassified,
 } from "../screens"
 import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
 import { DrawerNavigator } from "./Drawer/DrawerNavigator"
@@ -34,6 +35,7 @@ export type AppStackParamList = {
   Saved: undefined
   ClassifiedLinked: { classifiedId: string }
   UploadVideo: undefined
+  AddAClassified: undefined
 }
 
 const exitRoutes = Config.exitRoutes
@@ -77,6 +79,11 @@ const AppStack = observer(function AppStack() {
           <Stack.Screen
             name="UploadVideo"
             component={UploadVideo}
+            options={{ presentation: "containedModal" }}
+          />
+          <Stack.Screen
+            name="AddAClassified"
+            component={AddAClassified}
             options={{ presentation: "containedModal" }}
           />
         </>

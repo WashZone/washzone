@@ -25,6 +25,8 @@ export const LikeTopicsModelBase = ModelBase
     updatedAt: types.union(types.undefined, types.frozen()),
     userId: types.union(types.undefined, types.null, types.late((): any => UserModel)),
     TopicId: types.union(types.undefined, types.null, types.late((): any => TopicDetailModel)),
+    likeviews: types.union(types.undefined, types.null, types.number),
+    dislikeviews: types.union(types.undefined, types.null, types.number),
     status: types.union(types.undefined, types.null, types.string),
   })
   .views(self => ({
@@ -37,6 +39,8 @@ export class LikeTopicsModelSelector extends QueryBuilder {
   get _id() { return this.__attr(`_id`) }
   get createdAt() { return this.__attr(`createdAt`) }
   get updatedAt() { return this.__attr(`updatedAt`) }
+  get likeviews() { return this.__attr(`likeviews`) }
+  get dislikeviews() { return this.__attr(`dislikeviews`) }
   get status() { return this.__attr(`status`) }
   userId(builder: string | UserModelSelector | ((selector: UserModelSelector) => UserModelSelector) | undefined) { return this.__child(`userId`, UserModelSelector, builder) }
   TopicId(builder: string | TopicDetailModelSelector | ((selector: TopicDetailModelSelector) => TopicDetailModelSelector) | undefined) { return this.__child(`TopicId`, TopicDetailModelSelector, builder) }
@@ -45,4 +49,4 @@ export function selectFromLikeTopics() {
   return new LikeTopicsModelSelector()
 }
 
-export const likeTopicsModelPrimitives = selectFromLikeTopics()._id.createdAt.updatedAt.status
+export const likeTopicsModelPrimitives = selectFromLikeTopics()._id.createdAt.updatedAt.likeviews.dislikeviews.status
