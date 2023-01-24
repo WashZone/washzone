@@ -19,6 +19,7 @@ import { NavigationProp, useNavigation } from "@react-navigation/native"
 import Toast from "react-native-toast-message"
 import { toastMessages } from "../../utils/toastMessages"
 import { useHooks } from "../hooks"
+import { InputPlaylistInfoModal } from "./InputPlaylistInfo"
 
 export const UploadVideo: FC<AppStackScreenProps<"UploadVideo">> = function UploadVideo() {
   const {
@@ -28,13 +29,14 @@ export const UploadVideo: FC<AppStackScreenProps<"UploadVideo">> = function Uplo
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
   const [buttonLoading, setButtonLoading] = useState<boolean>(false)
   const [isFocus, setIsFocus] = useState<boolean>(false)
+  const [playlistModalVisible, setPlaylistModalVisible] = useState<boolean>(true)
   const [TNCAccepted, setTNCAccepted] = useState<boolean>(false)
   const [value, setValue] = useState("")
   const [allPlaylists, setAllPlaylist] = useState([])
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
   const [youtubeUrl, setYoutubeUrl] = useState("")
-  const { uploadVideo } = useHooks()
+  const { uploadVideo, refreshVideos } = useHooks()
 
   const syncAllPlaylists = async () => {
     const allPlaylistDropDownData = []
@@ -73,6 +75,8 @@ export const UploadVideo: FC<AppStackScreenProps<"UploadVideo">> = function Uplo
         attachmentVideoUrl: youtubeUrl,
         vedioPlaylistId: value,
       })
+      await refreshVideos()
+      navigation.goBack()
       setButtonLoading(false)
     } catch (err) {
       Toast.show(toastMessages.somethingWentWrong)
@@ -91,6 +95,7 @@ export const UploadVideo: FC<AppStackScreenProps<"UploadVideo">> = function Uplo
       backgroundColor={colors.palette.neutral100}
     >
       <Header
+        backgroundColor={colors.palette.neutral100}
         leftIcon="caretLeft"
         title="Add a Video"
         titleStyle={$titleStyle}
@@ -100,13 +105,16 @@ export const UploadVideo: FC<AppStackScreenProps<"UploadVideo">> = function Uplo
 
       <View style={$content}>
         <TextInput
+          multiline
           value={title}
           style={$inputContainer}
           onChangeText={setTitle}
           mode="outlined"
           label={"Title"}
           theme={$theme}
+          maxLength={180}
         />
+
         <TextInput
           multiline
           value={description}
@@ -115,17 +123,23 @@ export const UploadVideo: FC<AppStackScreenProps<"UploadVideo">> = function Uplo
           mode="outlined"
           label={"Description"}
           theme={$theme}
-          maxLength={240}
           placeholder="Enter a short description here!"
+          numberOfLines={1}
         />
+
         <TextInput
+          multiline
+          numberOfLines={1}
           value={youtubeUrl}
           onChangeText={setYoutubeUrl}
           style={$inputContainer}
           mode="outlined"
           label={"Youtube URL"}
           theme={$theme}
+          maxLength={180}
+          // placeholder={"Example : https://www.youtube.com/watch?v=xxx"}
         />
+
         <Dropdown
           data={allPlaylists}
           search
@@ -144,7 +158,7 @@ export const UploadVideo: FC<AppStackScreenProps<"UploadVideo">> = function Uplo
           }}
           renderLeftIcon={() => <Icon icon="arrowDown" />}
         />
-        <TouchableOpacity style={$flexRow}>
+        <TouchableOpacity style={$flexRow} onPress={() => setPlaylistModalVisible(true)}>
           <Icon icon="plus" size={20} />
           <Text text="Create a playlist" style={$createPlaylistText} weight="medium" />
         </TouchableOpacity>
@@ -165,11 +179,21 @@ export const UploadVideo: FC<AppStackScreenProps<"UploadVideo">> = function Uplo
             />
           )}
         >
-          <Icon icon="caretRight" color={colors.palette.neutral100} size={30} style={$iconCaret} />
+          <Text tx="common.add" style={$submitText} weight="semiBold" />
         </Button>
       </View>
+      <InputPlaylistInfoModal
+        syncAllPlaylists={syncAllPlaylists}
+        setModalVisible={setPlaylistModalVisible}
+        isVisible={playlistModalVisible}
+      />
     </Screen>
   )
+}
+
+const $submitText: TextStyle = {
+  fontSize: 18,
+  color: colors.palette.neutral100,
 }
 
 const $tnc: TextStyle = {
@@ -204,11 +228,9 @@ const $theme = {
 
 const $indicator: ViewStyle = { position: "absolute", right: 20 }
 
-const $iconCaret: ImageStyle = { alignSelf: "center", marginTop: 5 }
-
 const $submitButton: ViewStyle = {
   height: 45,
-  width: 160,
+  width: "100%",
   alignSelf: "center",
   marginTop: spacing.small,
   alignContent: "center",
@@ -227,7 +249,7 @@ const $container: ViewStyle = {
 }
 
 const $content: ViewStyle = {
-  margin: spacing.extraLarge,
+  marginHorizontal: spacing.extraLarge,
 }
 
 const $dropdown: ViewStyle = {

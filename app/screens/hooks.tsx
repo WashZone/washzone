@@ -62,6 +62,7 @@ export function useHooks() {
       queryGetAllSavedByUserIdpageNumber,
       mutateUploadVideoByUser,
       mutateCreateClassifiedDetail,
+      mutateUploadVideoPlaylist,
     },
     userStore,
   } = useStores()
@@ -302,7 +303,7 @@ export function useHooks() {
     return res.getClassifiedById?.data[0]
   }
 
-  const getVideos = async () => {
+  const refreshVideos = async () => {
     const res = await queryGetUserChannel()
     setVideos(res.getUserChannel)
     console.log("VIDEOS", res)
@@ -512,13 +513,28 @@ export function useHooks() {
     console.log("CREATE TOPIC", res)
   }
 
+  const createEmptyPlaylist = async (playListName: string) => {
+    try {
+      const res = await mutateUploadVideoPlaylist({
+        playListName,
+        userId: userStore._id,
+        videoUpload: [],
+      })
+      console.log("createEmptyPlaylist", res)
+      Toast.show(toastMessages.createdSuccessfully)
+    } catch (err) {
+      console.log("ERROR", err)
+      Toast.show(toastMessages.somethingWentWrong)
+    }
+  }
+
   const onBoot = async () => {
     await syncSavedInteractionsHook()
     await syncInteractedVideosAndTopics()
     await refreshTopics()
     await refreshPosts()
     await refreshClassifieds()
-    await getVideos()
+    await refreshVideos()
     await loadStories()
   }
 
@@ -539,7 +555,7 @@ export function useHooks() {
     interactWithSaveOnClassified,
     refreshSavedClassifieds,
     getClassified,
-    getVideos,
+    refreshVideos,
     saveVideo,
     getUserTopics,
     loadMoreUserTopics,
@@ -554,5 +570,6 @@ export function useHooks() {
     onBoot,
     uploadVideo,
     createClassified,
+    createEmptyPlaylist,
   }
 }

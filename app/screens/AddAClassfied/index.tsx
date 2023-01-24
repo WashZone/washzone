@@ -98,7 +98,7 @@ export const AddAClassified: FC<AppStackScreenProps<"AddAClassified">> = functio
   const [title, setTitle] = useState("")
   const [price, setPrice] = useState("")
   const [description, setDescription] = useState("")
-  const { createClassified } = useHooks()
+  const { createClassified, refreshClassifieds } = useHooks()
 
   const handleCreatePress = async () => {
     if (title.length === 0) {
@@ -129,6 +129,8 @@ export const AddAClassified: FC<AppStackScreenProps<"AddAClassified">> = functio
         prize: price,
         classifiedDetail: description,
       })
+      await refreshClassifieds()
+      navigation.goBack()
       setButtonLoading(false)
     } catch (err) {
       Toast.show(toastMessages.somethingWentWrong)
@@ -141,12 +143,14 @@ export const AddAClassified: FC<AppStackScreenProps<"AddAClassified">> = functio
       preset="fixed"
       contentContainerStyle={$container}
       backgroundColor={colors.palette.neutral100}
+      safeAreaEdges={["bottom"]}
     >
       <Header
         leftIcon="caretLeft"
         title={en.headerTitle.addClassfied}
         titleStyle={$titleStyle}
         onLeftPress={() => navigation.goBack()}
+        backgroundColor={colors.palette.neutral100}
         leftIconColor={colors.palette.neutral600}
       />
 
@@ -168,8 +172,8 @@ export const AddAClassified: FC<AppStackScreenProps<"AddAClassified">> = functio
           label={"Price"}
           theme={$theme}
           maxLength={240}
-          placeholder="Enter a short description here!"
           multiline
+          keyboardType="number-pad"
         />
 
         <TextInput
@@ -224,11 +228,16 @@ export const AddAClassified: FC<AppStackScreenProps<"AddAClassified">> = functio
             />
           )}
         >
-          <Icon icon="caretRight" color={colors.palette.neutral100} size={30} style={$iconCaret} />
+          <Text tx="common.add" style={$submitText} weight="semiBold" />
         </Button>
       </ScrollView>
     </Screen>
   )
+}
+
+const $submitText: TextStyle = {
+  fontSize: 18,
+  color: colors.palette.neutral100,
 }
 
 const $tnc: TextStyle = {
@@ -264,11 +273,9 @@ const $theme = {
 
 const $indicator: ViewStyle = { position: "absolute", right: 20 }
 
-const $iconCaret: ImageStyle = { alignSelf: "center", marginTop: 5 }
-
 const $submitButton: ViewStyle = {
   height: 45,
-  width: 160,
+  width: "100%",
   alignSelf: "center",
   marginTop: spacing.small,
   alignContent: "center",
@@ -287,7 +294,7 @@ const $container: ViewStyle = {
 }
 
 const $content: ViewStyle = {
-  margin: spacing.extraLarge,
+  marginHorizontal: spacing.extraLarge,
   flex: 1,
 }
 

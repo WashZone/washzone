@@ -1,6 +1,6 @@
 const en = {
   headerTitle: {
-    addClassfied: "Add a Classfied",
+    addClassfied: "Add a Classified",
     uploadVideo: "Add a Video",
   },
   common: {
@@ -8,6 +8,7 @@ const en = {
     cancel: "Cancel",
     back: "Back",
     logOut: "Log Out",
+    add: "Add",
   },
   welcomeScreen: {
     postscript:
@@ -211,6 +212,9 @@ const en = {
     },
     minimumOnePhotoRequired: {
       text1: "Please Upload atleast one image!",
+    },
+    createdSuccessfully: {
+      text1: "Successfully Created!",
     },
   },
 }

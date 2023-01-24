@@ -6,6 +6,7 @@ const ar: Translations = {
     cancel: "حذف",
     back: "خلف",
     logOut: "تسجيل خروج",
+    add: "تسجيل خروج",
   },
   welcomeScreen: {
     postscript:
@@ -44,10 +45,10 @@ const ar: Translations = {
     hint: "(: تلميح: يمكنك استخدام اي عنوان بريد الكتروني وكلمة السر المفضلة لديك",
   },
   TabNavigator: {
-    componentsTab: "عناصر",
-    debugTab: "تصحيح",
-    communityTab: "واصل اجتماعي",
-    podcastListTab: "البودكاست",
+    videosTab: "Videos",
+    homeTab: "Home",
+    topicsTab: "Topics",
+    ClassifiedsTab: "Classifieds",
   },
   demoCommunityScreen: {
     title: "تواصل مع المجتمع",

@@ -61,4 +61,12 @@ export const toastMessages = {
     type: "error",
     ...en.toastMessages.selectCondition,
   },
+  minimumOnePhotoRequired: {
+    type: "error",
+    ...en.toastMessages.minimumOnePhotoRequired,
+  },
+  createdSuccessfully: {
+    type: "success",
+    ...en.toastMessages.createdSuccessfully,
+  },
 }

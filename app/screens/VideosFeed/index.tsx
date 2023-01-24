@@ -100,7 +100,7 @@ export const VideoRowList = ({ channelDetails }) => {
 }
 
 export const VideosFeed: FC<VideosTabProps<"VideosFeed">> = observer(function VideosFeed(_props) {
-  const { getVideos } = useHooks()
+  const { refreshVideos } = useHooks()
   const [refreshing, setRefreshing] = useState<boolean>(false)
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
   const {
@@ -109,7 +109,7 @@ export const VideosFeed: FC<VideosTabProps<"VideosFeed">> = observer(function Vi
 
   const fetchVideos = async () => {
     setRefreshing(true)
-    await getVideos()
+    await refreshVideos()
     setRefreshing(false)
   }
 
