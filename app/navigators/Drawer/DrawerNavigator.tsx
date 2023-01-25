@@ -9,11 +9,14 @@ import { colors } from "../../theme"
 import { useSafeAreaInsetsStyle } from "../../utils/useSafeAreaInsetsStyle"
 import { DrawerIconButton } from "./DrawerIconButton"
 import { DrawerOptions } from "./DrawerOptions"
+import { NavigationProp, useNavigation } from "@react-navigation/native"
+import { AppStackParamList } from "../AppNavigator"
 
 export function DrawerNavigator() {
   const [open, setOpen] = useState(false)
   const timeout = useRef<ReturnType<typeof setTimeout>>()
   const drawerRef = useRef<DrawerLayout>()
+  const appNavigaion = useNavigation<NavigationProp<AppStackParamList>>()
   const progress = useSharedValue(0)
 
   const toggleDrawer = () => {
@@ -31,6 +34,10 @@ export function DrawerNavigator() {
   }, [])
 
   const $drawerInsets = useSafeAreaInsetsStyle(["top"])
+
+  const handleSearchPress = () => {
+    appNavigaion.navigate("Search")
+  }
 
   return (
     <DrawerLayout
@@ -70,7 +77,7 @@ export function DrawerNavigator() {
         <View style={$headerContainer}>
           <DrawerIconButton onPress={toggleDrawer} {...{ open, progress }} />
           <Icon icon="appLogo" size={45} />
-          <Pressable style={$searchContainer}>
+          <Pressable style={$searchContainer} onPress={handleSearchPress}>
             <Icon icon="search" size={24} />
           </Pressable>
         </View>

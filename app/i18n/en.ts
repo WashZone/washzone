@@ -9,6 +9,7 @@ const en = {
     back: "Back",
     logOut: "Log Out",
     add: "Add",
+    submit: "Submit",
   },
   welcomeScreen: {
     postscript:

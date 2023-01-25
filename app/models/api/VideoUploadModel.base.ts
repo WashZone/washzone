@@ -34,6 +34,8 @@ export const VideoUploadModelBase = ModelBase
     thumbnailUrl: types.union(types.undefined, types.null, types.string),
     view: types.union(types.undefined, types.null, types.number),
     status: types.union(types.undefined, types.null, types.string),
+    likeviews: types.union(types.undefined, types.null, types.integer),
+    dislikeviews: types.union(types.undefined, types.null, types.integer),
   })
   .views(self => ({
     get store() {
@@ -51,6 +53,8 @@ export class VideoUploadModelSelector extends QueryBuilder {
   get thumbnailUrl() { return this.__attr(`thumbnailUrl`) }
   get view() { return this.__attr(`view`) }
   get status() { return this.__attr(`status`) }
+  get likeviews() { return this.__attr(`likeviews`) }
+  get dislikeviews() { return this.__attr(`dislikeviews`) }
   userId(builder: string | UserModelSelector | ((selector: UserModelSelector) => UserModelSelector) | undefined) { return this.__child(`userId`, UserModelSelector, builder) }
   vedioPlaylistId(builder: string | VideoPlaylistModelSelector | ((selector: VideoPlaylistModelSelector) => VideoPlaylistModelSelector) | undefined) { return this.__child(`vedioPlaylistId`, VideoPlaylistModelSelector, builder) }
   LikeVideoId(builder: string | LikeVideosModelSelector | ((selector: LikeVideosModelSelector) => LikeVideosModelSelector) | undefined) { return this.__child(`LikeVideoId`, LikeVideosModelSelector, builder) }
@@ -59,4 +63,4 @@ export function selectFromVideoUpload() {
   return new VideoUploadModelSelector()
 }
 
-export const videoUploadModelPrimitives = selectFromVideoUpload()._id.createdAt.updatedAt.videoHeading.description.attachmentVideoUrl.thumbnailUrl.view.status
+export const videoUploadModelPrimitives = selectFromVideoUpload()._id.createdAt.updatedAt.videoHeading.description.attachmentVideoUrl.thumbnailUrl.view.status.likeviews.dislikeviews

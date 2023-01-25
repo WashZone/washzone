@@ -60,6 +60,7 @@ export enum RootStoreBaseQueries {
 queryHello="queryHello",
 queryGetUserByEmail="queryGetUserByEmail",
 queryGetAllUsers="queryGetAllUsers",
+queryGetAllUsersAdmin="queryGetAllUsersAdmin",
 queryGetUserBysocialId="queryGetUserBysocialId",
 queryGetchannelUser="queryGetchannelUser",
 queryGetSearchedUser="queryGetSearchedUser",
@@ -99,14 +100,15 @@ queryGetAllUploadedVideo="queryGetAllUploadedVideo",
 queryGetUploadedVideoByUserIdPage="queryGetUploadedVideoByUserIdPage",
 queryGetUserChannel="queryGetUserChannel",
 queryGetSearchedItem="queryGetSearchedItem",
-queryGetAllReviews="queryGetAllReviews",
-queryGetReviewOnUserId="queryGetReviewOnUserId",
-queryGetReviewByReviewId="queryGetReviewByReviewId",
 queryGetlikesVideoByUserId="queryGetlikesVideoByUserId",
+queryGetLikesonVideobyuser="queryGetLikesonVideobyuser",
 queryGetuserLikesonVideo="queryGetuserLikesonVideo",
 queryGetAllPlaylistVideo="queryGetAllPlaylistVideo",
 queryGetVideoPlaylistByUserId="queryGetVideoPlaylistByUserId",
-queryGetVideoPlaylistByPlaylistId="queryGetVideoPlaylistByPlaylistId"
+queryGetVideoPlaylistByPlaylistId="queryGetVideoPlaylistByPlaylistId",
+queryGetAllReviews="queryGetAllReviews",
+queryGetReviewOnUserId="queryGetReviewOnUserId",
+queryGetReviewByReviewId="queryGetReviewByReviewId"
 }
 export enum RootStoreBaseMutations {
 mutateCreateUser="mutateCreateUser",
@@ -143,14 +145,16 @@ mutateDeleteClassfied="mutateDeleteClassfied",
 mutateUploadVideoByUser="mutateUploadVideoByUser",
 mutateGetUploadVideoByUserId="mutateGetUploadVideoByUserId",
 mutateGetUploadVideoByVideoId="mutateGetUploadVideoByVideoId",
+mutateGetUploadVideoByPlaylistId="mutateGetUploadVideoByPlaylistId",
 mutateUpdateDeleteVideoId="mutateUpdateDeleteVideoId",
 mutateUpdateVideoViews="mutateUpdateVideoViews",
 mutateUpdatePlaylistIdVideoId="mutateUpdatePlaylistIdVideoId",
-mutateCreateUserReview="mutateCreateUserReview",
-mutateUpdateDeleteReviewId="mutateUpdateDeleteReviewId",
 mutateLikeDislikeVideo="mutateLikeDislikeVideo",
 mutateUploadVideoPlaylist="mutateUploadVideoPlaylist",
-mutateUpdateVideoPlaylist="mutateUpdateVideoPlaylist"
+mutateUpdateVideoPlaylist="mutateUpdateVideoPlaylist",
+mutateUpdateVideoPlaylistbyVideoId="mutateUpdateVideoPlaylistbyVideoId",
+mutateCreateUserReview="mutateCreateUserReview",
+mutateUpdateDeleteReviewId="mutateUpdateDeleteReviewId"
 }
 
 /**
@@ -173,6 +177,9 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     },
     queryGetAllUsers(variables?: {  }, options: QueryOptions = {}) {
       return self.query<{ getAllUsers: any }>(`query getAllUsers { getAllUsers }`, variables, options)
+    },
+    queryGetAllUsersAdmin(variables?: {  }, options: QueryOptions = {}) {
+      return self.query<{ getAllUsersAdmin: any }>(`query getAllUsersAdmin { getAllUsersAdmin }`, variables, options)
     },
     queryGetUserBysocialId(variables: { socialId: string }, options: QueryOptions = {}) {
       return self.query<{ getUserBysocialId: any }>(`query getUserBysocialId($socialId: String!) { getUserBysocialId(socialId: $socialId) }`, variables, options)
@@ -291,17 +298,11 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     queryGetSearchedItem(variables: { searchKey: string, pageNumber: number }, options: QueryOptions = {}) {
       return self.query<{ getSearchedItem: any }>(`query getSearchedItem($searchKey: String!, $pageNumber: Float!) { getSearchedItem(searchKey: $searchKey, pageNumber: $pageNumber) }`, variables, options)
     },
-    queryGetAllReviews(variables: { pageNumber: number }, options: QueryOptions = {}) {
-      return self.query<{ getAllReviews: any }>(`query getAllReviews($pageNumber: Float!) { getAllReviews(pageNumber: $pageNumber) }`, variables, options)
-    },
-    queryGetReviewOnUserId(variables: { pageNumber: number, userId: string }, options: QueryOptions = {}) {
-      return self.query<{ getReviewOnUserId: any }>(`query getReviewOnUserId($pageNumber: Float!, $userId: String!) { getReviewOnUserId(pageNumber: $pageNumber, userId: $userId) }`, variables, options)
-    },
-    queryGetReviewByReviewId(variables: { pageNumber: number, reviewerId: string }, options: QueryOptions = {}) {
-      return self.query<{ getReviewByReviewId: any }>(`query getReviewByReviewId($pageNumber: Float!, $reviewerId: String!) { getReviewByReviewId(pageNumber: $pageNumber, reviewerId: $reviewerId) }`, variables, options)
-    },
     queryGetlikesVideoByUserId(variables: { userId: string }, options: QueryOptions = {}) {
       return self.query<{ getlikesVideoByUserId: any }>(`query getlikesVideoByUserId($userId: String!) { getlikesVideoByUserId(userId: $userId) }`, variables, options)
+    },
+    queryGetLikesonVideobyuser(variables: { userId: string, videoId: string }, options: QueryOptions = {}) {
+      return self.query<{ getLikesonVideobyuser: any }>(`query getLikesonVideobyuser($userId: String!, $videoId: String!) { getLikesonVideobyuser(userId: $userId, videoId: $videoId) }`, variables, options)
     },
     queryGetuserLikesonVideo(variables: { videoId: string }, options: QueryOptions = {}) {
       return self.query<{ getuserLikesonVideo: any }>(`query getuserLikesonVideo($videoId: String!) { getuserLikesonVideo(videoId: $videoId) }`, variables, options)
@@ -314,6 +315,15 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     },
     queryGetVideoPlaylistByPlaylistId(variables: { playlistId: string }, options: QueryOptions = {}) {
       return self.query<{ getVideoPlaylistByPlaylistId: any }>(`query getVideoPlaylistByPlaylistId($playlistId: String!) { getVideoPlaylistByPlaylistId(playlistId: $playlistId) }`, variables, options)
+    },
+    queryGetAllReviews(variables: { pageNumber: number }, options: QueryOptions = {}) {
+      return self.query<{ getAllReviews: any }>(`query getAllReviews($pageNumber: Float!) { getAllReviews(pageNumber: $pageNumber) }`, variables, options)
+    },
+    queryGetReviewOnUserId(variables: { pageNumber: number, userId: string }, options: QueryOptions = {}) {
+      return self.query<{ getReviewOnUserId: any }>(`query getReviewOnUserId($pageNumber: Float!, $userId: String!) { getReviewOnUserId(pageNumber: $pageNumber, userId: $userId) }`, variables, options)
+    },
+    queryGetReviewByReviewId(variables: { pageNumber: number, reviewerId: string }, options: QueryOptions = {}) {
+      return self.query<{ getReviewByReviewId: any }>(`query getReviewByReviewId($pageNumber: Float!, $reviewerId: String!) { getReviewByReviewId(pageNumber: $pageNumber, reviewerId: $reviewerId) }`, variables, options)
     },
     mutateCreateUser(variables: { description?: (string | null), type: string, isSocialLogin: boolean, picture?: (string | null), lastName: string, firstName: string, socialId?: (string | null), password: string, email: string, name: string }, resultSelector: string | ((qb: UserModelSelector) => UserModelSelector) = userModelPrimitives.toString(), optimisticUpdate?: () => void) {
       return self.mutate<{ createUser: UserModelType}>(`mutation createUser($description: String, $type: String!, $isSocialLogin: Boolean!, $picture: String, $lastName: String!, $firstName: String!, $socialId: String, $password: String!, $email: String!, $name: String!) { createUser(description: $description, type: $type, isSocialLogin: $isSocialLogin, picture: $picture, last_name: $lastName, first_name: $firstName, socialId: $socialId, password: $password, email: $email, name: $name) {
@@ -381,8 +391,8 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     mutateUpdateDeleteTopicId(variables: { topicId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ UpdateDeleteTopicId: any }>(`mutation UpdateDeleteTopicId($topicId: String!) { UpdateDeleteTopicId(TopicId: $topicId) }`, variables, optimisticUpdate)
     },
-    mutateUpdateLikeViews(variables: { status: string, topicId: string, userId: string }, optimisticUpdate?: () => void) {
-      return self.mutate<{ UpdateLikeViews: any }>(`mutation UpdateLikeViews($status: String!, $topicId: String!, $userId: String!) { UpdateLikeViews(status: $status, TopicId: $topicId, userId: $userId) }`, variables, optimisticUpdate)
+    mutateUpdateLikeViews(variables: { status: string, videoIds: string, userId: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ UpdateLikeViews: any }>(`mutation UpdateLikeViews($status: String!, $videoIds: String!, $userId: String!) { UpdateLikeViews(status: $status, videoIds: $videoIds, userId: $userId) }`, variables, optimisticUpdate)
     },
     mutateLikeDislikeTopic(variables: { status: string, topicId: string, userId: string }, resultSelector: string | ((qb: LikeTopicsModelSelector) => LikeTopicsModelSelector) = likeTopicsModelPrimitives.toString(), optimisticUpdate?: () => void) {
       return self.mutate<{ likeDislikeTopic: LikeTopicsModelType}>(`mutation likeDislikeTopic($status: String!, $topicId: String!, $userId: String!) { likeDislikeTopic(status: $status, TopicId: $topicId, userId: $userId) {
@@ -443,6 +453,9 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     mutateGetUploadVideoByVideoId(variables: { videoId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ getUploadVideoByVideoId: any }>(`mutation getUploadVideoByVideoId($videoId: String!) { getUploadVideoByVideoId(videoId: $videoId) }`, variables, optimisticUpdate)
     },
+    mutateGetUploadVideoByPlaylistId(variables: { vedioPlaylistId: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ getUploadVideoByPlaylistId: any }>(`mutation getUploadVideoByPlaylistId($vedioPlaylistId: String!) { getUploadVideoByPlaylistId(vedioPlaylistId: $vedioPlaylistId) }`, variables, optimisticUpdate)
+    },
     mutateUpdateDeleteVideoId(variables: { videoId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ UpdateDeleteVideoId: any }>(`mutation UpdateDeleteVideoId($videoId: String!) { UpdateDeleteVideoId(videoId: $videoId) }`, variables, optimisticUpdate)
     },
@@ -451,14 +464,6 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     },
     mutateUpdatePlaylistIdVideoId(variables: { playlistId: string, videoIds: InputVideoUploadPlaylist[] }, optimisticUpdate?: () => void) {
       return self.mutate<{ updatePlaylistIdVideoId: any }>(`mutation updatePlaylistIdVideoId($playlistId: String!, $videoIds: [InputVideoUploadPlaylist!]!) { updatePlaylistIdVideoId(playlistId: $playlistId, videoIds: $videoIds) }`, variables, optimisticUpdate)
-    },
-    mutateCreateUserReview(variables: { reviewStar?: (string | null), reviewContent?: (string | null), classifiedId?: (string | null), reviewerId: string, userId: string }, resultSelector: string | ((qb: UserReviewModelSelector) => UserReviewModelSelector) = userReviewModelPrimitives.toString(), optimisticUpdate?: () => void) {
-      return self.mutate<{ createUserReview: UserReviewModelType}>(`mutation createUserReview($reviewStar: String, $reviewContent: String, $classifiedId: String, $reviewerId: String!, $userId: String!) { createUserReview(reviewStar: $reviewStar, reviewContent: $reviewContent, classifiedId: $classifiedId, reviewerId: $reviewerId, userId: $userId) {
-        ${typeof resultSelector === "function" ? resultSelector(new UserReviewModelSelector()).toString() : resultSelector}
-      } }`, variables, optimisticUpdate)
-    },
-    mutateUpdateDeleteReviewId(variables: { reviewId: string }, optimisticUpdate?: () => void) {
-      return self.mutate<{ UpdateDeleteReviewId: any }>(`mutation UpdateDeleteReviewId($reviewId: String!) { UpdateDeleteReviewId(reviewId: $reviewId) }`, variables, optimisticUpdate)
     },
     mutateLikeDislikeVideo(variables: { status: string, videoId: string, userId: string }, resultSelector: string | ((qb: LikeVideosModelSelector) => LikeVideosModelSelector) = likeVideosModelPrimitives.toString(), optimisticUpdate?: () => void) {
       return self.mutate<{ likeDislikeVideo: LikeVideosModelType}>(`mutation likeDislikeVideo($status: String!, $videoId: String!, $userId: String!) { likeDislikeVideo(status: $status, videoId: $videoId, userId: $userId) {
@@ -472,5 +477,16 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     },
     mutateUpdateVideoPlaylist(variables: { videoUploadId: InputVideoUploadPlaylist[], videoPlaylistId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ UpdateVideoPlaylist: any }>(`mutation UpdateVideoPlaylist($videoUploadId: [InputVideoUploadPlaylist!]!, $videoPlaylistId: String!) { UpdateVideoPlaylist(VideoUploadId: $videoUploadId, videoPlaylistId: $videoPlaylistId) }`, variables, optimisticUpdate)
+    },
+    mutateUpdateVideoPlaylistbyVideoId(variables: { videoUploadId: InputVideoUploadPlaylist[], videoPlaylistId: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ UpdateVideoPlaylistbyVideoId: any }>(`mutation UpdateVideoPlaylistbyVideoId($videoUploadId: [InputVideoUploadPlaylist!]!, $videoPlaylistId: String!) { UpdateVideoPlaylistbyVideoId(VideoUploadId: $videoUploadId, videoPlaylistId: $videoPlaylistId) }`, variables, optimisticUpdate)
+    },
+    mutateCreateUserReview(variables: { reviewStar?: (string | null), reviewContent?: (string | null), classifiedId?: (string | null), reviewerId: string, userId: string }, resultSelector: string | ((qb: UserReviewModelSelector) => UserReviewModelSelector) = userReviewModelPrimitives.toString(), optimisticUpdate?: () => void) {
+      return self.mutate<{ createUserReview: UserReviewModelType}>(`mutation createUserReview($reviewStar: String, $reviewContent: String, $classifiedId: String, $reviewerId: String!, $userId: String!) { createUserReview(reviewStar: $reviewStar, reviewContent: $reviewContent, classifiedId: $classifiedId, reviewerId: $reviewerId, userId: $userId) {
+        ${typeof resultSelector === "function" ? resultSelector(new UserReviewModelSelector()).toString() : resultSelector}
+      } }`, variables, optimisticUpdate)
+    },
+    mutateUpdateDeleteReviewId(variables: { reviewId: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ UpdateDeleteReviewId: any }>(`mutation UpdateDeleteReviewId($reviewId: String!) { UpdateDeleteReviewId(reviewId: $reviewId) }`, variables, optimisticUpdate)
     },
   })))

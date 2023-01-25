@@ -7,6 +7,7 @@ import {
   Dimensions,
   ScrollView,
   ActivityIndicator,
+  TouchableOpacity,
 } from "react-native"
 import { Text, Screen, IconTypes, Icon } from "../../components"
 import { ClassifiedsTabProps } from "../../tabs"
@@ -19,17 +20,7 @@ import { useHooks } from "../hooks"
 import { Rating } from "react-native-ratings"
 import { useStores } from "../../models"
 import { Interaction } from "../../utils/enums"
-
-// const mock = {
-//   poster:
-//     "https://img.freepik.com/free-psd/white-sport-car_176382-1598.jpg?w=1800&t=st=1670396984~exp=1670397584~hmac=58b3c062df733a373f5e3a78f4d6bcf6538765de4595e3e17cea5c2ec51ab8e3",
-//   publisher: {
-//     picture:
-//       "https://media.istockphoto.com/id/1309328823/photo/headshot-portrait-of-smiling-male-employee-in-office.jpg?b=1&s=170667a&w=0&k=20&c=MRMqc79PuLmQfxJ99fTfGqHL07EDHqHLWg0Tb4rPXQc=",
-//     name: "Jay Cue",
-//   },
-//   description: `Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.`,
-// }
+import { RateUserModal } from "./RateUser"
 
 interface ActionProps {
   icon: IconTypes
@@ -38,6 +29,7 @@ interface ActionProps {
 }
 
 const PublisherDetails = ({ publisher }: { publisher: any }) => {
+  const [rateUserModalVisible, setRateUserModalVisible] = useState(false)
   return (
     <>
       <View style={$publisherContainer}>
@@ -45,12 +37,15 @@ const PublisherDetails = ({ publisher }: { publisher: any }) => {
           <FastImage style={$publisherPicture} source={{ uri: publisher?.picture }} />
           <View>
             <Text text={publisher?.name} />
-            <Rating
-              startingValue={3}
-              imageSize={22}
-              tintColor={colors.backgroundGrey}
-              style={{ backgroundColor: colors.backgroundGrey, marginTop: spacing.extraSmall }}
-            />
+            <TouchableOpacity onPress={() => setRateUserModalVisible(true)}>
+              <Rating
+                readonly
+                startingValue={3}
+                imageSize={22}
+                tintColor={colors.backgroundGrey}
+                style={{ backgroundColor: colors.backgroundGrey, marginTop: spacing.extraSmall }}
+              />
+            </TouchableOpacity>
           </View>
         </View>
         {/* <Pressable style={$followButton}>
@@ -60,6 +55,7 @@ const PublisherDetails = ({ publisher }: { publisher: any }) => {
       {/* <Pressable style={$reviewsButtonContainer}>
         <Text text="See All Reviews" weight="semiBold" />
       </Pressable> */}
+      <RateUserModal isVisible={rateUserModalVisible} setModalVisible={setRateUserModalVisible} />
     </>
   )
 }

@@ -1,12 +1,5 @@
 import React, { FC, useEffect, useState } from "react"
-import {
-  ActivityIndicator,
-  ImageStyle,
-  TextStyle,
-  TouchableOpacity,
-  View,
-  ViewStyle,
-} from "react-native"
+import { ActivityIndicator, TextStyle, TouchableOpacity, View, ViewStyle } from "react-native"
 import { TextInput } from "react-native-paper"
 import { Button, Header, Icon, Screen, Text, Toggle } from "../../components"
 import { Dropdown } from "react-native-element-dropdown"
@@ -29,7 +22,7 @@ export const UploadVideo: FC<AppStackScreenProps<"UploadVideo">> = function Uplo
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
   const [buttonLoading, setButtonLoading] = useState<boolean>(false)
   const [isFocus, setIsFocus] = useState<boolean>(false)
-  const [playlistModalVisible, setPlaylistModalVisible] = useState<boolean>(true)
+  const [playlistModalVisible, setPlaylistModalVisible] = useState<boolean>(false)
   const [TNCAccepted, setTNCAccepted] = useState<boolean>(false)
   const [value, setValue] = useState("")
   const [allPlaylists, setAllPlaylist] = useState([])
@@ -39,14 +32,19 @@ export const UploadVideo: FC<AppStackScreenProps<"UploadVideo">> = function Uplo
   const { uploadVideo, refreshVideos } = useHooks()
 
   const syncAllPlaylists = async () => {
+    console.log("SYNCING PLAYLISTS")
     const allPlaylistDropDownData = []
-    const res = await queryGetVideoPlaylistByUserId({ userId: _id })
+    const res = await queryGetVideoPlaylistByUserId(
+      { userId: _id },
+      { fetchPolicy: "network-only" },
+    )
     console.log("ALL PLAYLIST", res.getVideoPlaylistByUserId?.data)
     if (res.getVideoPlaylistByUserId?.data) {
       res.getVideoPlaylistByUserId?.data.map((playlist) =>
         allPlaylistDropDownData.push({ label: playlist?.playListName, value: playlist?._id }),
       )
     }
+    console.log("SYNCING PLAYLISTS to :", allPlaylistDropDownData)
     setAllPlaylist(allPlaylistDropDownData)
   }
 

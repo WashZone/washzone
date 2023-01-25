@@ -32,8 +32,8 @@ export const TopicDetailModelBase = ModelBase
     attachmentType: types.union(types.undefined, types.null, types.string),
     attachmentUrl: types.union(types.undefined, types.null, types.string),
     status: types.union(types.undefined, types.null, types.string),
-    likeviews: types.union(types.undefined, types.null, types.number),
-    dislikeviews: types.union(types.undefined, types.null, types.number),
+    likeviews: types.union(types.undefined, types.null, types.integer),
+    dislikeviews: types.union(types.undefined, types.null, types.integer),
   })
   .views(self => ({
     get store() {

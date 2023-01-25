@@ -2,6 +2,7 @@ import { useStores } from "../models"
 import { Interaction } from "../utils/enums"
 import Toast from "react-native-toast-message"
 import { toastMessages } from "../utils/toastMessages"
+import DeviceInfo, { getAndroidId, getDeviceToken } from "react-native-device-info"
 
 export function useHooks() {
   const {
@@ -304,7 +305,7 @@ export function useHooks() {
   }
 
   const refreshVideos = async () => {
-    const res = await queryGetUserChannel()
+    const res = await queryGetUserChannel(undefined, { fetchPolicy: "no-cache" })
     setVideos(res.getUserChannel)
     console.log("VIDEOS", res)
     return res.getUserChannel
@@ -347,9 +348,12 @@ export function useHooks() {
   }
 
   const getPlaylist = async (playlistId: string) => {
-    const res = await queryGetVideoPlaylistByPlaylistId({
-      playlistId,
-    })
+    const res = await queryGetVideoPlaylistByPlaylistId(
+      {
+        playlistId,
+      },
+      { fetchPolicy: "network-only" },
+    )
     console.log(res.getVideoPlaylistByPlaylistId)
     return (
       res.getVideoPlaylistByPlaylistId?.data?.length > 0 &&
@@ -528,7 +532,25 @@ export function useHooks() {
     }
   }
 
+  const getDeviceInfo = async () => {
+    const res = await getDeviceToken()
+    console.log("RES---getDeviceInfo", res)
+    // try {
+    //   const res = await mutateUploadVideoPlaylist({
+    //     playListName,
+    //     userId: userStore._id,
+    //     videoUpload: [],
+    //   })
+    //   console.log("createEmptyPlaylist", res)
+    //   Toast.show(toastMessages.createdSuccessfully)
+    // } catch (err) {
+    //   console.log("ERROR", err)
+    //   Toast.show(toastMessages.somethingWentWrong)
+    // }
+  }
+
   const onBoot = async () => {
+    await getDeviceInfo()
     await syncSavedInteractionsHook()
     await syncInteractedVideosAndTopics()
     await refreshTopics()
