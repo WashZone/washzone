@@ -13,6 +13,8 @@ import Toast from "react-native-toast-message"
 import { toastMessages } from "../../utils/toastMessages"
 import { useHooks } from "../hooks"
 import { InputPlaylistInfoModal } from "./InputPlaylistInfo"
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
+import { $flex1 } from "../styles"
 
 export const UploadVideo: FC<AppStackScreenProps<"UploadVideo">> = function UploadVideo() {
   const {
@@ -87,11 +89,7 @@ export const UploadVideo: FC<AppStackScreenProps<"UploadVideo">> = function Uplo
   }, [])
 
   return (
-    <Screen
-      preset="fixed"
-      contentContainerStyle={$container}
-      backgroundColor={colors.palette.neutral100}
-    >
+    <>
       <Header
         backgroundColor={colors.palette.neutral100}
         leftIcon="caretLeft"
@@ -100,8 +98,12 @@ export const UploadVideo: FC<AppStackScreenProps<"UploadVideo">> = function Uplo
         onLeftPress={() => navigation.goBack()}
         leftIconColor={colors.palette.neutral600}
       />
-
-      <View style={$content}>
+      <Screen
+        preset="auto"
+        contentContainerStyle={[$container, $content]}
+        backgroundColor={colors.palette.neutral100}
+        safeAreaEdges={["bottom"]}
+      >
         <TextInput
           multiline
           value={title}
@@ -179,13 +181,14 @@ export const UploadVideo: FC<AppStackScreenProps<"UploadVideo">> = function Uplo
         >
           <Text tx="common.add" style={$submitText} weight="semiBold" />
         </Button>
-      </View>
-      <InputPlaylistInfoModal
-        syncAllPlaylists={syncAllPlaylists}
-        setModalVisible={setPlaylistModalVisible}
-        isVisible={playlistModalVisible}
-      />
-    </Screen>
+
+        <InputPlaylistInfoModal
+          syncAllPlaylists={syncAllPlaylists}
+          setModalVisible={setPlaylistModalVisible}
+          isVisible={playlistModalVisible}
+        />
+      </Screen>
+    </>
   )
 }
 
@@ -234,6 +237,7 @@ const $submitButton: ViewStyle = {
   alignContent: "center",
   padding: 0,
   margin: 0,
+  // marginBottom: 200,
 }
 
 const $titleStyle: TextStyle = {
@@ -242,11 +246,10 @@ const $titleStyle: TextStyle = {
   marginLeft: 20,
 }
 
-const $container: ViewStyle = {
-  flex: 1,
-}
+const $container: ViewStyle = {}
 
 const $content: ViewStyle = {
+  // flex: 1,
   marginHorizontal: spacing.extraLarge,
 }
 

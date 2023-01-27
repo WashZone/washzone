@@ -128,6 +128,7 @@ export const AddAClassified: FC<AppStackScreenProps<"AddAClassified">> = functio
         title,
         prize: price,
         classifiedDetail: description,
+        condition: value,
       })
       await refreshClassifieds()
       navigation.goBack()
@@ -190,7 +191,6 @@ export const AddAClassified: FC<AppStackScreenProps<"AddAClassified">> = functio
 
         <Dropdown
           data={data}
-          search
           maxHeight={300}
           // eslint-disable-next-line react-native/no-inline-styles
           style={[$dropdown, isFocus && { borderColor: colors.palette.primary100, borderWidth: 2 }]}
@@ -335,6 +335,6 @@ const $removeMedia: ViewStyle = {
   borderRadius: spacing.micro,
 }
 
-const $imageLoadingIndicator: View = {
+const $imageLoadingIndicator: ViewStyle = {
   position: "absolute",
 }

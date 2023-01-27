@@ -31,6 +31,7 @@ export const ClassifiedFeedModelBase = ModelBase
     status: types.union(types.undefined, types.null, types.string),
     prize: types.union(types.undefined, types.null, types.string),
     title: types.union(types.undefined, types.null, types.string),
+    condition: types.union(types.undefined, types.null, types.string),
   })
   .views(self => ({
     get store() {
@@ -48,6 +49,7 @@ export class ClassifiedFeedModelSelector extends QueryBuilder {
   get status() { return this.__attr(`status`) }
   get prize() { return this.__attr(`prize`) }
   get title() { return this.__attr(`title`) }
+  get condition() { return this.__attr(`condition`) }
   userId(builder: string | UserModelSelector | ((selector: UserModelSelector) => UserModelSelector) | undefined) { return this.__child(`userId`, UserModelSelector, builder) }
   reviewDetailId(builder: string | UserReviewModelSelector | ((selector: UserReviewModelSelector) => UserReviewModelSelector) | undefined) { return this.__child(`reviewDetailId`, UserReviewModelSelector, builder) }
 }
@@ -55,4 +57,4 @@ export function selectFromClassifiedFeed() {
   return new ClassifiedFeedModelSelector()
 }
 
-export const classifiedFeedModelPrimitives = selectFromClassifiedFeed()._id.createdAt.updatedAt.classifiedDetail.attachmentType.attachmentUrl.status.prize.title
+export const classifiedFeedModelPrimitives = selectFromClassifiedFeed()._id.createdAt.updatedAt.classifiedDetail.attachmentType.attachmentUrl.status.prize.title.condition

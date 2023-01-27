@@ -7,6 +7,8 @@ import { MSTGQLStore, configureStoreMixin, QueryOptions, withTypedRefs } from "m
 
 import { UserModel, UserModelType } from "./UserModel"
 import { userModelPrimitives, UserModelSelector } from "./UserModel.base"
+import { SigninUserModel, SigninUserModelType } from "./SigninUserModel"
+import { signinUserModelPrimitives, SigninUserModelSelector } from "./SigninUserModel.base"
 import { LikeVideosModel, LikeVideosModelType } from "./LikeVideosModel"
 import { likeVideosModelPrimitives, LikeVideosModelSelector } from "./LikeVideosModel.base"
 import { VideoPlaylistModel, VideoPlaylistModelType } from "./VideoPlaylistModel"
@@ -113,6 +115,8 @@ queryGetReviewByReviewId="queryGetReviewByReviewId"
 export enum RootStoreBaseMutations {
 mutateCreateUser="mutateCreateUser",
 mutateUpdatePassword="mutateUpdatePassword",
+mutateStoreDeviceId="mutateStoreDeviceId",
+mutateGetBlockedUser="mutateGetBlockedUser",
 mutateResetPassword="mutateResetPassword",
 mutateSignin="mutateSignin",
 mutateGetUserById="mutateGetUserById",
@@ -121,6 +125,7 @@ mutateSendOtpOnEmailByUserId="mutateSendOtpOnEmailByUserId",
 mutateVerifyEmailByUserId="mutateVerifyEmailByUserId",
 mutateGenerateOTP="mutateGenerateOTP",
 mutateUpdateDeleteStatus="mutateUpdateDeleteStatus",
+mutateStoreBlockedUser="mutateStoreBlockedUser",
 mutateSaveLikedVideo="mutateSaveLikedVideo",
 mutateUpdateDeletesavedVideo="mutateUpdateDeletesavedVideo",
 mutateDeleteVideo="mutateDeleteVideo",
@@ -162,7 +167,7 @@ mutateUpdateDeleteReviewId="mutateUpdateDeleteReviewId"
 */
 export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
   .named("RootStore")
-  .extend(configureStoreMixin([['User', () => UserModel], ['likeVideos', () => LikeVideosModel], ['VideoPlaylist', () => VideoPlaylistModel], ['VideoUploadPlaylist', () => VideoUploadPlaylistModel], ['VideoUpload', () => VideoUploadModel], ['saveVideo', () => SaveVideoModel], ['CommentsDetail', () => CommentsDetailModel], ['likeTopics', () => LikeTopicsModel], ['TopicDetail', () => TopicDetailModel], ['storyViewerUser', () => StoryViewerUserModel], ['followUser', () => FollowUserModel], ['UserReview', () => UserReviewModel], ['classifiedFeed', () => ClassifiedFeedModel], ['saveClassified', () => SaveClassifiedModel]], [], "js"))
+  .extend(configureStoreMixin([['User', () => UserModel], ['SigninUser', () => SigninUserModel], ['likeVideos', () => LikeVideosModel], ['VideoPlaylist', () => VideoPlaylistModel], ['VideoUploadPlaylist', () => VideoUploadPlaylistModel], ['VideoUpload', () => VideoUploadModel], ['saveVideo', () => SaveVideoModel], ['CommentsDetail', () => CommentsDetailModel], ['likeTopics', () => LikeTopicsModel], ['TopicDetail', () => TopicDetailModel], ['storyViewerUser', () => StoryViewerUserModel], ['followUser', () => FollowUserModel], ['UserReview', () => UserReviewModel], ['classifiedFeed', () => ClassifiedFeedModel], ['saveClassified', () => SaveClassifiedModel]], [], "js"))
   .props({
 
   })
@@ -333,6 +338,14 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     mutateUpdatePassword(variables: { userId: string, password: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ updatePassword: any }>(`mutation updatePassword($userId: String!, $password: String!) { updatePassword(userId: $userId, password: $password) }`, variables, optimisticUpdate)
     },
+    mutateStoreDeviceId(variables: { deviceId: string, userId: string }, resultSelector: string | ((qb: SigninUserModelSelector) => SigninUserModelSelector) = signinUserModelPrimitives.toString(), optimisticUpdate?: () => void) {
+      return self.mutate<{ storeDeviceId: SigninUserModelType}>(`mutation storeDeviceId($deviceId: String!, $userId: String!) { storeDeviceId(deviceId: $deviceId, userId: $userId) {
+        ${typeof resultSelector === "function" ? resultSelector(new SigninUserModelSelector()).toString() : resultSelector}
+      } }`, variables, optimisticUpdate)
+    },
+    mutateGetBlockedUser(variables: { deviceId: string, userId: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ getBlockedUser: any }>(`mutation getBlockedUser($deviceId: String!, $userId: String!) { getBlockedUser(deviceId: $deviceId, userId: $userId) }`, variables, optimisticUpdate)
+    },
     mutateResetPassword(variables: { newPassword: string, oldPassword: string, userId: string }, resultSelector: string | ((qb: UserModelSelector) => UserModelSelector) = userModelPrimitives.toString(), optimisticUpdate?: () => void) {
       return self.mutate<{ resetPassword: UserModelType}>(`mutation resetPassword($newPassword: String!, $oldPassword: String!, $userId: String!) { resetPassword(newPassword: $newPassword, oldPassword: $oldPassword, userId: $userId) {
         ${typeof resultSelector === "function" ? resultSelector(new UserModelSelector()).toString() : resultSelector}
@@ -362,6 +375,11 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     },
     mutateUpdateDeleteStatus(variables: { status: string, userId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ UpdateDeleteStatus: any }>(`mutation UpdateDeleteStatus($status: String!, $userId: String!) { UpdateDeleteStatus(status: $status, userId: $userId) }`, variables, optimisticUpdate)
+    },
+    mutateStoreBlockedUser(variables: { deviceId: string, userId: string }, resultSelector: string | ((qb: SigninUserModelSelector) => SigninUserModelSelector) = signinUserModelPrimitives.toString(), optimisticUpdate?: () => void) {
+      return self.mutate<{ storeBlockedUser: SigninUserModelType}>(`mutation storeBlockedUser($deviceId: String!, $userId: String!) { storeBlockedUser(deviceId: $deviceId, userId: $userId) {
+        ${typeof resultSelector === "function" ? resultSelector(new SigninUserModelSelector()).toString() : resultSelector}
+      } }`, variables, optimisticUpdate)
     },
     mutateSaveLikedVideo(variables: { videoId: string, userId: string }, resultSelector: string | ((qb: SaveVideoModelSelector) => SaveVideoModelSelector) = saveVideoModelPrimitives.toString(), optimisticUpdate?: () => void) {
       return self.mutate<{ saveLikedVideo: SaveVideoModelType}>(`mutation saveLikedVideo($videoId: String!, $userId: String!) { saveLikedVideo(videoId: $videoId, userId: $userId) {
@@ -417,8 +435,8 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
         ${typeof resultSelector === "function" ? resultSelector(new FollowUserModelSelector()).toString() : resultSelector}
       } }`, variables, optimisticUpdate)
     },
-    mutateCreateClassifiedDetail(variables: { title?: (string | null), prize?: (string | null), attachmentUrl?: (string | null), attachmentType?: (string | null), classifiedDetail?: (string | null), reviewDetailId?: (string | null), userId: string }, resultSelector: string | ((qb: ClassifiedFeedModelSelector) => ClassifiedFeedModelSelector) = classifiedFeedModelPrimitives.toString(), optimisticUpdate?: () => void) {
-      return self.mutate<{ createClassifiedDetail: ClassifiedFeedModelType}>(`mutation createClassifiedDetail($title: String, $prize: String, $attachmentUrl: String, $attachmentType: String, $classifiedDetail: String, $reviewDetailId: String, $userId: String!) { createClassifiedDetail(title: $title, prize: $prize, attachmentUrl: $attachmentUrl, attachmentType: $attachmentType, classifiedDetail: $classifiedDetail, reviewDetailId: $reviewDetailId, userId: $userId) {
+    mutateCreateClassifiedDetail(variables: { condition: string, title?: (string | null), prize?: (string | null), attachmentUrl?: (string | null), attachmentType?: (string | null), classifiedDetail?: (string | null), reviewDetailId?: (string | null), userId: string }, resultSelector: string | ((qb: ClassifiedFeedModelSelector) => ClassifiedFeedModelSelector) = classifiedFeedModelPrimitives.toString(), optimisticUpdate?: () => void) {
+      return self.mutate<{ createClassifiedDetail: ClassifiedFeedModelType}>(`mutation createClassifiedDetail($condition: String!, $title: String, $prize: String, $attachmentUrl: String, $attachmentType: String, $classifiedDetail: String, $reviewDetailId: String, $userId: String!) { createClassifiedDetail(condition: $condition, title: $title, prize: $prize, attachmentUrl: $attachmentUrl, attachmentType: $attachmentType, classifiedDetail: $classifiedDetail, reviewDetailId: $reviewDetailId, userId: $userId) {
         ${typeof resultSelector === "function" ? resultSelector(new ClassifiedFeedModelSelector()).toString() : resultSelector}
       } }`, variables, optimisticUpdate)
     },

@@ -16,6 +16,7 @@ import AppLovinMAX from "react-native-applovin-max/src/index"
 import { $flex1 } from "../styles"
 import Share from "react-native-share"
 import { getIconForInteraction } from "../../utils/helpers"
+import { defaultImages } from "../../utils"
 
 const Actions = observer(function ActionButtons({ item }: { item: any }) {
   const [loading, setLoading] = useState<boolean>(false)
@@ -101,8 +102,7 @@ export const TopicComponent = ({ topic, index }) => {
           <View style={$publisherInfoContainer}>
             <FastImage
               source={{
-                uri:
-                  topicDetails?.picture || "https://edigitalcare.in/public/uploads/user-dummy.png",
+                uri: topicDetails?.picture || defaultImages.profile,
               }}
               style={$picture}
             />

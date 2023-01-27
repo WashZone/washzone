@@ -33,6 +33,7 @@ export const UserModelBase = ModelBase
     status: types.union(types.undefined, types.null, types.string),
     role: types.union(types.undefined, types.null, types.string),
     description: types.union(types.undefined, types.null, types.string),
+    deviceId: types.union(types.undefined, types.null, types.array(types.string)),
   })
   .views(self => ({
     get store() {
@@ -58,9 +59,10 @@ export class UserModelSelector extends QueryBuilder {
   get status() { return this.__attr(`status`) }
   get role() { return this.__attr(`role`) }
   get description() { return this.__attr(`description`) }
+  get deviceId() { return this.__attr(`deviceId`) }
 }
 export function selectFromUser() {
   return new UserModelSelector()
 }
 
-export const userModelPrimitives = selectFromUser()._id.createdAt.updatedAt.userId.first_name.last_name.name.email.socialId.password.picture.isSocialLogin.type.token.status.role.description
+export const userModelPrimitives = selectFromUser()._id.createdAt.updatedAt.userId.first_name.last_name.name.email.socialId.password.picture.isSocialLogin.type.token.status.role.description.deviceId

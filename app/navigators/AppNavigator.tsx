@@ -2,7 +2,7 @@ import { DarkTheme, DefaultTheme, NavigationContainer } from "@react-navigation/
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import { StackScreenProps } from "@react-navigation/stack"
 import { observer } from "mobx-react-lite"
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import { useColorScheme } from "react-native"
 import Config from "../config"
 import { useStores } from "../models"
@@ -23,6 +23,8 @@ import {
 import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
 import { DrawerNavigator } from "./Drawer/DrawerNavigator"
 import { ClassifiedLinked } from "../screens/ClassifiedLinked"
+import { useHooks } from "../screens/hooks"
+import { BlockedUserModal } from "../components/BlockedUserModal"
 
 export type AppStackParamList = {
   Login: undefined
@@ -51,8 +53,10 @@ const Stack = createNativeStackNavigator<AppStackParamList>()
 
 const AppStack = observer(function AppStack() {
   const {
-    authenticationStore: { isAuthenticated },
+    authenticationStore: { isAuthenticated, isBlocked },
   } = useStores()
+  console.log("dsfsadfdasfISBLOCKEd", isBlocked)
+  const { onLoggedInBoot } = useHooks()
   const url = Linking.useURL()
 
   const openUrl = () => {
@@ -62,46 +66,52 @@ const AppStack = observer(function AppStack() {
     }
   }
   useEffect(() => openUrl(), [url])
+  useEffect(() => {
+    isAuthenticated && onLoggedInBoot()
+  }, [isAuthenticated])
 
   return (
-    <Stack.Navigator
-      screenOptions={{ headerShown: false }}
-      initialRouteName={isAuthenticated ? "Drawer" : "Login"}
-    >
-      {isAuthenticated ? (
-        <>
-          {/* <Stack.Screen name="Welcome" component={WelcomeScreen} /> */}
-          <Stack.Screen name="Drawer" component={DrawerNavigator} />
-          <Stack.Screen name="EditProfile" component={EditProfile} />
-          <Stack.Screen name="Notifications" component={Notifications} />
-          <Stack.Screen name="Settings" component={Settings} />
-          <Stack.Screen name="ResetPassword" component={ResetPassword} />
-          <Stack.Screen
-            name="Search"
-            component={Search}
-            options={{ presentation: "containedModal" }}
-          />
-          <Stack.Screen name="Saved" component={Saved} />
-          <Stack.Screen name="ClassifiedLinked" component={ClassifiedLinked} />
-          <Stack.Screen
-            name="UploadVideo"
-            component={UploadVideo}
-            options={{ presentation: "containedModal" }}
-          />
-          <Stack.Screen
-            name="AddAClassified"
-            component={AddAClassified}
-            options={{ presentation: "containedModal" }}
-          />
-        </>
-      ) : (
-        <>
-          <Stack.Screen name="Login" component={LoginScreen} />
-          <Stack.Screen name="Signup" component={SignupScreen} />
-          <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
-        </>
-      )}
-    </Stack.Navigator>
+    <>
+      <Stack.Navigator
+        screenOptions={{ headerShown: false }}
+        initialRouteName={isAuthenticated ? "Drawer" : "Login"}
+      >
+        {isAuthenticated ? (
+          <>
+            {/* <Stack.Screen name="Welcome" component={WelcomeScreen} /> */}
+            <Stack.Screen name="Drawer" component={DrawerNavigator} />
+            <Stack.Screen name="EditProfile" component={EditProfile} />
+            <Stack.Screen name="Notifications" component={Notifications} />
+            <Stack.Screen name="Settings" component={Settings} />
+            <Stack.Screen name="ResetPassword" component={ResetPassword} />
+            <Stack.Screen
+              name="Search"
+              component={Search}
+              options={{ presentation: "containedModal" }}
+            />
+            <Stack.Screen name="Saved" component={Saved} />
+            <Stack.Screen name="ClassifiedLinked" component={ClassifiedLinked} />
+            <Stack.Screen
+              name="UploadVideo"
+              component={UploadVideo}
+              options={{ presentation: "containedModal" }}
+            />
+            <Stack.Screen
+              name="AddAClassified"
+              component={AddAClassified}
+              options={{ presentation: "containedModal" }}
+            />
+          </>
+        ) : (
+          <>
+            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="Signup" component={SignupScreen} />
+            <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
+          </>
+        )}
+      </Stack.Navigator>
+      <BlockedUserModal isVisible={isBlocked} />
+    </>
   )
 })
 

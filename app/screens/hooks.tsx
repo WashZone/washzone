@@ -2,10 +2,11 @@ import { useStores } from "../models"
 import { Interaction } from "../utils/enums"
 import Toast from "react-native-toast-message"
 import { toastMessages } from "../utils/toastMessages"
-import DeviceInfo, { getAndroidId, getDeviceToken } from "react-native-device-info"
+import DeviceInfo, { getAndroidId, getUniqueId, getDeviceToken } from "react-native-device-info"
 
 export function useHooks() {
   const {
+    authenticationStore: { setBlocked, isBlocked, setAuthToken },
     feedStore: {
       setTopics: setFeedTopics,
       topics: feedTopics,
@@ -64,6 +65,8 @@ export function useHooks() {
       mutateUploadVideoByUser,
       mutateCreateClassifiedDetail,
       mutateUploadVideoPlaylist,
+      mutateGetBlockedUser,
+      mutateStoreDeviceId,
     },
     userStore,
   } = useStores()
@@ -505,7 +508,7 @@ export function useHooks() {
     console.log("VIDEO UPLOAD STATUS : ", res.uploadVideoByUser)
   }
 
-  const createClassified = async ({ attachmentUrl, title, prize, classifiedDetail }) => {
+  const createClassified = async ({ attachmentUrl, title, prize, classifiedDetail, condition }) => {
     const res = await mutateCreateClassifiedDetail({
       attachmentUrl,
       attachmentType: "image",
@@ -513,6 +516,7 @@ export function useHooks() {
       prize,
       classifiedDetail,
       userId: userStore._id,
+      condition,
     })
     console.log("CREATE TOPIC", res)
   }
@@ -532,25 +536,39 @@ export function useHooks() {
     }
   }
 
-  const getDeviceInfo = async () => {
-    const res = await getDeviceToken()
-    console.log("RES---getDeviceInfo", res)
-    // try {
-    //   const res = await mutateUploadVideoPlaylist({
-    //     playListName,
-    //     userId: userStore._id,
-    //     videoUpload: [],
-    //   })
-    //   console.log("createEmptyPlaylist", res)
-    //   Toast.show(toastMessages.createdSuccessfully)
-    // } catch (err) {
-    //   console.log("ERROR", err)
-    //   Toast.show(toastMessages.somethingWentWrong)
-    // }
+  const storeDeviceInfo = async () => {
+    const deviceId = await getUniqueId()
+    console.log("RES---deviceId", deviceId)
+    try {
+      const res = await mutateStoreDeviceId({
+        userId: userStore._id,
+        deviceId,
+      })
+      console.log("mutateStoreBlockedUser", res)
+    } catch (err) {
+      console.log("ERROR", err)
+    }
   }
 
-  const onBoot = async () => {
-    await getDeviceInfo()
+  const isUserBlocked = async () => {
+    const deviceId = await getUniqueId()
+    console.log("RES---deviceId", deviceId)
+    try {
+      const res = await mutateGetBlockedUser({
+        userId: userStore._id,
+        deviceId,
+      })
+      console.log("mutateGetBlockedUser", res.getBlockedUser?.status)
+      setBlocked(res.getBlockedUser?.status)
+      if (res.getBlockedUser?.status) {
+        setAuthToken(undefined)
+      }
+    } catch (err) {
+      console.log("ERROR", err)
+    }
+  }
+
+  const onLoggedInBoot = async () => {
     await syncSavedInteractionsHook()
     await syncInteractedVideosAndTopics()
     await refreshTopics()
@@ -560,7 +578,13 @@ export function useHooks() {
     await loadStories()
   }
 
+  const onBoot = async () => {
+    await storeDeviceInfo()
+    await isUserBlocked()
+  }
+
   return {
+    onLoggedInBoot,
     getPlaylist,
     loadStories,
     getAndUpdatePosts,

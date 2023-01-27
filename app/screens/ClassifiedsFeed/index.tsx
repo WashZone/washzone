@@ -18,6 +18,7 @@ import { useHooks } from "../hooks"
 import { useStores } from "../../models"
 import { $flex1 } from "../styles"
 import { AppStackParamList } from "../../navigators"
+import { defaultImages } from "../../utils"
 
 export const ClassifiedComponent = ({
   classified,
@@ -34,7 +35,7 @@ export const ClassifiedComponent = ({
     >
       <FastImage
         source={{
-          uri: classified?.attachmentUrl || "https://edigitalcare.in/public/uploads/user-dummy.png",
+          uri: classified?.attachmentUrl || defaultImages.noImage,
         }}
         style={$attachment}
       />

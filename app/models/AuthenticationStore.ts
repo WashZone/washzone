@@ -4,6 +4,7 @@ export const AuthenticationStoreModel = types
   .model("AuthenticationStore")
   .props({
     authToken: types.maybe(types.string),
+    isBlocked: types.maybe(types.boolean),
     authEmail: types.optional(types.string, ""),
     authPassword: types.optional(types.string, ""),
   })
@@ -29,6 +30,9 @@ export const AuthenticationStoreModel = types
     },
   }))
   .actions((store) => ({
+    setBlocked(value?: boolean) {
+      store.isBlocked = value
+    },
     setAuthToken(value?: string) {
       store.authToken = value
     },

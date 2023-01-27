@@ -1,5 +1,13 @@
 import React, { FC, useEffect, useState } from "react"
-import { ActivityIndicator, ScrollView, TextInput, TextStyle, View, ViewStyle } from "react-native"
+import {
+  ActivityIndicator,
+  Dimensions,
+  ScrollView,
+  TextInput,
+  TextStyle,
+  View,
+  ViewStyle,
+} from "react-native"
 import { Icon, Screen } from "../../components"
 import { colors, spacing } from "../../theme"
 import { HomeTabProps } from "../../tabs/Home"
@@ -61,7 +69,7 @@ export const TopicInfo: FC<HomeTabProps<"TopicInfo">> = function PostInfo(props)
   }
 
   return (
-    <Screen preset="fixed" contentContainerStyle={$container}>
+    <Screen preset="fixed" keyboardOffset={-180} contentContainerStyle={$container}>
       <ScrollView style={$contentContainer}>
         <PostComponent topic={topicDetails} index={0} />
         {comments.map((c) => (

@@ -22,6 +22,7 @@ import { Stories } from "./Stories"
 import { $flex1 } from "../../styles"
 import { NATIVE_AD_UNIT_ID } from "../../../utils/AppLovin"
 import NativeAdView from "../../../utils/NativeAd"
+import { defaultImages } from "../../../utils"
 
 export interface TopicComponentProps {
   topic: any
@@ -64,8 +65,7 @@ export const PostComponent = ({ topic, navigateOnPress, index }: TopicComponentP
           <Pressable onPress={() => navigation.navigate("Profile", { user: topic?.userId })}>
             <FastImage
               source={{
-                uri:
-                  topicDetails.picture || "https://edigitalcare.in/public/uploads/user-dummy.png",
+                uri: topicDetails.picture || defaultImages.profile,
               }}
               style={$picture}
             />

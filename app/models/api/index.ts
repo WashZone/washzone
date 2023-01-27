@@ -3,6 +3,7 @@
 /* tslint:disable */
 
 export * from "./UserModel"
+export * from "./SigninUserModel"
 export * from "./LikeVideosModel"
 export * from "./VideoPlaylistModel"
 export * from "./VideoUploadPlaylistModel"
