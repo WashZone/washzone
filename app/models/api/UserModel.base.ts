@@ -5,6 +5,8 @@
 import { types } from "mobx-state-tree"
 import { QueryBuilder } from "mst-gql"
 import { ModelBase } from "./ModelBase"
+import { UserRatingModel, UserRatingModelType } from "./UserRatingModel"
+import { UserRatingModelSelector } from "./UserRatingModel.base"
 import { RootStoreType } from "./index"
 
 
@@ -20,6 +22,7 @@ export const UserModelBase = ModelBase
     createdAt: types.union(types.undefined, types.frozen()),
     updatedAt: types.union(types.undefined, types.frozen()),
     userId: types.union(types.undefined, types.null, types.string),
+    ratingId: types.union(types.undefined, types.null, types.late((): any => UserRatingModel)),
     first_name: types.union(types.undefined, types.null, types.string),
     last_name: types.union(types.undefined, types.null, types.string),
     name: types.union(types.undefined, types.null, types.string),
@@ -33,7 +36,7 @@ export const UserModelBase = ModelBase
     status: types.union(types.undefined, types.null, types.string),
     role: types.union(types.undefined, types.null, types.string),
     description: types.union(types.undefined, types.null, types.string),
-    deviceId: types.union(types.undefined, types.null, types.array(types.string)),
+    averageRating: types.union(types.undefined, types.null, types.number),
   })
   .views(self => ({
     get store() {
@@ -59,10 +62,11 @@ export class UserModelSelector extends QueryBuilder {
   get status() { return this.__attr(`status`) }
   get role() { return this.__attr(`role`) }
   get description() { return this.__attr(`description`) }
-  get deviceId() { return this.__attr(`deviceId`) }
+  get averageRating() { return this.__attr(`averageRating`) }
+  ratingId(builder: string | UserRatingModelSelector | ((selector: UserRatingModelSelector) => UserRatingModelSelector) | undefined) { return this.__child(`ratingId`, UserRatingModelSelector, builder) }
 }
 export function selectFromUser() {
   return new UserModelSelector()
 }
 
-export const userModelPrimitives = selectFromUser()._id.createdAt.updatedAt.userId.first_name.last_name.name.email.socialId.password.picture.isSocialLogin.type.token.status.role.description.deviceId
+export const userModelPrimitives = selectFromUser()._id.createdAt.updatedAt.userId.first_name.last_name.name.email.socialId.password.picture.isSocialLogin.type.token.status.role.description.averageRating

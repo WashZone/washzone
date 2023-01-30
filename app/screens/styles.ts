@@ -9,3 +9,12 @@ export const $loaderContainer: ViewStyle = {
   alignItems: "center",
   justifyContent: "center",
 }
+
+export const $justifyCenter: ViewStyle = {
+  justifyContent: "center",
+}
+
+export const $contentCenter: ViewStyle = {
+  justifyContent: "center",
+  alignItems: "center",
+}

@@ -7,8 +7,8 @@ import { QueryBuilder } from "mst-gql"
 import { ModelBase } from "./ModelBase"
 import { UserModel, UserModelType } from "./UserModel"
 import { UserModelSelector } from "./UserModel.base"
-import { UserReviewModel, UserReviewModelType } from "./UserReviewModel"
-import { UserReviewModelSelector } from "./UserReviewModel.base"
+import { UserRatingModel, UserRatingModelType } from "./UserRatingModel"
+import { UserRatingModelSelector } from "./UserRatingModel.base"
 import { RootStoreType } from "./index"
 
 
@@ -24,7 +24,7 @@ export const ClassifiedFeedModelBase = ModelBase
     createdAt: types.union(types.undefined, types.frozen()),
     updatedAt: types.union(types.undefined, types.frozen()),
     userId: types.union(types.undefined, types.null, types.late((): any => UserModel)),
-    reviewDetailId: types.union(types.undefined, types.null, types.late((): any => UserReviewModel)),
+    ratingId: types.union(types.undefined, types.null, types.late((): any => UserRatingModel)),
     classifiedDetail: types.union(types.undefined, types.null, types.string),
     attachmentType: types.union(types.undefined, types.null, types.string),
     attachmentUrl: types.union(types.undefined, types.null, types.string),
@@ -51,7 +51,7 @@ export class ClassifiedFeedModelSelector extends QueryBuilder {
   get title() { return this.__attr(`title`) }
   get condition() { return this.__attr(`condition`) }
   userId(builder: string | UserModelSelector | ((selector: UserModelSelector) => UserModelSelector) | undefined) { return this.__child(`userId`, UserModelSelector, builder) }
-  reviewDetailId(builder: string | UserReviewModelSelector | ((selector: UserReviewModelSelector) => UserReviewModelSelector) | undefined) { return this.__child(`reviewDetailId`, UserReviewModelSelector, builder) }
+  ratingId(builder: string | UserRatingModelSelector | ((selector: UserRatingModelSelector) => UserRatingModelSelector) | undefined) { return this.__child(`ratingId`, UserRatingModelSelector, builder) }
 }
 export function selectFromClassifiedFeed() {
   return new ClassifiedFeedModelSelector()

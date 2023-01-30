@@ -34,13 +34,15 @@ export const InputPlaylistInfoModal = ({
     setButtonLoading(false)
   }
 
+  const closeModal = () => !buttonLoading && setModalVisible(false)
+
   return (
     <Modal
       backdropColor="#000"
       isVisible={isVisible}
       swipeDirection={!buttonLoading && ["down"]}
-      onSwipeComplete={() => !buttonLoading && setModalVisible(false)}
-      onBackdropPress={() => !buttonLoading && setModalVisible(false)}
+      onSwipeComplete={closeModal}
+      onBackdropPress={closeModal}
       coverScreen
     >
       <Screen backgroundColor={colors.transparent} contentContainerStyle={$parentContainer}>

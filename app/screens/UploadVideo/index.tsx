@@ -13,8 +13,6 @@ import Toast from "react-native-toast-message"
 import { toastMessages } from "../../utils/toastMessages"
 import { useHooks } from "../hooks"
 import { InputPlaylistInfoModal } from "./InputPlaylistInfo"
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
-import { $flex1 } from "../styles"
 
 export const UploadVideo: FC<AppStackScreenProps<"UploadVideo">> = function UploadVideo() {
   const {

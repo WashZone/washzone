@@ -2,6 +2,7 @@
 /* eslint-disable */
 /* tslint:disable */
 
+export * from "./UserRatingModel"
 export * from "./UserModel"
 export * from "./SigninUserModel"
 export * from "./LikeVideosModel"
@@ -14,7 +15,6 @@ export * from "./LikeTopicsModel"
 export * from "./TopicDetailModel"
 export * from "./StoryViewerUserModel"
 export * from "./FollowUserModel"
-export * from "./UserReviewModel"
 export * from "./ClassifiedFeedModel"
 export * from "./SaveClassifiedModel"
 export * from "./RootStore"

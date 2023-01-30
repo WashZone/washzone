@@ -9,7 +9,7 @@ import { NavigationProp, useNavigation } from "@react-navigation/native"
 
 export const ForgotPassword: FC<AppStackScreenProps<"ForgotPassword">> = function ForgotPassword() {
   const {
-    api: { mutateSendEmailByUserId },
+    api: { mutateSendOtpOnEmailByUserId },
     userStore: { _id },
   } = useStores()
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
@@ -21,10 +21,10 @@ export const ForgotPassword: FC<AppStackScreenProps<"ForgotPassword">> = functio
   const onReset = async () => {
     setButtonLoading(true)
     try {
-      const res = await mutateSendEmailByUserId({
-        userId: _id,
-      })
-      console.log(res)
+      // const res = await mutateSendOtpOnEmailByUserId({
+      //   userId: _id,
+      // })
+      // console.log(res)
     } catch (e) {
       console.log("erroer", e)
       setButtonLoading(false)

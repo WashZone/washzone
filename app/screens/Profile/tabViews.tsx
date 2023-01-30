@@ -1,26 +1,12 @@
 import React, { useEffect, useState } from "react"
-import { FlatList, View, ViewStyle, ScrollView, Dimensions, ImageStyle } from "react-native"
+import { View, ViewStyle, Dimensions, ImageStyle } from "react-native"
 import { colors, spacing } from "../../theme"
 import { useHooks } from "../hooks"
 import { VideoBlock } from "../VideosFeed"
 import { ClassifiedComponent } from "../ClassifiedsFeed"
 import { TopicComponent } from "../TopicsFeed"
-import Animated, {
-  interpolate,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from "react-native-reanimated"
 import { AutoImage } from "../../components"
-
-const AnimatedFlatList = Animated.createAnimatedComponent(FlatList)
-
-const mockImageData = [
-  { uri: "https://dummyimage.com/600x400/000/fff/&text=GM @Arben!" },
-  { uri: "https://dummyimage.com/400x400/000/fff/&text=Below this gallery section" },
-  { uri: "https://dummyimage.com/400x600/000/fff/&text=We will update this later! " },
-  { uri: "https://dummyimage.com/600x200/000/fff/&text=would be more content Right?" },
-]
+import { HFlatList, HScrollView } from "react-native-head-tab-view"
 
 const GalleryItem = ({ uri }) => {
   console.log(uri)
@@ -34,8 +20,6 @@ const GalleryItem = ({ uri }) => {
 }
 
 export const GalleryTabView = ({ galleryItems }: { galleryItems: Array<any> }) => {
-  const [isOpen, setOpen] = useState(false)
-  const open = useSharedValue(0)
   const [imageData, setImageData] = useState<{ left: Array<any>; right: Array<any> }>({
     left: [],
     right: [],
@@ -62,63 +46,29 @@ export const GalleryTabView = ({ galleryItems }: { galleryItems: Array<any> }) =
     console.log(right)
   }, [galleryItems])
 
-  const animatedContainer = useAnimatedStyle(() => {
-    const height = interpolate(open.value, [0, 1], [0, 400])
-    return {
-      height,
-      backgroundColor: colors.palette.neutral100,
-    }
-  })
-
-  const dropStyle = useAnimatedStyle(() => {
-    const rotate = interpolate(open.value, [0, 1], [0, -180])
-    return {
-      transform: [{ rotate: `${rotate}deg` }],
-    }
-  })
-
-  const handleExpand = () => {
-    setOpen(!isOpen)
-  }
-
-  useEffect(() => {
-    open.value = withTiming(isOpen ? 0 : 1, { duration: 150 })
-  }, [isOpen])
-
   return (
-    <>
-      {/* <Pressable onPress={handleExpand} style={$galleryHeaderContainer}>
-        <Text tx="profile.gallery" preset="formLabel" />
-        <Animated.View style={dropStyle}>
-          <Icon icon="arrowDown" color={colors.palette.neutral800} />
-        </Animated.View>
-      </Pressable> */}
-
-      <ScrollView style={$screenContainer}>
-        <View style={$flexRow}>
-          <View style={{ flex: 1 / 2 }}>
-            {imageData.left.map((e, index) => (
-              <GalleryItem uri={e?.attachmentUrl || e.thumbnailUrl} key={index} />
-            ))}
-          </View>
-          <View style={{ flex: 1 / 2 }}>
-            {imageData.right.map((e, index) => (
-              <GalleryItem uri={e?.attachmentUrl || e.thumbnailUrl} key={index} />
-            ))}
-          </View>
+    <HScrollView showsVerticalScrollIndicator={false} index={3} style={$screenContainer}>
+      <View style={$flexRow}>
+        <View style={{ flex: 1 / 2 }}>
+          {imageData.left.map((e, index) => (
+            <GalleryItem uri={e?.attachmentUrl || e.thumbnailUrl} key={index} />
+          ))}
         </View>
-      </ScrollView>
-    </>
+        <View style={{ flex: 1 / 2 }}>
+          {imageData.right.map((e, index) => (
+            <GalleryItem uri={e?.attachmentUrl || e.thumbnailUrl} key={index} />
+          ))}
+        </View>
+      </View>
+    </HScrollView>
   )
 }
 
 export const TopicsTabScreen = ({
   userId,
-  bioHeightRef,
   addToGallery,
 }: {
   userId: string
-  bioHeightRef: any
   addToGallery: (toAdd: Array<any>) => void
 }) => {
   const [userTopics, setUserTopics] = React.useState([])
@@ -132,20 +82,17 @@ export const TopicsTabScreen = ({
 
   useEffect(() => {
     fetchUserTopics()
-  }, [])
+  }, [userId])
 
   return (
-    <View style={$screenContainer}>
-      <AnimatedFlatList
-        bounces={false}
-        scrollEventThrottle={16}
-        onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: bioHeightRef } } }], {
-          useNativeDriver: false,
-        })}
-        data={userTopics}
-        renderItem={({ item, index }) => <TopicComponent index={index} topic={item} />}
-      />
-    </View>
+    <HFlatList
+      index={0}
+      style={$screenContainer}
+      bounces={false}
+      data={userTopics}
+      showsVerticalScrollIndicator={false}
+      renderItem={({ item, index }) => <TopicComponent index={index} topic={item} />}
+    />
   )
 }
 
@@ -167,20 +114,21 @@ export const ClassifiedsTabScreen = ({
 
   useEffect(() => {
     fetchUserClassifieds()
-  }, [])
+  }, [userId])
 
   return (
-    <View style={$screenContainer}>
-      <FlatList
-        data={userClassifieds}
-        numColumns={2}
-        renderItem={({ item }) => (
-          <View style={$classifiedBlockContainer}>
-            <ClassifiedComponent classified={item} />
-          </View>
-        )}
-      />
-    </View>
+    <HFlatList
+      index={1}
+      data={userClassifieds}
+      style={$screenContainer}
+      showsVerticalScrollIndicator={false}
+      numColumns={2}
+      renderItem={({ item }) => (
+        <View style={$classifiedBlockContainer}>
+          <ClassifiedComponent classified={item} />
+        </View>
+      )}
+    />
   )
 }
 
@@ -202,19 +150,20 @@ export const VideosTabScreen = ({
 
   useEffect(() => {
     fetchUserVideos()
-  }, [])
+  }, [userId])
 
   return (
-    <View style={$screenContainer}>
-      <FlatList
-        data={userVideos}
-        renderItem={({ item }) => (
-          <View style={$videoBlockContainer}>
-            <VideoBlock videoDetails={item} />
-          </View>
-        )}
-      />
-    </View>
+    <HFlatList
+      index={2}
+      style={$screenContainer}
+      data={userVideos}
+      showsVerticalScrollIndicator={false}
+      renderItem={({ item }) => (
+        <View style={$videoBlockContainer}>
+          <VideoBlock videoDetails={item} />
+        </View>
+      )}
+    />
   )
 }
 
@@ -232,7 +181,7 @@ const $classifiedBlockContainer: ViewStyle = {
 
 const $screenContainer: ViewStyle = {
   flex: 1,
-  backgroundColor: colors.backgroundGrey,
+  backgroundColor: colors.palette.primaryOverlay15,
 }
 
 const $marginAutoImage: ImageStyle = { margin: 10 }

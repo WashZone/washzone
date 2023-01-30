@@ -2,11 +2,12 @@ import { useStores } from "../models"
 import { Interaction } from "../utils/enums"
 import Toast from "react-native-toast-message"
 import { toastMessages } from "../utils/toastMessages"
-import DeviceInfo, { getAndroidId, getUniqueId, getDeviceToken } from "react-native-device-info"
+import { getUniqueId } from "react-native-device-info"
 
 export function useHooks() {
   const {
-    authenticationStore: { setBlocked, isBlocked, setAuthToken },
+    authenticationStore: { setBlocked, setAuthToken },
+    searchStore: { setResults },
     feedStore: {
       setTopics: setFeedTopics,
       topics: feedTopics,
@@ -67,6 +68,12 @@ export function useHooks() {
       mutateUploadVideoPlaylist,
       mutateGetBlockedUser,
       mutateStoreDeviceId,
+      queryGetSearchedTopic,
+      queryGetSearchedUser,
+      queryGetSearchedclassified,
+      mutateCreateUserRating,
+      queryGetratingOnUserId,
+      queryGetSearchedItem,
     },
     userStore,
   } = useStores()
@@ -568,6 +575,31 @@ export function useHooks() {
     }
   }
 
+  const rateUser = async (userId: string, rating: number) => {
+    try {
+      const res = await mutateCreateUserRating({
+        userId,
+        ratinguserId: userStore._id,
+        ratingStar: rating,
+      })
+      console.log("RATING USER", userId, " - ", res.createUserRating)
+      return true
+    } catch (err) {
+      return false
+    }
+  }
+
+  const getRatingOnUser = async (userId: string) => {
+    const res = await queryGetratingOnUserId({ userId }, { fetchPolicy: "no-cache" })
+    console.log("GOT USER RATING ON ", userId, " to be ", res.getratingOnUserId)
+    return res.getratingOnUserId?.data?.length > 0 ? res.getratingOnUserId?.data[0].ratingStar : 0
+  }
+
+  const onBoot = async () => {
+    await storeDeviceInfo()
+    await isUserBlocked()
+  }
+
   const onLoggedInBoot = async () => {
     await syncSavedInteractionsHook()
     await syncInteractedVideosAndTopics()
@@ -578,9 +610,33 @@ export function useHooks() {
     await loadStories()
   }
 
-  const onBoot = async () => {
-    await storeDeviceInfo()
-    await isUserBlocked()
+  const searchKeyword = async (searchKey: string) => {
+    try {
+      const resTopics = await queryGetSearchedTopic(
+        { searchKey, pageNumber: 1 },
+        { fetchPolicy: "no-cache" },
+      )
+      const resClassifieds = await queryGetSearchedclassified(
+        { searchKey, pageNumber: 1 },
+        { fetchPolicy: "no-cache" },
+      )
+      const resUsers = await queryGetSearchedUser(
+        { searchKey, pageNumber: 1 },
+        { fetchPolicy: "no-cache" },
+      )
+      const resVideos = await queryGetSearchedItem(
+        { searchKey, pageNumber: 1 },
+        { fetchPolicy: "no-cache" },
+      )
+      setResults({
+        classifieds: resClassifieds.getSearchedclassified?.data || [],
+        topics: resTopics.getSearchedTopic?.data || [],
+        users: resUsers.getSearchedUser?.data || [],
+        videos: resVideos.getSearchedItem?.data || [],
+      })
+    } catch (err) {
+      Toast.show(toastMessages.somethingWentWrong)
+    }
   }
 
   return {
@@ -617,5 +673,8 @@ export function useHooks() {
     uploadVideo,
     createClassified,
     createEmptyPlaylist,
+    searchKeyword,
+    getRatingOnUser,
+    rateUser,
   }
 }

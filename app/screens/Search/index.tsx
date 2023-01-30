@@ -1,60 +1,206 @@
-import React, { FC } from "react"
-import { TextStyle, View, ViewStyle } from "react-native"
-import { Header, ListItem, Screen, Toggle } from "../../components"
-import { colors, spacing } from "../../theme"
-
-import { AppStackParamList, AppStackScreenProps } from "../../navigators"
-import { NavigationProp, useNavigation } from "@react-navigation/native"
-import { useStores } from "../../models"
+import React, { FC, useState } from "react"
+import { SectionList, TextStyle, TouchableOpacity, View, ViewStyle } from "react-native"
 import { observer } from "mobx-react-lite"
+import { ActivityIndicator, TextInput } from "react-native-paper"
+import { NavigationProp, useNavigation } from "@react-navigation/native"
+
+import { Header, Icon, Screen, Text } from "../../components"
+import { colors, spacing } from "../../theme"
+import { AppStackParamList, AppStackScreenProps } from "../../navigators"
+import { $flex1, $justifyCenter } from "../styles"
+import { useHooks } from "../hooks"
+import { useStores } from "../../models"
+import {
+  ClassifiedsTabParamList,
+  HomeTabParamList,
+  TopicsTabParamList,
+  VideosTabParamList,
+} from "../../tabs"
 
 export const Search: FC<AppStackScreenProps<"Search">> = observer(function Search() {
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
+  const navigationTopics = useNavigation<NavigationProp<TopicsTabParamList>>()
+  const navigationClassifieds = useNavigation<NavigationProp<ClassifiedsTabParamList>>()
+  const navigationHome = useNavigation<NavigationProp<HomeTabParamList>>()
+  const navigationVideos = useNavigation<NavigationProp<VideosTabParamList>>()
+  const [searchKey, setSearchKey] = useState("")
+  const [loading, setLoading] = useState(false)
+
+  const { searchKeyword } = useHooks()
   const {
-    userStore: { isSocialLogin },
+    searchStore: { searchResults },
   } = useStores()
-  console.log()
-  const {
-    settings: { toggleNotification, notifications },
-  } = useStores()
+
+  const onSearch = async () => {
+    setLoading(true)
+    await searchKeyword(searchKey)
+    setLoading(false)
+  }
+
+  const sections = [
+    {
+      title: "Topics",
+      data: searchResults.topics,
+      renderItem: ({ item }) => (
+        <TouchableOpacity
+          onPress={() => {
+            navigation.goBack()
+            navigationTopics.navigate("TopicInfo", { topic: item?._id })
+          }}
+          style={$resultContainer}
+        >
+          <Text
+            text={item?.topicContent}
+            style={$resultText}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+            weight="semiBold"
+          />
+        </TouchableOpacity>
+      ),
+    },
+    {
+      title: "Classifieds",
+      data: searchResults.classifieds,
+      renderItem: ({ item }) => (
+        <TouchableOpacity
+          style={$resultContainer}
+          onPress={() =>
+            navigationClassifieds.navigate("ClassifiedsDetails", { classified: item?._id })
+          }
+        >
+          <Text
+            text={item?.title}
+            weight="semiBold"
+            style={$resultText}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          />
+        </TouchableOpacity>
+      ),
+    },
+    {
+      title: "Users",
+      data: searchResults.users,
+      renderItem: ({ item }) => (
+        <TouchableOpacity
+          onPress={() => navigationHome.navigate("Profile", { user: item })}
+          style={$resultContainer}
+        >
+          <Text
+            text={item?.name}
+            weight="semiBold"
+            style={$resultText}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          />
+        </TouchableOpacity>
+      ),
+    },
+    {
+      title: "Videos",
+      data: searchResults.videos,
+      renderItem: ({ item }) => (
+        <TouchableOpacity
+          onPress={() => navigationVideos.navigate("VideoDetails", { data: item })}
+          style={$resultContainer}
+        >
+          <Text
+            text={item?.videoHeading}
+            weight="semiBold"
+            style={$resultText}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          />
+        </TouchableOpacity>
+      ),
+    },
+  ]
+
   return (
     <Screen preset="fixed" contentContainerStyle={$container}>
       <Header
         leftIcon="caretLeft"
-        title="Settings"
+        title="Search"
         titleStyle={$titleStyle}
         onLeftPress={() => navigation.goBack()}
         leftIconColor={colors.palette.neutral600}
       />
       <View style={$content}>
-        <ListItem
-          onPress={() => toggleNotification()}
-          style={$listItemStyle}
-          leftIcon="bell"
-          tx="settings.notificationToggle"
-          RightComponent={
-            <Toggle variant="switch" value={notifications} onPress={() => toggleNotification()} />
-          }
-        />
-        {!isSocialLogin && (
-          <ListItem
-            onPress={() => navigation.navigate("ResetPassword")}
-            style={$listItemStyle}
-            leftIcon="reset"
-            tx="settings.reset"
-            rightIcon="caretRight"
+        <View style={$justifyCenter}>
+          <TextInput
+            mode="outlined"
+            theme={$theme}
+            label="Search......"
+            value={searchKey}
+            onChangeText={setSearchKey}
+            contentStyle={$inputContent}
           />
-        )}
+          <Icon
+            onPress={onSearch}
+            icon="search"
+            size={24}
+            color={colors.palette.primary100}
+            containerStyle={$searchIcon}
+          />
+        </View>
+        <View style={$flex1}>
+          {loading ? (
+            <ActivityIndicator color={colors.palette.primary100} style={$loader} animating />
+          ) : (
+            <SectionList
+              showsVerticalScrollIndicator={false}
+              renderSectionHeader={({ section }) =>
+                section.data.length > 0 && (
+                  <Text weight="bold" size="md" text={section.title} style={$sectionHeader} />
+                )
+              }
+              stickySectionHeadersEnabled
+              sections={sections}
+              ListEmptyComponent={
+                <View style={$resultContainer}>
+                  <Text text="None Found" />
+                </View>
+              }
+            />
+          )}
+        </View>
       </View>
     </Screen>
   )
 })
 
-const $listItemStyle: ViewStyle = {
-  alignItems: "center",
-  borderBottomWidth: 0.5,
-  borderColor: colors.palette.overlay20,
-  paddingVertical: spacing.micro,
+const $resultText: TextStyle = {
+  color: colors.palette.primary100,
+  fontSize: 13,
+}
+
+const $sectionHeader: TextStyle = { lineHeight: 40, backgroundColor: colors.backgroundGrey }
+
+const $resultContainer: ViewStyle = {
+  marginVertical: 0.5,
+  borderRadius: 6,
+  backgroundColor: colors.palette.primaryOverlay15,
+  padding: spacing.extraSmall,
+}
+
+const $loader: ViewStyle = { marginTop: spacing.massive }
+
+const $inputContent: ViewStyle = {
+  marginRight: spacing.large,
+}
+
+const $searchIcon: ViewStyle = {
+  position: "absolute",
+  right: 10,
+}
+
+const $theme = {
+  colors: {
+    primary: colors.palette.primary100,
+    border: "red",
+    secondary: colors.palette.primary100,
+  },
 }
 
 const $titleStyle: TextStyle = {
@@ -69,4 +215,5 @@ const $container: ViewStyle = {
 const $content: ViewStyle = {
   marginHorizontal: spacing.extraLarge,
   marginVertical: spacing.medium,
+  flex: 1,
 }

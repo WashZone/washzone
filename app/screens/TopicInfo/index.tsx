@@ -1,13 +1,5 @@
 import React, { FC, useEffect, useState } from "react"
-import {
-  ActivityIndicator,
-  Dimensions,
-  ScrollView,
-  TextInput,
-  TextStyle,
-  View,
-  ViewStyle,
-} from "react-native"
+import { ScrollView, TextInput, TextStyle, View, ViewStyle } from "react-native"
 import { Icon, Screen } from "../../components"
 import { colors, spacing } from "../../theme"
 import { HomeTabProps } from "../../tabs/Home"
@@ -16,6 +8,7 @@ import { Capture } from "../../utils/device/MediaPicker"
 import { useHooks } from "../hooks"
 import { CommentComponent } from "./Comments"
 import { useStores } from "../../models"
+import { ActivityIndicator } from "react-native-paper"
 
 export const TopicInfo: FC<HomeTabProps<"TopicInfo">> = function PostInfo(props) {
   const { topic } = props.route.params
@@ -31,22 +24,24 @@ export const TopicInfo: FC<HomeTabProps<"TopicInfo">> = function PostInfo(props)
   } = useStores()
 
   const handleTopic = async () => {
-    if (loading && typeof topic === "string") {
+    setLoading(true)
+    if (typeof topic === "string") {
       console.log("TOPIC--ID", topic)
       const res = await mutateGetTopicByTopicId({ topicId: topic })
       console.log("RES", res)
       const topicData = res.getTopicByTopicId?.data.length === 1 && res.getTopicByTopicId?.data[0]
       setTopicDetails(topicData)
-      setLoading(false)
       await syncComments(topicData?._id)
+      setLoading(false)
     } else {
       await syncComments(topicDetails?._id)
+      setLoading(false)
     }
   }
 
   useEffect(() => {
     handleTopic()
-  }, [])
+  }, [topic])
 
   async function syncComments(id: string) {
     const data = await getCommentsOnPost(id)
@@ -63,7 +58,7 @@ export const TopicInfo: FC<HomeTabProps<"TopicInfo">> = function PostInfo(props)
   if (loading) {
     return (
       <View style={$loadingScreen}>
-        <ActivityIndicator animating />
+        <ActivityIndicator animating color={colors.palette.primary100} />
       </View>
     )
   }

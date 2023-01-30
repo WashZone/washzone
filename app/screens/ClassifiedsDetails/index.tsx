@@ -6,7 +6,6 @@ import {
   ViewStyle,
   Dimensions,
   ScrollView,
-  ActivityIndicator,
   TouchableOpacity,
 } from "react-native"
 import { Text, Screen, IconTypes, Icon } from "../../components"
@@ -16,11 +15,14 @@ import { observer } from "mobx-react-lite"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import Share from "react-native-share"
 import { useNavigation } from "@react-navigation/native"
+import { ActivityIndicator } from "react-native-paper"
+
 import { useHooks } from "../hooks"
 import { Rating } from "react-native-ratings"
 import { useStores } from "../../models"
 import { Interaction } from "../../utils/enums"
 import { RateUserModal } from "./RateUser"
+import { $contentCenter } from "../styles"
 
 interface ActionProps {
   icon: IconTypes
@@ -40,7 +42,7 @@ const PublisherDetails = ({ publisher }: { publisher: any }) => {
             <TouchableOpacity onPress={() => setRateUserModalVisible(true)}>
               <Rating
                 readonly
-                startingValue={3}
+                startingValue={publisher?.averageRating}
                 imageSize={22}
                 tintColor={colors.backgroundGrey}
                 style={{ backgroundColor: colors.backgroundGrey, marginTop: spacing.extraSmall }}
@@ -55,7 +57,11 @@ const PublisherDetails = ({ publisher }: { publisher: any }) => {
       {/* <Pressable style={$reviewsButtonContainer}>
         <Text text="See All Reviews" weight="semiBold" />
       </Pressable> */}
-      <RateUserModal isVisible={rateUserModalVisible} setModalVisible={setRateUserModalVisible} />
+      <RateUserModal
+        userId={publisher?._id}
+        isVisible={rateUserModalVisible}
+        setModalVisible={setRateUserModalVisible}
+      />
     </>
   )
 }
@@ -148,6 +154,7 @@ export const ClassifiedsDetails: FC<ClassifiedsTabProps<"ClassifiedsDetails">> =
 
     const handleStringTypeClassified = async () => {
       console.log("RUNNING")
+      setLoading(true)
       if (typeof classified === "string") {
         const res = await mutateGetClassifiedById({ classifiedId: classified })
         console.log("RES CLASSFIED", res)
@@ -155,6 +162,7 @@ export const ClassifiedsDetails: FC<ClassifiedsTabProps<"ClassifiedsDetails">> =
         setLoading(false)
       } else {
         setClassifiedDetails(classified)
+        setLoading(false)
       }
     }
 
@@ -164,8 +172,8 @@ export const ClassifiedsDetails: FC<ClassifiedsTabProps<"ClassifiedsDetails">> =
 
     if (loading) {
       return (
-        <Screen contentContainerStyle={$flex1}>
-          <ActivityIndicator animating />
+        <Screen contentContainerStyle={[$flex1, $contentCenter]}>
+          <ActivityIndicator animating color={colors.palette.primary100} />
         </Screen>
       )
     }
