@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ScrollView,
   ViewStyle,
+  Pressable,
 } from "react-native"
 import { TextInput } from "react-native-paper"
 import { Button, Header, Icon, Screen, Text, Toggle } from "../../components"
@@ -210,10 +211,10 @@ export const AddAClassified: FC<AppStackScreenProps<"AddAClassified">> = functio
 
         <MediaHandlerComponent selectedMedia={selectedMedia} setSelectedMedia={setSelectedMedia} />
 
-        <TouchableOpacity onPress={() => setTNCAccepted(!TNCAccepted)} style={$flexRow}>
+        <Pressable onPress={() => setTNCAccepted(!TNCAccepted)} style={[$flexRow]}>
           <Toggle onPress={() => setTNCAccepted(!TNCAccepted)} value={TNCAccepted} />
           <Text style={$tnc} tx="addAVideo.acceptTNC" weight="medium" />
-        </TouchableOpacity>
+        </Pressable>
 
         <Button
           onPress={handleCreatePress}
