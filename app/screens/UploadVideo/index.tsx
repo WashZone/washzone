@@ -1,15 +1,7 @@
 import React, { FC, useEffect, useState } from "react"
-import {
-  ActivityIndicator,
-  Keyboard,
-  TextStyle,
-  TouchableNativeFeedbackBase,
-  TouchableOpacity,
-  View,
-  ViewStyle,
-} from "react-native"
+import { ActivityIndicator, TextStyle, TouchableOpacity, View, ViewStyle } from "react-native"
 import { TextInput } from "react-native-paper"
-import { Button, Header, Icon, Screen, Text, Toggle } from "../../components"
+import { Button, Header, Icon, Text, Toggle } from "../../components"
 import { Dropdown } from "react-native-element-dropdown"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 
@@ -22,9 +14,6 @@ import Toast from "react-native-toast-message"
 import { toastMessages } from "../../utils/toastMessages"
 import { useHooks } from "../hooks"
 import { InputPlaylistInfoModal } from "./InputPlaylistInfo"
-import { useSafeAreaInsets } from "react-native-safe-area-context"
-import { TouchableWithoutFeedback } from "react-native-gesture-handler"
-import { $flex1 } from "../styles"
 
 export const UploadVideo: FC<AppStackScreenProps<"UploadVideo">> = function UploadVideo() {
   const {

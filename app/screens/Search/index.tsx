@@ -4,7 +4,7 @@ import { observer } from "mobx-react-lite"
 import { ActivityIndicator, TextInput } from "react-native-paper"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 
-import { Header, Icon, Screen, Text } from "../../components"
+import { Button, Header, Icon, Screen, Text } from "../../components"
 import { colors, spacing } from "../../theme"
 import { AppStackParamList, AppStackScreenProps } from "../../navigators"
 import { $flex1, $justifyCenter } from "../styles"
@@ -16,6 +16,7 @@ import {
   TopicsTabParamList,
   VideosTabParamList,
 } from "../../tabs"
+import { formatName } from "../../utils/formatName"
 
 export const Search: FC<AppStackScreenProps<"Search">> = observer(function Search() {
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
@@ -28,7 +29,7 @@ export const Search: FC<AppStackScreenProps<"Search">> = observer(function Searc
 
   const { searchKeyword } = useHooks()
   const {
-    searchStore: { searchResults },
+    searchStore: { searchResults, setResults },
   } = useStores()
 
   const onSearch = async () => {
@@ -88,7 +89,7 @@ export const Search: FC<AppStackScreenProps<"Search">> = observer(function Searc
           style={$resultContainer}
         >
           <Text
-            text={item?.name}
+            text={formatName(item?.name)}
             weight="semiBold"
             style={$resultText}
             numberOfLines={1}
@@ -164,11 +165,31 @@ export const Search: FC<AppStackScreenProps<"Search">> = observer(function Searc
               }
             />
           )}
+          <Button
+            text="Clear"
+            style={$resetButton}
+            textStyle={$resetText}
+            onPress={() => {
+              setResults({ classifieds: [], users: [], topics: [], videos: [] })
+            }}
+          />
         </View>
       </View>
     </Screen>
   )
 })
+
+const $resetText: TextStyle = {
+  color: colors.palette.neutral100,
+}
+
+const $resetButton: ViewStyle = {
+  position: "absolute",
+  right: 0,
+  top: spacing.extraSmall,
+  padding: spacing.micro,
+  backgroundColor: colors.palette.primary100,
+}
 
 const $resultText: TextStyle = {
   color: colors.palette.primary100,
