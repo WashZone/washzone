@@ -76,7 +76,8 @@ export const DrawerOptions = observer(function DrawerOptions({
       icon: "legal",
       label: "DrawerNavigator.legal",
       onPress() {
-        Alert.alert("DrawerNavigator.legal")
+        toggleDrawer()
+        navigaton.navigate("Legal")
       },
     },
     {

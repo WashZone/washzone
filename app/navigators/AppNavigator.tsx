@@ -2,7 +2,7 @@ import { DarkTheme, DefaultTheme, NavigationContainer } from "@react-navigation/
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import { StackScreenProps } from "@react-navigation/stack"
 import { observer } from "mobx-react-lite"
-import React, { useEffect, useState } from "react"
+import React, { useEffect } from "react"
 import { useColorScheme } from "react-native"
 import Config from "../config"
 import { useStores } from "../models"
@@ -19,6 +19,8 @@ import {
   UploadVideo,
   AddAClassified,
   Search,
+  Legal,
+  Support,
 } from "../screens"
 import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
 import { DrawerNavigator } from "./Drawer/DrawerNavigator"
@@ -40,6 +42,8 @@ export type AppStackParamList = {
   UploadVideo: undefined
   AddAClassified: undefined
   Search: undefined
+  Legal: undefined
+  Support: undefined
 }
 
 const exitRoutes = Config.exitRoutes
@@ -81,9 +85,11 @@ const AppStack = observer(function AppStack() {
             {/* <Stack.Screen name="Welcome" component={WelcomeScreen} /> */}
             <Stack.Screen name="Drawer" component={DrawerNavigator} />
             <Stack.Screen name="EditProfile" component={EditProfile} />
+            <Stack.Screen name="Legal" component={Legal} />
             <Stack.Screen name="Notifications" component={Notifications} />
             <Stack.Screen name="Settings" component={Settings} />
             <Stack.Screen name="ResetPassword" component={ResetPassword} />
+            <Stack.Screen name="Support" component={Support} />
             <Stack.Screen
               name="Search"
               component={Search}

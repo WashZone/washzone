@@ -24,6 +24,7 @@ export const UserRatingModelBase = ModelBase
     userId: types.union(types.undefined, types.null, types.late((): any => UserModel)),
     ratinguserId: types.union(types.undefined, types.null, types.late((): any => UserModel)),
     ratingStar: types.union(types.undefined, types.null, types.number),
+    averageRating: types.union(types.undefined, types.null, types.number),
     status: types.union(types.undefined, types.null, types.string),
   })
   .views(self => ({
@@ -37,6 +38,7 @@ export class UserRatingModelSelector extends QueryBuilder {
   get createdAt() { return this.__attr(`createdAt`) }
   get updatedAt() { return this.__attr(`updatedAt`) }
   get ratingStar() { return this.__attr(`ratingStar`) }
+  get averageRating() { return this.__attr(`averageRating`) }
   get status() { return this.__attr(`status`) }
   userId(builder: string | UserModelSelector | ((selector: UserModelSelector) => UserModelSelector) | undefined) { return this.__child(`userId`, UserModelSelector, builder) }
   ratinguserId(builder: string | UserModelSelector | ((selector: UserModelSelector) => UserModelSelector) | undefined) { return this.__child(`ratinguserId`, UserModelSelector, builder) }
@@ -45,4 +47,4 @@ export function selectFromUserRating() {
   return new UserRatingModelSelector()
 }
 
-export const userRatingModelPrimitives = selectFromUserRating()._id.createdAt.updatedAt.ratingStar.status
+export const userRatingModelPrimitives = selectFromUserRating()._id.createdAt.updatedAt.ratingStar.averageRating.status

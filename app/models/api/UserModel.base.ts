@@ -5,8 +5,14 @@
 import { types } from "mobx-state-tree"
 import { QueryBuilder } from "mst-gql"
 import { ModelBase } from "./ModelBase"
+import { ClassifiedFeedModel, ClassifiedFeedModelType } from "./ClassifiedFeedModel"
+import { ClassifiedFeedModelSelector } from "./ClassifiedFeedModel.base"
+import { TopicDetailModel, TopicDetailModelType } from "./TopicDetailModel"
+import { TopicDetailModelSelector } from "./TopicDetailModel.base"
 import { UserRatingModel, UserRatingModelType } from "./UserRatingModel"
 import { UserRatingModelSelector } from "./UserRatingModel.base"
+import { VideoUploadModel, VideoUploadModelType } from "./VideoUploadModel"
+import { VideoUploadModelSelector } from "./VideoUploadModel.base"
 import { RootStoreType } from "./index"
 
 
@@ -23,6 +29,9 @@ export const UserModelBase = ModelBase
     updatedAt: types.union(types.undefined, types.frozen()),
     userId: types.union(types.undefined, types.null, types.string),
     ratingId: types.union(types.undefined, types.null, types.late((): any => UserRatingModel)),
+    topicId: types.union(types.undefined, types.null, types.late((): any => TopicDetailModel)),
+    classifiedId: types.union(types.undefined, types.null, types.late((): any => ClassifiedFeedModel)),
+    videoId: types.union(types.undefined, types.null, types.late((): any => VideoUploadModel)),
     first_name: types.union(types.undefined, types.null, types.string),
     last_name: types.union(types.undefined, types.null, types.string),
     name: types.union(types.undefined, types.null, types.string),
@@ -64,6 +73,9 @@ export class UserModelSelector extends QueryBuilder {
   get description() { return this.__attr(`description`) }
   get averageRating() { return this.__attr(`averageRating`) }
   ratingId(builder: string | UserRatingModelSelector | ((selector: UserRatingModelSelector) => UserRatingModelSelector) | undefined) { return this.__child(`ratingId`, UserRatingModelSelector, builder) }
+  topicId(builder: string | TopicDetailModelSelector | ((selector: TopicDetailModelSelector) => TopicDetailModelSelector) | undefined) { return this.__child(`topicId`, TopicDetailModelSelector, builder) }
+  classifiedId(builder: string | ClassifiedFeedModelSelector | ((selector: ClassifiedFeedModelSelector) => ClassifiedFeedModelSelector) | undefined) { return this.__child(`classifiedId`, ClassifiedFeedModelSelector, builder) }
+  videoId(builder: string | VideoUploadModelSelector | ((selector: VideoUploadModelSelector) => VideoUploadModelSelector) | undefined) { return this.__child(`videoId`, VideoUploadModelSelector, builder) }
 }
 export function selectFromUser() {
   return new UserModelSelector()

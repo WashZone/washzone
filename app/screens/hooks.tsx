@@ -74,6 +74,7 @@ export function useHooks() {
       mutateCreateUserRating,
       queryGetratingOnUserId,
       queryGetSearchedItem,
+      queryGetAllLegalitiesData,
     },
     userStore,
   } = useStores()
@@ -639,6 +640,19 @@ export function useHooks() {
     }
   }
 
+  const getLegalities = async () => {
+    try {
+      const res = await queryGetAllLegalitiesData()
+      console.log("queryGetAllLegalitiesData", res.getAllLegalitiesData)
+      return res.getAllLegalitiesData.length > 0
+        ? res.getAllLegalitiesData[0].LegalitiesData
+        : undefined
+    } catch (err) {
+      Toast.show(toastMessages.somethingWentWrong)
+      return undefined
+    }
+  }
+
   return {
     onLoggedInBoot,
     getPlaylist,
@@ -676,5 +690,6 @@ export function useHooks() {
     searchKeyword,
     getRatingOnUser,
     rateUser,
+    getLegalities,
   }
 }
