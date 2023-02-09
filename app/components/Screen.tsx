@@ -2,7 +2,6 @@ import { useScrollToTop } from "@react-navigation/native"
 import { StatusBar, StatusBarProps } from "expo-status-bar"
 import React, { useRef, useState } from "react"
 import {
-  Dimensions,
   KeyboardAvoidingView,
   KeyboardAvoidingViewProps,
   LayoutChangeEvent,
@@ -17,6 +16,9 @@ import { colors } from "../theme"
 import { ExtendedEdge, useSafeAreaInsetsStyle } from "../utils/useSafeAreaInsetsStyle"
 
 interface BaseScreenProps {
+  // Keyboard Behavior on Android
+
+  androidKeyboardBehavior?: "height" | undefined
   /**
    * Children components.
    */
@@ -196,6 +198,7 @@ export function Screen(props: ScreenProps) {
     safeAreaEdges,
     StatusBarProps,
     statusBarStyle = "dark",
+    androidKeyboardBehavior,
   } = props
 
   const $containerInsets = useSafeAreaInsetsStyle(safeAreaEdges)
@@ -204,7 +207,7 @@ export function Screen(props: ScreenProps) {
       <StatusBar style={statusBarStyle} {...StatusBarProps} />
 
       <KeyboardAvoidingView
-        behavior={isIos ? "padding" : undefined}
+        behavior={isIos ? "padding" : androidKeyboardBehavior}
         keyboardVerticalOffset={keyboardOffset}
         {...KeyboardAvoidingViewProps}
         style={[$keyboardAvoidingViewStyle, KeyboardAvoidingViewProps?.style]}

@@ -1,5 +1,6 @@
 apply plugin: 'kotlin-android'
 apply plugin: "com.android.application"
+// apply plugin: 'com.google.gms.google-services' 
 
 import com.android.build.OutputFile
 import org.apache.tools.ant.taskdefs.condition.Os
@@ -264,9 +265,12 @@ android {
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
-
     //noinspection GradleDynamicVersion
     implementation "com.facebook.react:react-native:+"  // From node_modules
+    implementation 'com.facebook.android:facebook-android-sdk:latest.release'
+
+    // implementation project(':react-native-fbsdk')
+    implementation 'androidx.work:work-runtime:2.7.0-alpha05'
 
     def isGifEnabled = (findProperty('expo.gif.enabled') ?: "") == "true";
     def isWebpEnabled = (findProperty('expo.webp.enabled') ?: "") == "true";
@@ -321,7 +325,6 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
 
-
 if (isNewArchitectureEnabled()) {
     // If new architecture is enabled, we let you build RN from source
     // Otherwise we fallback to a prebuilt .aar bundled in the NPM package.
@@ -356,3 +359,4 @@ def isNewArchitectureEnabled() {
     // - Set an environment variable `ORG_GRADLE_PROJECT_newArchEnabled=true`
     return project.hasProperty("newArchEnabled") && project.newArchEnabled == "true"
 }
+

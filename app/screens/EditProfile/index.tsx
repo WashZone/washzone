@@ -9,6 +9,7 @@ import { useStores } from "../../models"
 import { MediaPicker } from "../../utils/device/MediaPicker"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { useHooks } from "../hooks"
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 
 const maxBioLength = 280
 
@@ -64,7 +65,7 @@ export const EditProfile: FC<AppStackScreenProps<"EditProfile">> = function Edit
   }
 
   return (
-    <Screen preset="fixed" contentContainerStyle={$container}>
+    <>
       <Header
         leftIcon="caretLeft"
         title="Edit Profile"
@@ -72,74 +73,75 @@ export const EditProfile: FC<AppStackScreenProps<"EditProfile">> = function Edit
         onLeftPress={() => navigation.goBack()}
         leftIconColor={colors.palette.neutral600}
       />
+      <Screen contentContainerStyle={[$container, $content]}>
+        <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
+          {/* <View style={}> */}
+          <FastImage source={{ uri: picture }} style={$picture} />
 
-      <View style={$content}>
-        <FastImage source={{ uri: picture }} style={$picture} />
+          <Text text="Edit Profile Picture" style={$editPP} onPress={onEditPP} />
+          <TextField
+            value={firstName}
+            onChangeText={onChangeFirstName}
+            containerStyle={$textField}
+            autoCapitalize="characters"
+            autoCorrect={false}
+            placeholder="First Name"
+            style={$inputText}
+            inputWrapperStyle={$inputWrapperStyle}
+            placeholderTextColor={colors.palette.overlay50}
+            maxLength={20}
+          />
 
-        <Text text="Edit Profile Picture" style={$editPP} onPress={onEditPP} />
+          <TextField
+            value={lastName}
+            onChangeText={onChangeLastName}
+            containerStyle={$textField}
+            autoCapitalize="characters"
+            autoCorrect={false}
+            placeholder="Last Name"
+            style={$inputText}
+            inputWrapperStyle={$inputWrapperStyle}
+            placeholderTextColor={colors.palette.overlay50}
+            maxLength={20}
+          />
 
-        <TextField
-          value={firstName}
-          onChangeText={onChangeFirstName}
-          containerStyle={$textField}
-          autoCapitalize="characters"
-          autoCorrect={false}
-          placeholder="First Name"
-          style={$inputText}
-          inputWrapperStyle={$inputWrapperStyle}
-          placeholderTextColor={colors.palette.overlay50}
-          maxLength={20}
-        />
+          <TextField
+            value={bio}
+            onChangeText={onChangeBio}
+            containerStyle={$textField}
+            autoCapitalize="characters"
+            autoCorrect={false}
+            placeholder="Bio"
+            style={[$inputText, $bioHeight, justOverflowed && { color: colors.palette.angry500 }]}
+            inputWrapperStyle={[
+              $inputWrapperStyle,
+              { borderColor: justOverflowed ? colors.palette.angry500 : colors.palette.primary100 },
+            ]}
+            placeholderTextColor={colors.palette.overlay50}
+            multiline
+          />
 
-        <TextField
-          value={lastName}
-          onChangeText={onChangeLastName}
-          containerStyle={$textField}
-          autoCapitalize="characters"
-          autoCorrect={false}
-          placeholder="Last Name"
-          style={$inputText}
-          inputWrapperStyle={$inputWrapperStyle}
-          placeholderTextColor={colors.palette.overlay50}
-          maxLength={20}
-        />
-
-        <TextField
-          value={bio}
-          onChangeText={onChangeBio}
-          containerStyle={$textField}
-          autoCapitalize="characters"
-          autoCorrect={false}
-          placeholder="Bio"
-          style={[$inputText, $bioHeight, justOverflowed && { color: colors.palette.angry500 }]}
-          inputWrapperStyle={[
-            $inputWrapperStyle,
-            { borderColor: justOverflowed ? colors.palette.angry500 : colors.palette.primary100 },
-          ]}
-          placeholderTextColor={colors.palette.overlay50}
-          multiline
-        />
-
-        <Button
-          onPress={onSubmit}
-          disabled={!isActive || buttonLoading}
-          style={[
-            $submitButton,
-            { backgroundColor: isActive ? colors.palette.primary100 : colors.palette.neutral400 },
-          ]}
-          text={"Save"}
-          textStyle={$textButton}
-          RightAccessory={() => (
-            <ActivityIndicator
-              animating={buttonLoading}
-              size={20}
-              style={$indicator}
-              color={colors.palette.neutral100}
-            />
-          )}
-        />
-      </View>
-    </Screen>
+          <Button
+            onPress={onSubmit}
+            disabled={!isActive || buttonLoading}
+            style={[
+              $submitButton,
+              { backgroundColor: isActive ? colors.palette.primary100 : colors.palette.neutral400 },
+            ]}
+            text={"Save"}
+            textStyle={$textButton}
+            RightAccessory={() => (
+              <ActivityIndicator
+                animating={buttonLoading}
+                size={20}
+                style={$indicator}
+                color={colors.palette.neutral100}
+              />
+            )}
+          />
+        </KeyboardAwareScrollView>
+      </Screen>
+    </>
   )
 }
 

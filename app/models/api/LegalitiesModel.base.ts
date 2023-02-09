@@ -19,6 +19,7 @@ export const LegalitiesModelBase = ModelBase
     _id: types.identifier,
     createdAt: types.union(types.undefined, types.frozen()),
     updatedAt: types.union(types.undefined, types.frozen()),
+    legalId: types.union(types.undefined, types.null, types.string),
     LegalitiesData: types.union(types.undefined, types.null, types.string),
   })
   .views(self => ({
@@ -31,10 +32,11 @@ export class LegalitiesModelSelector extends QueryBuilder {
   get _id() { return this.__attr(`_id`) }
   get createdAt() { return this.__attr(`createdAt`) }
   get updatedAt() { return this.__attr(`updatedAt`) }
+  get legalId() { return this.__attr(`legalId`) }
   get LegalitiesData() { return this.__attr(`LegalitiesData`) }
 }
 export function selectFromLegalities() {
   return new LegalitiesModelSelector()
 }
 
-export const legalitiesModelPrimitives = selectFromLegalities()._id.createdAt.updatedAt.LegalitiesData
+export const legalitiesModelPrimitives = selectFromLegalities()._id.createdAt.updatedAt.legalId.LegalitiesData

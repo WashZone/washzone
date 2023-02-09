@@ -2,6 +2,7 @@ import App from "./app/app.tsx"
 import React from "react"
 import { registerRootComponent } from "expo"
 import * as SplashScreen from "expo-splash-screen"
+import { gestureHandlerRootHOC } from 'react-native-gesture-handler';
 
 SplashScreen.preventAutoHideAsync()
 

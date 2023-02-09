@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react"
-import { Dimensions, Platform, Pressable, TextStyle, View, ViewStyle } from "react-native"
+import { Dimensions, Platform, Pressable, TextStyle, View, ViewStyle, Keyboard } from "react-native"
 import { DrawerLayout, DrawerState } from "react-native-gesture-handler"
 import { useSharedValue, withTiming } from "react-native-reanimated"
 import { Icon, Screen, Text } from "../../components"
@@ -22,6 +22,7 @@ export function DrawerNavigator() {
   const toggleDrawer = () => {
     if (!open) {
       setOpen(true)
+      Keyboard.dismiss()
       drawerRef.current?.openDrawer({ speed: 2 })
     } else {
       setOpen(false)
@@ -48,6 +49,7 @@ export function DrawerNavigator() {
       drawerPosition={isRTL ? "right" : "left"}
       drawerBackgroundColor={colors.palette.neutral100}
       overlayColor={colors.palette.overlay20}
+      // keyboardDismissMode="on-drag"
       onDrawerSlide={(drawerProgress) => {
         progress.value = open ? 1 - drawerProgress : drawerProgress
       }}

@@ -85,6 +85,10 @@
 	<string>App needs photo library Access</string>
 	<key>NSUserTrackingUsageDescription</key>
 	<string>This only uses device info for more interesting and relevant ads</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>BootSplash</string>
 	<key>UIRequiredDeviceCapabilities</key>

@@ -79,7 +79,7 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
   })
 
   const animatedContentContainer = useAnimatedStyle(() => {
-    const height = interpolate(animVal.value, [0, 1], [150, 400])
+    const height = interpolate(animVal.value, [0, 1], [150, 410])
 
     return {
       height,
@@ -112,7 +112,12 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
   })
 
   return (
-    <Screen keyboardOffset={-250} preset="fixed" contentContainerStyle={$screenContentContainer}>
+    <Screen
+      androidKeyboardBehavior="height"
+      keyboardOffset={-250}
+      preset="fixed"
+      contentContainerStyle={$screenContentContainer}
+    >
       <View style={$topView}>
         <Logo animVal={animVal} />
         <Animated.View style={animatedContentContainer}>

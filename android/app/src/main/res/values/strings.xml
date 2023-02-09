@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">WashZone</string>
+    <string name="facebook_app_id">656188942713213</string>
+    <string name="fb_login_protocol_scheme">fb656188942713213</string>
+    <string name="facebook_client_token">e3bdcaf708c52dbff112a2a273307f4e</string>
+    <string name="server_client_id">13619163176-1na00l0e80pvlbs9u1ggvfih13c0t06k.apps.googleusercontent.com</string>
 </resources>

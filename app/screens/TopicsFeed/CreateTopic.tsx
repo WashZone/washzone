@@ -30,7 +30,7 @@ export function CreateTopic() {
   const progress = useSharedValue(0)
   const inputRef = useRef<TextInput>()
   const [selectedImage, setSelectedImage] = useState<any>({ height: 1, width: 1 })
-  const { createTopic,refreshTopics} = useHooks()
+  const { createTopic, refreshTopics } = useHooks()
   const onPost = async () => {
     setIsPosting(true)
     // const data = new FormData()
@@ -48,8 +48,8 @@ export function CreateTopic() {
       // console.log(res)
       // console.log(_id)
       await createTopic({
-       content: postContent,
-       attachment:selectedImage
+        content: postContent,
+        attachment: selectedImage,
       })
       await refreshTopics()
     } catch (error) {
@@ -281,5 +281,5 @@ const $container: ViewStyle = {
   shadowColor: colors.background,
   shadowRadius: 10,
   shadowOpacity: 0.9,
-  shadowOffset: { height:-10, width: 1 },
+  shadowOffset: { height: -10, width: 1 },
 }

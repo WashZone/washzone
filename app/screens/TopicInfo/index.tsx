@@ -49,11 +49,13 @@ export const TopicInfo: FC<HomeTabProps<"TopicInfo">> = function PostInfo(props)
   }
 
   const onComment = async () => {
-    setIsCommenting(true)
-    await postComment(commentText, topicDetails?._id)
-    await syncComments(topicDetails?._id)
-    setCommentText("")
-    setIsCommenting(false)
+    if (commentText.length > 2) {
+      setIsCommenting(true)
+      await postComment(commentText, topicDetails?._id)
+      await syncComments(topicDetails?._id)
+      setCommentText("")
+      setIsCommenting(false)
+    }
   }
   if (loading) {
     return (
@@ -108,7 +110,7 @@ const $rightIconContainer: ViewStyle = {
 
 const $commentInput: TextStyle = {
   flex: 1,
-  height: 34,
+  height: 48,
   backgroundColor: colors.background,
   marginHorizontal: 10,
   borderRadius: 24,
@@ -124,7 +126,7 @@ const $contentContainer: ViewStyle = {
 }
 
 const $postCommentContainer: ViewStyle = {
-  height: 46,
+  height: 54,
   flexDirection: "row",
   paddingHorizontal: spacing.medium,
   backgroundColor: colors.palette.neutral100,

@@ -12,7 +12,7 @@ import { SettingsStoreModel } from "./SettingsStore"
 import { InteractionStoreModel } from "./InteractionStore"
 import { SearchStoreModel } from "./SearchStore"
 
-const baseURL = "http://3.139.81.184:3002"
+const baseURL = "http://3.128.205.216:3002"
 
 export const env = {
   gqlHttpClient: createHttpClient(`${baseURL}/graphql`),

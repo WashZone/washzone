@@ -48,6 +48,9 @@ export type InputUser = {
   picture?: (string | null)
   description?: (string | null)
 }
+export type InputInfo = {
+  LegalitiesData?: (string | null)
+}
 export type InputTopic = {
   topicContent?: (string | null)
   attachmentType?: (string | null)
@@ -157,6 +160,7 @@ mutateGenerateOTP="mutateGenerateOTP",
 mutateUpdateDeleteStatus="mutateUpdateDeleteStatus",
 mutateStoreBlockedUser="mutateStoreBlockedUser",
 mutateStoreLegalities="mutateStoreLegalities",
+mutateUpdateLegalInfo="mutateUpdateLegalInfo",
 mutateSaveLikedVideo="mutateSaveLikedVideo",
 mutateUpdateDeletesavedVideo="mutateUpdateDeletesavedVideo",
 mutateDeleteVideo="mutateDeleteVideo",
@@ -425,6 +429,9 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
       return self.mutate<{ StoreLegalities: LegalitiesModelType}>(`mutation StoreLegalities($legalitiesData: String!) { StoreLegalities(LegalitiesData: $legalitiesData) {
         ${typeof resultSelector === "function" ? resultSelector(new LegalitiesModelSelector()).toString() : resultSelector}
       } }`, variables, optimisticUpdate)
+    },
+    mutateUpdateLegalInfo(variables: { legalitiesdata: InputInfo }, optimisticUpdate?: () => void) {
+      return self.mutate<{ updateLegalInfo: any }>(`mutation updateLegalInfo($legalitiesdata: InputInfo!) { updateLegalInfo(Legalitiesdata: $legalitiesdata) }`, variables, optimisticUpdate)
     },
     mutateSaveLikedVideo(variables: { videoId: string, userId: string }, resultSelector: string | ((qb: SaveVideoModelSelector) => SaveVideoModelSelector) = saveVideoModelPrimitives.toString(), optimisticUpdate?: () => void) {
       return self.mutate<{ saveLikedVideo: SaveVideoModelType}>(`mutation saveLikedVideo($videoId: String!, $userId: String!) { saveLikedVideo(videoId: $videoId, userId: $userId) {

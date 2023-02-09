@@ -33,9 +33,11 @@ export const Search: FC<AppStackScreenProps<"Search">> = observer(function Searc
   } = useStores()
 
   const onSearch = async () => {
-    setLoading(true)
-    await searchKeyword(searchKey)
-    setLoading(false)
+    if (searchKey.length > 2) {
+      setLoading(true)
+      await searchKeyword(searchKey)
+      setLoading(false)
+    }
   }
 
   const sections = [
@@ -132,10 +134,11 @@ export const Search: FC<AppStackScreenProps<"Search">> = observer(function Searc
           <TextInput
             mode="outlined"
             theme={$theme}
-            label="Search......"
+            label="Search..."
             value={searchKey}
             onChangeText={setSearchKey}
             contentStyle={$inputContent}
+            onSubmitEditing={onSearch}
           />
           <Icon
             onPress={onSearch}

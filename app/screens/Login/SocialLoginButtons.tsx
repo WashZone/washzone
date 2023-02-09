@@ -1,10 +1,17 @@
 import React from "react"
-import { Pressable, TextStyle, View, ViewStyle } from "react-native"
+import { Platform, Pressable, TextStyle, View, ViewStyle } from "react-native"
 import { Icon, Text } from "../../components"
 import { colors, spacing } from "../../theme"
-import { AccessToken, GraphRequest, GraphRequestManager, LoginManager } from "react-native-fbsdk"
+import {
+  AccessToken,
+  GraphRequest,
+  GraphRequestManager,
+  LoginManager,
+} from "react-native-fbsdk-next"
 import { GoogleSignin } from "@react-native-google-signin/google-signin"
 import { useStores } from "../../models"
+import Toast from "react-native-toast-message"
+import { toastMessages } from "../../utils/toastMessages"
 
 interface OptionType {
   icon: "fb" | "google" | "email" | "apple"
@@ -20,6 +27,10 @@ export function SocialLogin() {
   } = useStores()
   const siginGoogle = () => {
     GoogleSignin.configure({
+      webClientId:
+        Platform.OS === "ios"
+          ? "1023545677586-8n9vl69j28eoul9q628f71rjap11obk2.apps.googleusercontent.com"
+          : "13619163176-1na00l0e80pvlbs9u1ggvfih13c0t06k.apps.googleusercontent.com",
       iosClientId: "1023545677586-8n9vl69j28eoul9q628f71rjap11obk2.apps.googleusercontent.com",
     })
     GoogleSignin.hasPlayServices()
@@ -34,37 +45,41 @@ export function SocialLogin() {
                 { fetchPolicy: "network-only" },
               )
               const userFound = resGetUserBySocialId.getUserBysocialId.length > 0
-              let resCreateUser: { createUser: any }
-              if (!userFound) {
-                resCreateUser = await mutateCreateUser({
-                  type: "google",
-                  isSocialLogin: true,
-                  lastName: userInfo.user.name.split(" ")[1] || "",
-                  firstName: userInfo.user.name.split(" ")[0],
-                  password: "",
-                  email: userInfo?.user?.email,
-                  name: userInfo?.user?.name,
-                  picture: userInfo?.user?.photo,
+              try {
+                let resCreateUser: { createUser: any }
+                if (!userFound) {
+                  resCreateUser = await mutateCreateUser({
+                    type: "google",
+                    isSocialLogin: true,
+                    lastName: userInfo.user.name.split(" ")[1] || "",
+                    firstName: userInfo.user.name.split(" ")[0],
+                    password: "",
+                    email: userInfo?.user?.email,
+                    name: userInfo?.user?.name,
+                    picture: userInfo?.user?.photo,
+                    socialId: userInfo.user.id,
+                  })
+                }
+                setUser({
+                  _id: userFound
+                    ? resGetUserBySocialId.getUserBysocialId[0]?._id
+                    : resCreateUser.createUser._id,
+                  name: userInfo.user.name,
+                  email: userInfo.user.email,
+                  first_name: userInfo.user.givenName,
                   socialId: userInfo.user.id,
+                  last_name: userInfo.user.familyName || "",
+                  picture: userInfo.user.photo,
+                  isSocialLogin: true,
+                  type: "google",
                 })
+                setAuthToken(userInfo.idToken)
+              } catch (err) {
+                Toast.show(toastMessages.emailAlreadyExists)
               }
-              setUser({
-                _id: userFound
-                  ? resGetUserBySocialId.getUserBysocialId[0]?._id
-                  : resCreateUser.createUser._id,
-                name: userInfo.user.name,
-                email: userInfo.user.email,
-                first_name: userInfo.user.givenName,
-                socialId: userInfo.user.id,
-                last_name: userInfo.user.familyName || "",
-                picture: userInfo.user.photo,
-                isSocialLogin: true,
-                type: "google",
-              })
-              setAuthToken(userInfo.idToken)
             })
             .catch((e) => {
-              console.log("ERROR IS: " + JSON.stringify(e))
+              console.log("ERROR ISccc: " + JSON.stringify(e))
             })
         }
       })
@@ -92,34 +107,38 @@ export function SocialLogin() {
             { fetchPolicy: "network-only" },
           )
           const userFound = resGetUserBySocialId.getUserBysocialId.length > 0
-          let resCreateUser: { createUser: any }
-          if (!userFound) {
-            resCreateUser = await mutateCreateUser({
+          try {
+            let resCreateUser: { createUser: any }
+            if (!userFound) {
+              resCreateUser = await mutateCreateUser({
+                name: userInfo?.name,
+                email: userInfo?.email,
+                firstName: userInfo?.first_name,
+                socialId: userInfo?.id,
+                lastName: userInfo?.last_name,
+                picture: userInfo?.picture.data?.url,
+                isSocialLogin: true,
+                type: "facebook",
+                password: "",
+              })
+            }
+            setUser({
+              _id: userFound
+                ? resGetUserBySocialId.getUserBysocialId[0]?._id
+                : resCreateUser.createUser._id,
               name: userInfo?.name,
               email: userInfo?.email,
-              firstName: userInfo?.first_name,
+              first_name: userInfo?.first_name,
               socialId: userInfo?.id,
-              lastName: userInfo?.last_name,
+              last_name: userInfo?.last_name,
               picture: userInfo?.picture.data?.url,
               isSocialLogin: true,
               type: "facebook",
-              password: "",
             })
+            setAuthToken(token)
+          } catch (err) {
+            Toast.show(toastMessages.emailAlreadyExists)
           }
-          setUser({
-            _id: userFound
-              ? resGetUserBySocialId.getUserBysocialId[0]?._id
-              : resCreateUser.createUser._id,
-            name: userInfo?.name,
-            email: userInfo?.email,
-            first_name: userInfo?.first_name,
-            socialId: userInfo?.id,
-            last_name: userInfo?.last_name,
-            picture: userInfo?.picture.data?.url,
-            isSocialLogin: true,
-            type: "facebook",
-          })
-          setAuthToken(token)
         }
       },
     )
@@ -127,13 +146,15 @@ export function SocialLogin() {
   }
 
   const loginWithFacebook = () => {
-    LoginManager.logInWithPermissions(["public_profile", "email"]).then(
+    LoginManager.logInWithPermissions(["public_profile"]).then(
       (login) => {
+        console.log("ACCESSTOKEN _ IN")
         if (login.isCancelled) {
           console.log("Login cancelled")
         } else {
           AccessToken.getCurrentAccessToken().then((data) => {
             const accessToken = data.accessToken.toString()
+            console.log("ACCESSTOKEN", accessToken)
             getInfoFromTokenForFacebook(accessToken)
           })
         }

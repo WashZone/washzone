@@ -30,6 +30,7 @@ public class MainActivity extends ReactActivity {
     return new ReactActivityDelegateWrapper(this, new MainActivityDelegate(this, getMainComponentName()));
   }
 
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     RNBootSplash.init(this);            // <- initialize the splash screen
