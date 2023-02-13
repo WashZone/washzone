@@ -142,6 +142,7 @@ export const InteractionStoreModel = types
         val.dislikedOffset = -1
       if (!store.topics.disliked.includes(id) && store.topics.lastSyncedDisliked.includes(id))
         val.dislikedOffset = 1
+      console.log("OSSFET", val)
       return val
     },
     getVideoInteractionOffset(id: string) {

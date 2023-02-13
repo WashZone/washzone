@@ -116,6 +116,7 @@ export const Posts = observer(() => {
 
   const onRefresh = () => {
     refreshTopics()
+    loadStories()
     setRefreshing(false)
   }
 

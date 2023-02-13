@@ -80,7 +80,8 @@ export function useHooks() {
   } = useStores()
 
   const loadStories = async () => {
-    const res = await queryGetAllStory({ fetchPolicy: "network-only" })
+    console.log("RELOADING STORIES")
+    const res = await queryGetAllStory({ fetchPolicy: "no-cache" })
     setStories(res.getAllStory?.data || [])
   }
 
@@ -179,6 +180,8 @@ export function useHooks() {
       userId: userStore._id,
     })
     console.log("CREATE TOPIC", res)
+    await refreshTopics()
+    await loadStories()
   }
 
   const updateProfile = async (firstName: string, lastName: string, picture: string) => {
@@ -415,6 +418,7 @@ export function useHooks() {
 
   const interactWithTopic = async (topicId: string, buttonType: "like" | "dislike") => {
     console.log("topicId IN HOOK", topicId)
+    console.log("USER ID", userStore._id)
     console.log("INPUT INTERACTION", getInteractionOnTopic(topicId))
 
     const getInputInteraction = () => {

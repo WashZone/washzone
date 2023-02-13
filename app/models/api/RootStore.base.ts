@@ -109,13 +109,13 @@ queryGetlikesTopicByUserId="queryGetlikesTopicByUserId",
 queryGetuserLikesonTopic="queryGetuserLikesonTopic",
 queryGetByTopicId="queryGetByTopicId",
 queryGetLikesonTopicbyuser="queryGetLikesonTopicbyuser",
-queryGetAllComments="queryGetAllComments",
-queryGetAllComment="queryGetAllComment",
-queryGetCommentsByUserId="queryGetCommentsByUserId",
 queryGetStoryByUserId="queryGetStoryByUserId",
 queryGetStoryByStoryId="queryGetStoryByStoryId",
 queryGetAllStory="queryGetAllStory",
 queryGetAllStoryByPage="queryGetAllStoryByPage",
+queryGetAllComments="queryGetAllComments",
+queryGetAllComment="queryGetAllComment",
+queryGetCommentsByUserId="queryGetCommentsByUserId",
 queryGetfollowingByUserId="queryGetfollowingByUserId",
 queryGetfollowerByFollowId="queryGetfollowerByFollowId",
 queryGetAllClassifiedFeedss="queryGetAllClassifiedFeedss",
@@ -172,9 +172,9 @@ mutateUpdateDeleteTopicId="mutateUpdateDeleteTopicId",
 mutateUpdateLikeViews="mutateUpdateLikeViews",
 mutateUpdateUserTopic="mutateUpdateUserTopic",
 mutateLikeDislikeTopic="mutateLikeDislikeTopic",
+mutateCreateStory="mutateCreateStory",
 mutateCommentOnTopic="mutateCommentOnTopic",
 mutateDeleteCommentbyCommentId="mutateDeleteCommentbyCommentId",
-mutateCreateStory="mutateCreateStory",
 mutateFollowById="mutateFollowById",
 mutateCreateClassifiedDetail="mutateCreateClassifiedDetail",
 mutateGetClassifiedByUserId="mutateGetClassifiedByUserId",
@@ -269,15 +269,6 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     queryGetLikesonTopicbyuser(variables: { userId: string, topicId: string }, options: QueryOptions = {}) {
       return self.query<{ getLikesonTopicbyuser: any }>(`query getLikesonTopicbyuser($userId: String!, $topicId: String!) { getLikesonTopicbyuser(userId: $userId, TopicId: $topicId) }`, variables, options)
     },
-    queryGetAllComments(variables: { pageNumber: number }, options: QueryOptions = {}) {
-      return self.query<{ getAllComments: any }>(`query getAllComments($pageNumber: Float!) { getAllComments(pageNumber: $pageNumber) }`, variables, options)
-    },
-    queryGetAllComment(variables?: {  }, options: QueryOptions = {}) {
-      return self.query<{ getAllComment: any }>(`query getAllComment { getAllComment }`, variables, options)
-    },
-    queryGetCommentsByUserId(variables: { pageNumber: number, userId: string }, options: QueryOptions = {}) {
-      return self.query<{ getCommentsByUserId: any }>(`query getCommentsByUserId($pageNumber: Float!, $userId: String!) { getCommentsByUserId(pageNumber: $pageNumber, userId: $userId) }`, variables, options)
-    },
     queryGetStoryByUserId(variables: { userId: string }, options: QueryOptions = {}) {
       return self.query<{ getStoryByUserId: any }>(`query getStoryByUserId($userId: String!) { getStoryByUserId(userId: $userId) }`, variables, options)
     },
@@ -289,6 +280,15 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     },
     queryGetAllStoryByPage(variables: { pageNumber: number }, options: QueryOptions = {}) {
       return self.query<{ getAllStoryByPage: any }>(`query getAllStoryByPage($pageNumber: Float!) { getAllStoryByPage(pageNumber: $pageNumber) }`, variables, options)
+    },
+    queryGetAllComments(variables: { pageNumber: number }, options: QueryOptions = {}) {
+      return self.query<{ getAllComments: any }>(`query getAllComments($pageNumber: Float!) { getAllComments(pageNumber: $pageNumber) }`, variables, options)
+    },
+    queryGetAllComment(variables?: {  }, options: QueryOptions = {}) {
+      return self.query<{ getAllComment: any }>(`query getAllComment { getAllComment }`, variables, options)
+    },
+    queryGetCommentsByUserId(variables: { pageNumber: number, userId: string }, options: QueryOptions = {}) {
+      return self.query<{ getCommentsByUserId: any }>(`query getCommentsByUserId($pageNumber: Float!, $userId: String!) { getCommentsByUserId(pageNumber: $pageNumber, userId: $userId) }`, variables, options)
     },
     queryGetfollowingByUserId(variables: { userId: string }, options: QueryOptions = {}) {
       return self.query<{ getfollowingByUserId: any }>(`query getfollowingByUserId($userId: String!) { getfollowingByUserId(userId: $userId) }`, variables, options)
@@ -474,6 +474,11 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
         ${typeof resultSelector === "function" ? resultSelector(new LikeTopicsModelSelector()).toString() : resultSelector}
       } }`, variables, optimisticUpdate)
     },
+    mutateCreateStory(variables: { attachmentUrl: string, attachmentType: string, thumbnailUrl?: (string | null), userId: string }, resultSelector: string | ((qb: StoryViewerUserModelSelector) => StoryViewerUserModelSelector) = storyViewerUserModelPrimitives.toString(), optimisticUpdate?: () => void) {
+      return self.mutate<{ createStory: StoryViewerUserModelType}>(`mutation createStory($attachmentUrl: String!, $attachmentType: String!, $thumbnailUrl: String, $userId: String!) { createStory(attachmentUrl: $attachmentUrl, attachmentType: $attachmentType, thumbnailUrl: $thumbnailUrl, userId: $userId) {
+        ${typeof resultSelector === "function" ? resultSelector(new StoryViewerUserModelSelector()).toString() : resultSelector}
+      } }`, variables, optimisticUpdate)
+    },
     mutateCommentOnTopic(variables: { acttachmentType?: (string | null), acttachmentUrl?: (string | null), comment?: (string | null), topicId: string, userId: string }, resultSelector: string | ((qb: CommentsDetailModelSelector) => CommentsDetailModelSelector) = commentsDetailModelPrimitives.toString(), optimisticUpdate?: () => void) {
       return self.mutate<{ commentOnTopic: CommentsDetailModelType}>(`mutation commentOnTopic($acttachmentType: String, $acttachmentUrl: String, $comment: String, $topicId: String!, $userId: String!) { commentOnTopic(acttachmentType: $acttachmentType, acttachmentUrl: $acttachmentUrl, comment: $comment, TopicId: $topicId, userId: $userId) {
         ${typeof resultSelector === "function" ? resultSelector(new CommentsDetailModelSelector()).toString() : resultSelector}
@@ -481,11 +486,6 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     },
     mutateDeleteCommentbyCommentId(variables: { commentId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ deleteCommentbyCommentId: boolean }>(`mutation deleteCommentbyCommentId($commentId: String!) { deleteCommentbyCommentId(commentId: $commentId) }`, variables, optimisticUpdate)
-    },
-    mutateCreateStory(variables: { attachmentUrl: string, attachmentType: string, thumbnailUrl: string, userId: string }, resultSelector: string | ((qb: StoryViewerUserModelSelector) => StoryViewerUserModelSelector) = storyViewerUserModelPrimitives.toString(), optimisticUpdate?: () => void) {
-      return self.mutate<{ createStory: StoryViewerUserModelType}>(`mutation createStory($attachmentUrl: String!, $attachmentType: String!, $thumbnailUrl: String!, $userId: String!) { createStory(attachmentUrl: $attachmentUrl, attachmentType: $attachmentType, thumbnailUrl: $thumbnailUrl, userId: $userId) {
-        ${typeof resultSelector === "function" ? resultSelector(new StoryViewerUserModelSelector()).toString() : resultSelector}
-      } }`, variables, optimisticUpdate)
     },
     mutateFollowById(variables: { followId: string, userId: string }, resultSelector: string | ((qb: FollowUserModelSelector) => FollowUserModelSelector) = followUserModelPrimitives.toString(), optimisticUpdate?: () => void) {
       return self.mutate<{ followById: FollowUserModelType}>(`mutation followById($followId: String!, $userId: String!) { followById(followId: $followId, userId: $userId) {

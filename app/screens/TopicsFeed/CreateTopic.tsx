@@ -30,7 +30,7 @@ export function CreateTopic() {
   const progress = useSharedValue(0)
   const inputRef = useRef<TextInput>()
   const [selectedImage, setSelectedImage] = useState<any>({ height: 1, width: 1 })
-  const { createTopic, refreshTopics } = useHooks()
+  const { createTopic, loadStories, refreshTopics } = useHooks()
   const onPost = async () => {
     setIsPosting(true)
     // const data = new FormData()
@@ -52,6 +52,7 @@ export function CreateTopic() {
         attachment: selectedImage,
       })
       await refreshTopics()
+      await loadStories()
     } catch (error) {
       console.log(error)
     } finally {
