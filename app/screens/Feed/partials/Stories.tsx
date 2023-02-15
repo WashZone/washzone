@@ -10,13 +10,14 @@ import { useStores } from "../../../models"
 import { formatName } from "../../../utils/formatName"
 import { colors, spacing } from "../../../theme"
 import { Text } from "../../../components"
+import { observer } from "mobx-react-lite"
 
 interface StoryComponentProps {
   item: any
   index: number
 }
 
-export function Stories() {
+export const Stories = observer(() => {
   const { loadStories } = useHooks()
   const {
     feedStore: { stories },
@@ -102,7 +103,7 @@ export function Stories() {
       />
     </View>
   )
-}
+})
 
 const storyContainerRadius = 10
 

@@ -124,8 +124,12 @@ export const InteractionStoreModel = types
       return Interaction.notSaved
     },
     getInteractionOnTopic(id: string) {
-      if (store.topics.liked.includes(id)) return Interaction.like
-      if (store.topics.disliked.includes(id)) return Interaction.dislike
+      if (store.topics.liked.includes(id)) {
+        return Interaction.like
+      }
+      if (store.topics.disliked.includes(id)) {
+        return Interaction.dislike
+      }
       return Interaction.null
     },
     getInteractionOnClassified(id: string) {
@@ -134,15 +138,20 @@ export const InteractionStoreModel = types
     },
     getTopicInteractionOffset(id: string) {
       const val = { likedOffset: 0, dislikedOffset: 0 }
-      if (store.topics.liked.includes(id) && !store.topics.lastSyncedLiked.includes(id))
+      if (store.topics.liked.includes(id) && !store.topics.lastSyncedLiked.includes(id)) {
         val.likedOffset = -1
-      if (!store.topics.liked.includes(id) && store.topics.lastSyncedLiked.includes(id))
+      }
+      if (!store.topics.liked.includes(id) && store.topics.lastSyncedLiked.includes(id)) {
         val.likedOffset = 1
-      if (store.topics.disliked.includes(id) && !store.topics.lastSyncedDisliked.includes(id))
+      }
+      if (store.topics.disliked.includes(id) && !store.topics.lastSyncedDisliked.includes(id)) {
         val.dislikedOffset = -1
-      if (!store.topics.disliked.includes(id) && store.topics.lastSyncedDisliked.includes(id))
+      }
+      if (!store.topics.disliked.includes(id) && store.topics.lastSyncedDisliked.includes(id)) {
         val.dislikedOffset = 1
-      console.log("OSSFET", val)
+      }
+
+      console.log("OFFSET", val)
       return val
     },
     getVideoInteractionOffset(id: string) {

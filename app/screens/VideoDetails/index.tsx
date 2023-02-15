@@ -18,35 +18,41 @@ import { getIconForInteraction } from "../../utils/helpers"
 const ActionButtons = observer(function TopicsFeed({ data }: { data: any }) {
   const {
     userStore: { _id },
-    interaction: { getInteractionOnVideo, videos },
+    interaction: { getInteractionOnVideo, getVideoInteractionOffset },
   } = useStores()
   const [loading, setLoading] = useState<boolean>(false)
   const { interactWithVideo, interactWithSaveOnVideo } = useHooks()
-  console.log("Interaction", videos)
+
+  const interaction = getInteractionOnVideo(data?._id)
+  const interactionOffset = getVideoInteractionOffset(data?._id)
+
   const options: Array<{
     label: string
     icon: IconTypes
     onPress: () => void
     status?: boolean
+    count?: any
   }> = [
     {
       label: "Like",
-      icon: getIconForInteraction(getInteractionOnVideo(data?._id), "liked"),
+      icon: getIconForInteraction(interaction, "liked"),
       onPress: async () => {
         setLoading(true)
         await interactWithVideo(data?._id, "like")
         setLoading(false)
       },
       status: true,
+      count: data?.likeviews - interactionOffset.likedOffset,
     },
     {
       label: "Dislike",
-      icon: getIconForInteraction(getInteractionOnVideo(data?._id), "disliked"),
+      icon: getIconForInteraction(interaction, "disliked"),
       onPress: async () => {
         setLoading(true)
         await interactWithVideo(data?._id, "dislike")
         setLoading(false)
       },
+      count: data?.dislikeviews - interactionOffset.dislikedOffset,
       status: false,
     },
     {
@@ -78,7 +84,11 @@ const ActionButtons = observer(function TopicsFeed({ data }: { data: any }) {
   return (
     <View style={$actionButtonsContainer}>
       {options.map((option) => (
-        <View style={$pressableAction} key={option.label}>
+        // eslint-disable-next-line react-native/no-inline-styles
+        <View
+          style={[$pressableAction, option.count !== undefined && { width: 80 }]}
+          key={option.label}
+        >
           <Icon
             icon={option.icon}
             size={22}
@@ -87,6 +97,7 @@ const ActionButtons = observer(function TopicsFeed({ data }: { data: any }) {
             }}
           />
           <Text text={option.label} style={$actionLabel} />
+          <Text text={option.count || ""} style={$actionLabel} />
         </View>
       ))}
     </View>
@@ -159,18 +170,17 @@ export const VideoDetails: FC<VideosTabProps<"VideoDetails">> = observer(functio
   const {
     api: { mutateGetUploadVideoByVideoId },
   } = useStores()
+  console.log(data)
 
   const handleDataType = async () => {
     if (typeof data === "string") {
-      if (typeof data === "string") {
-        setLoading(true)
-        const res = await mutateGetUploadVideoByVideoId({ videoId: data })
-        console.log("mutateGetUploadVideoByVideoId", JSON.stringify(res))
-        setVideoDetails(
-          res.getUploadVideoByVideoId?.data?.length === 1 && res.getUploadVideoByVideoId?.data[0],
-        )
-        setLoading(false)
-      }
+      setLoading(true)
+      const res = await mutateGetUploadVideoByVideoId({ videoId: data })
+      console.log("mutateGetUploadVideoByVideoId", JSON.stringify(res))
+      setVideoDetails(
+        res.getUploadVideoByVideoId?.data?.length === 1 && res.getUploadVideoByVideoId?.data[0],
+      )
+      setLoading(false)
     } else {
       setVideoDetails(data)
     }
@@ -247,6 +257,7 @@ const $shareContainer: ViewStyle = {
 }
 
 const $flex1: ViewStyle = { flex: 1 }
+const $iconCountContainer: ViewStyle = { flexDirection: "row" }
 
 const screenWidth = Dimensions.get("screen").width
 

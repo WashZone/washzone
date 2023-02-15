@@ -24,11 +24,15 @@ const Actions = observer(function ActionButtons({ item }: { item: any }) {
   const {
     interaction: { getInteractionOnTopic, getTopicInteractionOffset },
   } = useStores()
+
+  const interaction = getInteractionOnTopic(item?._id)
+  const interactionOffset = getTopicInteractionOffset(item?._id)
+
   return (
     <View style={$actionsContainer}>
       <View style={$actionContainer}>
         <Icon
-          icon={getIconForInteraction(getInteractionOnTopic(item?._id), "liked")}
+          icon={getIconForInteraction(interaction, "liked")}
           size={20}
           style={{ marginRight: spacing.extraSmall }}
           onPress={async () => {
@@ -39,13 +43,11 @@ const Actions = observer(function ActionButtons({ item }: { item: any }) {
             }
           }}
         />
-        <Text>
-          {item?.likeviews && item?.likeviews - getTopicInteractionOffset(item?._id).likedOffset}
-        </Text>
+        <Text>{item?.likeviews - interactionOffset.likedOffset}</Text>
       </View>
       <View style={$actionContainer}>
         <Icon
-          icon={getIconForInteraction(getInteractionOnTopic(item?._id), "disliked")}
+          icon={getIconForInteraction(interaction, "disliked")}
           size={20}
           style={{ marginRight: spacing.extraSmall }}
           onPress={async () => {
@@ -56,10 +58,7 @@ const Actions = observer(function ActionButtons({ item }: { item: any }) {
             }
           }}
         />
-        <Text>
-          {item?.dislikeviews &&
-            item?.dislikeviews - getTopicInteractionOffset(item?._id).dislikedOffset}
-        </Text>
+        <Text>{item?.dislikeviews - interactionOffset.dislikedOffset}</Text>
       </View>
       <View style={$actionContainer}>
         <Icon

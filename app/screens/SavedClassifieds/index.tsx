@@ -11,6 +11,7 @@ import Share from "react-native-share"
 import { FlatList } from "react-native-gesture-handler"
 import { useStores } from "../../models"
 import { observer } from "mobx-react-lite"
+import * as Linking from "expo-linking"
 
 interface ActionProps {
   icon: IconTypes
@@ -64,13 +65,14 @@ const BottomActions = ({ classified, type }: { classified: any; type: "video" | 
   )
 }
 
-const SavedItem = ({ item, index }) => {
+const SavedItem = ({ item, index, handleOnPress }) => {
   const videoDetails = item?.VideoDetail[0]
   const classifiedDetails = item?.ClassifiedFeedId[0]
 
   if (item?.savedType === "video") {
     return (
       <ListItem
+        onPress={() => handleOnPress(videoDetails._id, item?.savedType)}
         key={index}
         style={$listItemStyle}
         LeftComponent={
@@ -95,6 +97,7 @@ const SavedItem = ({ item, index }) => {
 
   return (
     <ListItem
+      onPress={() => handleOnPress(classifiedDetails._id, item?.savedType)}
       key={index}
       style={$listItemStyle}
       LeftComponent={
@@ -129,6 +132,15 @@ export const Saved: FC<AppStackScreenProps<"Saved">> = observer(function Saved()
     refreshSavedClassifieds()
   }, [])
 
+  const handleOnPress = (id, type) => {
+    navigation.goBack()
+    if (type === "video") {
+      Linking.openURL(`washzone://shared-video/${id}`)
+    } else {
+      Linking.openURL(`washzone://shared-classified/${id}`)
+    }
+  }
+
   const onRefresh = async () => {
     setRefreshing(true)
     await refreshSavedClassifieds()
@@ -147,7 +159,9 @@ export const Saved: FC<AppStackScreenProps<"Saved">> = observer(function Saved()
       <FlatList
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         data={savedClassifieds}
-        renderItem={SavedItem}
+        renderItem={({ item, index }) => (
+          <SavedItem item={item} index={index} handleOnPress={handleOnPress} />
+        )}
       />
     </Screen>
   )

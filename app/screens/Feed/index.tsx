@@ -14,7 +14,6 @@ export const Feed: FC<HomeTabProps<"Feed">> = function Home(_props) {
   )
 }
 
-
-const $container :ViewStyle={
-  flex:1
+const $container: ViewStyle = {
+  flex: 1,
 }

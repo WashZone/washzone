@@ -23,7 +23,7 @@ import { useHooks } from "../../hooks"
 import { observer } from "mobx-react-lite"
 
 export const CreatePost = observer(function CreatePost() {
-  const { createTopic, refreshTopics } = useHooks()
+  const { createTopic } = useHooks()
   const {
     userStore: { picture },
   } = useStores()
@@ -33,8 +33,7 @@ export const CreatePost = observer(function CreatePost() {
   const inputRef = useRef<TextInput>()
   const [selectedImage, setSelectedImage] = useState<any>({ height: 1, width: 1 })
   const { getAndUpdatePosts } = useHooks()
-  // useMemo(
-  //   () =>
+
   const onPost = async () => {
     setIsPosting(true)
     // const data = new FormData()
@@ -55,7 +54,7 @@ export const CreatePost = observer(function CreatePost() {
         attachment: selectedImage,
         content: postContent,
       })
-      await refreshTopics()
+
       console.log(res)
       await getAndUpdatePosts(false)
     } catch (error) {

@@ -81,7 +81,8 @@ export function useHooks() {
 
   const loadStories = async () => {
     console.log("RELOADING STORIES")
-    const res = await queryGetAllStory({ fetchPolicy: "no-cache" })
+    const res = await queryGetAllStory(undefined, { fetchPolicy: "network-only" })
+    console.log("GOT STOREIES", res.getAllStory?.data.length)
     setStories(res.getAllStory?.data || [])
   }
 
@@ -179,9 +180,10 @@ export function useHooks() {
       topicContent: content,
       userId: userStore._id,
     })
-    console.log("CREATE TOPIC", res)
+    console.log("TOPIC CREATED", res)
     await refreshTopics()
     await loadStories()
+    // setTimeout(loadStories, 1000)
   }
 
   const updateProfile = async (firstName: string, lastName: string, picture: string) => {
@@ -415,23 +417,25 @@ export function useHooks() {
       console.log(err)
     }
   }
+  const getInputInteraction = (buttonType, currentInteraction) => {
+    if (buttonType === "like") {
+      if (currentInteraction === Interaction.like) return Interaction.null
+      else return Interaction.like
+    } else {
+      if (currentInteraction === Interaction.dislike) return Interaction.null
+      else return Interaction.dislike
+    }
+  }
 
   const interactWithTopic = async (topicId: string, buttonType: "like" | "dislike") => {
     console.log("topicId IN HOOK", topicId)
     console.log("USER ID", userStore._id)
-    console.log("INPUT INTERACTION", getInteractionOnTopic(topicId))
+    const currentInteraction = getInteractionOnTopic(topicId)
+    console.log("Current INTERACTION", currentInteraction)
 
-    const getInputInteraction = () => {
-      if (buttonType === "like") {
-        if (getInteractionOnTopic(topicId) === Interaction.like) return Interaction.null
-        else return Interaction.like
-      } else {
-        if (getInteractionOnTopic(topicId) === Interaction.dislike) return Interaction.null
-        else return Interaction.dislike
-      }
-    }
-    const inputInteraction = getInputInteraction()
-    console.log("INPUT INTERACTION", inputInteraction)
+    console.log("GETTING INPUT INTERACTION")
+    const inputInteraction = getInputInteraction(buttonType, currentInteraction)
+    console.log("INPUT INTERACTION inputInteraction", inputInteraction)
     try {
       await mutateLikeDislikeTopic({
         topicId,
@@ -518,6 +522,7 @@ export function useHooks() {
     }
     const res = await mutateUploadVideoByUser(body)
     console.log("VIDEO UPLOAD STATUS : ", res.uploadVideoByUser)
+    setTimeout(async () => await loadStories(), 1000)
   }
 
   const createClassified = async ({ attachmentUrl, title, prize, classifiedDetail, condition }) => {
@@ -531,6 +536,7 @@ export function useHooks() {
       condition,
     })
     console.log("CREATE TOPIC", res)
+    setTimeout(async () => await loadStories(), 1000)
   }
 
   const createEmptyPlaylist = async (playListName: string) => {
