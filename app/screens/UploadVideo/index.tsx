@@ -54,10 +54,10 @@ export const UploadVideo: FC<AppStackScreenProps<"UploadVideo">> = function Uplo
       Toast.show({ ...toastMessages.inputTitle })
       return
     }
-    if (youtubeUrl.split("=").length !== 2) {
-      Toast.show({ ...toastMessages.inputYTURL })
-      return
-    }
+    // if (youtubeUrl.split("=").length !== 2) {
+    //   Toast.show({ ...toastMessages.inputYTURL })
+    //   return
+    // }
     if (description.length === 0) {
       Toast.show({ ...toastMessages.inputDescription })
       return

@@ -21,7 +21,7 @@ import { useStores } from "../../../models"
 import { Stories } from "./Stories"
 import { $flex1 } from "../../styles"
 import { NATIVE_AD_UNIT_ID } from "../../../utils/AppLovin"
-import NativeAdView from "../../../utils/NativeAd"
+// import NativeAdView from "../../../utils/NativeAd"
 import { defaultImages } from "../../../utils"
 
 export interface TopicComponentProps {
@@ -53,11 +53,11 @@ export const PostComponent = ({ topic, navigateOnPress, index }: TopicComponentP
 
   const nativeAdViewRef = useRef<any>()
 
-  useEffect(() => {
-    if (nativeAdViewRef?.current) {
-      nativeAdViewRef.current?.loadAd()
-    }
-  }, [nativeAdViewRef.current])
+  // useEffect(() => {
+  //   if (nativeAdViewRef?.current) {
+  //     nativeAdViewRef.current?.loadAd()
+  //   }
+  // }, [nativeAdViewRef.current])
   return (
     <>
       <Pressable style={$postContainer} onPress={onContainerPress}>
@@ -90,14 +90,14 @@ export const PostComponent = ({ topic, navigateOnPress, index }: TopicComponentP
           }
         />
       </Pressable>
-      {index % 5 === 0 && (
-        <NativeAdView adUnitId={NATIVE_AD_UNIT_ID} ref={nativeAdViewRef} />
+      {/* {index % 5 === 0 && (
+        // <NativeAdView adUnitId={NATIVE_AD_UNIT_ID} ref={nativeAdViewRef} />
         // <AppLovinMAX.AdView
         //   adUnitId={MREC_AD_UNIT_ID}
         //   adFormat={AppLovinMAX.AdFormat.BANNER}
         //   style={$mrecStyle}
         // />
-      )}
+      )} */}
     </>
   )
 }

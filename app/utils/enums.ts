@@ -1,6 +1,6 @@
 export enum Interaction {
-  like = "LIKE",
-  dislike = "DISLIKE",
+  like = "like",
+  dislike = "dislike",
   null = "",
   notLiked = "NOT-LIKED",
   notDisliked = "NOT-DISLIKED",

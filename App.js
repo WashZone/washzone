@@ -10,5 +10,5 @@ function WashZone() {
   return <App hideSplashScreen={SplashScreen.hideAsync} />
 }
 
-registerRootComponent(WashZone)
+registerRootComponent(() => gestureHandlerRootHOC(WashZone))
 export default WashZone

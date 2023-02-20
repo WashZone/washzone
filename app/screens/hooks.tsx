@@ -115,6 +115,7 @@ export function useHooks() {
     )
     console.log("refreshd", res.getAllTopicByPageNumber?.data)
     setFeedTopics(res.getAllTopicByPageNumber?.data)
+    syncInteractedVideosAndTopics()
   }
 
   const loadMoreClassified = async () => {
@@ -154,7 +155,9 @@ export function useHooks() {
   const refreshTopics = async () => {
     const res = await queryGetAllTopicByPageNumber({ pageNumber: 1 }, { fetchPolicy: "no-cache" })
     console.log("refreshd", res.getAllTopicByPageNumber?.data)
+    await syncInteractedVideosAndTopics()
     setTopics(res.getAllTopicByPageNumber?.data)
+    await syncInteractedVideosAndTopics()
   }
 
   const postComment = async (comment: string, topicId: string) => {
@@ -324,6 +327,7 @@ export function useHooks() {
     const res = await queryGetUserChannel(undefined, { fetchPolicy: "no-cache" })
     setVideos(res.getUserChannel)
     console.log("VIDEOS", res)
+    await syncInteractedVideosAndTopics()
     return res.getUserChannel
   }
 

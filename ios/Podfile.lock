@@ -46,20 +46,20 @@ PODS:
     - React-Core (= 0.69.7)
     - React-jsi (= 0.69.7)
     - ReactCommon/turbomodule/core (= 0.69.7)
-  - FBSDKCoreKit (8.2.0):
-    - FBSDKCoreKit/Basics (= 8.2.0)
-    - FBSDKCoreKit/Core (= 8.2.0)
-  - FBSDKCoreKit/Basics (8.2.0)
-  - FBSDKCoreKit/Core (8.2.0):
+  - FBSDKCoreKit (9.3.0):
+    - FBSDKCoreKit/Basics (= 9.3.0)
+    - FBSDKCoreKit/Core (= 9.3.0)
+  - FBSDKCoreKit/Basics (9.3.0)
+  - FBSDKCoreKit/Core (9.3.0):
     - FBSDKCoreKit/Basics
-  - FBSDKLoginKit (8.2.0):
-    - FBSDKLoginKit/Login (= 8.2.0)
-  - FBSDKLoginKit/Login (8.2.0):
-    - FBSDKCoreKit (~> 8.2.0)
-  - FBSDKShareKit (8.2.0):
-    - FBSDKShareKit/Share (= 8.2.0)
-  - FBSDKShareKit/Share (8.2.0):
-    - FBSDKCoreKit (~> 8.2.0)
+  - FBSDKLoginKit (9.3.0):
+    - FBSDKLoginKit/Login (= 9.3.0)
+  - FBSDKLoginKit/Login (9.3.0):
+    - FBSDKCoreKit (~> 9.3.0)
+  - FBSDKShareKit (9.3.0):
+    - FBSDKShareKit/Share (= 9.3.0)
+  - FBSDKShareKit/Share (9.3.0):
+    - FBSDKCoreKit (~> 9.3.0)
   - Flipper (0.157.0):
     - Flipper-Folly (~> 2.6)
   - Flipper-Boost-iOSX (1.76.0.1.11)
@@ -164,6 +164,9 @@ PODS:
     - FBLazyVector (= 0.69.7)
     - RCTRequired (= 0.69.7)
     - React-Core (= 0.69.7)
+  - RCTYouTube (2.0.2):
+    - React
+    - YoutubePlayer-in-WKWebView (~> 0.3.1)
   - React (0.69.7):
     - React-Core (= 0.69.7)
     - React-Core/DevSupport (= 0.69.7)
@@ -368,21 +371,25 @@ PODS:
   - React-jsinspector (0.69.7)
   - React-logger (0.69.7):
     - glog
-  - react-native-fbsdk (3.0.0):
-    - React
-    - react-native-fbsdk/Core (= 3.0.0)
-    - react-native-fbsdk/Login (= 3.0.0)
-    - react-native-fbsdk/Share (= 3.0.0)
-  - react-native-fbsdk/Core (3.0.0):
-    - FBSDKCoreKit (~> 8.1)
-    - React
-  - react-native-fbsdk/Login (3.0.0):
-    - FBSDKLoginKit (~> 8.1)
-    - React
-  - react-native-fbsdk/Share (3.0.0):
-    - FBSDKShareKit (~> 8.1)
-    - React
+  - react-native-fbsdk-next (4.6.0):
+    - React-Core
+    - react-native-fbsdk-next/Core (= 4.6.0)
+    - react-native-fbsdk-next/Login (= 4.6.0)
+    - react-native-fbsdk-next/Share (= 4.6.0)
+  - react-native-fbsdk-next/Core (4.6.0):
+    - FBSDKCoreKit (~> 9.3)
+    - React-Core
+  - react-native-fbsdk-next/Login (4.6.0):
+    - FBSDKLoginKit (~> 9.3)
+    - React-Core
+  - react-native-fbsdk-next/Share (4.6.0):
+    - FBSDKShareKit (~> 9.3)
+    - React-Core
   - react-native-image-picker (4.10.1):
+    - React-Core
+  - react-native-pager-view (6.1.2):
+    - React-Core
+  - react-native-render-html (6.3.4):
     - React-Core
   - react-native-safe-area-context (4.3.4):
     - RCT-Folly
@@ -394,6 +401,8 @@ PODS:
     - React-Core
     - react-native-video/Video (= 5.2.1)
   - react-native-video/Video (5.2.1):
+    - React-Core
+  - react-native-webview (11.26.0):
     - React-Core
   - React-perflogger (0.69.7)
   - React-RCTActionSheet (0.69.7):
@@ -465,6 +474,10 @@ PODS:
     - React-Core
   - RNCAsyncStorage (1.17.11):
     - React-Core
+  - RNCPushNotificationIOS (1.10.1):
+    - React-Core
+  - RNDeviceInfo (10.3.0):
+    - React-Core
   - RNFastImage (8.6.3):
     - React-Core
     - SDWebImage (~> 5.11.1)
@@ -516,6 +529,7 @@ PODS:
   - Yoga (1.14.0)
   - YogaKit (1.18.1):
     - Yoga (~> 1.14)
+  - YoutubePlayer-in-WKWebView (0.3.8)
 
 DEPENDENCIES:
   - boost (from `../node_modules/react-native/third-party-podspecs/boost.podspec`)
@@ -563,6 +577,7 @@ DEPENDENCIES:
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCTRequired (from `../node_modules/react-native/Libraries/RCTRequired`)
   - RCTTypeSafety (from `../node_modules/react-native/Libraries/TypeSafety`)
+  - RCTYouTube (from `../node_modules/react-native-youtube`)
   - React (from `../node_modules/react-native/`)
   - React-bridging (from `../node_modules/react-native/ReactCommon`)
   - React-callinvoker (from `../node_modules/react-native/ReactCommon/callinvoker`)
@@ -577,10 +592,13 @@ DEPENDENCIES:
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
-  - react-native-fbsdk (from `../node_modules/react-native-fbsdk`)
+  - react-native-fbsdk-next (from `../node_modules/react-native-fbsdk-next`)
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
+  - react-native-pager-view (from `../node_modules/react-native-pager-view`)
+  - react-native-render-html (from `../node_modules/react-native-render-html`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-video (from `../node_modules/react-native-video`)
+  - react-native-webview (from `../node_modules/react-native-webview`)
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
   - React-RCTAnimation (from `../node_modules/react-native/Libraries/NativeAnimation`)
@@ -595,6 +613,8 @@ DEPENDENCIES:
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - RNBootSplash (from `../node_modules/react-native-bootsplash`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
+  - "RNCPushNotificationIOS (from `../node_modules/@react-native-community/push-notification-ios`)"
+  - RNDeviceInfo (from `../node_modules/react-native-device-info`)
   - RNFastImage (from `../node_modules/react-native-fast-image`)
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - "RNGoogleSignin (from `../node_modules/@react-native-google-signin/google-signin`)"
@@ -630,6 +650,7 @@ SPEC REPOS:
     - SDWebImageWebPCoder
     - SocketRocket
     - YogaKit
+    - YoutubePlayer-in-WKWebView
 
 EXTERNAL SOURCES:
   boost:
@@ -676,6 +697,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/Libraries/RCTRequired"
   RCTTypeSafety:
     :path: "../node_modules/react-native/Libraries/TypeSafety"
+  RCTYouTube:
+    :path: "../node_modules/react-native-youtube"
   React:
     :path: "../node_modules/react-native/"
   React-bridging:
@@ -700,14 +723,20 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/jsinspector"
   React-logger:
     :path: "../node_modules/react-native/ReactCommon/logger"
-  react-native-fbsdk:
-    :path: "../node_modules/react-native-fbsdk"
+  react-native-fbsdk-next:
+    :path: "../node_modules/react-native-fbsdk-next"
   react-native-image-picker:
     :path: "../node_modules/react-native-image-picker"
+  react-native-pager-view:
+    :path: "../node_modules/react-native-pager-view"
+  react-native-render-html:
+    :path: "../node_modules/react-native-render-html"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
   react-native-video:
     :path: "../node_modules/react-native-video"
+  react-native-webview:
+    :path: "../node_modules/react-native-webview"
   React-perflogger:
     :path: "../node_modules/react-native/ReactCommon/reactperflogger"
   React-RCTActionSheet:
@@ -736,6 +765,10 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-bootsplash"
   RNCAsyncStorage:
     :path: "../node_modules/@react-native-async-storage/async-storage"
+  RNCPushNotificationIOS:
+    :path: "../node_modules/@react-native-community/push-notification-ios"
+  RNDeviceInfo:
+    :path: "../node_modules/react-native-device-info"
   RNFastImage:
     :path: "../node_modules/react-native-fast-image"
   RNGestureHandler:
@@ -771,9 +804,9 @@ SPEC CHECKSUMS:
   EXSplashScreen: 799bece80089219b2c989c1082d70f3b00995cda
   FBLazyVector: 6b7f5692909b4300d50e7359cdefbcd09dd30faa
   FBReactNativeSpec: affcf71d996f6b0c01f68883482588297b9d5e6e
-  FBSDKCoreKit: 4afd6ff53d8133a433dbcda44451c9498f8c6ce4
-  FBSDKLoginKit: 7181765f2524d7ebf82d9629066c8e6caafc99d0
-  FBSDKShareKit: 0c0d51b3af47075a85ed9bea0e28b2fc70e3594b
+  FBSDKCoreKit: 0d1ae58388a458b8222f72025804cdc84eb5d0c3
+  FBSDKLoginKit: aea68df6121c5e165ccae2fabfdc83c4644ee40f
+  FBSDKShareKit: 70889c97c62f0c6b3ccb8b999e73a85f19024001
   Flipper: 19985db5fff887a746c0e15585917bf1ab304317
   Flipper-Boost-iOSX: fd1e2b8cbef7e662a122412d7ac5f5bea715403c
   Flipper-DoubleConversion: 2dc99b02f658daf147069aad9dbd29d8feb06d30
@@ -795,6 +828,7 @@ SPEC CHECKSUMS:
   RCT-Folly: b9d9fe1fc70114b751c076104e52f3b1b5e5a95a
   RCTRequired: 54bff6aa61efd9598ab59d2a823c382b4fe13d27
   RCTTypeSafety: 47632bfa768df7befde08e339a9847e6cff6ff78
+  RCTYouTube: a8bb45705622a6fc9decf64be04128d3658ed411
   React: 72a676de573cc5ee0e375e5535238af9a4bd435c
   React-bridging: 12b6677a30fbd46555a35aa6096331737a9af598
   React-callinvoker: bb574a923c2281d01be23ed3b5d405caa583f56d
@@ -807,10 +841,13 @@ SPEC CHECKSUMS:
   React-jsiexecutor: a73bec0218ba959fc92f811b581ad6c2270c6b6f
   React-jsinspector: 8134ee22182b8dd98dc0973db6266c398103ce6c
   React-logger: 1e7ac909607ee65fd5c4d8bea8c6e644f66b8843
-  react-native-fbsdk: 8e92c7a334fd8d9c2b5d8b8fcd7ae2c314161099
+  react-native-fbsdk-next: a0dd8905af573ec4d21b7bc398423ccaa2ce2b07
   react-native-image-picker: f2ab1215d17bcfe27b0eb6417cc236fd1f4775e7
+  react-native-pager-view: 54bed894cecebe28cede54c01038d9d1e122de43
+  react-native-render-html: 984dfe2294163d04bf5fe25d7c9f122e60e05ebe
   react-native-safe-area-context: dfe5aa13bee37a0c7e8059d14f72ffc076d120e9
   react-native-video: c26780b224543c62d5e1b2a7244a5cd1b50e8253
+  react-native-webview: 994b9f8fbb504d6314dc40d83f94f27c6831b3bf
   React-perflogger: 8e832d4e21fdfa613033c76d58d7e617341e804b
   React-RCTActionSheet: 9ca778182a9523991bff6381045885b6e808bb73
   React-RCTAnimation: 9ced26ad20b96e532ac791a8ab92a7b1ce2266b8
@@ -825,6 +862,8 @@ SPEC CHECKSUMS:
   ReactCommon: 1e783348b9aa73ae68236271df972ba898560a95
   RNBootSplash: 5f346163977573d6b2aeba1b25df9d2245c0d73c
   RNCAsyncStorage: 8616bd5a58af409453ea4e1b246521bb76578d60
+  RNCPushNotificationIOS: 87b8d16d3ede4532745e05b03c42cff33a36cc45
+  RNDeviceInfo: 4701f0bf2a06b34654745053db0ce4cb0c53ada7
   RNFastImage: 5c9c9fed9c076e521b3f509fe79e790418a544e8
   RNGestureHandler: bad495418bcbd3ab47017a38d93d290ebd406f50
   RNGoogleSignin: b2179ba653c759b936404a7746fc5302f9de6a5a
@@ -836,6 +875,7 @@ SPEC CHECKSUMS:
   SocketRocket: fccef3f9c5cedea1353a9ef6ada904fde10d6608
   Yoga: 0b84a956f7393ef1f37f3bb213c516184e4a689d
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
+  YoutubePlayer-in-WKWebView: 4fca3b4f6f09940077bfbae7bddb771f2b43aacd
 
 PODFILE CHECKSUM: f28ddc49719382729cedee6904b896c5992a6482
 

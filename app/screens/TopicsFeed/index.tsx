@@ -12,7 +12,7 @@ import { observer } from "mobx-react-lite"
 import { CreateTopic } from "./CreateTopic"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { MREC_AD_UNIT_ID } from "../../utils/AppLovin"
-import AppLovinMAX from "react-native-applovin-max/src/index"
+// import AppLovinMAX from "react-native-applovin-max/src/index"
 import { $flex1 } from "../styles"
 import Share from "react-native-share"
 import { getIconForInteraction } from "../../utils/helpers"
@@ -128,13 +128,13 @@ export const TopicComponent = ({ topic, index }) => {
           />
         </View>
       </Pressable>
-      {index % 5 === 0 && (
+      {/* {index % 5 === 0 && (
         <AppLovinMAX.AdView
           adUnitId={MREC_AD_UNIT_ID}
           adFormat={AppLovinMAX.AdFormat.BANNER}
           style={$mrecStyle}
         />
-      )}
+      )} */}
     </>
   )
 }

@@ -8,6 +8,7 @@ import {
   View,
   ViewStyle,
   Image,
+  TouchableOpacity,
 } from "react-native"
 import { TxKeyPath } from "../../i18n"
 import { colors } from "../../theme"
@@ -16,6 +17,7 @@ import { useStores } from "../../models"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { AppStackParamList } from "../AppNavigator"
 import { observer } from "mobx-react-lite"
+import { navigationRef } from "../navigationUtilities"
 
 interface DrawerOptionType {
   icon: IconTypes
@@ -46,7 +48,6 @@ export const DrawerOptions = observer(function DrawerOptions({
       icon: "notifications",
       label: "DrawerNavigator.notification",
       onPress() {
-        toggleDrawer()
         navigaton.navigate("Notifications")
       },
     },
@@ -54,7 +55,6 @@ export const DrawerOptions = observer(function DrawerOptions({
       icon: "profile",
       label: "DrawerNavigator.profile",
       onPress() {
-        toggleDrawer()
         navigaton.navigate("EditProfile")
       },
     },
@@ -76,7 +76,6 @@ export const DrawerOptions = observer(function DrawerOptions({
       icon: "legal",
       label: "DrawerNavigator.legal",
       onPress() {
-        toggleDrawer()
         navigaton.navigate("Legal")
       },
     },
@@ -84,7 +83,6 @@ export const DrawerOptions = observer(function DrawerOptions({
       icon: "save",
       label: "DrawerNavigator.saved",
       onPress() {
-        toggleDrawer()
         navigaton.navigate("Saved")
       },
     },
@@ -100,13 +98,16 @@ export const DrawerOptions = observer(function DrawerOptions({
   const ActionComponent = (action: Action) => {
     const { icon, label, onPress } = action.action
     return (
-      <Pressable
-        onPress={onPress}
+      <TouchableOpacity
+        onPress={() => {
+          toggleDrawer()
+          onPress()
+        }}
         style={getActionContainerStyle(!["notifications", "logout"].includes(icon))}
       >
         <Icon icon={icon} size={22} style={$actionIcon} />
         <Text tx={label} style={$actionLabel} />
-      </Pressable>
+      </TouchableOpacity>
     )
   }
 

@@ -20,13 +20,14 @@ export function DrawerNavigator() {
   const progress = useSharedValue(0)
 
   const toggleDrawer = () => {
+    console.log("TOGGLING!")
     if (!open) {
-      setOpen(true)
       Keyboard.dismiss()
       drawerRef.current?.openDrawer({ speed: 2 })
+      setOpen(true)
     } else {
+      drawerRef.current?.closeDrawer({ speed: 10 })
       setOpen(false)
-      drawerRef.current?.closeDrawer({ speed: 2 })
     }
   }
 
@@ -63,7 +64,7 @@ export function DrawerNavigator() {
       }}
       renderNavigationView={() => (
         <View style={[$drawer, $drawerInsets]}>
-          <DrawerOptions toggleDrawer={toggleDrawer} />
+          <DrawerOptions toggleDrawer={() => toggleDrawer()} />
           <View style={$versionContainer}>
             <Text tx="DrawerNavigator.version" style={$versionText} />
           </View>

@@ -94,6 +94,7 @@ queryHello="queryHello",
 queryGetUserByEmail="queryGetUserByEmail",
 queryGetAllUsers="queryGetAllUsers",
 queryGetAllUsersAdmin="queryGetAllUsersAdmin",
+queryGetAllUsersAdminpage="queryGetAllUsersAdminpage",
 queryGetUserBysocialId="queryGetUserBysocialId",
 queryGetchannelUser="queryGetchannelUser",
 queryGetSearchedUser="queryGetSearchedUser",
@@ -223,6 +224,9 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     },
     queryGetAllUsersAdmin(variables?: {  }, options: QueryOptions = {}) {
       return self.query<{ getAllUsersAdmin: any }>(`query getAllUsersAdmin { getAllUsersAdmin }`, variables, options)
+    },
+    queryGetAllUsersAdminpage(variables: { pageNumber: number }, options: QueryOptions = {}) {
+      return self.query<{ getAllUsersAdminpage: any }>(`query getAllUsersAdminpage($pageNumber: Float!) { getAllUsersAdminpage(pageNumber: $pageNumber) }`, variables, options)
     },
     queryGetUserBysocialId(variables: { socialId: string }, options: QueryOptions = {}) {
       return self.query<{ getUserBysocialId: any }>(`query getUserBysocialId($socialId: String!) { getUserBysocialId(socialId: $socialId) }`, variables, options)
@@ -417,8 +421,8 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     mutateGenerateOTP(variables: { userId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ generateOTP: any }>(`mutation generateOTP($userId: String!) { generateOTP(userId: $userId) }`, variables, optimisticUpdate)
     },
-    mutateUpdateDeleteStatus(variables: { status: string, userId: string }, optimisticUpdate?: () => void) {
-      return self.mutate<{ UpdateDeleteStatus: any }>(`mutation UpdateDeleteStatus($status: String!, $userId: String!) { UpdateDeleteStatus(status: $status, userId: $userId) }`, variables, optimisticUpdate)
+    mutateUpdateDeleteStatus(variables: { pageNumber: number, status: string, userId: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ UpdateDeleteStatus: any }>(`mutation UpdateDeleteStatus($pageNumber: Float!, $status: String!, $userId: String!) { UpdateDeleteStatus(pageNumber: $pageNumber, status: $status, userId: $userId) }`, variables, optimisticUpdate)
     },
     mutateStoreBlockedUser(variables: { deviceId: string, userId: string }, resultSelector: string | ((qb: SigninUserModelSelector) => SigninUserModelSelector) = signinUserModelPrimitives.toString(), optimisticUpdate?: () => void) {
       return self.mutate<{ storeBlockedUser: SigninUserModelType}>(`mutation storeBlockedUser($deviceId: String!, $userId: String!) { storeBlockedUser(deviceId: $deviceId, userId: $userId) {
@@ -458,8 +462,8 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     mutateGetTopicByTopicId(variables: { topicId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ getTopicByTopicId: any }>(`mutation getTopicByTopicId($topicId: String!) { getTopicByTopicId(TopicId: $topicId) }`, variables, optimisticUpdate)
     },
-    mutateUpdateDeleteTopicId(variables: { topicId: string }, optimisticUpdate?: () => void) {
-      return self.mutate<{ UpdateDeleteTopicId: any }>(`mutation UpdateDeleteTopicId($topicId: String!) { UpdateDeleteTopicId(TopicId: $topicId) }`, variables, optimisticUpdate)
+    mutateUpdateDeleteTopicId(variables: { pageNumber: number, topicId: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ UpdateDeleteTopicId: any }>(`mutation UpdateDeleteTopicId($pageNumber: Float!, $topicId: String!) { UpdateDeleteTopicId(pageNumber: $pageNumber, TopicId: $topicId) }`, variables, optimisticUpdate)
     },
     mutateUpdateLikeViews(variables: { status: string, videoIds: string, userId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ UpdateLikeViews: any }>(`mutation UpdateLikeViews($status: String!, $videoIds: String!, $userId: String!) { UpdateLikeViews(status: $status, videoIds: $videoIds, userId: $userId) }`, variables, optimisticUpdate)
@@ -503,8 +507,8 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     mutateGetClassifiedById(variables: { classifiedId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ getClassifiedById: any }>(`mutation getClassifiedById($classifiedId: String!) { getClassifiedById(classifiedId: $classifiedId) }`, variables, optimisticUpdate)
     },
-    mutateUpdateDeleteClassifiedId(variables: { classifiedId: string }, optimisticUpdate?: () => void) {
-      return self.mutate<{ UpdateDeleteClassifiedId: any }>(`mutation UpdateDeleteClassifiedId($classifiedId: String!) { UpdateDeleteClassifiedId(classifiedId: $classifiedId) }`, variables, optimisticUpdate)
+    mutateUpdateDeleteClassifiedId(variables: { pageNumber: number, classifiedId: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ UpdateDeleteClassifiedId: any }>(`mutation UpdateDeleteClassifiedId($pageNumber: Float!, $classifiedId: String!) { UpdateDeleteClassifiedId(pageNumber: $pageNumber, classifiedId: $classifiedId) }`, variables, optimisticUpdate)
     },
     mutateUpdateUserClassified(variables: { classifiedFeed: InputClassified, classifiedId: string }, resultSelector: string | ((qb: ClassifiedFeedModelSelector) => ClassifiedFeedModelSelector) = classifiedFeedModelPrimitives.toString(), optimisticUpdate?: () => void) {
       return self.mutate<{ updateUserClassified: ClassifiedFeedModelType}>(`mutation updateUserClassified($classifiedFeed: InputClassified!, $classifiedId: String!) { updateUserClassified(ClassifiedFeed: $classifiedFeed, classifiedId: $classifiedId) {
@@ -536,8 +540,8 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     mutateGetUploadVideoByPlaylistId(variables: { vedioPlaylistId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ getUploadVideoByPlaylistId: any }>(`mutation getUploadVideoByPlaylistId($vedioPlaylistId: String!) { getUploadVideoByPlaylistId(vedioPlaylistId: $vedioPlaylistId) }`, variables, optimisticUpdate)
     },
-    mutateUpdateDeleteVideoId(variables: { videoId: string }, optimisticUpdate?: () => void) {
-      return self.mutate<{ UpdateDeleteVideoId: any }>(`mutation UpdateDeleteVideoId($videoId: String!) { UpdateDeleteVideoId(videoId: $videoId) }`, variables, optimisticUpdate)
+    mutateUpdateDeleteVideoId(variables: { pageNumber: number, videoId: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ UpdateDeleteVideoId: any }>(`mutation UpdateDeleteVideoId($pageNumber: Float!, $videoId: String!) { UpdateDeleteVideoId(pageNumber: $pageNumber, videoId: $videoId) }`, variables, optimisticUpdate)
     },
     mutateUpdateVideoViews(variables: { videoId: string, userId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ UpdateVideoViews: any }>(`mutation UpdateVideoViews($videoId: String!, $userId: String!) { UpdateVideoViews(videoId: $videoId, userId: $userId) }`, variables, optimisticUpdate)

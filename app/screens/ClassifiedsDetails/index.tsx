@@ -73,7 +73,7 @@ const MoreDetails = ({ classified }: { classified: any }) => {
       <View style={$containerCondition}>
         <View style={$conditionContainer}>
           <Text text="Condition" weight="medium" />
-          <Text text="New" weight="light" />
+          <Text text={classified?.condition} weight="light" />
         </View>
         <Icon icon="caretRight" size={22} />
       </View>
@@ -162,6 +162,7 @@ export const ClassifiedsDetails: FC<ClassifiedsTabProps<"ClassifiedsDetails">> =
         setLoading(false)
       } else {
         setClassifiedDetails(classified)
+        console.log("RES CLASSFIED", classified)
         setLoading(false)
       }
     }
