@@ -13,7 +13,6 @@ import { ActivityIndicator } from "react-native-paper"
 export const TopicInfo: FC<HomeTabProps<"TopicInfo">> = function PostInfo(props) {
   const { topic } = props.route.params
   const [commentText, setCommentText] = useState<string>("")
-  console.log("POSTD", topic)
   const { postComment, getCommentsOnPost } = useHooks()
   const [comments, setComments] = useState<Array<any>>([])
   const [isCommenting, setIsCommenting] = useState<boolean>(false)
@@ -26,9 +25,7 @@ export const TopicInfo: FC<HomeTabProps<"TopicInfo">> = function PostInfo(props)
   const handleTopic = async () => {
     setLoading(true)
     if (typeof topic === "string") {
-      console.log("TOPIC--ID", topic)
       const res = await mutateGetTopicByTopicId({ topicId: topic })
-      console.log("RES", res)
       const topicData = res.getTopicByTopicId?.data.length === 1 && res.getTopicByTopicId?.data[0]
       setTopicDetails(topicData)
       await syncComments(topicData?._id)

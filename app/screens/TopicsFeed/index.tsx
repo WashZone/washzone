@@ -81,7 +81,7 @@ const Actions = observer(function ActionButtons({ item }: { item: any }) {
 
 export const TopicComponent = ({ topic, index }) => {
   const navigation = useNavigation<NavigationProp<TopicsTabParamList>>()
-  console.log("TOPICTOPCITOPCI", topic)
+
   const topicDetails = {
     picture: topic?.userId?.picture,
     first_name: topic?.userId?.first_name,

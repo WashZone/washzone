@@ -21,7 +21,6 @@ interface ActionProps {
 
 const BottomActions = ({ classified, type }: { classified: any; type: "video" | "classified" }) => {
   const { interactWithSaveOnClassified } = useHooks()
-  console.log(classified)
 
   const bottomOptions: Array<ActionProps> = [
     {

@@ -13,7 +13,6 @@ export const Settings: FC<AppStackScreenProps<"Settings">> = observer(function S
   const {
     userStore: { isSocialLogin },
   } = useStores()
-  console.log()
   const {
     settings: { toggleNotification, notifications },
   } = useStores()

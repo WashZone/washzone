@@ -48,8 +48,6 @@ export const CreatePost = observer(function CreatePost() {
       //   type: selectedImage?.type,
       //   fileName: selectedImage?.fileName,
       // })
-      // console.log(res)
-      // console.log(_id)
       const res = await createTopic({
         attachment: selectedImage,
         content: postContent,

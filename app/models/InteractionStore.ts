@@ -44,14 +44,12 @@ export const InteractionStoreModel = types
       })
     },
     async syncSavedInteractions(data: { savedVideos: string[]; savedClassifieds: string[] }) {
-      console.log("SAVEINTERACTIONS", data.savedVideos)
-      console.log("SAVEINTERACTIONS", data.savedClassifieds)
       self.setProp("videos", {
         liked: [...self.videos.liked],
         disliked: [...self.videos.disliked],
         saved: [...data.savedVideos],
       })
-      console.log("SAVEINTERACTIONS", { saved: [...data.savedClassifieds] })
+
       self.setProp("classified", { saved: [...data.savedClassifieds] })
     },
     addToLikedTopics(id: string) {
@@ -150,8 +148,6 @@ export const InteractionStoreModel = types
       if (!store.topics.disliked.includes(id) && store.topics.lastSyncedDisliked.includes(id)) {
         val.dislikedOffset = 1
       }
-
-      console.log("OFFSET", val)
       return val
     },
     getVideoInteractionOffset(id: string) {

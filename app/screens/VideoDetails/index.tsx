@@ -142,9 +142,7 @@ const VideoContainer = ({ uri, videoId }: { uri: string; videoId: string }) => {
   } = useStores()
 
   const onVideoLoad = async () => {
-    console.log(uri)
     const res = await mutateUpdateVideoViews({ videoId, userId: _id })
-    console.log("onVideoLoad", res)
   }
 
   return (
@@ -176,7 +174,6 @@ export const VideoDetails: FC<VideosTabProps<"VideoDetails">> = observer(functio
     if (typeof data === "string") {
       setLoading(true)
       const res = await mutateGetUploadVideoByVideoId({ videoId: data })
-      console.log("mutateGetUploadVideoByVideoId", JSON.stringify(res))
       setVideoDetails(
         res.getUploadVideoByVideoId?.data?.length === 1 && res.getUploadVideoByVideoId?.data[0],
       )

@@ -144,10 +144,9 @@ export function ListItem(props: ListItemProps) {
           Component={LeftComponent}
         />
 
-        <Text {...TextProps} tx={tx} text={text} txOptions={txOptions} style={$textStyles}>
-          {children}
-        </Text>
-
+        {text && <Text {...TextProps} tx={tx} text={text} txOptions={txOptions} style={$textStyles}>
+        </Text>}
+        {children}
         <ListItemAction
           side="right"
           size={height}
@@ -205,7 +204,8 @@ const $textStyle: TextStyle = {
 
 const $touchableStyle: ViewStyle = {
   flexDirection: "row",
-  alignItems: "flex-start",
+  width:'100%',
+  justifyContent: "space-between",
 }
 
 const $iconContainer: ViewStyle = {

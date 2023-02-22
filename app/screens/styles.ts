@@ -4,6 +4,11 @@ export const $flex1: ViewStyle = {
   flex: 1,
 }
 
+export const $flexRow: ViewStyle = {
+  flexDirection: 'row'
+}
+
+
 export const $loaderContainer: ViewStyle = {
   flex: 1,
   alignItems: "center",

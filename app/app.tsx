@@ -48,12 +48,7 @@ export const NAVIGATION_PERSISTENCE_KEY = "NAVIGATION_STATE"
 
 const config = {
   screens: {
-    ClassifiedLinked: {
-      path: "classified/:classifiedId",
-      parse: {
-        classifiedId: (classifiedId: string) => classifiedId,
-      },
-    },
+
   },
 }
 
@@ -130,7 +125,7 @@ function App(props: AppProps) {
   }, [])
 
   const prefix = Linking.createURL("/")
-  console.log("PREFIXES", prefix)
+
 
   const {
     initialNavigationState,

@@ -34,7 +34,6 @@ export const LoginView = observer(() => {
         email: authEmail,
         password: authPassword,
       })
-      console.log(res)
 
       setUser({
         name: res.signin.name,

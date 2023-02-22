@@ -24,7 +24,6 @@ export const RateUserModal = ({
 
   const syncRating = async () => {
     const res = await getRatingOnUser(userId)
-    console.log("syncRating", res)
     setRating(res)
   }
 
@@ -33,8 +32,6 @@ export const RateUserModal = ({
   }, [isVisible])
 
   const onSubmit = async () => {
-    console.log("USER ID", userId)
-    console.log("RATING", rating)
     setButtonLoading(true)
     const res = await rateUser(userId, rating)
     if (res) {

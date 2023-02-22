@@ -90,8 +90,6 @@ export const Stories = observer(() => {
     )
   }
 
-  console.log("Storiesl,", stories)
-
   return (
     <View style={$container}>
       <FlatList

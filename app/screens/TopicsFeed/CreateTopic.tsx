@@ -45,8 +45,7 @@ export function CreateTopic() {
       //   type: selectedImage?.type,
       //   fileName: selectedImage?.fileName,
       // })
-      // console.log(res)
-      // console.log(_id)
+
       await createTopic({
         content: postContent,
         attachment: selectedImage,

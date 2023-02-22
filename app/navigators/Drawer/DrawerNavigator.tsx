@@ -11,6 +11,7 @@ import { DrawerIconButton } from "./DrawerIconButton"
 import { DrawerOptions } from "./DrawerOptions"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { AppStackParamList } from "../AppNavigator"
+import { $flexRow } from "../../screens/styles"
 
 export function DrawerNavigator() {
   const [open, setOpen] = useState(false)
@@ -40,6 +41,12 @@ export function DrawerNavigator() {
   const handleSearchPress = () => {
     appNavigaion.navigate("Search")
   }
+
+  const handleChatPress = () => {
+    appNavigaion.navigate("AllChats")
+  }
+
+
 
   return (
     <DrawerLayout
@@ -78,11 +85,18 @@ export function DrawerNavigator() {
         contentContainerStyle={$screenContainer}
       >
         <View style={$headerContainer}>
-          <DrawerIconButton onPress={toggleDrawer} {...{ open, progress }} />
+          <View style={{ position: 'absolute', left: 0 }}>
+            <DrawerIconButton onPress={toggleDrawer} {...{ open, progress }} />
+          </View>
           <Icon icon="appLogo" size={45} />
-          <Pressable style={$searchContainer} onPress={handleSearchPress}>
-            <Icon icon="search" size={24} />
-          </Pressable>
+          <View style={[$flexRow, { position: 'absolute', right: 10 }]}>
+            <Pressable style={$searchContainer} onPress={handleChatPress}>
+              <Icon icon="chatMessage" size={24} />
+            </Pressable>
+            <Pressable style={$searchContainer} onPress={handleSearchPress}>
+              <Icon icon="search" size={24} />
+            </Pressable>
+          </View>
         </View>
         <TabNavigator />
       </Screen>
@@ -92,7 +106,7 @@ export function DrawerNavigator() {
 
 const $searchContainer: ViewStyle = {
   height: 56,
-  width: 56,
+  width: 40,
   alignItems: "center",
   justifyContent: "center",
   paddingLeft: 2,
@@ -100,7 +114,7 @@ const $searchContainer: ViewStyle = {
 
 const $headerContainer: ViewStyle = {
   flexDirection: "row",
-  justifyContent: "space-between",
+  justifyContent: "center",
   width: "100%",
   paddingHorizontal: 4,
   height: 56,

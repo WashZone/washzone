@@ -84,7 +84,6 @@ const MoreDetails = ({ classified }: { classified: any }) => {
 
 const BottomActions = ({ classified }: { classified: any }) => {
   const { interactWithSaveOnClassified } = useHooks()
-  console.log(classified)
   const [isSaving, setSaving] = useState(false)
 
   const bottomOptions: Array<ActionProps> = [
@@ -142,7 +141,6 @@ const BottomActions = ({ classified }: { classified: any }) => {
 
 export const ClassifiedsDetails: FC<ClassifiedsTabProps<"ClassifiedsDetails">> = observer(
   function ClassifiedsDetails(props) {
-    console.log("classified", props.route.params)
     const classified = props.route.params.classified
     const navigation = useNavigation()
     const [classifiedDetails, setClassifiedDetails] = useState<any>(classified)
@@ -153,16 +151,16 @@ export const ClassifiedsDetails: FC<ClassifiedsTabProps<"ClassifiedsDetails">> =
     } = useStores()
 
     const handleStringTypeClassified = async () => {
-      console.log("RUNNING")
+   
       setLoading(true)
       if (typeof classified === "string") {
         const res = await mutateGetClassifiedById({ classifiedId: classified })
-        console.log("RES CLASSFIED", res)
+ 
         setClassifiedDetails(res.getClassifiedById?.length === 1 && res.getClassifiedById[0])
         setLoading(false)
       } else {
         setClassifiedDetails(classified)
-        console.log("RES CLASSFIED", classified)
+
         setLoading(false)
       }
     }

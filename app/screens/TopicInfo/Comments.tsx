@@ -7,7 +7,6 @@ import { fromNow } from "../../utils/agoFromNow"
 import { formatName } from "../../utils/formatName"
 
 export const CommentComponent = ({ comment }: { comment: any }) => {
-  console.log("CommentComponent", comment)
   return (
     <View style={$commentContainer}>
       <FastImage

@@ -147,6 +147,8 @@ export const iconRegistry = {
   arrowDown: require("../../assets/icons/arrowDown.png"),
   plus: require("../../assets/icons/plus.png"),
   uploadCloud: require("../../assets/icons/upload_cloud.png"),
+  chatMessage: require("../../assets/icons/chat-message.png"),
+  addMessage: require("../../assets/icons/add-message.png"),
 }
 
 const $imageStyle: ImageStyle = {

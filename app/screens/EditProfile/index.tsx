@@ -28,7 +28,6 @@ export const EditProfile: FC<AppStackScreenProps<"EditProfile">> = function Edit
 
   const onEditPP = async () => {
     const res = await MediaPicker()
-    console.log(res)
     if (res?.uri) {
       setPicture(res?.uri)
     }

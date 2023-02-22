@@ -33,19 +33,19 @@ export const UploadVideo: FC<AppStackScreenProps<"UploadVideo">> = function Uplo
   const { uploadVideo, refreshVideos } = useHooks()
 
   const syncAllPlaylists = async () => {
-    console.log("SYNCING PLAYLISTS")
+
     const allPlaylistDropDownData = []
     const res = await queryGetVideoPlaylistByUserId(
       { userId: _id },
       { fetchPolicy: "network-only" },
     )
-    console.log("ALL PLAYLIST", res.getVideoPlaylistByUserId?.data)
+
     if (res.getVideoPlaylistByUserId?.data) {
       res.getVideoPlaylistByUserId?.data.map((playlist) =>
         allPlaylistDropDownData.push({ label: playlist?.playListName, value: playlist?._id }),
       )
     }
-    console.log("SYNCING PLAYLISTS to :", allPlaylistDropDownData)
+
     setAllPlaylist(allPlaylistDropDownData)
   }
 

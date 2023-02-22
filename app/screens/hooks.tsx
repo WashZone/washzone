@@ -80,9 +80,8 @@ export function useHooks() {
   } = useStores()
 
   const loadStories = async () => {
-    console.log("RELOADING STORIES")
+
     const res = await queryGetAllStory(undefined, { fetchPolicy: "network-only" })
-    console.log("GOT STOREIES", res.getAllStory?.data.length)
     setStories(res.getAllStory?.data || [])
   }
 
@@ -95,48 +94,46 @@ export function useHooks() {
   }
 
   const loadMorePosts = async () => {
-    console.log("lOADING MORE")
-    console.log("FEEDPOSTSLENGTH", feedTopics.length)
+ 
     const res = await queryGetAllTopicByPageNumber(
       { pageNumber: parseInt((feedTopics.length / 10).toFixed(0)) },
       { fetchPolicy: "network-only" },
     )
-    console.log(res)
+    
     const morePosts = res.getAllTopicByPageNumber?.data
-    console.log("MOREPOSTS", morePosts.length)
+   
     addtoFeedTopics(morePosts)
   }
 
   const refreshPosts = async () => {
-    console.log("REFRESHING")
+  
     const res = await queryGetAllTopicByPageNumber(
       { pageNumber: 1 },
       { fetchPolicy: "network-only" },
     )
-    console.log("refreshd", res.getAllTopicByPageNumber?.data)
+
     setFeedTopics(res.getAllTopicByPageNumber?.data)
     syncInteractedVideosAndTopics()
   }
 
   const loadMoreClassified = async () => {
-    console.log("lOADING MORE")
-    console.log("FEEDPOSTSLENGTH", classifieds?.length)
+
     const res = await queryGetAllClassifiedFeed(
       { pageNumber: parseInt((classifieds.length / 10).toFixed(0)) },
       { fetchPolicy: "no-cache" },
     )
-    console.log(res)
+
     const moreClassified = res.getAllClassifiedFeed?.data
-    console.log("moreClassified", moreClassified.length)
+    
     if (res.getAllClassifiedFeed.totalCount > classifieds?.length) {
       addToClassfieds(moreClassified)
     }
   }
 
   const refreshClassifieds = async () => {
-    console.log("REFRESHING", classifieds.length)
+   
     const res = await queryGetAllClassifiedFeed({ pageNumber: 0 }, { fetchPolicy: "no-cache" })
-    console.log("refreshd", res.getAllClassifiedFeed.totalCount)
+ 
     setClassifieds(res.getAllClassifiedFeed?.data)
   }
 
@@ -145,7 +142,7 @@ export function useHooks() {
       { pageNumber: parseInt((topics.length / 10).toFixed(0)) },
       { fetchPolicy: "no-cache" },
     )
-    console.log(res.getAllTopicByPageNumber?.data)
+
     const moreTopics = res.getAllTopicByPageNumber?.data
     if (res.getAllTopicByPageNumber.totalCount > topics?.length) {
       addToTopics(moreTopics)
@@ -154,24 +151,20 @@ export function useHooks() {
 
   const refreshTopics = async () => {
     const res = await queryGetAllTopicByPageNumber({ pageNumber: 1 }, { fetchPolicy: "no-cache" })
-    console.log("refreshd", res.getAllTopicByPageNumber?.data)
+
     await syncInteractedVideosAndTopics()
     setTopics(res.getAllTopicByPageNumber?.data)
     await syncInteractedVideosAndTopics()
   }
 
   const postComment = async (comment: string, topicId: string) => {
-    console.log(userStore._id)
-    console.log(topicId)
+
     const res = await mutateCommentOnTopic({ userId: userStore._id, comment, topicId })
-    console.log(res)
+
   }
 
   const getCommentsOnPost = async (topicId: string) => {
-    console.log(userStore._id)
-    console.log("TOPICIDDDD", topicId)
     const res = await queryGetCommentsByTopicId({ topicId }, { fetchPolicy: "network-only" })
-    console.log("TOPIC COMMENTS", JSON.stringify(res.getCommentsByTopicId[0].comments))
 
     return res.getCommentsByTopicId.length === 1 && res.getCommentsByTopicId[0]?.comments
   }
@@ -183,7 +176,6 @@ export function useHooks() {
       topicContent: content,
       userId: userStore._id,
     })
-    console.log("TOPIC CREATED", res)
     await refreshTopics()
     await loadStories()
     // setTimeout(loadStories, 1000)
@@ -206,11 +198,11 @@ export function useHooks() {
       name: firstName + " " + lastName,
       picture,
     })
-    console.log(res)
+
   }
 
   const syncSavedInteractionsHook = async () => {
-    console.log("USERIDDD=>>", userStore?._id)
+  
     const res = await queryGetAllSavedByUserId(
       { userId: userStore?._id },
       { fetchPolicy: "no-cache" },
@@ -234,9 +226,6 @@ export function useHooks() {
         )
       }
     })
-    console.log("SAVEDVIDEOS", savedVideoIds)
-    console.log("savedClassifiedIds", savedClassifiedIds)
-
     syncSavedInteractions({
       savedClassifieds: [...savedClassifiedIds],
       savedVideos: [...savedVideoIds],
@@ -244,14 +233,12 @@ export function useHooks() {
   }
 
   const interactWithSaveOnClassified = async (classifiedFeedId: string) => {
-    console.log("getInteractionOnClassified", getInteractionOnClassified(classifiedFeedId))
     try {
       if (getInteractionOnClassified(classifiedFeedId) === Interaction.notSaved) {
         const res = await mutateSaveLikedClassifiedFeed({
           classifiedFeedId,
           userId: userStore._id,
         })
-        console.log("saveClassified", res)
         addToSavedClassified(classifiedFeedId)
         Toast.show(toastMessages.classifiedSavedSuccessfully)
       } else {
@@ -264,20 +251,16 @@ export function useHooks() {
       }
     } catch (err) {
       Toast.show(toastMessages.somethingWentWrong)
-
-      console.log(err)
     }
   }
 
   const interactWithSaveOnVideo = async (videoId: string) => {
-    console.log("getSavedInteractionOnVideo", getSavedInteractionOnVideo(videoId))
     try {
       if (getInteractionOnClassified(videoId) === Interaction.notSaved) {
         const res = await mutateSaveLikedVideo({
           videoId,
           userId: userStore._id,
         })
-        console.log("saveClassified", res)
         addToSavedVideos(videoId)
         Toast.show(toastMessages.videoSavedSuccessfully)
       } else {
@@ -285,13 +268,11 @@ export function useHooks() {
           videosavedId: videoId,
           userId: userStore._id,
         })
-        console.log("UNSAVING", res)
         removeFromSavedVideos(videoId)
         Toast.show(toastMessages.videoUnsavedSuccessfully)
       }
     } catch (err) {
       Toast.show(toastMessages.somethingWentWrong)
-      console.log(err)
     }
   }
 
@@ -301,7 +282,6 @@ export function useHooks() {
       userId: store.userStore._id,
       videoId,
     })
-    console.log(res)
   }
 
   const refreshSavedClassifieds = async () => {
@@ -313,7 +293,6 @@ export function useHooks() {
       { fetchPolicy: "no-cache" },
     )
     setSavedClassifieds(res.getAllSavedByUserIdpageNumber?.data)
-    console.log("saveClassified", JSON.stringify(res.getAllSavedByUserIdpageNumber?.data))
   }
 
   const getClassified = async (classifiedId: string) => {
@@ -326,7 +305,7 @@ export function useHooks() {
   const refreshVideos = async () => {
     const res = await queryGetUserChannel(undefined, { fetchPolicy: "no-cache" })
     setVideos(res.getUserChannel)
-    console.log("VIDEOS", res)
+
     await syncInteractedVideosAndTopics()
     return res.getUserChannel
   }
@@ -336,7 +315,7 @@ export function useHooks() {
       userId,
       pageNumber: 1,
     })
-    console.log("USERTOPICAS", res.getTopicByUserId)
+
     return res.getTopicByUserId?.data
   }
 
@@ -345,17 +324,17 @@ export function useHooks() {
       userId,
       pageNumber,
     })
-    console.log(res.getTopicByUserId)
+
     return res.getTopicByUserId
   }
 
   const getUserVideos = async (userId: string) => {
-    console.log("USERID< VIDEOS", userId)
+
 
     const res = await mutateGetUploadVideoByUserId({
       userId,
     })
-    console.log(res.getUploadVideoByUserId)
+
     return res.getUploadVideoByUserId
   }
 
@@ -363,7 +342,7 @@ export function useHooks() {
     const res = await mutateGetClassifiedByUserId({
       userId,
     })
-    console.log(res.getClassifiedByUserId)
+
     return res.getClassifiedByUserId
   }
 
@@ -374,7 +353,7 @@ export function useHooks() {
       },
       { fetchPolicy: "network-only" },
     )
-    console.log(res.getVideoPlaylistByPlaylistId)
+
     return (
       res.getVideoPlaylistByPlaylistId?.data?.length > 0 &&
       res.getVideoPlaylistByPlaylistId?.data[0]
@@ -382,9 +361,6 @@ export function useHooks() {
   }
 
   const interactWithVideo = async (videoId: string, buttonType: "like" | "dislike") => {
-    console.log("VIDEOID IN HOOK", videoId)
-    console.log("INPUT INTERACTION", getInteractionOnVideo(videoId))
-
     const getInputInteraction = () => {
       if (buttonType === "like") {
         if (getInteractionOnVideo(videoId) === Interaction.like) return Interaction.null
@@ -395,7 +371,7 @@ export function useHooks() {
       }
     }
     const inputInteraction = getInputInteraction()
-    console.log("INPUT INTERACTION", inputInteraction)
+  
     try {
       await mutateLikeDislikeVideo({
         videoId,
@@ -403,22 +379,22 @@ export function useHooks() {
         status: inputInteraction,
       })
       if (inputInteraction === Interaction.like) {
-        console.log("LIKING")
+   
         addToLikedVideos(videoId)
         removefromDislikedVideos(videoId)
       }
       if (inputInteraction === Interaction.dislike) {
-        console.log("DIS-LIKING")
+   
         addToDislikedVideos(videoId)
         removefromLikedVideos(videoId)
       }
       if (inputInteraction === Interaction.null) {
-        console.log("SETTING TO NULL")
+ 
         removefromDislikedVideos(videoId)
         removefromLikedVideos(videoId)
       }
     } catch (err) {
-      console.log(err)
+
     }
   }
   const getInputInteraction = (buttonType, currentInteraction) => {
@@ -432,14 +408,8 @@ export function useHooks() {
   }
 
   const interactWithTopic = async (topicId: string, buttonType: "like" | "dislike") => {
-    console.log("topicId IN HOOK", topicId)
-    console.log("USER ID", userStore._id)
     const currentInteraction = getInteractionOnTopic(topicId)
-    console.log("Current INTERACTION", currentInteraction)
-
-    console.log("GETTING INPUT INTERACTION")
     const inputInteraction = getInputInteraction(buttonType, currentInteraction)
-    console.log("INPUT INTERACTION inputInteraction", inputInteraction)
     try {
       await mutateLikeDislikeTopic({
         topicId,
@@ -447,22 +417,18 @@ export function useHooks() {
         status: inputInteraction,
       })
       if (inputInteraction === Interaction.like) {
-        console.log("LIKING")
         addToLikedTopics(topicId)
         removefromDislikedTopics(topicId)
       }
       if (inputInteraction === Interaction.dislike) {
-        console.log("DIS-LIKING")
         addToDislikedTopics(topicId)
         removefromLikedTopics(topicId)
       }
       if (inputInteraction === Interaction.null) {
-        console.log("SETTING TO NULL")
         removefromDislikedTopics(topicId)
         removefromLikedTopics(topicId)
       }
     } catch (err) {
-      console.log(err)
     }
   }
 
@@ -525,7 +491,6 @@ export function useHooks() {
       body = { ...body, vedioPlaylistId }
     }
     const res = await mutateUploadVideoByUser(body)
-    console.log("VIDEO UPLOAD STATUS : ", res.uploadVideoByUser)
     setTimeout(async () => await loadStories(), 1000)
   }
 
@@ -539,7 +504,6 @@ export function useHooks() {
       userId: userStore._id,
       condition,
     })
-    console.log("CREATE TOPIC", res)
     setTimeout(async () => await loadStories(), 1000)
   }
 
@@ -550,43 +514,35 @@ export function useHooks() {
         userId: userStore._id,
         videoUpload: [],
       })
-      console.log("createEmptyPlaylist", res)
       Toast.show(toastMessages.createdSuccessfully)
     } catch (err) {
-      console.log("ERROR", err)
       Toast.show(toastMessages.somethingWentWrong)
     }
   }
 
   const storeDeviceInfo = async () => {
     const deviceId = await getUniqueId()
-    console.log("RES---deviceId", deviceId)
     try {
       const res = await mutateStoreDeviceId({
         userId: userStore._id,
         deviceId,
       })
-      console.log("mutateStoreBlockedUser", res)
     } catch (err) {
-      console.log("ERROR", err)
     }
   }
 
   const isUserBlocked = async () => {
     const deviceId = await getUniqueId()
-    console.log("RES---deviceId", deviceId)
     try {
       const res = await mutateGetBlockedUser({
         userId: userStore._id,
         deviceId,
       })
-      console.log("mutateGetBlockedUser", res.getBlockedUser?.status)
       setBlocked(res.getBlockedUser?.status)
       if (res.getBlockedUser?.status) {
         setAuthToken(undefined)
       }
     } catch (err) {
-      console.log("ERROR", err)
     }
   }
 
@@ -597,7 +553,6 @@ export function useHooks() {
         ratinguserId: userStore._id,
         ratingStar: rating,
       })
-      console.log("RATING USER", userId, " - ", res.createUserRating)
       return true
     } catch (err) {
       return false
@@ -606,7 +561,6 @@ export function useHooks() {
 
   const getRatingOnUser = async (userId: string) => {
     const res = await queryGetratingOnUserId({ userId }, { fetchPolicy: "no-cache" })
-    console.log("GOT USER RATING ON ", userId, " to be ", res.getratingOnUserId)
     return res.getratingOnUserId?.data?.length > 0 ? res.getratingOnUserId?.data[0].ratingStar : 0
   }
 
@@ -657,7 +611,6 @@ export function useHooks() {
   const getLegalities = async () => {
     try {
       const res = await queryGetAllLegalitiesData()
-      console.log("queryGetAllLegalitiesData", res.getAllLegalitiesData)
       return res.getAllLegalitiesData.length > 0
         ? res.getAllLegalitiesData[0].LegalitiesData
         : undefined

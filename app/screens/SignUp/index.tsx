@@ -44,8 +44,6 @@ export const SignupScreen: FC<SignupProps> = observer(function LoginScreen(_prop
     api: { mutateCreateUser },
   } = useStores()
 
-  console.log("Actual", JSON.stringify(useStores().api))
-
   async function login() {
     setIsSubmitted(true)
     setAttemptsCount(attemptsCount + 1)
