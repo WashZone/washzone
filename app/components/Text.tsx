@@ -1,6 +1,12 @@
 import i18n from "i18n-js"
 import React from "react"
-import { StyleProp, Text as RNText, TextProps as RNTextProps, TextStyle } from "react-native"
+import {
+  ColorValue,
+  StyleProp,
+  Text as RNText,
+  TextProps as RNTextProps,
+  TextStyle,
+} from "react-native"
 import { isRTL, translate, TxKeyPath } from "../i18n"
 import { colors, typography } from "../theme"
 
@@ -42,6 +48,10 @@ export interface TextProps extends RNTextProps {
    * Children components.
    */
   children?: React.ReactNode
+  /**
+   * Text Color.
+   */
+  color?: ColorValue
 }
 
 /**
@@ -51,7 +61,17 @@ export interface TextProps extends RNTextProps {
  * - [Documentation and Examples](https://github.com/infinitered/ignite/blob/master/docs/Components-Text.md)
  */
 export function Text(props: TextProps) {
-  const { weight, size, tx, txOptions, text, children, style: $styleOverride, ...rest } = props
+  const {
+    weight,
+    size,
+    tx,
+    txOptions,
+    text,
+    children,
+    style: $styleOverride,
+    color,
+    ...rest
+  } = props
 
   const i18nText = tx && translate(tx, txOptions)
   const content = i18nText || text || children
@@ -63,6 +83,7 @@ export function Text(props: TextProps) {
     $fontWeightStyles[weight],
     $sizeStyles[size],
     $styleOverride,
+    color && { color: color },
   ]
 
   return (
@@ -82,9 +103,12 @@ const $sizeStyles = {
   xxs: { fontSize: 12, lineHeight: 18 } as TextStyle,
 }
 
-const $fontWeightStyles = Object.entries(typography.primary).reduce((acc, [weight, fontFamily]) => {
-  return { ...acc, [weight]: { fontFamily } }
-}, {}) as Record<Weights, TextStyle>
+export const $fontWeightStyles = Object.entries(typography.primary).reduce(
+  (acc, [weight, fontFamily]) => {
+    return { ...acc, [weight]: { fontFamily } }
+  },
+  {},
+) as Record<Weights, TextStyle>
 
 const $baseStyle: StyleProp<TextStyle> = [
   $sizeStyles.sm,

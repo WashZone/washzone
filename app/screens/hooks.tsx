@@ -80,7 +80,6 @@ export function useHooks() {
   } = useStores()
 
   const loadStories = async () => {
-
     const res = await queryGetAllStory(undefined, { fetchPolicy: "network-only" })
     setStories(res.getAllStory?.data || [])
   }
@@ -94,19 +93,17 @@ export function useHooks() {
   }
 
   const loadMorePosts = async () => {
- 
     const res = await queryGetAllTopicByPageNumber(
       { pageNumber: parseInt((feedTopics.length / 10).toFixed(0)) },
       { fetchPolicy: "network-only" },
     )
-    
+
     const morePosts = res.getAllTopicByPageNumber?.data
-   
+
     addtoFeedTopics(morePosts)
   }
 
   const refreshPosts = async () => {
-  
     const res = await queryGetAllTopicByPageNumber(
       { pageNumber: 1 },
       { fetchPolicy: "network-only" },
@@ -117,23 +114,21 @@ export function useHooks() {
   }
 
   const loadMoreClassified = async () => {
-
     const res = await queryGetAllClassifiedFeed(
       { pageNumber: parseInt((classifieds.length / 10).toFixed(0)) },
       { fetchPolicy: "no-cache" },
     )
 
     const moreClassified = res.getAllClassifiedFeed?.data
-    
+
     if (res.getAllClassifiedFeed.totalCount > classifieds?.length) {
       addToClassfieds(moreClassified)
     }
   }
 
   const refreshClassifieds = async () => {
-   
     const res = await queryGetAllClassifiedFeed({ pageNumber: 0 }, { fetchPolicy: "no-cache" })
- 
+
     setClassifieds(res.getAllClassifiedFeed?.data)
   }
 
@@ -158,9 +153,7 @@ export function useHooks() {
   }
 
   const postComment = async (comment: string, topicId: string) => {
-
     const res = await mutateCommentOnTopic({ userId: userStore._id, comment, topicId })
-
   }
 
   const getCommentsOnPost = async (topicId: string) => {
@@ -198,11 +191,9 @@ export function useHooks() {
       name: firstName + " " + lastName,
       picture,
     })
-
   }
 
   const syncSavedInteractionsHook = async () => {
-  
     const res = await queryGetAllSavedByUserId(
       { userId: userStore?._id },
       { fetchPolicy: "no-cache" },
@@ -329,8 +320,6 @@ export function useHooks() {
   }
 
   const getUserVideos = async (userId: string) => {
-
-
     const res = await mutateGetUploadVideoByUserId({
       userId,
     })
@@ -371,7 +360,7 @@ export function useHooks() {
       }
     }
     const inputInteraction = getInputInteraction()
-  
+
     try {
       await mutateLikeDislikeVideo({
         videoId,
@@ -379,23 +368,18 @@ export function useHooks() {
         status: inputInteraction,
       })
       if (inputInteraction === Interaction.like) {
-   
         addToLikedVideos(videoId)
         removefromDislikedVideos(videoId)
       }
       if (inputInteraction === Interaction.dislike) {
-   
         addToDislikedVideos(videoId)
         removefromLikedVideos(videoId)
       }
       if (inputInteraction === Interaction.null) {
- 
         removefromDislikedVideos(videoId)
         removefromLikedVideos(videoId)
       }
-    } catch (err) {
-
-    }
+    } catch (err) {}
   }
   const getInputInteraction = (buttonType, currentInteraction) => {
     if (buttonType === "like") {
@@ -428,8 +412,7 @@ export function useHooks() {
         removefromDislikedTopics(topicId)
         removefromLikedTopics(topicId)
       }
-    } catch (err) {
-    }
+    } catch (err) {}
   }
 
   const syncInteractedVideosAndTopics = async () => {
@@ -527,8 +510,7 @@ export function useHooks() {
         userId: userStore._id,
         deviceId,
       })
-    } catch (err) {
-    }
+    } catch (err) {}
   }
 
   const isUserBlocked = async () => {
@@ -542,8 +524,7 @@ export function useHooks() {
       if (res.getBlockedUser?.status) {
         setAuthToken(undefined)
       }
-    } catch (err) {
-    }
+    } catch (err) {}
   }
 
   const rateUser = async (userId: string, rating: number) => {
@@ -608,6 +589,21 @@ export function useHooks() {
     }
   }
 
+  const searchUser = async (searchKey: string) => {
+    try {
+      console.log(searchKey)
+      const resUsers = await queryGetSearchedUser(
+        { searchKey, pageNumber: 1 },
+        { fetchPolicy: "no-cache" },
+      )
+      console.log("resUsers",resUsers)
+      return resUsers.getSearchedUser?.data || []
+    } catch (err) {
+      Toast.show(toastMessages.somethingWentWrong)
+      return []
+    }
+  }
+
   const getLegalities = async () => {
     try {
       const res = await queryGetAllLegalitiesData()
@@ -658,5 +654,6 @@ export function useHooks() {
     getRatingOnUser,
     rateUser,
     getLegalities,
+    searchUser
   }
 }

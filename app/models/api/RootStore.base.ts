@@ -33,10 +33,16 @@ import { SaveVideoModel, SaveVideoModelType } from "./SaveVideoModel"
 import { saveVideoModelPrimitives, SaveVideoModelSelector } from "./SaveVideoModel.base"
 import { StoryViewerUserModel, StoryViewerUserModelType } from "./StoryViewerUserModel"
 import { storyViewerUserModelPrimitives, StoryViewerUserModelSelector } from "./StoryViewerUserModel.base"
-import { FollowUserModel, FollowUserModelType } from "./FollowUserModel"
-import { followUserModelPrimitives, FollowUserModelSelector } from "./FollowUserModel.base"
 import { SaveClassifiedModel, SaveClassifiedModelType } from "./SaveClassifiedModel"
 import { saveClassifiedModelPrimitives, SaveClassifiedModelSelector } from "./SaveClassifiedModel.base"
+import { FollowUserModel, FollowUserModelType } from "./FollowUserModel"
+import { followUserModelPrimitives, FollowUserModelSelector } from "./FollowUserModel.base"
+import { RoomChatModel, RoomChatModelType } from "./RoomChatModel"
+import { roomChatModelPrimitives, RoomChatModelSelector } from "./RoomChatModel.base"
+import { UsersModel, UsersModelType } from "./UsersModel"
+import { usersModelPrimitives, UsersModelSelector } from "./UsersModel.base"
+import { UsersChatModel, UsersChatModelType } from "./UsersChatModel"
+import { usersChatModelPrimitives, UsersChatModelSelector } from "./UsersChatModel.base"
 
 
 
@@ -59,14 +65,6 @@ export type InputTopic = {
   likeviews?: (number | null)
   dislikeviews?: (number | null)
 }
-export type InputClassified = {
-  classifiedDetail?: (string | null)
-  attachmentType?: (string | null)
-  attachmentUrl?: (string | null)
-  prize?: (string | null)
-  title?: (string | null)
-  condition?: (string | null)
-}
 export type InputVideoUploadPlaylist = {
   VideoId?: (string | null)
 }
@@ -79,6 +77,17 @@ export type InputVideo = {
   status?: (string | null)
   likeviews?: (number | null)
   dislikeviews?: (number | null)
+}
+export type InputClassified = {
+  classifiedDetail?: (string | null)
+  attachmentType?: (string | null)
+  attachmentUrl?: (string | null)
+  prize?: (string | null)
+  title?: (string | null)
+  condition?: (string | null)
+}
+export type InputUsers = {
+  userId1?: (string | null)
 }
 /* The TypeScript type that explicits the refs to other models in order to prevent a circular refs issue */
 type Refs = {
@@ -93,13 +102,13 @@ export enum RootStoreBaseQueries {
 queryHello="queryHello",
 queryGetUserByEmail="queryGetUserByEmail",
 queryGetAllUsers="queryGetAllUsers",
+queryGetAdmin="queryGetAdmin",
 queryGetAllUsersAdmin="queryGetAllUsersAdmin",
 queryGetAllUsersAdminpage="queryGetAllUsersAdminpage",
 queryGetUserBysocialId="queryGetUserBysocialId",
 queryGetchannelUser="queryGetchannelUser",
 queryGetSearchedUser="queryGetSearchedUser",
 queryGetAllLegalitiesData="queryGetAllLegalitiesData",
-queryGetByvideoId="queryGetByvideoId",
 queryGetAllTopicByPageNumber="queryGetAllTopicByPageNumber",
 queryGetAllTopics="queryGetAllTopics",
 queryGetTopicByUserId="queryGetTopicByUserId",
@@ -114,11 +123,11 @@ queryGetStoryByUserId="queryGetStoryByUserId",
 queryGetStoryByStoryId="queryGetStoryByStoryId",
 queryGetAllStory="queryGetAllStory",
 queryGetAllStoryByPage="queryGetAllStoryByPage",
-queryGetAllComments="queryGetAllComments",
-queryGetAllComment="queryGetAllComment",
-queryGetCommentsByUserId="queryGetCommentsByUserId",
-queryGetfollowingByUserId="queryGetfollowingByUserId",
-queryGetfollowerByFollowId="queryGetfollowerByFollowId",
+queryGetAllVideo="queryGetAllVideo",
+queryGetAllUploadedVideo="queryGetAllUploadedVideo",
+queryGetUploadedVideoByUserIdPage="queryGetUploadedVideoByUserIdPage",
+queryGetUserChannel="queryGetUserChannel",
+queryGetSearchedItem="queryGetSearchedItem",
 queryGetAllClassifiedFeedss="queryGetAllClassifiedFeedss",
 queryGetAllClassifiedFeed="queryGetAllClassifiedFeed",
 queryGetClassifiedByUserIdPage="queryGetClassifiedByUserIdPage",
@@ -130,17 +139,18 @@ queryGetAllSavedClassified="queryGetAllSavedClassified",
 queryGetAllSavedByUserIdpageNumber="queryGetAllSavedByUserIdpageNumber",
 queryGetAllSavedByUserId="queryGetAllSavedByUserId",
 queryGetAllSavedByType="queryGetAllSavedByType",
-queryGetAllVideo="queryGetAllVideo",
-queryGetAllUploadedVideo="queryGetAllUploadedVideo",
-queryGetUploadedVideoByUserIdPage="queryGetUploadedVideoByUserIdPage",
-queryGetUserChannel="queryGetUserChannel",
-queryGetSearchedItem="queryGetSearchedItem",
+queryGetByvideoId="queryGetByvideoId",
 queryGetlikesVideoByUserId="queryGetlikesVideoByUserId",
 queryGetLikesonVideobyuser="queryGetLikesonVideobyuser",
 queryGetuserLikesonVideo="queryGetuserLikesonVideo",
 queryGetAllPlaylistVideo="queryGetAllPlaylistVideo",
 queryGetVideoPlaylistByUserId="queryGetVideoPlaylistByUserId",
 queryGetVideoPlaylistByPlaylistId="queryGetVideoPlaylistByPlaylistId",
+queryGetAllComments="queryGetAllComments",
+queryGetAllComment="queryGetAllComment",
+queryGetCommentsByUserId="queryGetCommentsByUserId",
+queryGetfollowingByUserId="queryGetfollowingByUserId",
+queryGetfollowerByFollowId="queryGetfollowerByFollowId",
 queryGetratingOnUserId="queryGetratingOnUserId",
 queryCheckUserRating="queryCheckUserRating",
 queryGetratingByratingId="queryGetratingByratingId"
@@ -162,9 +172,6 @@ mutateUpdateDeleteStatus="mutateUpdateDeleteStatus",
 mutateStoreBlockedUser="mutateStoreBlockedUser",
 mutateStoreLegalities="mutateStoreLegalities",
 mutateUpdateLegalInfo="mutateUpdateLegalInfo",
-mutateSaveLikedVideo="mutateSaveLikedVideo",
-mutateUpdateDeletesavedVideo="mutateUpdateDeletesavedVideo",
-mutateDeleteVideo="mutateDeleteVideo",
 mutateCreateUserTopic="mutateCreateUserTopic",
 mutateUploadFile="mutateUploadFile",
 mutateGetTopicByUser="mutateGetTopicByUser",
@@ -174,17 +181,6 @@ mutateUpdateLikeViews="mutateUpdateLikeViews",
 mutateUpdateUserTopic="mutateUpdateUserTopic",
 mutateLikeDislikeTopic="mutateLikeDislikeTopic",
 mutateCreateStory="mutateCreateStory",
-mutateCommentOnTopic="mutateCommentOnTopic",
-mutateDeleteCommentbyCommentId="mutateDeleteCommentbyCommentId",
-mutateFollowById="mutateFollowById",
-mutateCreateClassifiedDetail="mutateCreateClassifiedDetail",
-mutateGetClassifiedByUserId="mutateGetClassifiedByUserId",
-mutateGetClassifiedById="mutateGetClassifiedById",
-mutateUpdateDeleteClassifiedId="mutateUpdateDeleteClassifiedId",
-mutateUpdateUserClassified="mutateUpdateUserClassified",
-mutateSaveLikedClassifiedFeed="mutateSaveLikedClassifiedFeed",
-mutateUpdateDeletesavedclassified="mutateUpdateDeletesavedclassified",
-mutateDeleteClassfied="mutateDeleteClassfied",
 mutateUploadVideoByUser="mutateUploadVideoByUser",
 mutateGetUploadVideoByUserId="mutateGetUploadVideoByUserId",
 mutateGetUploadVideoByVideoId="mutateGetUploadVideoByVideoId",
@@ -193,12 +189,29 @@ mutateUpdateDeleteVideoId="mutateUpdateDeleteVideoId",
 mutateUpdateVideoViews="mutateUpdateVideoViews",
 mutateUpdatePlaylistIdVideoId="mutateUpdatePlaylistIdVideoId",
 mutateUpdateUserVideo="mutateUpdateUserVideo",
+mutateCreateClassifiedDetail="mutateCreateClassifiedDetail",
+mutateGetClassifiedByUserId="mutateGetClassifiedByUserId",
+mutateGetClassifiedById="mutateGetClassifiedById",
+mutateUpdateDeleteClassifiedId="mutateUpdateDeleteClassifiedId",
+mutateUpdateUserClassified="mutateUpdateUserClassified",
+mutateSaveLikedClassifiedFeed="mutateSaveLikedClassifiedFeed",
+mutateUpdateDeletesavedclassified="mutateUpdateDeletesavedclassified",
+mutateDeleteClassfied="mutateDeleteClassfied",
+mutateSaveLikedVideo="mutateSaveLikedVideo",
+mutateUpdateDeletesavedVideo="mutateUpdateDeletesavedVideo",
+mutateDeleteVideo="mutateDeleteVideo",
 mutateLikeDislikeVideo="mutateLikeDislikeVideo",
 mutateUploadVideoPlaylist="mutateUploadVideoPlaylist",
 mutateUpdateVideoPlaylist="mutateUpdateVideoPlaylist",
 mutateUpdateVideoPlaylistbyVideoId="mutateUpdateVideoPlaylistbyVideoId",
+mutateCommentOnTopic="mutateCommentOnTopic",
+mutateDeleteCommentbyCommentId="mutateDeleteCommentbyCommentId",
+mutateFollowById="mutateFollowById",
 mutateCreateUserRating="mutateCreateUserRating",
-mutateUpdateRating="mutateUpdateRating"
+mutateUpdateRating="mutateUpdateRating",
+mutateCreateChatRoom="mutateCreateChatRoom",
+mutateCreateUserMessage="mutateCreateUserMessage",
+mutateGetchatByUserId="mutateGetchatByUserId"
 }
 
 /**
@@ -206,7 +219,7 @@ mutateUpdateRating="mutateUpdateRating"
 */
 export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
   .named("RootStore")
-  .extend(configureStoreMixin([['UserRating', () => UserRatingModel], ['classifiedFeed', () => ClassifiedFeedModel], ['CommentsDetail', () => CommentsDetailModel], ['likeTopics', () => LikeTopicsModel], ['TopicDetail', () => TopicDetailModel], ['likeVideos', () => LikeVideosModel], ['VideoPlaylist', () => VideoPlaylistModel], ['VideoUploadPlaylist', () => VideoUploadPlaylistModel], ['VideoUpload', () => VideoUploadModel], ['User', () => UserModel], ['SigninUser', () => SigninUserModel], ['Legalities', () => LegalitiesModel], ['saveVideo', () => SaveVideoModel], ['storyViewerUser', () => StoryViewerUserModel], ['followUser', () => FollowUserModel], ['saveClassified', () => SaveClassifiedModel]], [], "js"))
+  .extend(configureStoreMixin([['UserRating', () => UserRatingModel], ['classifiedFeed', () => ClassifiedFeedModel], ['CommentsDetail', () => CommentsDetailModel], ['likeTopics', () => LikeTopicsModel], ['TopicDetail', () => TopicDetailModel], ['likeVideos', () => LikeVideosModel], ['VideoPlaylist', () => VideoPlaylistModel], ['VideoUploadPlaylist', () => VideoUploadPlaylistModel], ['VideoUpload', () => VideoUploadModel], ['User', () => UserModel], ['SigninUser', () => SigninUserModel], ['Legalities', () => LegalitiesModel], ['saveVideo', () => SaveVideoModel], ['storyViewerUser', () => StoryViewerUserModel], ['saveClassified', () => SaveClassifiedModel], ['followUser', () => FollowUserModel], ['roomChat', () => RoomChatModel], ['Users', () => UsersModel], ['usersChat', () => UsersChatModel]], [], "js"))
   .props({
 
   })
@@ -221,6 +234,9 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     },
     queryGetAllUsers(variables?: {  }, options: QueryOptions = {}) {
       return self.query<{ getAllUsers: any }>(`query getAllUsers { getAllUsers }`, variables, options)
+    },
+    queryGetAdmin(variables?: {  }, options: QueryOptions = {}) {
+      return self.query<{ getAdmin: any }>(`query getAdmin { getAdmin }`, variables, options)
     },
     queryGetAllUsersAdmin(variables?: {  }, options: QueryOptions = {}) {
       return self.query<{ getAllUsersAdmin: any }>(`query getAllUsersAdmin { getAllUsersAdmin }`, variables, options)
@@ -239,9 +255,6 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     },
     queryGetAllLegalitiesData(variables?: {  }, options: QueryOptions = {}) {
       return self.query<{ getAllLegalitiesData: any }>(`query getAllLegalitiesData { getAllLegalitiesData }`, variables, options)
-    },
-    queryGetByvideoId(variables: { videoId: string }, options: QueryOptions = {}) {
-      return self.query<{ getByvideoId: any }>(`query getByvideoId($videoId: String!) { getByvideoId(videoId: $videoId) }`, variables, options)
     },
     queryGetAllTopicByPageNumber(variables: { pageNumber: number }, options: QueryOptions = {}) {
       return self.query<{ getAllTopicByPageNumber: any }>(`query getAllTopicByPageNumber($pageNumber: Float!) { getAllTopicByPageNumber(pageNumber: $pageNumber) }`, variables, options)
@@ -285,20 +298,20 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     queryGetAllStoryByPage(variables: { pageNumber: number }, options: QueryOptions = {}) {
       return self.query<{ getAllStoryByPage: any }>(`query getAllStoryByPage($pageNumber: Float!) { getAllStoryByPage(pageNumber: $pageNumber) }`, variables, options)
     },
-    queryGetAllComments(variables: { pageNumber: number }, options: QueryOptions = {}) {
-      return self.query<{ getAllComments: any }>(`query getAllComments($pageNumber: Float!) { getAllComments(pageNumber: $pageNumber) }`, variables, options)
+    queryGetAllVideo(variables?: {  }, options: QueryOptions = {}) {
+      return self.query<{ getAllVideo: any }>(`query getAllVideo { getAllVideo }`, variables, options)
     },
-    queryGetAllComment(variables?: {  }, options: QueryOptions = {}) {
-      return self.query<{ getAllComment: any }>(`query getAllComment { getAllComment }`, variables, options)
+    queryGetAllUploadedVideo(variables: { pageNumber: number }, options: QueryOptions = {}) {
+      return self.query<{ getAllUploadedVideo: any }>(`query getAllUploadedVideo($pageNumber: Float!) { getAllUploadedVideo(pageNumber: $pageNumber) }`, variables, options)
     },
-    queryGetCommentsByUserId(variables: { pageNumber: number, userId: string }, options: QueryOptions = {}) {
-      return self.query<{ getCommentsByUserId: any }>(`query getCommentsByUserId($pageNumber: Float!, $userId: String!) { getCommentsByUserId(pageNumber: $pageNumber, userId: $userId) }`, variables, options)
+    queryGetUploadedVideoByUserIdPage(variables: { pageNumber: number, userId: string }, options: QueryOptions = {}) {
+      return self.query<{ getUploadedVideoByUserIdPage: any }>(`query getUploadedVideoByUserIdPage($pageNumber: Float!, $userId: String!) { getUploadedVideoByUserIdPage(pageNumber: $pageNumber, userId: $userId) }`, variables, options)
     },
-    queryGetfollowingByUserId(variables: { userId: string }, options: QueryOptions = {}) {
-      return self.query<{ getfollowingByUserId: any }>(`query getfollowingByUserId($userId: String!) { getfollowingByUserId(userId: $userId) }`, variables, options)
+    queryGetUserChannel(variables?: {  }, options: QueryOptions = {}) {
+      return self.query<{ getUserChannel: any }>(`query getUserChannel { getUserChannel }`, variables, options)
     },
-    queryGetfollowerByFollowId(variables: { followId: string }, options: QueryOptions = {}) {
-      return self.query<{ getfollowerByFollowId: any }>(`query getfollowerByFollowId($followId: String!) { getfollowerByFollowId(followId: $followId) }`, variables, options)
+    queryGetSearchedItem(variables: { searchKey: string, pageNumber: number }, options: QueryOptions = {}) {
+      return self.query<{ getSearchedItem: any }>(`query getSearchedItem($searchKey: String!, $pageNumber: Float!) { getSearchedItem(searchKey: $searchKey, pageNumber: $pageNumber) }`, variables, options)
     },
     queryGetAllClassifiedFeedss(variables?: {  }, options: QueryOptions = {}) {
       return self.query<{ getAllClassifiedFeedss: any }>(`query getAllClassifiedFeedss { getAllClassifiedFeedss }`, variables, options)
@@ -333,20 +346,8 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     queryGetAllSavedByType(variables: { pageNumber: number, savedType: string }, options: QueryOptions = {}) {
       return self.query<{ getAllSavedByType: any }>(`query getAllSavedByType($pageNumber: Float!, $savedType: String!) { getAllSavedByType(pageNumber: $pageNumber, savedType: $savedType) }`, variables, options)
     },
-    queryGetAllVideo(variables?: {  }, options: QueryOptions = {}) {
-      return self.query<{ getAllVideo: any }>(`query getAllVideo { getAllVideo }`, variables, options)
-    },
-    queryGetAllUploadedVideo(variables: { pageNumber: number }, options: QueryOptions = {}) {
-      return self.query<{ getAllUploadedVideo: any }>(`query getAllUploadedVideo($pageNumber: Float!) { getAllUploadedVideo(pageNumber: $pageNumber) }`, variables, options)
-    },
-    queryGetUploadedVideoByUserIdPage(variables: { pageNumber: number, userId: string }, options: QueryOptions = {}) {
-      return self.query<{ getUploadedVideoByUserIdPage: any }>(`query getUploadedVideoByUserIdPage($pageNumber: Float!, $userId: String!) { getUploadedVideoByUserIdPage(pageNumber: $pageNumber, userId: $userId) }`, variables, options)
-    },
-    queryGetUserChannel(variables?: {  }, options: QueryOptions = {}) {
-      return self.query<{ getUserChannel: any }>(`query getUserChannel { getUserChannel }`, variables, options)
-    },
-    queryGetSearchedItem(variables: { searchKey: string, pageNumber: number }, options: QueryOptions = {}) {
-      return self.query<{ getSearchedItem: any }>(`query getSearchedItem($searchKey: String!, $pageNumber: Float!) { getSearchedItem(searchKey: $searchKey, pageNumber: $pageNumber) }`, variables, options)
+    queryGetByvideoId(variables: { videoId: string }, options: QueryOptions = {}) {
+      return self.query<{ getByvideoId: any }>(`query getByvideoId($videoId: String!) { getByvideoId(videoId: $videoId) }`, variables, options)
     },
     queryGetlikesVideoByUserId(variables: { userId: string }, options: QueryOptions = {}) {
       return self.query<{ getlikesVideoByUserId: any }>(`query getlikesVideoByUserId($userId: String!) { getlikesVideoByUserId(userId: $userId) }`, variables, options)
@@ -365,6 +366,21 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     },
     queryGetVideoPlaylistByPlaylistId(variables: { playlistId: string }, options: QueryOptions = {}) {
       return self.query<{ getVideoPlaylistByPlaylistId: any }>(`query getVideoPlaylistByPlaylistId($playlistId: String!) { getVideoPlaylistByPlaylistId(playlistId: $playlistId) }`, variables, options)
+    },
+    queryGetAllComments(variables: { pageNumber: number }, options: QueryOptions = {}) {
+      return self.query<{ getAllComments: any }>(`query getAllComments($pageNumber: Float!) { getAllComments(pageNumber: $pageNumber) }`, variables, options)
+    },
+    queryGetAllComment(variables?: {  }, options: QueryOptions = {}) {
+      return self.query<{ getAllComment: any }>(`query getAllComment { getAllComment }`, variables, options)
+    },
+    queryGetCommentsByUserId(variables: { pageNumber: number, userId: string }, options: QueryOptions = {}) {
+      return self.query<{ getCommentsByUserId: any }>(`query getCommentsByUserId($pageNumber: Float!, $userId: String!) { getCommentsByUserId(pageNumber: $pageNumber, userId: $userId) }`, variables, options)
+    },
+    queryGetfollowingByUserId(variables: { userId: string }, options: QueryOptions = {}) {
+      return self.query<{ getfollowingByUserId: any }>(`query getfollowingByUserId($userId: String!) { getfollowingByUserId(userId: $userId) }`, variables, options)
+    },
+    queryGetfollowerByFollowId(variables: { followId: string }, options: QueryOptions = {}) {
+      return self.query<{ getfollowerByFollowId: any }>(`query getfollowerByFollowId($followId: String!) { getfollowerByFollowId(followId: $followId) }`, variables, options)
     },
     queryGetratingOnUserId(variables: { userId: string }, options: QueryOptions = {}) {
       return self.query<{ getratingOnUserId: any }>(`query getratingOnUserId($userId: String!) { getratingOnUserId(userId: $userId) }`, variables, options)
@@ -437,17 +453,6 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     mutateUpdateLegalInfo(variables: { legalitiesdata: InputInfo }, optimisticUpdate?: () => void) {
       return self.mutate<{ updateLegalInfo: any }>(`mutation updateLegalInfo($legalitiesdata: InputInfo!) { updateLegalInfo(Legalitiesdata: $legalitiesdata) }`, variables, optimisticUpdate)
     },
-    mutateSaveLikedVideo(variables: { videoId: string, userId: string }, resultSelector: string | ((qb: SaveVideoModelSelector) => SaveVideoModelSelector) = saveVideoModelPrimitives.toString(), optimisticUpdate?: () => void) {
-      return self.mutate<{ saveLikedVideo: SaveVideoModelType}>(`mutation saveLikedVideo($videoId: String!, $userId: String!) { saveLikedVideo(videoId: $videoId, userId: $userId) {
-        ${typeof resultSelector === "function" ? resultSelector(new SaveVideoModelSelector()).toString() : resultSelector}
-      } }`, variables, optimisticUpdate)
-    },
-    mutateUpdateDeletesavedVideo(variables: { userId: string, videosavedId: string }, optimisticUpdate?: () => void) {
-      return self.mutate<{ UpdateDeletesavedVideo: any }>(`mutation UpdateDeletesavedVideo($userId: String!, $videosavedId: String!) { UpdateDeletesavedVideo(userId: $userId, VideosavedId: $videosavedId) }`, variables, optimisticUpdate)
-    },
-    mutateDeleteVideo(variables: { videoId: string }, optimisticUpdate?: () => void) {
-      return self.mutate<{ deleteVideo: boolean }>(`mutation deleteVideo($videoId: String!) { deleteVideo(videoId: $videoId) }`, variables, optimisticUpdate)
-    },
     mutateCreateUserTopic(variables: { attachmentUrl?: (string | null), attachmentType?: (string | null), topicContent: string, commentId?: (string | null), userId: string }, resultSelector: string | ((qb: TopicDetailModelSelector) => TopicDetailModelSelector) = topicDetailModelPrimitives.toString(), optimisticUpdate?: () => void) {
       return self.mutate<{ createUserTopic: TopicDetailModelType}>(`mutation createUserTopic($attachmentUrl: String, $attachmentType: String, $topicContent: String!, $commentId: String, $userId: String!) { createUserTopic(attachmentUrl: $attachmentUrl, attachmentType: $attachmentType, topicContent: $topicContent, commentId: $commentId, userId: $userId) {
         ${typeof resultSelector === "function" ? resultSelector(new TopicDetailModelSelector()).toString() : resultSelector}
@@ -483,17 +488,32 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
         ${typeof resultSelector === "function" ? resultSelector(new StoryViewerUserModelSelector()).toString() : resultSelector}
       } }`, variables, optimisticUpdate)
     },
-    mutateCommentOnTopic(variables: { acttachmentType?: (string | null), acttachmentUrl?: (string | null), comment?: (string | null), topicId: string, userId: string }, resultSelector: string | ((qb: CommentsDetailModelSelector) => CommentsDetailModelSelector) = commentsDetailModelPrimitives.toString(), optimisticUpdate?: () => void) {
-      return self.mutate<{ commentOnTopic: CommentsDetailModelType}>(`mutation commentOnTopic($acttachmentType: String, $acttachmentUrl: String, $comment: String, $topicId: String!, $userId: String!) { commentOnTopic(acttachmentType: $acttachmentType, acttachmentUrl: $acttachmentUrl, comment: $comment, TopicId: $topicId, userId: $userId) {
-        ${typeof resultSelector === "function" ? resultSelector(new CommentsDetailModelSelector()).toString() : resultSelector}
+    mutateUploadVideoByUser(variables: { thumbnailUrl: string, view?: (string | null), attachmentVideoUrl: string, description?: (string | null), videoHeading?: (string | null), vedioPlaylistId?: (string | null), userId: string }, resultSelector: string | ((qb: VideoUploadModelSelector) => VideoUploadModelSelector) = videoUploadModelPrimitives.toString(), optimisticUpdate?: () => void) {
+      return self.mutate<{ uploadVideoByUser: VideoUploadModelType}>(`mutation uploadVideoByUser($thumbnailUrl: String!, $view: String, $attachmentVideoUrl: String!, $description: String, $videoHeading: String, $vedioPlaylistId: String, $userId: String!) { uploadVideoByUser(thumbnailUrl: $thumbnailUrl, view: $view, attachmentVideoUrl: $attachmentVideoUrl, description: $description, videoHeading: $videoHeading, vedioPlaylistId: $vedioPlaylistId, userId: $userId) {
+        ${typeof resultSelector === "function" ? resultSelector(new VideoUploadModelSelector()).toString() : resultSelector}
       } }`, variables, optimisticUpdate)
     },
-    mutateDeleteCommentbyCommentId(variables: { commentId: string }, optimisticUpdate?: () => void) {
-      return self.mutate<{ deleteCommentbyCommentId: boolean }>(`mutation deleteCommentbyCommentId($commentId: String!) { deleteCommentbyCommentId(commentId: $commentId) }`, variables, optimisticUpdate)
+    mutateGetUploadVideoByUserId(variables: { userId: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ getUploadVideoByUserId: any }>(`mutation getUploadVideoByUserId($userId: String!) { getUploadVideoByUserId(userId: $userId) }`, variables, optimisticUpdate)
     },
-    mutateFollowById(variables: { followId: string, userId: string }, resultSelector: string | ((qb: FollowUserModelSelector) => FollowUserModelSelector) = followUserModelPrimitives.toString(), optimisticUpdate?: () => void) {
-      return self.mutate<{ followById: FollowUserModelType}>(`mutation followById($followId: String!, $userId: String!) { followById(followId: $followId, userId: $userId) {
-        ${typeof resultSelector === "function" ? resultSelector(new FollowUserModelSelector()).toString() : resultSelector}
+    mutateGetUploadVideoByVideoId(variables: { videoId: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ getUploadVideoByVideoId: any }>(`mutation getUploadVideoByVideoId($videoId: String!) { getUploadVideoByVideoId(videoId: $videoId) }`, variables, optimisticUpdate)
+    },
+    mutateGetUploadVideoByPlaylistId(variables: { vedioPlaylistId: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ getUploadVideoByPlaylistId: any }>(`mutation getUploadVideoByPlaylistId($vedioPlaylistId: String!) { getUploadVideoByPlaylistId(vedioPlaylistId: $vedioPlaylistId) }`, variables, optimisticUpdate)
+    },
+    mutateUpdateDeleteVideoId(variables: { pageNumber: number, videoId: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ UpdateDeleteVideoId: any }>(`mutation UpdateDeleteVideoId($pageNumber: Float!, $videoId: String!) { UpdateDeleteVideoId(pageNumber: $pageNumber, videoId: $videoId) }`, variables, optimisticUpdate)
+    },
+    mutateUpdateVideoViews(variables: { videoId: string, userId: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ UpdateVideoViews: any }>(`mutation UpdateVideoViews($videoId: String!, $userId: String!) { UpdateVideoViews(videoId: $videoId, userId: $userId) }`, variables, optimisticUpdate)
+    },
+    mutateUpdatePlaylistIdVideoId(variables: { playlistId: string, videoIds: InputVideoUploadPlaylist[] }, optimisticUpdate?: () => void) {
+      return self.mutate<{ updatePlaylistIdVideoId: any }>(`mutation updatePlaylistIdVideoId($playlistId: String!, $videoIds: [InputVideoUploadPlaylist!]!) { updatePlaylistIdVideoId(playlistId: $playlistId, videoIds: $videoIds) }`, variables, optimisticUpdate)
+    },
+    mutateUpdateUserVideo(variables: { userVideos: InputVideo, videoId: string }, resultSelector: string | ((qb: VideoUploadModelSelector) => VideoUploadModelSelector) = videoUploadModelPrimitives.toString(), optimisticUpdate?: () => void) {
+      return self.mutate<{ updateUserVideo: VideoUploadModelType}>(`mutation updateUserVideo($userVideos: InputVideo!, $videoId: String!) { updateUserVideo(UserVideos: $userVideos, videoId: $videoId) {
+        ${typeof resultSelector === "function" ? resultSelector(new VideoUploadModelSelector()).toString() : resultSelector}
       } }`, variables, optimisticUpdate)
     },
     mutateCreateClassifiedDetail(variables: { condition: string, title?: (string | null), prize?: (string | null), attachmentUrl?: (string | null), attachmentType?: (string | null), classifiedDetail?: (string | null), reviewDetailId?: (string | null), userId: string }, resultSelector: string | ((qb: ClassifiedFeedModelSelector) => ClassifiedFeedModelSelector) = classifiedFeedModelPrimitives.toString(), optimisticUpdate?: () => void) {
@@ -526,33 +546,16 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     mutateDeleteClassfied(variables: { classifiedFeedId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ deleteClassfied: boolean }>(`mutation deleteClassfied($classifiedFeedId: String!) { deleteClassfied(ClassifiedFeedId: $classifiedFeedId) }`, variables, optimisticUpdate)
     },
-    mutateUploadVideoByUser(variables: { thumbnailUrl: string, view?: (string | null), attachmentVideoUrl: string, description?: (string | null), videoHeading?: (string | null), vedioPlaylistId?: (string | null), userId: string }, resultSelector: string | ((qb: VideoUploadModelSelector) => VideoUploadModelSelector) = videoUploadModelPrimitives.toString(), optimisticUpdate?: () => void) {
-      return self.mutate<{ uploadVideoByUser: VideoUploadModelType}>(`mutation uploadVideoByUser($thumbnailUrl: String!, $view: String, $attachmentVideoUrl: String!, $description: String, $videoHeading: String, $vedioPlaylistId: String, $userId: String!) { uploadVideoByUser(thumbnailUrl: $thumbnailUrl, view: $view, attachmentVideoUrl: $attachmentVideoUrl, description: $description, videoHeading: $videoHeading, vedioPlaylistId: $vedioPlaylistId, userId: $userId) {
-        ${typeof resultSelector === "function" ? resultSelector(new VideoUploadModelSelector()).toString() : resultSelector}
+    mutateSaveLikedVideo(variables: { videoId: string, userId: string }, resultSelector: string | ((qb: SaveVideoModelSelector) => SaveVideoModelSelector) = saveVideoModelPrimitives.toString(), optimisticUpdate?: () => void) {
+      return self.mutate<{ saveLikedVideo: SaveVideoModelType}>(`mutation saveLikedVideo($videoId: String!, $userId: String!) { saveLikedVideo(videoId: $videoId, userId: $userId) {
+        ${typeof resultSelector === "function" ? resultSelector(new SaveVideoModelSelector()).toString() : resultSelector}
       } }`, variables, optimisticUpdate)
     },
-    mutateGetUploadVideoByUserId(variables: { userId: string }, optimisticUpdate?: () => void) {
-      return self.mutate<{ getUploadVideoByUserId: any }>(`mutation getUploadVideoByUserId($userId: String!) { getUploadVideoByUserId(userId: $userId) }`, variables, optimisticUpdate)
+    mutateUpdateDeletesavedVideo(variables: { userId: string, videosavedId: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ UpdateDeletesavedVideo: any }>(`mutation UpdateDeletesavedVideo($userId: String!, $videosavedId: String!) { UpdateDeletesavedVideo(userId: $userId, VideosavedId: $videosavedId) }`, variables, optimisticUpdate)
     },
-    mutateGetUploadVideoByVideoId(variables: { videoId: string }, optimisticUpdate?: () => void) {
-      return self.mutate<{ getUploadVideoByVideoId: any }>(`mutation getUploadVideoByVideoId($videoId: String!) { getUploadVideoByVideoId(videoId: $videoId) }`, variables, optimisticUpdate)
-    },
-    mutateGetUploadVideoByPlaylistId(variables: { vedioPlaylistId: string }, optimisticUpdate?: () => void) {
-      return self.mutate<{ getUploadVideoByPlaylistId: any }>(`mutation getUploadVideoByPlaylistId($vedioPlaylistId: String!) { getUploadVideoByPlaylistId(vedioPlaylistId: $vedioPlaylistId) }`, variables, optimisticUpdate)
-    },
-    mutateUpdateDeleteVideoId(variables: { pageNumber: number, videoId: string }, optimisticUpdate?: () => void) {
-      return self.mutate<{ UpdateDeleteVideoId: any }>(`mutation UpdateDeleteVideoId($pageNumber: Float!, $videoId: String!) { UpdateDeleteVideoId(pageNumber: $pageNumber, videoId: $videoId) }`, variables, optimisticUpdate)
-    },
-    mutateUpdateVideoViews(variables: { videoId: string, userId: string }, optimisticUpdate?: () => void) {
-      return self.mutate<{ UpdateVideoViews: any }>(`mutation UpdateVideoViews($videoId: String!, $userId: String!) { UpdateVideoViews(videoId: $videoId, userId: $userId) }`, variables, optimisticUpdate)
-    },
-    mutateUpdatePlaylistIdVideoId(variables: { playlistId: string, videoIds: InputVideoUploadPlaylist[] }, optimisticUpdate?: () => void) {
-      return self.mutate<{ updatePlaylistIdVideoId: any }>(`mutation updatePlaylistIdVideoId($playlistId: String!, $videoIds: [InputVideoUploadPlaylist!]!) { updatePlaylistIdVideoId(playlistId: $playlistId, videoIds: $videoIds) }`, variables, optimisticUpdate)
-    },
-    mutateUpdateUserVideo(variables: { userVideos: InputVideo, videoId: string }, resultSelector: string | ((qb: VideoUploadModelSelector) => VideoUploadModelSelector) = videoUploadModelPrimitives.toString(), optimisticUpdate?: () => void) {
-      return self.mutate<{ updateUserVideo: VideoUploadModelType}>(`mutation updateUserVideo($userVideos: InputVideo!, $videoId: String!) { updateUserVideo(UserVideos: $userVideos, videoId: $videoId) {
-        ${typeof resultSelector === "function" ? resultSelector(new VideoUploadModelSelector()).toString() : resultSelector}
-      } }`, variables, optimisticUpdate)
+    mutateDeleteVideo(variables: { videoId: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ deleteVideo: boolean }>(`mutation deleteVideo($videoId: String!) { deleteVideo(videoId: $videoId) }`, variables, optimisticUpdate)
     },
     mutateLikeDislikeVideo(variables: { status: string, videoId: string, userId: string }, resultSelector: string | ((qb: LikeVideosModelSelector) => LikeVideosModelSelector) = likeVideosModelPrimitives.toString(), optimisticUpdate?: () => void) {
       return self.mutate<{ likeDislikeVideo: LikeVideosModelType}>(`mutation likeDislikeVideo($status: String!, $videoId: String!, $userId: String!) { likeDislikeVideo(status: $status, videoId: $videoId, userId: $userId) {
@@ -570,6 +573,19 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     mutateUpdateVideoPlaylistbyVideoId(variables: { videoUploadId: InputVideoUploadPlaylist[], videoPlaylistId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ UpdateVideoPlaylistbyVideoId: any }>(`mutation UpdateVideoPlaylistbyVideoId($videoUploadId: [InputVideoUploadPlaylist!]!, $videoPlaylistId: String!) { UpdateVideoPlaylistbyVideoId(VideoUploadId: $videoUploadId, videoPlaylistId: $videoPlaylistId) }`, variables, optimisticUpdate)
     },
+    mutateCommentOnTopic(variables: { acttachmentType?: (string | null), acttachmentUrl?: (string | null), comment?: (string | null), topicId: string, userId: string }, resultSelector: string | ((qb: CommentsDetailModelSelector) => CommentsDetailModelSelector) = commentsDetailModelPrimitives.toString(), optimisticUpdate?: () => void) {
+      return self.mutate<{ commentOnTopic: CommentsDetailModelType}>(`mutation commentOnTopic($acttachmentType: String, $acttachmentUrl: String, $comment: String, $topicId: String!, $userId: String!) { commentOnTopic(acttachmentType: $acttachmentType, acttachmentUrl: $acttachmentUrl, comment: $comment, TopicId: $topicId, userId: $userId) {
+        ${typeof resultSelector === "function" ? resultSelector(new CommentsDetailModelSelector()).toString() : resultSelector}
+      } }`, variables, optimisticUpdate)
+    },
+    mutateDeleteCommentbyCommentId(variables: { commentId: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ deleteCommentbyCommentId: boolean }>(`mutation deleteCommentbyCommentId($commentId: String!) { deleteCommentbyCommentId(commentId: $commentId) }`, variables, optimisticUpdate)
+    },
+    mutateFollowById(variables: { followId: string, userId: string }, resultSelector: string | ((qb: FollowUserModelSelector) => FollowUserModelSelector) = followUserModelPrimitives.toString(), optimisticUpdate?: () => void) {
+      return self.mutate<{ followById: FollowUserModelType}>(`mutation followById($followId: String!, $userId: String!) { followById(followId: $followId, userId: $userId) {
+        ${typeof resultSelector === "function" ? resultSelector(new FollowUserModelSelector()).toString() : resultSelector}
+      } }`, variables, optimisticUpdate)
+    },
     mutateCreateUserRating(variables: { ratingStar?: (number | null), ratinguserId: string, userId: string }, resultSelector: string | ((qb: UserRatingModelSelector) => UserRatingModelSelector) = userRatingModelPrimitives.toString(), optimisticUpdate?: () => void) {
       return self.mutate<{ createUserRating: UserRatingModelType}>(`mutation createUserRating($ratingStar: Float, $ratinguserId: String!, $userId: String!) { createUserRating(ratingStar: $ratingStar, ratinguserId: $ratinguserId, userId: $userId) {
         ${typeof resultSelector === "function" ? resultSelector(new UserRatingModelSelector()).toString() : resultSelector}
@@ -577,5 +593,28 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     },
     mutateUpdateRating(variables: { ratingStar: number, ratinguserId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ UpdateRating: any }>(`mutation UpdateRating($ratingStar: Float!, $ratinguserId: String!) { UpdateRating(ratingStar: $ratingStar, ratinguserId: $ratinguserId) }`, variables, optimisticUpdate)
+    },
+    mutateCreateChatRoom(variables: { membersId: InputUsers[], roomType?: (string | null), adminId: string }, resultSelector: string | ((qb: RoomChatModelSelector) => RoomChatModelSelector) = roomChatModelPrimitives.toString(), optimisticUpdate?: () => void) {
+      return self.mutate<{ createChatRoom: RoomChatModelType}>(`mutation createChatRoom($membersId: [InputUsers!]!, $roomType: String, $adminId: String!) { createChatRoom(membersId: $membersId, roomType: $roomType, adminId: $adminId) {
+        ${typeof resultSelector === "function" ? resultSelector(new RoomChatModelSelector()).toString() : resultSelector}
+      } }`, variables, optimisticUpdate)
+    },
+    mutateCreateUserMessage(variables: { width?: (number | null), mimeType?: (string | null), text: string, previewData?: (string | null), uri?: (string | null), size?: (number | null), name?: (string | null), height?: (number | null), status?: (string | null), messageType?: (string | null), roomId: string, authorId: string }, resultSelector: string | ((qb: UsersChatModelSelector) => UsersChatModelSelector) = usersChatModelPrimitives.toString(), optimisticUpdate?: () => void) {
+      return self.mutate<{ createUserMessage: UsersChatModelType}>(`mutation createUserMessage($width: Float, $mimeType: String, $text: String!, $previewData: String, $uri: String, $size: Float, $name: String, $height: Float, $status: String, $messageType: String, $roomId: String!, $authorId: String!) { createUserMessage(width: $width, mimeType: $mimeType, text: $text, previewData: $previewData, uri: $uri, size: $size, name: $name, height: $height, status: $status, messageType: $messageType, roomId: $roomId, authorId: $authorId) {
+        ${typeof resultSelector === "function" ? resultSelector(new UsersChatModelSelector()).toString() : resultSelector}
+      } }`, variables, optimisticUpdate)
+    },
+    mutateGetchatByUserId(variables: { authorId: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ getchatByUserId: any }>(`mutation getchatByUserId($authorId: String!) { getchatByUserId(authorId: $authorId) }`, variables, optimisticUpdate)
+    },
+    subscribeNewMessageadd(variables?: {  }, resultSelector: string | ((qb: RoomChatModelSelector) => RoomChatModelSelector) = roomChatModelPrimitives.toString(), onData?: (item: any) => void, onError?: (error: Error) => void) {
+      return self.subscribe<{ newMessageadd: RoomChatModelType}>(`subscription newMessageadd { newMessageadd {
+        ${typeof resultSelector === "function" ? resultSelector(new RoomChatModelSelector()).toString() : resultSelector}
+      } }`, variables, onData, onError)
+    },
+    subscribeNewuserchat(variables?: {  }, resultSelector: string | ((qb: UsersChatModelSelector) => UsersChatModelSelector) = usersChatModelPrimitives.toString(), onData?: (item: any) => void, onError?: (error: Error) => void) {
+      return self.subscribe<{ newuserchat: UsersChatModelType}>(`subscription newuserchat { newuserchat {
+        ${typeof resultSelector === "function" ? resultSelector(new UsersChatModelSelector()).toString() : resultSelector}
+      } }`, variables, onData, onError)
     },
   })))

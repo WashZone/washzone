@@ -9,7 +9,27 @@ import { AddMessageModal, P2PUserComponent } from "./partials"
 import { FlatList, View } from "react-native"
 
 export const AllChats: FC<AppStackScreenProps<"AllChats">> = observer(function AllChats(props) {
-  const [data, setData] = useState<any>()
+  const [data, setData] = useState<any>([
+    {
+      __v: 0,
+      _id: "63c9404e5c7f5266eee17a9c",
+      createdAt: "2023-01-19T13:06:22.051Z",
+      description: "",
+      email: "Jirzo@gmail.com",
+      first_name: "Jirazo",
+      isSocialLogin: false,
+      last_name: "Kat",
+      name: "Jirazo Kat",
+      password: "43dc4952544e840d6ec4e2e3d282c09db38c8596c68fe4608ba2e9480520c60b",
+      picture: "https://ca.slack-edge.com/T01JZCZCSJY-U04C0Q08N4T-3e1650a7323c-512",
+      role: "user",
+      socialId: "",
+      status: "",
+      token: "",
+      type: "email",
+      updatedAt: "2023-02-16T04:59:21.972Z",
+    },
+  ])
   const [addModalVisible, setAddModalVisible] = useState<any>()
   const navigation = useNavigation()
   // const { getPlaylist } = useHooks()
@@ -39,9 +59,9 @@ export const AllChats: FC<AppStackScreenProps<"AllChats">> = observer(function A
         />
         <FlatList
           style={$flex1}
-          data={[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
-          renderItem={({ item, index }) => <P2PUserComponent />}
-          ListFooterComponent={<View style={{padding:spacing.medium}}/>}
+          data={data}
+          renderItem={({ item, index }) => <P2PUserComponent key={index} data={item}/>}
+          ListFooterComponent={<View style={{ padding: spacing.medium }} />}
         />
       </Screen>
       <AddMessageModal isVisible={addModalVisible} setVisible={setAddModalVisible} />

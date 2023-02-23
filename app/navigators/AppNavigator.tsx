@@ -21,8 +21,9 @@ import {
   Search,
   Legal,
   Support,
-  P2PChat, 
-  AllChats
+  P2PChat,
+  AllChats,
+  CallScreen,
 } from "../screens"
 import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
 import { DrawerNavigator } from "./Drawer/DrawerNavigator"
@@ -44,8 +45,9 @@ export type AppStackParamList = {
   Search: undefined
   Legal: undefined
   Support: undefined
-  AllChats : undefined
-  P2PChat : any
+  AllChats: undefined
+  P2PChat:  {receiver:any}
+  CallScreen: { mode: "audio" | "video" }
 }
 
 const exitRoutes = Config.exitRoutes
@@ -94,12 +96,14 @@ const AppStack = observer(function AppStack() {
             <Stack.Screen name="AllChats" component={AllChats} />
             <Stack.Screen name="P2PChat" component={P2PChat} />
             <Stack.Screen name="Support" component={Support} />
+            <Stack.Screen name="CallScreen" component={CallScreen}
+            options={{ presentation: "containedModal" }} />
             <Stack.Screen
               name="Search"
               component={Search}
               options={{ presentation: "containedModal" }}
             />
-            <Stack.Screen name="Saved" component={Saved} /> 
+            <Stack.Screen name="Saved" component={Saved} />
             <Stack.Screen
               name="UploadVideo"
               component={UploadVideo}

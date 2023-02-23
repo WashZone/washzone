@@ -140,15 +140,22 @@ export const iconRegistry = {
   forward: require("../../assets/icons/forward.png"),
   likefill: require("../../assets/icons/like-fill.png"),
   like: require("../../assets/icons/like.png"),
+  share3Dot: require("../../assets/icons/share-3dot.png"),
+  userProfile: require("../../assets/icons/user-profile.png"),
   save_box: require("../../assets/icons/save_box.png"),
   add_vector: require("../../assets/icons/add-vector.png"),
   reset: require("../../assets/icons/reset.png"),
   key: require("../../assets/icons/key.png"),
   arrowDown: require("../../assets/icons/arrowDown.png"),
   plus: require("../../assets/icons/plus.png"),
+  download: require("../../assets/icons/download.png"),
   uploadCloud: require("../../assets/icons/upload_cloud.png"),
+  audioCall: require("../../assets/icons/audio-call.png"),
+  videoCall: require("../../assets/icons/video-call.png"),
   chatMessage: require("../../assets/icons/chat-message.png"),
   addMessage: require("../../assets/icons/add-message.png"),
+  hangUpCall: require("../../assets/icons/call-hang-up.png"),
+  
 }
 
 const $imageStyle: ImageStyle = {

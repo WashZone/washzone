@@ -1,6 +1,7 @@
 import { ImageLibraryOptions } from "react-native-image-picker"
 const ImagePicker = require("react-native-image-picker")
 
+
 export const Capture = async() => {
   const options = {
     storageOptions: {

@@ -23,6 +23,7 @@ import { useStores } from "../../models"
 import { Interaction } from "../../utils/enums"
 import { RateUserModal } from "./RateUser"
 import { $contentCenter } from "../styles"
+import { SendOfferModal } from "./SendOfferModal"
 
 interface ActionProps {
   icon: IconTypes
@@ -85,6 +86,7 @@ const MoreDetails = ({ classified }: { classified: any }) => {
 const BottomActions = ({ classified }: { classified: any }) => {
   const { interactWithSaveOnClassified } = useHooks()
   const [isSaving, setSaving] = useState(false)
+  const [sendOfferModal, setSendOfferModal] = useState(false)
 
   const bottomOptions: Array<ActionProps> = [
     {
@@ -117,25 +119,28 @@ const BottomActions = ({ classified }: { classified: any }) => {
     {
       icon: "offer",
       title: "Send Offer",
-      onPress: () => console.log("ALERT"),
+      onPress: () => setSendOfferModal(true),
     },
   ]
 
   return (
+    <>
     <View style={$bottomActionsContainer}>
       {bottomOptions.map((option) => (
         <View style={$singleActionContainer} key={option.title}>
-          <Pressable style={$actionIconContainer} onPress={option.onPress}>
+          <TouchableOpacity style={$actionIconContainer} onPress={option.onPress}>
             {isSaving && option.icon === "save" ? (
               <ActivityIndicator animating color={colors.palette.primary100} />
             ) : (
               <Icon icon={option.icon} />
             )}
-          </Pressable>
+          </TouchableOpacity>
           <Text text={option.title} />
         </View>
       ))}
     </View>
+    <SendOfferModal isVisible={sendOfferModal} setVisible={setSendOfferModal} receiver={classified?.UserId || classified?.userId}/>
+    </>
   )
 }
 
@@ -151,11 +156,10 @@ export const ClassifiedsDetails: FC<ClassifiedsTabProps<"ClassifiedsDetails">> =
     } = useStores()
 
     const handleStringTypeClassified = async () => {
-   
       setLoading(true)
       if (typeof classified === "string") {
         const res = await mutateGetClassifiedById({ classifiedId: classified })
- 
+
         setClassifiedDetails(res.getClassifiedById?.length === 1 && res.getClassifiedById[0])
         setLoading(false)
       } else {
@@ -178,7 +182,7 @@ export const ClassifiedsDetails: FC<ClassifiedsTabProps<"ClassifiedsDetails">> =
     }
 
     return (
-      <Screen contentContainerStyle={$flex1}>
+      <View style={[$flex1, {backgroundColor:colors.background}]}>
         <ScrollView style={$flex1}>
           <FastImage
             source={{ uri: classifiedDetails?.attachmentUrl }}
@@ -199,7 +203,7 @@ export const ClassifiedsDetails: FC<ClassifiedsTabProps<"ClassifiedsDetails">> =
           />
         </Pressable>
         <BottomActions classified={classifiedDetails} />
-      </Screen>
+      </View>
     )
   },
 )

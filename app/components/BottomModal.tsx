@@ -15,6 +15,7 @@ interface CustomModalProps {
   children: React.ReactNode
   title?: string
   propagateSwipe?: boolean
+  avoidKeyboard?: boolean
 }
 
 export const BottomModal = ({
@@ -23,6 +24,7 @@ export const BottomModal = ({
   setVisible,
   children,
   title,
+  avoidKeyboard,
 }: CustomModalProps) => {
   const safeArea = useSafeAreaInsets()
   const closeModal = () => setVisible(false)
@@ -31,6 +33,7 @@ export const BottomModal = ({
       propagateSwipe={propagateSwipe}
       isVisible={isVisible}
       style={$modal}
+      avoidKeyboard={avoidKeyboard}
       swipeDirection={["down"]}
       onSwipeComplete={closeModal}
       onBackdropPress={closeModal}
@@ -46,10 +49,15 @@ export const BottomModal = ({
   )
 }
 
-const $title: TextStyle = { textAlign:'center', lineHeight: 80, fontSize: 25, textAlignVertical: "center" }
+const $title: TextStyle = {
+  textAlign: "center",
+  lineHeight: 80,
+  fontSize: 25,
+  textAlignVertical: "center",
+}
 
 const $content: ViewStyle = {
-  backgroundColor: colors.background,
+  backgroundColor: colors.palette.primary100,
   borderTopLeftRadius: 30,
   borderTopRightRadius: 30,
 }

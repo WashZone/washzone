@@ -119,6 +119,8 @@ export interface HeaderProps {
    * Override the default edges for the safe area.
    */
   safeAreaEdges?: ExtendedEdge[]
+
+  children?: React.ReactNode
 }
 
 interface HeaderActionProps {
@@ -157,6 +159,7 @@ export function Header(props: HeaderProps) {
     style: $styleOverride,
     titleStyle: $titleStyleOverride,
     containerStyle: $containerStyleOverride,
+    children,
   } = props
 
   const $containerInsets = useSafeAreaInsetsStyle(safeAreaEdges)
@@ -179,7 +182,7 @@ export function Header(props: HeaderProps) {
 
         {!!titleContent && (
           <Text
-          numberOfLines={1}
+            numberOfLines={1}
             weight="bold"
             size="md"
             text={titleContent}
@@ -190,7 +193,6 @@ export function Header(props: HeaderProps) {
             ]}
           />
         )}
-
         <HeaderAction
           tx={rightTx}
           text={rightText}
@@ -201,6 +203,7 @@ export function Header(props: HeaderProps) {
           backgroundColor={backgroundColor}
           ActionComponent={RightActionComponent}
         />
+        {children}
       </View>
     </View>
   )

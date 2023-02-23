@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react"
 import { ViewStyle, View, ActivityIndicator, TextStyle } from "react-native"
-import { Text, Screen, Button } from "../../components"
+import { Text, Screen, Button, BottomModal } from "../../components"
 import Modal from "react-native-modal"
 import { colors, spacing } from "../../theme"
 import { Rating } from "react-native-ratings"
@@ -42,58 +42,53 @@ export const RateUserModal = ({
   }
 
   return (
-    <Modal
-      isVisible={isVisible}
-      swipeDirection={!buttonLoading && ["down"]}
-      onSwipeComplete={() => !buttonLoading && setModalVisible(false)}
-      onBackdropPress={() => !buttonLoading && setModalVisible(false)}
-    >
-      <Screen backgroundColor={colors.transparent} contentContainerStyle={$parentContainer}>
-        <View style={$contentContainer}>
-          <Text text={"Rate User  "} style={$headerTitle} weight="semiBold" />
-          <Rating
-            ref={ratingRef}
-            onFinishRating={(rating) => setRating(rating)}
-            ratingColor={colors.palette.primary100}
-            ratingTextColor={colors.palette.primary100}
-            ratingBackgroundColor={colors.palette.neutral100}
-            showRating
-            startingValue={rating}
-            imageSize={40}
-            style={{ backgroundColor: colors.palette.neutral100, marginTop: spacing.extraSmall }}
-          />
-          {/* <TextInput mode="outlined" label={"Title"} value={title} onChangeText={setTitle} />
+    <BottomModal isVisible={isVisible} setVisible={setModalVisible}>
+      <View style={$contentContainer}>
+        <Text text={"Rate User  "} style={$headerTitle} weight="semiBold" />
+        <Rating
+          ref={ratingRef}
+          onFinishRating={(rating) => setRating(rating)}
+          ratingColor={colors.palette.primary100}
+          ratingTextColor={colors.palette.neutral100}
+          ratingBackgroundColor={colors.palette.primary100}
+          showRating
+          tintColor={colors.palette.primary100}
+          startingValue={rating}
+          imageSize={40}
+          style={{ backgroundColor: colors.palette.primary100, marginTop: spacing.extraSmall }}
+        />
+        {/* <TextInput mode="outlined" label={"Title"} value={title} onChangeText={setTitle} />
           <Text text={error} style={$errorText} weight="medium" /> */}
-          <Button
-            onPress={onSubmit}
-            disabled={buttonLoading}
-            style={[$submitButton, { backgroundColor: colors.palette.primary100 }]}
-          >
-            {buttonLoading ? (
-              <ActivityIndicator
-                animating={buttonLoading}
-                size={20}
-                color={colors.palette.neutral100}
-              />
-            ) : (
-              <Text tx="common.submit" style={$submitText} weight="semiBold" />
-            )}
-          </Button>
-        </View>
-      </Screen>
-    </Modal>
+        <Button
+          onPress={onSubmit}
+          disabled={buttonLoading}
+          style={[$submitButton, { backgroundColor: colors.palette.neutral100 }]}
+          textStyle={{ color: colors.palette.primary100 }}
+        >
+          {buttonLoading ? (
+            <ActivityIndicator
+              animating={buttonLoading}
+              size={20}
+              color={colors.palette.primary100}
+            />
+          ) : (
+            <Text tx="common.submit" style={$submitText} weight="semiBold" />
+          )}
+        </Button>
+      </View>
+    </BottomModal>
   )
 }
 
 const $headerTitle: TextStyle = {
-  color: colors.palette.primary100,
+  color: colors.palette.neutral100,
 }
 
-const $parentContainer: ViewStyle = { justifyContent: "center", flex: 1 }
+const $parentContainer: ViewStyle = { justifyContent: "center", flex: 1, height: 500 }
 
 const $submitText: TextStyle = {
   fontSize: 18,
-  color: colors.palette.neutral100,
+  color: colors.palette.primary100,
 }
 
 const $submitButton: ViewStyle = {
@@ -107,7 +102,5 @@ const $submitButton: ViewStyle = {
 }
 
 const $contentContainer: ViewStyle = {
-  backgroundColor: colors.palette.neutral100,
   padding: spacing.medium,
-  borderRadius: 10,
 }
