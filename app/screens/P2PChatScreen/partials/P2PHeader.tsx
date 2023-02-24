@@ -13,7 +13,6 @@ import { he } from "date-fns/locale"
 export const P2PHeader = ({ data }) => {
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
   const safeArea = useSafeAreaInsets()
-  console.log("safeArea", safeArea)
   return (
     <View style={{ paddingTop: safeArea.top, backgroundColor: colors.palette.primary100 }}>
       <View style={$container}>

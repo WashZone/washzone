@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite"
-import React, { FC, useState } from "react"
+import React, { FC, useEffect, useState } from "react"
 import { AppStackParamList, AppStackScreenProps } from "../../navigators"
 import { $contentCenter, $flex1, $flexRow, $justifyCenter } from "../styles"
 import { Screen, Header, Icon } from "../../components"
@@ -16,94 +16,27 @@ import { MediaPicker } from "../../utils/device/MediaPicker"
 import { MessageOptionsModal } from "./partials/MessageOptionsModal"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { P2PHeader } from "./partials"
-
-
+import { useStores } from "../../models"
+import { useHooks } from "../hooks"
 
 export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2PChat(props) {
-  const { receiver } = props.route.params
+  const { receiver, roomId } = props.route.params
+  console.log("ROOMID", roomId)
+  const {
+    userStore,
+    allChats: {allChatRooms, chatMessages, getRoomMessages },
+  } = useStores()
+  const {syncChatMessages} = useHooks()
 
-  const testData = [
-    {
-      author: {
-        createdAt: 1677025650,
-        firstName: "Jirazo",
-        id: "06c33e8b-e835-4736-80f4-63f44b66666d",
-        imageUrl:
-          receiver?.picture,
-        lastSeen: 1677025650,
-      },
-      createdAt: 1677025650,
-      id: 1,
-      status: "sent",
-      type: "image",
-      uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQfOiUfb4VFnytmuO25W3RGvUAwj3S1fDc0eq3nVdAM0w&s',
-      size: 20,
-      text: "Hi There!",
-    },
-    {
-      author: {
-        createdAt: 1677025650,
-        firstName: "Jirazo",
-        id: "06c33e8b-e835-4736-80f4-63f44b66666c",
-        imageUrl:
-          receiver?.picture,
-        lastSeen: 1677025650,
-      },
-      createdAt: 1677025650,
-      id: 2,
-      status: "sent",
-      type: "image",
-      uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTZbid4L4Db-UU3xKTLC-rF-wcVO2nEAKkPgvKmEU4TnA&s',
-      size: 20,
-      text: "Hi There!",
-    },
-
-    {
-      author: {
-        createdAt: 1677025650,
-        firstName: "Jirazo",
-        id: "06c33e8b-e835-4736-80f4-63f44b66666c",
-        imageUrl:
-          receiver?.picture,
-        lastSeen: 1677025650,
-      },
-      createdAt: 1677025650,
-      id: 4,
-      status: "sent",
-      type: "text",
-      text: "Hi There!",
-    },
-    {
-      author: {
-        createdAt: 1677025650,
-        firstName: "Jirazo",
-        id: "06c33e8b-e835-4736-80f-63f44b66666c",
-        imageUrl:
-          receiver?.picture,
-        lastSeen: 1677025650,
-      },
-      createdAt: 1677025650,
-      id: 5,
-      status: "sent",
-      type: "text",
-      text: "Hi There!",
-    },
-  ]
-  const [data, setData] = useState<any>(testData)
-
-  const navigation = useNavigation<NavigationProp<AppStackParamList>>()
-
-  const [messages, setMessages] = useState(data as Array<any>)
+  // const [messages, setMessages] = useState(data as Array<any>)
   const [optionsModalVisible, setOptionsModalVisible] = useState(false)
   const [selectedMessage, setSelectedMessage] = useState<any>({ tpye: "unsupported" })
   const user = {
-    id: "06c33e8b-e835-4736-80f4-63f44b66666c",
-    imageUrl:
-     receiver?.picture,
-    name: "Jirazo",
+    id: userStore._id,
+    imageUrl: userStore?.picture,
+    name: userStore.name,
     status: "online",
   }
-
 
   const handleMessagePress = async (message: any) => {
     if (message.type === "file") {
@@ -112,6 +45,17 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
       } catch {}
     }
   }
+
+  const syncChat = async() =>{
+    await syncChatMessages(roomId)
+  console.log(allChatRooms)
+  }
+  console.log('chatMessages',chatMessages)
+
+
+  useEffect(() =>{
+    syncChat()
+  },[])
 
   // const handleSendPress = (message: MessageType.PartialText) => {
   //   const textMessage: MessageType.Text = {
@@ -140,12 +84,9 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
     const res = await MediaPicker()
   }
 
-  const handleSendPress = (text) => {
-    console.log(text)
-  }
+  const handleSendPress = (text) => {}
 
   const handleOnMessageLongPress = (message) => {
-    console.log(message)
     setSelectedMessage(message)
     setOptionsModalVisible(true)
   }
@@ -189,7 +130,7 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
           },
           borders: { inputBorderRadius: 10, messageBorderRadius: 10 },
         }}
-        messages={messages}
+        messages={getRoomMessages({ roomId })}
         onAttachmentPress={onAttachmentPress}
         onMessagePress={handleMessagePress}
         onMessageLongPress={handleOnMessageLongPress}
@@ -216,3 +157,66 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
 })
 
 const testTextStyle: TextStyle = {}
+// const testData = [
+//   {
+//     author: {
+//       createdAt: 1677025650,
+//       firstName: "Jirazo",
+//       id: "06c33e8b-e835-4736-80f4-63f44b66666d",
+//       imageUrl: receiver?.picture,
+//       lastSeen: 1677025650,
+//     },
+//     createdAt: 1677025650,
+//     id: 1,
+//     status: "sent",
+//     type: "image",
+//     uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQfOiUfb4VFnytmuO25W3RGvUAwj3S1fDc0eq3nVdAM0w&s",
+//     size: 20,
+//     text: "Hi There!",
+//   },
+//   {
+//     author: {
+//       createdAt: 1677025650,
+//       firstName: "Jirazo",
+//       id: "06c33e8b-e835-4736-80f4-63f44b66666c",
+//       imageUrl: receiver?.picture,
+//       lastSeen: 1677025650,
+//     },
+//     createdAt: 1677025650,
+//     id: 2,
+//     status: "sent",
+//     type: "image",
+//     uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTZbid4L4Db-UU3xKTLC-rF-wcVO2nEAKkPgvKmEU4TnA&s",
+//     size: 20,
+//     text: "Hi There!",
+//   },
+
+//   {
+//     author: {
+//       createdAt: 1677025650,
+//       firstName: "Jirazo",
+//       id: "06c33e8b-e835-4736-80f4-63f44b66666c",
+//       imageUrl: receiver?.picture,
+//       lastSeen: 1677025650,
+//     },
+//     createdAt: 1677025650,
+//     id: 4,
+//     status: "sent",
+//     type: "text",
+//     text: "Hi There!",
+//   },
+//   {
+//     author: {
+//       createdAt: 1677025650,
+//       firstName: "Jirazo",
+//       id: "06c33e8b-e835-4736-80f-63f44b66666c",
+//       imageUrl: receiver?.picture,
+//       lastSeen: 1677025650,
+//     },
+//     createdAt: 1677025650,
+//     id: 5,
+//     status: "sent",
+//     type: "text",
+//     text: "Hi There!",
+//   },
+// ]

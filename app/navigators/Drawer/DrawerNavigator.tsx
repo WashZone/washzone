@@ -21,7 +21,6 @@ export function DrawerNavigator() {
   const progress = useSharedValue(0)
 
   const toggleDrawer = () => {
-    console.log("TOGGLING!")
     if (!open) {
       Keyboard.dismiss()
       drawerRef.current?.openDrawer({ speed: 2 })

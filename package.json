@@ -107,6 +107,7 @@
     "reactotron-mst": "3.1.4",
     "reactotron-react-js": "^3.3.7",
     "reactotron-react-native": "5.0.3",
+    "subscriptions-transport-ws": "^0.11.0",
     "yarn": "^1.22.19"
   },
   "devDependencies": {

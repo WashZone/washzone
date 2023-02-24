@@ -14,6 +14,6 @@ export const ClassifiedFeedModel = ClassifiedFeedModelBase
   .actions(self => ({
     // This is an auto-generated example action.
     log() {
-      console.log(JSON.stringify(self))
+      // console.log(JSON.stringify(self))
     }
   }))

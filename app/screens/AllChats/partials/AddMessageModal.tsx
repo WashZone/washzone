@@ -13,7 +13,6 @@ export const AddMessageModal = ({ isVisible, setVisible }) => {
   const [searchResults, setSearchResults] = useState([])
   const [searchKey, setSearchKey] = useState("")
   const [loading, setLoading] = useState(false)
-  console.log(searchResults)
   const handleSearch = useCallback(
     debounce(async (text: string) => {
       if (text.length > 0) {

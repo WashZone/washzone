@@ -21,11 +21,9 @@ export const VideoBlock = ({
 }) => {
   const navigation = useNavigation<NavigationProp<VideosTabParamList>>()
 
-  console.log("videoDetails", videoDetails)
-
   const handleOnPress = () => {
     if (!disabled) {
-      console.log(":IN", videoDetails)
+    
       if (videoDetails?.vedioPlaylistId && videoDetails?.vedioPlaylistId !== "") {
         navigation.navigate("Playlist", { playlistId: videoDetails?.vedioPlaylistId })
       } else {

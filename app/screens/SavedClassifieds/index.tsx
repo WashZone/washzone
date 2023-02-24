@@ -38,10 +38,9 @@ const BottomActions = ({ classified, type }: { classified: any; type: "video" | 
           url: "",
         })
           .then((res) => {
-            console.log(res)
           })
           .catch((err) => {
-            err && console.log(err)
+
           }),
     },
     {

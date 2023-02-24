@@ -67,10 +67,10 @@ const Actions = observer(function ActionButtons({ item }: { item: any }) {
           onPress={() =>
             Share.open({ message: "", title: "", url: `washzone://shared-topic/${item?._id}` })
               .then((res) => {
-                console.log(res)
+
               })
               .catch((err) => {
-                err && console.log(err)
+
               })
           }
         />

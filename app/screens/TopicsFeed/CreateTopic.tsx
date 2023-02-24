@@ -53,7 +53,7 @@ export function CreateTopic() {
       await refreshTopics()
       await loadStories()
     } catch (error) {
-      console.log(error)
+
     } finally {
       setIsPosting(false)
       progress.value = withTiming(0, { duration: 400 })
@@ -79,7 +79,6 @@ export function CreateTopic() {
 
       const image = await MediaPicker()
       if (image?.uri) {
-        console.log("setSLe", image)
         setSelectedImage(image)
       }
 
@@ -87,7 +86,7 @@ export function CreateTopic() {
         progress.value = withTiming(1, { duration: 300 })
       }, 100)
     } catch (e) {
-      console.log(e)
+
     }
   }
 

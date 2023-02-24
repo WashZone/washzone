@@ -37,12 +37,12 @@ import { SaveClassifiedModel, SaveClassifiedModelType } from "./SaveClassifiedMo
 import { saveClassifiedModelPrimitives, SaveClassifiedModelSelector } from "./SaveClassifiedModel.base"
 import { FollowUserModel, FollowUserModelType } from "./FollowUserModel"
 import { followUserModelPrimitives, FollowUserModelSelector } from "./FollowUserModel.base"
+import { UsersChatModel, UsersChatModelType } from "./UsersChatModel"
+import { usersChatModelPrimitives, UsersChatModelSelector } from "./UsersChatModel.base"
 import { RoomChatModel, RoomChatModelType } from "./RoomChatModel"
 import { roomChatModelPrimitives, RoomChatModelSelector } from "./RoomChatModel.base"
 import { UsersModel, UsersModelType } from "./UsersModel"
 import { usersModelPrimitives, UsersModelSelector } from "./UsersModel.base"
-import { UsersChatModel, UsersChatModelType } from "./UsersChatModel"
-import { usersChatModelPrimitives, UsersChatModelSelector } from "./UsersChatModel.base"
 
 
 
@@ -211,7 +211,12 @@ mutateCreateUserRating="mutateCreateUserRating",
 mutateUpdateRating="mutateUpdateRating",
 mutateCreateChatRoom="mutateCreateChatRoom",
 mutateCreateUserMessage="mutateCreateUserMessage",
-mutateGetchatByUserId="mutateGetchatByUserId"
+mutateGetchatByUserId="mutateGetchatByUserId",
+mutateGetchatByRoomId="mutateGetchatByRoomId",
+mutateGetroomByUserId="mutateGetroomByUserId",
+mutateGetroomByUsers="mutateGetroomByUsers",
+mutateDeleteChatMessage="mutateDeleteChatMessage",
+mutateDeleteChatRoom="mutateDeleteChatRoom"
 }
 
 /**
@@ -219,7 +224,7 @@ mutateGetchatByUserId="mutateGetchatByUserId"
 */
 export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
   .named("RootStore")
-  .extend(configureStoreMixin([['UserRating', () => UserRatingModel], ['classifiedFeed', () => ClassifiedFeedModel], ['CommentsDetail', () => CommentsDetailModel], ['likeTopics', () => LikeTopicsModel], ['TopicDetail', () => TopicDetailModel], ['likeVideos', () => LikeVideosModel], ['VideoPlaylist', () => VideoPlaylistModel], ['VideoUploadPlaylist', () => VideoUploadPlaylistModel], ['VideoUpload', () => VideoUploadModel], ['User', () => UserModel], ['SigninUser', () => SigninUserModel], ['Legalities', () => LegalitiesModel], ['saveVideo', () => SaveVideoModel], ['storyViewerUser', () => StoryViewerUserModel], ['saveClassified', () => SaveClassifiedModel], ['followUser', () => FollowUserModel], ['roomChat', () => RoomChatModel], ['Users', () => UsersModel], ['usersChat', () => UsersChatModel]], [], "js"))
+  .extend(configureStoreMixin([['UserRating', () => UserRatingModel], ['classifiedFeed', () => ClassifiedFeedModel], ['CommentsDetail', () => CommentsDetailModel], ['likeTopics', () => LikeTopicsModel], ['TopicDetail', () => TopicDetailModel], ['likeVideos', () => LikeVideosModel], ['VideoPlaylist', () => VideoPlaylistModel], ['VideoUploadPlaylist', () => VideoUploadPlaylistModel], ['VideoUpload', () => VideoUploadModel], ['User', () => UserModel], ['SigninUser', () => SigninUserModel], ['Legalities', () => LegalitiesModel], ['saveVideo', () => SaveVideoModel], ['storyViewerUser', () => StoryViewerUserModel], ['saveClassified', () => SaveClassifiedModel], ['followUser', () => FollowUserModel], ['usersChat', () => UsersChatModel], ['roomChat', () => RoomChatModel], ['Users', () => UsersModel]], [], "js"))
   .props({
 
   })
@@ -606,6 +611,21 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     },
     mutateGetchatByUserId(variables: { authorId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ getchatByUserId: any }>(`mutation getchatByUserId($authorId: String!) { getchatByUserId(authorId: $authorId) }`, variables, optimisticUpdate)
+    },
+    mutateGetchatByRoomId(variables: { roomId: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ getchatByRoomId: any }>(`mutation getchatByRoomId($roomId: String!) { getchatByRoomId(roomId: $roomId) }`, variables, optimisticUpdate)
+    },
+    mutateGetroomByUserId(variables: { adminId: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ getroomByUserId: any }>(`mutation getroomByUserId($adminId: String!) { getroomByUserId(adminId: $adminId) }`, variables, optimisticUpdate)
+    },
+    mutateGetroomByUsers(variables: { membersId: InputUsers[] }, optimisticUpdate?: () => void) {
+      return self.mutate<{ getroomByUsers: any }>(`mutation getroomByUsers($membersId: [InputUsers!]!) { getroomByUsers(membersId: $membersId) }`, variables, optimisticUpdate)
+    },
+    mutateDeleteChatMessage(variables: { chatmessageId: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ deleteChatMessage: boolean }>(`mutation deleteChatMessage($chatmessageId: String!) { deleteChatMessage(chatmessageId: $chatmessageId) }`, variables, optimisticUpdate)
+    },
+    mutateDeleteChatRoom(variables: { roomId: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ deleteChatRoom: boolean }>(`mutation deleteChatRoom($roomId: String!) { deleteChatRoom(roomId: $roomId) }`, variables, optimisticUpdate)
     },
     subscribeNewMessageadd(variables?: {  }, resultSelector: string | ((qb: RoomChatModelSelector) => RoomChatModelSelector) = roomChatModelPrimitives.toString(), onData?: (item: any) => void, onError?: (error: Error) => void) {
       return self.subscribe<{ newMessageadd: RoomChatModelType}>(`subscription newMessageadd { newMessageadd {

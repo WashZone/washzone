@@ -12,6 +12,9 @@ export { selectFromUsersChat, usersChatModelPrimitives, UsersChatModelSelector }
  */
 export const UsersChatModel = UsersChatModelBase
   .actions(self => ({
+    // afterAll(){
+    //   self.
+    // },
     // This is an auto-generated example action.
     log() {
       console.log(JSON.stringify(self))

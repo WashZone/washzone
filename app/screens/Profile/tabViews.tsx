@@ -9,7 +9,6 @@ import { AutoImage } from "../../components"
 import { HFlatList, HScrollView } from "react-native-head-tab-view"
 
 const GalleryItem = ({ uri }) => {
-  console.log(uri)
   return (
     <AutoImage
       source={{ uri }}
@@ -42,8 +41,6 @@ export const GalleryTabView = ({ galleryItems }: { galleryItems: Array<any> }) =
       left,
       right,
     })
-    console.log(left)
-    console.log(right)
   }, [galleryItems])
 
   return (

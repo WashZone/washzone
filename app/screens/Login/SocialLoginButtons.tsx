@@ -79,12 +79,11 @@ export function SocialLogin() {
               }
             })
             .catch((e) => {
-              console.log("ERROR ISccc: " + JSON.stringify(e))
             })
         }
       })
       .catch((e) => {
-        console.log("ERROR IS: " + JSON.stringify(e))
+
       })
   }
 
@@ -99,7 +98,6 @@ export function SocialLogin() {
       { accessToken: token, parameters: PROFILE_REQUEST_PARAMS },
       async (error, user) => {
         if (error) {
-          console.log("login info has error: " + error)
         } else {
           const userInfo: any = user
           const resGetUserBySocialId = await queryGetUserBysocialId(
@@ -148,19 +146,15 @@ export function SocialLogin() {
   const loginWithFacebook = () => {
     LoginManager.logInWithPermissions(["public_profile"]).then(
       (login) => {
-        console.log("ACCESSTOKEN _ IN")
         if (login.isCancelled) {
-          console.log("Login cancelled")
         } else {
           AccessToken.getCurrentAccessToken().then((data) => {
             const accessToken = data.accessToken.toString()
-            console.log("ACCESSTOKEN", accessToken)
             getInfoFromTokenForFacebook(accessToken)
           })
         }
       },
       (error) => {
-        console.log("Login fail with error: " + error)
       },
     )
   }

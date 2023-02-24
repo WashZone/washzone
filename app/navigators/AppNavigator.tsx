@@ -46,7 +46,7 @@ export type AppStackParamList = {
   Legal: undefined
   Support: undefined
   AllChats: undefined
-  P2PChat:  {receiver:any}
+  P2PChat: { receiver: any; roomId: string | undefined }
   CallScreen: { mode: "audio" | "video" }
 }
 
@@ -96,8 +96,11 @@ const AppStack = observer(function AppStack() {
             <Stack.Screen name="AllChats" component={AllChats} />
             <Stack.Screen name="P2PChat" component={P2PChat} />
             <Stack.Screen name="Support" component={Support} />
-            <Stack.Screen name="CallScreen" component={CallScreen}
-            options={{ presentation: "containedModal" }} />
+            <Stack.Screen
+              name="CallScreen"
+              component={CallScreen}
+              options={{ presentation: "containedModal" }}
+            />
             <Stack.Screen
               name="Search"
               component={Search}

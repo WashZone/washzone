@@ -31,11 +31,9 @@ export const ResetPassword: FC<AppStackScreenProps<"ResetPassword">> = function 
         oldPassword: currentPass,
       })
       Toast.show({ ...toastMessages.passwordResetSuccess })
-      console.log(res)
       setButtonLoading(false)
     } catch (e) {
       Toast.show({ ...toastMessages.incorrectCredentials })
-      console.log("errror", e)
       setButtonLoading(false)
     }
   }

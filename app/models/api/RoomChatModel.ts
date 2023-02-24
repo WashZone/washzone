@@ -13,6 +13,9 @@ export { selectFromRoomChat, roomChatModelPrimitives, RoomChatModelSelector } fr
 export const RoomChatModel = RoomChatModelBase
   .actions(self => ({
     // This is an auto-generated example action.
+    // afterAll() {
+    //   self.
+    // },
     log() {
       console.log(JSON.stringify(self))
     }

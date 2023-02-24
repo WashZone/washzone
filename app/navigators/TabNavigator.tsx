@@ -42,7 +42,6 @@ export function TabNavigator() {
   const url = Linking.useURL()
 
   const handleStoryURL = (linkUrl: string) => {
-    console.log("URLURL", linkUrl)
     if (/shared-classified/.test(linkUrl)) {
       navigation.navigate("Classifieds")
       setTimeout(

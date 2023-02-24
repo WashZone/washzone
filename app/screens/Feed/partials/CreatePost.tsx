@@ -53,10 +53,8 @@ export const CreatePost = observer(function CreatePost() {
         content: postContent,
       })
 
-      console.log(res)
       await getAndUpdatePosts(false)
     } catch (error) {
-      console.log(error)
     } finally {
       setIsPosting(false)
       progress.value = withTiming(0, { duration: 400 })
@@ -85,7 +83,6 @@ export const CreatePost = observer(function CreatePost() {
 
       const image = await MediaPicker()
       if (image?.uri) {
-        console.log("setSLe", image)
         setSelectedImage(image)
       }
 
@@ -93,7 +90,6 @@ export const CreatePost = observer(function CreatePost() {
         progress.value = withTiming(1, { duration: 300 })
       }, 100)
     } catch (e) {
-      console.log(e)
     }
   }
 

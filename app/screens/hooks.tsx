@@ -6,6 +6,7 @@ import { getUniqueId } from "react-native-device-info"
 
 export function useHooks() {
   const {
+    subscribeAll,
     authenticationStore: { setBlocked, setAuthToken },
     searchStore: { setResults },
     feedStore: {
@@ -18,6 +19,7 @@ export function useHooks() {
     topics: { setTopics, topics, addToTopics },
     saved: { setSavedClassifieds },
     videos: { setVideos },
+    allChats: { setChatRooms, updateRoomMessages },
     interaction: {
       addToDislikedTopics,
       addToLikedTopics,
@@ -75,13 +77,19 @@ export function useHooks() {
       queryGetratingOnUserId,
       queryGetSearchedItem,
       queryGetAllLegalitiesData,
+      mutateGetroomByUserId,
+      mutateGetchatByRoomId,
     },
     userStore,
   } = useStores()
 
   const loadStories = async () => {
-    const res = await queryGetAllStory(undefined, { fetchPolicy: "network-only" })
-    setStories(res.getAllStory?.data || [])
+    try {
+      const res = await queryGetAllStory(undefined, { fetchPolicy: "network-only" })
+      setStories(res.getAllStory?.data || [])
+    } catch (err) {
+      console.log(err)
+    }
   }
 
   const getAndUpdatePosts = async (cache?: boolean) => {
@@ -104,13 +112,17 @@ export function useHooks() {
   }
 
   const refreshPosts = async () => {
-    const res = await queryGetAllTopicByPageNumber(
-      { pageNumber: 1 },
-      { fetchPolicy: "network-only" },
-    )
+    try {
+      const res = await queryGetAllTopicByPageNumber(
+        { pageNumber: 1 },
+        { fetchPolicy: "network-only" },
+      )
 
-    setFeedTopics(res.getAllTopicByPageNumber?.data)
-    syncInteractedVideosAndTopics()
+      setFeedTopics(res.getAllTopicByPageNumber?.data)
+      syncInteractedVideosAndTopics()
+    } catch (err) {
+      console.log(err)
+    }
   }
 
   const loadMoreClassified = async () => {
@@ -127,9 +139,13 @@ export function useHooks() {
   }
 
   const refreshClassifieds = async () => {
-    const res = await queryGetAllClassifiedFeed({ pageNumber: 0 }, { fetchPolicy: "no-cache" })
+    try {
+      const res = await queryGetAllClassifiedFeed({ pageNumber: 0 }, { fetchPolicy: "no-cache" })
 
-    setClassifieds(res.getAllClassifiedFeed?.data)
+      setClassifieds(res.getAllClassifiedFeed?.data)
+    } catch (err) {
+      console.log(err)
+    }
   }
 
   const loadMoreTopics = async () => {
@@ -145,11 +161,15 @@ export function useHooks() {
   }
 
   const refreshTopics = async () => {
-    const res = await queryGetAllTopicByPageNumber({ pageNumber: 1 }, { fetchPolicy: "no-cache" })
+    try {
+      const res = await queryGetAllTopicByPageNumber({ pageNumber: 1 }, { fetchPolicy: "no-cache" })
 
-    await syncInteractedVideosAndTopics()
-    setTopics(res.getAllTopicByPageNumber?.data)
-    await syncInteractedVideosAndTopics()
+      await syncInteractedVideosAndTopics()
+      setTopics(res.getAllTopicByPageNumber?.data)
+      await syncInteractedVideosAndTopics()
+    } catch (err) {
+      console.log(err)
+    }
   }
 
   const postComment = async (comment: string, topicId: string) => {
@@ -194,33 +214,37 @@ export function useHooks() {
   }
 
   const syncSavedInteractionsHook = async () => {
-    const res = await queryGetAllSavedByUserId(
-      { userId: userStore?._id },
-      { fetchPolicy: "no-cache" },
-    )
-    const savedVideoIds: Array<string> = []
-    const savedClassifiedIds: Array<string> = []
-    // eslint-disable-next-line array-callback-return
-    res.getAllSavedByUserId?.data?.map((item: any) => {
-      if (item?.savedType === "classified") {
-        savedClassifiedIds.push(
-          item?.ClassifiedFeedId?.length &&
-            typeof item?.ClassifiedFeedId[0]?._id === "string" &&
-            item?.ClassifiedFeedId[0]?._id,
-        )
-      }
-      if (item?.savedType === "video") {
-        savedVideoIds.push(
-          item?.VideoDetail?.length &&
-            typeof item?.VideoDetail[0]?._id === "string" &&
-            item?.VideoDetail[0]?._id,
-        )
-      }
-    })
-    syncSavedInteractions({
-      savedClassifieds: [...savedClassifiedIds],
-      savedVideos: [...savedVideoIds],
-    })
+    try {
+      const res = await queryGetAllSavedByUserId(
+        { userId: userStore?._id },
+        { fetchPolicy: "no-cache" },
+      )
+      const savedVideoIds: Array<string> = []
+      const savedClassifiedIds: Array<string> = []
+      // eslint-disable-next-line array-callback-return
+      res.getAllSavedByUserId?.data?.map((item: any) => {
+        if (item?.savedType === "classified") {
+          savedClassifiedIds.push(
+            item?.ClassifiedFeedId?.length &&
+              typeof item?.ClassifiedFeedId[0]?._id === "string" &&
+              item?.ClassifiedFeedId[0]?._id,
+          )
+        }
+        if (item?.savedType === "video") {
+          savedVideoIds.push(
+            item?.VideoDetail?.length &&
+              typeof item?.VideoDetail[0]?._id === "string" &&
+              item?.VideoDetail[0]?._id,
+          )
+        }
+      })
+      syncSavedInteractions({
+        savedClassifieds: [...savedClassifiedIds],
+        savedVideos: [...savedVideoIds],
+      })
+    } catch (err) {
+      console.log(err)
+    }
   }
 
   const interactWithSaveOnClassified = async (classifiedFeedId: string) => {
@@ -294,11 +318,15 @@ export function useHooks() {
   }
 
   const refreshVideos = async () => {
-    const res = await queryGetUserChannel(undefined, { fetchPolicy: "no-cache" })
-    setVideos(res.getUserChannel)
+    try {
+      const res = await queryGetUserChannel(undefined, { fetchPolicy: "no-cache" })
+      setVideos(res.getUserChannel)
 
-    await syncInteractedVideosAndTopics()
-    return res.getUserChannel
+      await syncInteractedVideosAndTopics()
+      return res.getUserChannel
+    } catch (err) {
+      console.log(err)
+    }
   }
 
   const getUserTopics = async (userId: string) => {
@@ -529,7 +557,7 @@ export function useHooks() {
 
   const rateUser = async (userId: string, rating: number) => {
     try {
-      const res = await mutateCreateUserRating({
+      await mutateCreateUserRating({
         userId,
         ratinguserId: userStore._id,
         ratingStar: rating,
@@ -551,6 +579,8 @@ export function useHooks() {
   }
 
   const onLoggedInBoot = async () => {
+    console.log("RUNNING = onLoggedInBoot")
+
     await syncSavedInteractionsHook()
     await syncInteractedVideosAndTopics()
     await refreshTopics()
@@ -558,6 +588,8 @@ export function useHooks() {
     await refreshClassifieds()
     await refreshVideos()
     await loadStories()
+    await syncAllChats()
+    subscribeAll()
   }
 
   const searchKeyword = async (searchKey: string) => {
@@ -591,12 +623,11 @@ export function useHooks() {
 
   const searchUser = async (searchKey: string) => {
     try {
-      console.log(searchKey)
       const resUsers = await queryGetSearchedUser(
         { searchKey, pageNumber: 1 },
         { fetchPolicy: "no-cache" },
       )
-      console.log("resUsers",resUsers)
+
       return resUsers.getSearchedUser?.data || []
     } catch (err) {
       Toast.show(toastMessages.somethingWentWrong)
@@ -616,7 +647,25 @@ export function useHooks() {
     }
   }
 
+  const syncAllChats = async () => {
+    try {
+      const res = await mutateGetroomByUserId({ adminId: userStore._id })
+      console.log("SYNCING ALL CHATS", JSON.stringify(res))
+      setChatRooms(res.getroomByUserId?.data)
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  const syncChatMessages = async (roomId: string) => {
+    try {
+      const res = await mutateGetchatByRoomId({ roomId })
+      updateRoomMessages(res.getchatByRoomId?.data || [])
+    } catch (err) {}
+  }
+
   return {
+    syncChatMessages,
     onLoggedInBoot,
     getPlaylist,
     loadStories,
@@ -654,6 +703,6 @@ export function useHooks() {
     getRatingOnUser,
     rateUser,
     getLegalities,
-    searchUser
+    searchUser,
   }
 }

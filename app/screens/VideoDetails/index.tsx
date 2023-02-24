@@ -65,10 +65,10 @@ const ActionButtons = observer(function TopicsFeed({ data }: { data: any }) {
           url: "",
         })
           .then((res) => {
-            console.log(res)
+
           })
           .catch((err) => {
-            err && console.log(err)
+
           }),
     },
     {
@@ -194,7 +194,7 @@ export const VideoDetails: FC<VideosTabProps<"VideoDetails">> = observer(functio
       url: `washzone://shared-video/${data?._id}`,
     })
       .then((res) => {
-        console.log(res)
+   
       })
       .catch((err) => {
         err && console.log(err)

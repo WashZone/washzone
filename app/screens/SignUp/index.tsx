@@ -77,7 +77,6 @@ export const SignupScreen: FC<SignupProps> = observer(function LoginScreen(_prop
           isSocialLogin: false,
           _id: res.createUser._id,
         })
-        console.log(res)
         setIsSubmitted(false)
         const token = new Date()
         setAuthToken(token.toString())
