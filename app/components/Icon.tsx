@@ -154,7 +154,7 @@ export const iconRegistry = {
   videoCall: require("../../assets/icons/video-call.png"),
   chatMessage: require("../../assets/icons/chat-message.png"),
   addMessage: require("../../assets/icons/add-message.png"),
-  hangUpCall: require("../../assets/icons/call-hang-up.png"),
+  hangUpCall: require("../../assets/icons/hang-up.png"),
   
 }
 

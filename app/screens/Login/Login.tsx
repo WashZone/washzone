@@ -119,6 +119,7 @@ export const LoginView = observer(() => {
         style={$tapButton}
         preset="reversed"
         onPress={login}
+        textColor={colors.palette.neutral100}
       />
       <Pressable onPress={() => navigation.navigate("Signup")} style={$footer}>
         <Text tx="loginScreen.noAccont" size="sm" weight="light" style={$hint} />

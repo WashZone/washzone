@@ -1,5 +1,6 @@
 import React, { ComponentType } from "react"
 import {
+  ColorValue,
   Pressable,
   PressableProps,
   PressableStateCallbackType,
@@ -65,6 +66,8 @@ export interface ButtonProps extends PressableProps {
    * Children components.
    */
   children?: React.ReactNode
+
+  textColor ?:ColorValue
 }
 
 /**
@@ -85,6 +88,7 @@ export function Button(props: ButtonProps) {
     children,
     RightAccessory,
     LeftAccessory,
+    textColor,
     ...rest
   } = props
 
@@ -94,6 +98,7 @@ export function Button(props: ButtonProps) {
       $viewPresets[preset],
       $viewStyleOverride,
       !!pressed && [$pressedViewPresets[preset], $pressedViewStyleOverride],
+
     ]
   }
   function $textStyle({ pressed }) {
@@ -101,6 +106,8 @@ export function Button(props: ButtonProps) {
       $textPresets[preset],
       $textStyleOverride,
       !!pressed && [$pressedTextPresets[preset], $pressedTextStyleOverride],
+      textColor && {color:textColor}
+
     ]
   }
 

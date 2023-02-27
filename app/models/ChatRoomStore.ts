@@ -4,8 +4,8 @@ import { withSetPropAction } from "./helpers/withSetPropAction"
 export const ChatRoomStoreModel = types
   .model("ChatRoomStore")
   .props({
-    allChatRooms: types.frozen(),
-    chatMessages: types.frozen(),
+    allChatRooms: types.frozen([]),
+    chatMessages: types.frozen({}),
   })
   .actions(withSetPropAction)
   .actions((self) => ({

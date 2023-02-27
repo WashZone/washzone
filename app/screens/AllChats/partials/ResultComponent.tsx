@@ -15,8 +15,9 @@ export const ResultComponent = ({ data, setVisible }: { data: any, setVisible:(b
   const handlePress = () => {
     Keyboard.dismiss()
     setVisible(false)
-    navigation.navigate("P2PChat", { receiver: data })
+    navigation.navigate("P2PChat", { receiver: data , roomId: undefined })
   }
+
   return (
     <ListItem
       onPress={handlePress}

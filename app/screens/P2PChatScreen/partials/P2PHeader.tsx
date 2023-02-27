@@ -9,6 +9,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { formatName } from "../../../utils/formatName"
 import { he } from "date-fns/locale"
+import { Role } from "../../CallScreen"
 
 export const P2PHeader = ({ data }) => {
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
@@ -26,25 +27,29 @@ export const P2PHeader = ({ data }) => {
 
           <TouchableOpacity style={[$flexRow, $contentCenter]}>
             <FastImage source={{ uri: data?.picture }} style={$profileImage} />
-            <View >
+            <View>
               <Text text={formatName(data?.name)} style={$usernameText} size="md" />
               <View style={$flexRow}>
-                <View style={[$statusIcon ,{ backgroundColor:colors.palette.status.online}]}/><Text
-
-                text={data?.status|| 'Online'}
-                style={$usernameText}
-                size="xxs"
-                color={colors.palette.greyOverlay100}
-              />
+                <View style={[$statusIcon, { backgroundColor: colors.palette.status.online }]} />
+                <Text
+                  text={data?.status || "Online"}
+                  style={$usernameText}
+                  size="xxs"
+                  color={colors.palette.greyOverlay100}
+                />
               </View>
             </View>
           </TouchableOpacity>
         </View>
         <View style={[$flexRow, $contentCenter]}>
-          <TouchableOpacity onPress={() => navigation.navigate("CallScreen", { mode: "audio" })}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("CallScreen", { mode: "audio", receiver: data,role:Role.initiator })}
+          >
             <Icon icon="audioCall" size={28} color={colors.palette.neutral100} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate("CallScreen", { mode: "audio" })}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("CallScreen", { mode: "video", receiver: data, role:Role.initiator })}
+          >
             <Icon
               icon="videoCall"
               size={28}
@@ -58,7 +63,13 @@ export const P2PHeader = ({ data }) => {
   )
 }
 
-const $statusIcon :ViewStyle={height:6, width:6, borderRadius:3,alignSelf:'center', marginRight:spacing.tiny}
+const $statusIcon: ViewStyle = {
+  height: 6,
+  width: 6,
+  borderRadius: 3,
+  alignSelf: "center",
+  marginRight: spacing.tiny,
+}
 
 const $usernameText: TextStyle = {
   color: colors.palette.neutral100,

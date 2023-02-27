@@ -48,10 +48,8 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
 
   const syncChat = async() =>{
     await syncChatMessages(roomId)
-  console.log(allChatRooms)
+    console.log(allChatRooms)
   }
-  console.log('chatMessages',chatMessages)
-
 
   useEffect(() =>{
     syncChat()
@@ -84,7 +82,7 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
     const res = await MediaPicker()
   }
 
-  const handleSendPress = (text) => {}
+  const handleSendPress = (text:MessageType.PartialText) => {}
 
   const handleOnMessageLongPress = (message) => {
     setSelectedMessage(message)

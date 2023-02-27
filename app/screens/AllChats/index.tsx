@@ -17,7 +17,6 @@ export const AllChats: FC<AppStackScreenProps<"AllChats">> = observer(function A
     allChats:{ allChatRooms },
     userStore:{_id}
   } = useStores()
-  console.log("allChatRooms",allChatRooms)
 
   // const handleNewMessage = (item: any) => {
   //   console.log("handleNewMessage", item)

@@ -23,3 +23,5 @@ export const $contentCenter: ViewStyle = {
   justifyContent: "center",
   alignItems: "center",
 }
+
+export const $scaleFull :ViewStyle={ height: "100%", width: "100%" }

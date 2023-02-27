@@ -29,6 +29,7 @@ import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
 import { DrawerNavigator } from "./Drawer/DrawerNavigator"
 import { useHooks } from "../screens/hooks"
 import { BlockedUserModal } from "../components/BlockedUserModal"
+import { Role } from "../screens/CallScreen"
 
 export type AppStackParamList = {
   Login: undefined
@@ -47,7 +48,7 @@ export type AppStackParamList = {
   Support: undefined
   AllChats: undefined
   P2PChat: { receiver: any; roomId: string | undefined }
-  CallScreen: { mode: "audio" | "video" }
+  CallScreen: { mode: "audio" | "video"; receiver: any, role: Role }
 }
 
 const exitRoutes = Config.exitRoutes

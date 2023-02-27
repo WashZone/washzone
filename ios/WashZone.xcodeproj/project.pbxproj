@@ -16,6 +16,8 @@
 		4D90CED1D40FD47F07E04CEB /* libPods-WashZone.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5389F2083BA5F695AF9AA33F /* libPods-WashZone.a */; };
 		4F23530D71577609641E45B7 /* libPods-WashZone-WashZoneTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CEF8690A37918520F73C5FF7 /* libPods-WashZone-WashZoneTests.a */; };
 		623C26AB2930837E00F5AD66 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 623C26AA2930837E00F5AD66 /* GoogleService-Info.plist */; };
+		991E35A129ACC1290048BBD9 /* ringing.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 991E359F29ACC1290048BBD9 /* ringing.mp3 */; };
+		991E35A229ACC1290048BBD9 /* connecting.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 991E35A029ACC1290048BBD9 /* connecting.mp3 */; };
 		9977D54129A61FF700ED62C1 /* hermes.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9977D54029A61FF700ED62C1 /* hermes.xcframework */; };
 		9977D54229A61FF700ED62C1 /* hermes.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9977D54029A61FF700ED62C1 /* hermes.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		BE406F562862D73000A81E39 /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BE406F552862D73000A81E39 /* BootSplash.storyboard */; };
@@ -61,6 +63,8 @@
 		5389F2083BA5F695AF9AA33F /* libPods-WashZone.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-WashZone.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		623C26AA2930837E00F5AD66 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		951E59D51E504BC9C5F46169 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-WashZone/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
+		991E359F29ACC1290048BBD9 /* ringing.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = ringing.mp3; path = ../assets/sound/ringing.mp3; sourceTree = "<group>"; };
+		991E35A029ACC1290048BBD9 /* connecting.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = connecting.mp3; path = ../assets/sound/connecting.mp3; sourceTree = "<group>"; };
 		9977D54029A61FF700ED62C1 /* hermes.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = hermes.xcframework; path = "Pods/hermes-engine/destroot/Library/Frameworks/universal/hermes.xcframework"; sourceTree = "<group>"; };
 		BC90C5CE8E0CCF85D4516B1F /* Pods-WashZone.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WashZone.debug.xcconfig"; path = "Target Support Files/Pods-WashZone/Pods-WashZone.debug.xcconfig"; sourceTree = "<group>"; };
 		BE406F552862D73000A81E39 /* BootSplash.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = BootSplash.storyboard; path = WashZone/BootSplash.storyboard; sourceTree = "<group>"; };
@@ -161,6 +165,8 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				991E35A029ACC1290048BBD9 /* connecting.mp3 */,
+				991E359F29ACC1290048BBD9 /* ringing.mp3 */,
 				13B07FAE1A68108700A75B9A /* WashZone */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* WashZoneTests */,
@@ -299,8 +305,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				BE406F562862D73000A81E39 /* BootSplash.storyboard in Resources */,
+				991E35A229ACC1290048BBD9 /* connecting.mp3 in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				623C26AB2930837E00F5AD66 /* GoogleService-Info.plist in Resources */,
+				991E35A129ACC1290048BBD9 /* ringing.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -559,7 +567,7 @@
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = WashZone/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -602,7 +610,7 @@
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = WashZone/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
