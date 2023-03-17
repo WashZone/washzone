@@ -139,7 +139,7 @@ const BottomActions = ({ classified }: { classified: any }) => {
         </View>
       ))}
     </View>
-    <SendOfferModal isVisible={sendOfferModal} setVisible={setSendOfferModal} receiver={classified?.UserId || classified?.userId
+    <SendOfferModal classified={classified} isVisible={sendOfferModal} setVisible={setSendOfferModal} receiver={classified?.UserId || classified?.userId
     }/>
     </>
   )

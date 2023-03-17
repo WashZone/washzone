@@ -9,35 +9,91 @@ export const Actions = ({
   onHangUp,
   role,
   status,
+  acceptCall,
+  setSpeaker,
+  setMute,
+  mute,
+  speaker,
 }: {
+  setSpeaker: (b: boolean) => void
+  setMute: (b: boolean) => void
+  mute: boolean
+  speaker: boolean
+  acceptCall: () => void
   onHangUp: () => void
   role: Role
   status: CallStatus
 }) => {
+  if (status === CallStatus.processing) return null
   return (
     <View style={$container}>
-      {role === Role.receiver && (
-        <TouchableOpacity
-          onPress={onHangUp}
-          style={[$actionContainer, { backgroundColor: colors.palette.angry500 }]}
-        >
-          <Icon icon="x" size={30} color={colors.palette.neutral100} />
-        </TouchableOpacity>
-      )}
-      {role !== Role.receiver && (
-        <TouchableOpacity
-          onPress={onHangUp}
-          style={[$actionContainer, { backgroundColor: colors.palette.angry500 }]}
-        >
-          <Icon icon="hangUpCall" size={38} color={colors.palette.neutral100} style={{marginTop:spacing.tiny}}/>
-        </TouchableOpacity>
-      )}
-      {role === Role.receiver && (
-        <TouchableOpacity
-          style={[$actionContainer, { backgroundColor: colors.palette.success100 }]}
-        >
-          <Icon icon="audioCall" size={30} color={colors.palette.neutral100} />
-        </TouchableOpacity>
+      {status === CallStatus.connected ? (
+        <>
+          <TouchableOpacity
+            onPress={() => setMute(!mute)}
+            style={[$sideActionConatiner, { backgroundColor: colors.palette.greyOverlay100 }]}
+          >
+            <Icon
+              icon={mute ? "microphone_block" : "microphone"}
+              size={28}
+              color={colors.palette.neutral100}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={onHangUp}
+            style={[$actionContainer, { backgroundColor: colors.palette.angry500 }]}
+          >
+            <Icon
+              icon="hangUpCall"
+              size={38}
+              color={colors.palette.neutral100}
+              style={{ marginTop: spacing.tiny }}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setSpeaker(!speaker)}
+            style={[$sideActionConatiner, { backgroundColor: colors.palette.greyOverlay100 }]}
+          >
+            <Icon
+              icon={speaker ? "speaker" : "no_audio"}
+              size={28}
+              color={colors.palette.neutral100}
+            />
+          </TouchableOpacity>
+        </>
+      ) : (
+        <>
+          {role === Role.receiver && (
+            <TouchableOpacity
+              onPress={onHangUp}
+              style={[$actionContainer, { backgroundColor: colors.palette.angry500 }]}
+            >
+              <Icon icon="x" size={30} color={colors.palette.neutral100} />
+            </TouchableOpacity>
+          )}
+          {role === Role.initiator && (
+            <TouchableOpacity
+              onPress={onHangUp}
+              style={[$actionContainer, { backgroundColor: colors.palette.angry500 }]}
+            >
+              <Icon
+                icon="hangUpCall"
+                size={38}
+                color={colors.palette.neutral100}
+                style={{ marginTop: spacing.tiny }}
+              />
+            </TouchableOpacity>
+          )}
+          {role === Role.receiver && (
+            <TouchableOpacity
+              testID="accept-call"
+              onPress={acceptCall}
+              style={[$actionContainer, { backgroundColor: colors.palette.success100 }]}
+            >
+              <Icon icon="audioCall" size={30} color={colors.palette.neutral100} />
+            </TouchableOpacity>
+          )}
+        </>
       )}
     </View>
   )

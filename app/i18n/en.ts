@@ -74,7 +74,7 @@ const en = {
   TabNavigator: {
     videosTab: "Videos",
     homeTab: "Home",
-    topicsTab: "Topics",
+    discussTab: "Discuss",
     ClassifiedsTab: "Classifieds",
   },
   demoCommunityScreen: {

@@ -132,14 +132,16 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
             <View style={$buttonContainer}>
               <Button
                 testID="get-started-button"
-                tx="loginScreen.getStarted"
+                text='Sign Up'
                 style={$tapButton}
                 preset="reversed"
+                textColor={colors.palette.neutral100}
                 onPress={() => navigation.navigate("Signup")}
               />
               <Button
                 testID="get-started-button"
-                tx="loginScreen.Login"
+                text='LogIn'
+
                 style={$tapButton}
                 preset="reversed"
                 onPress={login}

@@ -4,7 +4,7 @@ import { withSetPropAction } from "./helpers/withSetPropAction"
 export const TopicsStoreModel = types
   .model("TopicsStore")
   .props({
-    topics: types.frozen(),
+    topics: types.frozen([]),
   })
   .actions(withSetPropAction)
   .actions((self) => ({
@@ -12,7 +12,7 @@ export const TopicsStoreModel = types
       self.topics = topics
     },
     addToTopics(topics: any) {
-        self.topics = [...topics, self.topics]
+        self.topics = [ ...topics, ...self.topics]
       },  
     clear() {
       self.topics = []

@@ -81,7 +81,7 @@ const Actions = observer(function ActionButtons({ item }: { item: any }) {
 
 export const TopicComponent = ({ topic, index }) => {
   const navigation = useNavigation<NavigationProp<TopicsTabParamList>>()
-
+console.log('TOPIC TOPIC<' , topic)
   const topicDetails = {
     picture: topic?.userId?.picture,
     first_name: topic?.userId?.first_name,
@@ -89,6 +89,7 @@ export const TopicComponent = ({ topic, index }) => {
     attachmentUrl: topic?.attachmentUrl,
     createdAt: topic?.createdAt,
     content: topic?.topicContent,
+    title : topic?.title
   }
 
   return (
@@ -113,6 +114,7 @@ export const TopicComponent = ({ topic, index }) => {
               <Text text={fromNow(topicDetails.createdAt)} style={$agoStamp} />
             </View>
           </View>
+          <Text style={$postContent} text={topicDetails.title} numberOfLines={1} />
           <Text style={$postContent} text={topicDetails.content} numberOfLines={3} />
           <Actions item={topic} />
         </View>
@@ -151,13 +153,13 @@ export const TopicsFeed: FC<TopicsTabProps<"TopicsFeed">> = observer(function To
   }
 
   return (
-    <Screen contentContainerStyle={$container}>
+    <Screen contentContainerStyle={$container} keyboardOffset={-180}>
       <FlatList
         ListHeaderComponent={<CreateTopic />}
         stickyHeaderIndices={[0]}
         style={$container}
         onEndReached={loadMoreTopics}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}tintColor={colors.palette.primary100} />}
         data={topics.topics}
         renderItem={({ item, index }) => <TopicComponent topic={item} index={index} />}
       />

@@ -1,4 +1,4 @@
-import { ViewStyle } from "react-native"
+import { Dimensions, ViewStyle } from "react-native"
 
 export const $flex1: ViewStyle = {
   flex: 1,
@@ -24,4 +24,4 @@ export const $contentCenter: ViewStyle = {
   alignItems: "center",
 }
 
-export const $scaleFull :ViewStyle={ height: "100%", width: "100%" }
+export const $scaleFull :ViewStyle={ height: Dimensions.get('window').height, width: Dimensions.get('window').width}

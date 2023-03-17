@@ -5,21 +5,30 @@ import { ActivityIndicator } from "react-native-paper"
 import { $fontWeightStyles, BottomModal, Button, Text, TextField } from "../../components"
 import { AppStackParamList } from "../../navigators"
 import { colors, spacing } from "../../theme"
+import { useHooks } from "../hooks"
 
-export const SendOfferModal = ({ isVisible, setVisible , receiver}) => {
+export const SendOfferModal = ({ isVisible, setVisible, receiver, classified }) => {
   const [amount, setAmount] = useState("")
   const [loading, setLoading] = useState(false)
+  const { sendClassfiedOffer, getOrCreateRoom } = useHooks()
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
 
   const onSend = async () => {
     setLoading(true)
-    setTimeout(() => {
-      Keyboard.dismiss()
-      setLoading(false)
-      setVisible(false)
-      navigation.navigate("P2PChat", { receiver: receiver })
-      setAmount("")
-    }, 1000)
+    const roomId = await getOrCreateRoom(receiver?._id)
+
+    const res = await sendClassfiedOffer(roomId, receiver?._id, amount, {
+      id: classified?._id,
+      amount,
+      title: classified?.title,
+      description: classified?.classifiedDetail,
+      image: classified?.attachmentUrl,
+    })
+    Keyboard.dismiss()
+    setLoading(false)
+    setVisible(false)
+    navigation.navigate("P2PChat", { receiver: receiver, roomId: roomId })
+    setAmount("")
   }
 
   return (

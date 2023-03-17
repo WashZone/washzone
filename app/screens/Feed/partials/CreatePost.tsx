@@ -23,7 +23,7 @@ import { useHooks } from "../../hooks"
 import { observer } from "mobx-react-lite"
 
 export const CreatePost = observer(function CreatePost() {
-  const { createTopic } = useHooks()
+  const { createPost } = useHooks()
   const {
     userStore: { picture },
   } = useStores()
@@ -48,13 +48,14 @@ export const CreatePost = observer(function CreatePost() {
       //   type: selectedImage?.type,
       //   fileName: selectedImage?.fileName,
       // })
-      const res = await createTopic({
+      const res = await createPost({
         attachment: selectedImage,
         content: postContent,
       })
 
       await getAndUpdatePosts(false)
     } catch (error) {
+      console.log("Create Post",error)
     } finally {
       setIsPosting(false)
       progress.value = withTiming(0, { duration: 400 })

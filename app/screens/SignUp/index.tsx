@@ -21,7 +21,6 @@ import {
   validatePassword,
 } from "../../utils/validate"
 import Toast from "react-native-toast-message"
-import { toastMessages } from "../../utils/toastMessages"
 
 interface SignupProps extends AppStackScreenProps<"Signup"> {}
 
@@ -82,6 +81,7 @@ export const SignupScreen: FC<SignupProps> = observer(function LoginScreen(_prop
         setAuthToken(token.toString())
         setLoading(false)
       } catch (err) {
+        console.log("ERROEW",err)
         Toast.show({
           type: "error",
           text1: err?.response?.errors?.length > 0 && err?.response?.errors[0].message,
@@ -193,7 +193,7 @@ export const SignupScreen: FC<SignupProps> = observer(function LoginScreen(_prop
           />
         )}
         testID="login-button"
-        tx="loginScreen.create"
+        text="Sign Up"
         style={$tapButton}
         preset="reversed"
         onPress={login}

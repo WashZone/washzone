@@ -49,7 +49,7 @@ export const EditProfile: FC<AppStackScreenProps<"EditProfile">> = function Edit
     if (t.length > maxBioLength) {
       setJustOverflowed(true)
       setTimeout(() => setJustOverflowed(false), 200)
-    } else if (t.length > 0 && t.length <= maxBioLength + 1) {
+    } else if (t.length <= maxBioLength + 1) {
       setBio(t)
     }
   }
@@ -57,7 +57,7 @@ export const EditProfile: FC<AppStackScreenProps<"EditProfile">> = function Edit
   const onSubmit = async () => {
     if (isActive) {
       setButtonLoading(true)
-      await updateProfile(firstName, lastName, picture)
+      await updateProfile(firstName, lastName, picture, bio)
       navigation.goBack()
       setButtonLoading(false)
     }

@@ -29,9 +29,9 @@ export function SocialLogin() {
     GoogleSignin.configure({
       webClientId:
         Platform.OS === "ios"
-          ? "1023545677586-8n9vl69j28eoul9q628f71rjap11obk2.apps.googleusercontent.com"
+          ? "801053055110-7i8u483irj11gaovpcu7srko4hv73ga8.apps.googleusercontent.com"
           : "13619163176-1na00l0e80pvlbs9u1ggvfih13c0t06k.apps.googleusercontent.com",
-      iosClientId: "1023545677586-8n9vl69j28eoul9q628f71rjap11obk2.apps.googleusercontent.com",
+      iosClientId: "801053055110-7i8u483irj11gaovpcu7srko4hv73ga8.apps.googleusercontent.com",
     })
     GoogleSignin.hasPlayServices()
       .then((hasPlayService) => {

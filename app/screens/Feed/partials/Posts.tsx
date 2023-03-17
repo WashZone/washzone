@@ -60,7 +60,7 @@ export const PostComponent = ({ topic, navigateOnPress, index }: TopicComponentP
   // }, [nativeAdViewRef.current])
   return (
     <>
-      <Pressable style={$postContainer} onPress={onContainerPress}>
+      <View style={$postContainer}>
         <View style={$publisherInfoContainer}>
           <Pressable onPress={() => navigation.navigate("Profile", { user: topic?.userId })}>
             <FastImage
@@ -89,7 +89,7 @@ export const PostComponent = ({ topic, navigateOnPress, index }: TopicComponentP
             })
           }
         />
-      </Pressable>
+      </View>
       {/* {index % 5 === 0 && (
         // <NativeAdView adUnitId={NATIVE_AD_UNIT_ID} ref={nativeAdViewRef} />
         // <AppLovinMAX.AdView
@@ -104,28 +104,28 @@ export const PostComponent = ({ topic, navigateOnPress, index }: TopicComponentP
 
 export const Posts = observer(() => {
   const {
-    topics: { topics },
+    feedStore: { homeFeed},
   } = useStores()
-  const { refreshTopics, loadMoreTopics, loadStories } = useHooks()
+  const { refreshHomeFeed, loadMoreHomeFeed, loadStories } = useHooks()
   const [refreshing, setRefreshing] = useState<boolean>(false)
   useEffect(() => {
-    refreshTopics()
+    refreshHomeFeed()
     loadStories()
   }, [])
 
   const onRefresh = () => {
-    refreshTopics()
+    refreshHomeFeed()
     loadStories()
     setRefreshing(false)
   }
-
+console.log("FFEED IN PIOSITST", homeFeed)
   return (
     <View style={$flex1}>
       <FlatList
         ListHeaderComponent={<Stories />}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-        onEndReached={loadMoreTopics}
-        data={topics}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.palette.primary100}/>}
+        onEndReached={loadMoreHomeFeed}
+        data={homeFeed}
         renderItem={({ item, index }) => (
           <PostComponent key={item?._id} topic={item} navigateOnPress={true} index={index} />
         )}

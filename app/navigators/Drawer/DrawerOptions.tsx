@@ -134,7 +134,7 @@ export const DrawerOptions = observer(function DrawerOptions({
       </View>
       {drawerOptions
         .slice(1, 7)
-        .map((m) => useMemo(() => <ActionComponent key={m.icon} action={m} />, []))}
+        .map((m) => useMemo(() => <ActionComponent key={m.icon.toString()} action={m} />, []))}
     </View>
   )
 })

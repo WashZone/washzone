@@ -48,7 +48,16 @@ export type AppStackParamList = {
   Support: undefined
   AllChats: undefined
   P2PChat: { receiver: any; roomId: string | undefined }
-  CallScreen: { mode: "audio" | "video"; receiver: any, role: Role }
+  CallScreen: {
+    mode: "audio" | "video"
+    receiverId: string
+    role: Role
+    roomId: string
+    offer?: any
+    answer?: any
+    cancelled ?: boolean
+  }
+  TestNotification:undefined
 }
 
 const exitRoutes = Config.exitRoutes
@@ -64,7 +73,6 @@ const AppStack = observer(function AppStack() {
   const {
     authenticationStore: { isAuthenticated, isBlocked },
   } = useStores()
-  console.log("dsfsadfdasfISBLOCKEd", isBlocked)
   const { onLoggedInBoot } = useHooks()
   const url = Linking.useURL()
 

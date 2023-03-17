@@ -40,6 +40,7 @@ export const UserStoreModel = types
       store.email = user?.email
       store.first_name = user?.first_name
       store.last_name = user?.last_name
+      store.description = user?.description
       store.name = user?.name
       store.picture = user?.picture
       store.socialId = user?.socialId

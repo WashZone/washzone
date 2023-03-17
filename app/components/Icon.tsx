@@ -155,7 +155,10 @@ export const iconRegistry = {
   chatMessage: require("../../assets/icons/chat-message.png"),
   addMessage: require("../../assets/icons/add-message.png"),
   hangUpCall: require("../../assets/icons/hang-up.png"),
-  
+  microphone: require("../../assets/icons/microphone.png"),
+  microphone_block: require("../../assets/icons/microphone-block.png"),
+  no_audio: require("../../assets/icons/no-audio.png"),
+  speaker: require("../../assets/icons/speaker.png"),
 }
 
 const $imageStyle: ImageStyle = {

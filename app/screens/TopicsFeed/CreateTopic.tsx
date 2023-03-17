@@ -8,7 +8,7 @@ import {
   Pressable,
   ActivityIndicator,
 } from "react-native"
-import { Icon, iconRegistry, Text, TextField } from "../../components"
+import { $fontWeightStyles, Icon, iconRegistry, Text, TextField } from "../../components"
 import { colors, spacing } from "../../theme"
 import { useStores } from "../../models"
 import FastImage, { ImageStyle } from "react-native-fast-image"
@@ -26,9 +26,12 @@ export function CreateTopic() {
     userStore: { picture, _id },
   } = useStores()
   const [postContent, setPostContent] = useState<string>("")
+  const [topicDescription, setTopicDescription] = useState<string>("")
+  const [topicTitle, setTopicTitle] = useState<string>("")
   const [isPosting, setIsPosting] = useState<boolean>(false)
   const progress = useSharedValue(0)
   const inputRef = useRef<TextInput>()
+  const inputTitleRef = useRef<TextInput>()
   const [selectedImage, setSelectedImage] = useState<any>({ height: 1, width: 1 })
   const { createTopic, loadStories, refreshTopics } = useHooks()
   const onPost = async () => {
@@ -47,18 +50,19 @@ export function CreateTopic() {
       // })
 
       await createTopic({
-        content: postContent,
+        content: topicDescription,
         attachment: selectedImage,
+        title: topicTitle,
       })
       await refreshTopics()
       await loadStories()
     } catch (error) {
-
     } finally {
       setIsPosting(false)
       progress.value = withTiming(0, { duration: 400 })
       setSelectedImage({ height: 1, windth: 1 })
       inputRef.current.clear()
+      inputTitleRef.current.clear()
       inputRef.current.blur()
     }
   }
@@ -85,9 +89,7 @@ export function CreateTopic() {
       setTimeout(() => {
         progress.value = withTiming(1, { duration: 300 })
       }, 100)
-    } catch (e) {
-
-    }
+    } catch (e) {}
   }
 
   const onDeletePress = () => {
@@ -164,25 +166,41 @@ export function CreateTopic() {
         <FastImage source={{ uri: picture }} style={$picture} resizeMode="contain" />
         <View style={$contentContainer}>
           <TextField
-            value={postContent}
-            onChangeText={setPostContent}
+            value={topicTitle}
+            onChangeText={setTopicTitle}
+            ref={inputTitleRef}
+            onFocus={onFocus}
+            containerStyle={$inputContainerTitle}
+            inputWrapperStyle={$inputWrapper}
+            style={[$inputText, $fontWeightStyles.medium]}
+            placeholder="Title"
+            placeholderTextColor={colors.palette.neutral400}
+          />
+          <TextField
+            value={topicDescription}
+            onChangeText={setTopicDescription}
             ref={inputRef}
             onFocus={onFocus}
             containerStyle={$inputContainer}
             inputWrapperStyle={$inputWrapper}
             multiline
+            // numberOfLines={3}
             style={$inputText}
-            placeholderTx="HomeSreen.createPostPlaceholder"
-            placeholderTextColor={colors.palette.neutral700}
+            placeholder="Description"
+            placeholderTextColor={colors.palette.neutral400}
           />
         </View>
       </View>
       <Animated.View style={animatedMediaContainer}>
+        <Pressable style={$deleteIcon} onPress={onDeletePress}>
+          <Icon
+            icon="delete"
+            color={colors.palette.neutral500}
+            size={selectedImage.uri ? 28 : 0.0000001}
+          />
+        </Pressable>
         <Animated.View style={animatedPreviewContainer}>
           <FastImage source={{ uri: selectedImage?.uri }} style={previewImage} />
-          <Pressable style={$deleteIcon} onPress={onDeletePress}>
-            <Icon icon="delete" size={selectedImage.uri ? 20 : 0.0000001} />
-          </Pressable>
         </Animated.View>
         <View style={$bottomActionContainer}>
           <View style={$actionButtonsContainer}>
@@ -218,8 +236,8 @@ const $loadingIndicator: ViewStyle = {
 
 const $deleteIcon: ViewStyle = {
   position: "absolute",
-  top: 3,
-  right: 3,
+  top: 0,
+  right: spacing.medium,
 }
 
 const $actionButtonsContainer: ViewStyle = {
@@ -241,9 +259,9 @@ const $bottomActionContainer: ViewStyle = {
 }
 
 const $picture: ImageStyle = {
-  height: 50,
-  width: 50,
-  borderRadius: 25,
+  height: 70,
+  width: 70,
+  borderRadius: 35,
 }
 
 const $inputText: TextStyle = {
@@ -251,10 +269,11 @@ const $inputText: TextStyle = {
   fontSize: 13,
 }
 const $contentContainer: ViewStyle = {
-  height: 65,
+  height: 100,
   flex: 1,
   alignItems: "center",
   justifyContent: "center",
+  // backgroundColor: "red",
 }
 
 const $inputContainer: ViewStyle = {
@@ -262,6 +281,15 @@ const $inputContainer: ViewStyle = {
   flex: 1,
   borderWidth: 0,
   padding: 0,
+  // backgroundColor:'blue'
+}
+
+const $inputContainerTitle: ViewStyle = {
+  marginLeft: spacing.homeScreen / 2,
+  borderWidth: 0,
+  padding: 0,
+  // backgroundColor:'green',
+  height: 28,
 }
 
 const $inputWrapper: ViewStyle = {
@@ -272,7 +300,7 @@ const $inputWrapper: ViewStyle = {
 
 const $container: ViewStyle = {
   width: "100%",
-  height: 80,
+  height: 115,
   backgroundColor: colors.palette.neutral100,
   paddingHorizontal: spacing.homeScreen,
   flexDirection: "row",

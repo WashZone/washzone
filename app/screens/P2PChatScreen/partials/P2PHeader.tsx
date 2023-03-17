@@ -10,10 +10,12 @@ import FastImage, { ImageStyle } from "react-native-fast-image"
 import { formatName } from "../../../utils/formatName"
 import { he } from "date-fns/locale"
 import { Role } from "../../CallScreen"
+import { useStores } from "../../../models"
 
-export const P2PHeader = ({ data }) => {
+export const P2PHeader = ({ data, roomId }) => {
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
   const safeArea = useSafeAreaInsets()
+
   return (
     <View style={{ paddingTop: safeArea.top, backgroundColor: colors.palette.primary100 }}>
       <View style={$container}>
@@ -43,12 +45,30 @@ export const P2PHeader = ({ data }) => {
         </View>
         <View style={[$flexRow, $contentCenter]}>
           <TouchableOpacity
-            onPress={() => navigation.navigate("CallScreen", { mode: "audio", receiver: data,role:Role.initiator })}
+            onPress={() =>
+             {
+               navigation.navigate("CallScreen", {
+                mode: "audio",
+                receiverId: data?._id,
+                role: Role.initiator,
+                roomId
+              })}
+            }
           >
             <Icon icon="audioCall" size={28} color={colors.palette.neutral100} />
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => navigation.navigate("CallScreen", { mode: "video", receiver: data, role:Role.initiator })}
+            onPress={() =>
+
+            {
+               navigation.navigate("CallScreen", {
+                mode: "video",
+                receiverId: data?._id,
+
+                role: Role.initiator,
+                roomId
+              })}
+            }
           >
             <Icon
               icon="videoCall"

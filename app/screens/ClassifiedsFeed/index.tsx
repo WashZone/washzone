@@ -74,7 +74,7 @@ export const ClassifiedsFeed: FC<ClassifiedsTabProps<"ClassifiedsFeed">> = obser
           showsVerticalScrollIndicator={false}
           columnWrapperStyle={$flatlistContentContainer}
           ListHeaderComponent={<View style={$headerSpace} />}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.palette.primary100}/>}
           data={classifieds}
           renderItem={({ item }) => <ClassifiedComponent classified={item} />}
           numColumns={2}

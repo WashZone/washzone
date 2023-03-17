@@ -1,31 +1,39 @@
 import { NavigationProp, useNavigation } from "@react-navigation/native"
+import { observer } from "mobx-react-lite"
 import React, { useEffect } from "react"
 import { TextStyle, View, ViewStyle } from "react-native"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { Icon, ListItem, Text } from "../../../components"
+import { useStores } from "../../../models"
 import { AppStackParamList } from "../../../navigators"
 import { colors, spacing } from "../../../theme"
 import { fromNow } from "../../../utils/agoFromNow"
 import { formatDate } from "../../../utils/formatDate"
 import { formatName } from "../../../utils/formatName"
 import { $flex1, $flexRow } from "../../styles"
-
-export const P2PUserComponent = ({ data, myId }: { data: any; myId: string }) => {
+export const P2PUserComponent = observer(function p2PUserComponent({
+  data,
+  myId,
+  onLongPress,
+}: {
+  data: any
+  myId: string
+  onLongPress: (id:string) => void
+}) {
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
-  console.log("datadatadata", data)
+  const {
+    allChats: { getLatestMessageForRoom },
+  } = useStores()
 
   const receiver = data?.membersId.filter((i: any) => i._id !== myId)[0]
-  console.log("receiver", receiver)
+
   const handlePress = () => {
     navigation.navigate("P2PChat", { receiver: receiver, roomId: data?._id })
   }
 
-  // useEffect(() =>{
-
-  // },[])
-
   return (
     <ListItem
+      onLongPress={() => onLongPress(data?._id)}
       onPress={handlePress}
       height={66}
       style={{ alignItems: "center" }}
@@ -44,10 +52,10 @@ export const P2PUserComponent = ({ data, myId }: { data: any; myId: string }) =>
       <View style={$contentContainer}>
         <View style={$topContentContainer}>
           <Text text={formatName(receiver?.name)} weight="semiBold" size="md" />
-          <Text size="xxs" text={fromNow(data?.createdAt)} />
+          <Text size="xxs" text={fromNow(getLatestMessageForRoom(data?._id).time)} />
         </View>
         <Text
-          text={data?.latestMessage?.text}
+          text={getLatestMessageForRoom(data?._id).message}
           numberOfLines={1}
           size="sm"
           style={{ color: colors.palette.neutral500 }}
@@ -55,7 +63,7 @@ export const P2PUserComponent = ({ data, myId }: { data: any; myId: string }) =>
       </View>
     </ListItem>
   )
-}
+})
 
 const $topContentContainer: ViewStyle = {
   flexDirection: "row",

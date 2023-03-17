@@ -111,7 +111,7 @@ export function TabNavigator() {
         name="Topics"
         component={Topics}
         options={{
-          tabBarLabel: translate("TabNavigator.topicsTab"),
+          tabBarLabel: translate("TabNavigator.discussTab"),
           tabBarIcon: ({ focused }) => (
             <Icon
               icon="topics"

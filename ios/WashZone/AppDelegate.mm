@@ -117,6 +117,8 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
   [self.window makeKeyAndVisible];
   [super application:application didFinishLaunchingWithOptions:launchOptions];
   [RNBootSplash initWithStoryboard:@"BootSplash" rootView:rootView];
+  [[FBSDKApplicationDelegate sharedInstance] application:application
+                             didFinishLaunchingWithOptions:launchOptions];
   return YES;
 }
 

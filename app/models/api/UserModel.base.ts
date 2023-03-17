@@ -27,7 +27,6 @@ export const UserModelBase = ModelBase
     _id: types.identifier,
     createdAt: types.union(types.undefined, types.frozen()),
     updatedAt: types.union(types.undefined, types.frozen()),
-    userId: types.union(types.undefined, types.null, types.string),
     ratingId: types.union(types.undefined, types.null, types.late((): any => UserRatingModel)),
     topicId: types.union(types.undefined, types.null, types.late((): any => TopicDetailModel)),
     classifiedId: types.union(types.undefined, types.null, types.late((): any => ClassifiedFeedModel)),
@@ -46,6 +45,7 @@ export const UserModelBase = ModelBase
     role: types.union(types.undefined, types.null, types.string),
     description: types.union(types.undefined, types.null, types.string),
     averageRating: types.union(types.undefined, types.null, types.number),
+    notificationToken: types.union(types.undefined, types.null, types.string),
   })
   .views(self => ({
     get store() {
@@ -57,7 +57,6 @@ export class UserModelSelector extends QueryBuilder {
   get _id() { return this.__attr(`_id`) }
   get createdAt() { return this.__attr(`createdAt`) }
   get updatedAt() { return this.__attr(`updatedAt`) }
-  get userId() { return this.__attr(`userId`) }
   get first_name() { return this.__attr(`first_name`) }
   get last_name() { return this.__attr(`last_name`) }
   get name() { return this.__attr(`name`) }
@@ -72,6 +71,7 @@ export class UserModelSelector extends QueryBuilder {
   get role() { return this.__attr(`role`) }
   get description() { return this.__attr(`description`) }
   get averageRating() { return this.__attr(`averageRating`) }
+  get notificationToken() { return this.__attr(`notificationToken`) }
   ratingId(builder: string | UserRatingModelSelector | ((selector: UserRatingModelSelector) => UserRatingModelSelector) | undefined) { return this.__child(`ratingId`, UserRatingModelSelector, builder) }
   topicId(builder: string | TopicDetailModelSelector | ((selector: TopicDetailModelSelector) => TopicDetailModelSelector) | undefined) { return this.__child(`topicId`, TopicDetailModelSelector, builder) }
   classifiedId(builder: string | ClassifiedFeedModelSelector | ((selector: ClassifiedFeedModelSelector) => ClassifiedFeedModelSelector) | undefined) { return this.__child(`classifiedId`, ClassifiedFeedModelSelector, builder) }
@@ -81,4 +81,4 @@ export function selectFromUser() {
   return new UserModelSelector()
 }
 
-export const userModelPrimitives = selectFromUser()._id.createdAt.updatedAt.userId.first_name.last_name.name.email.socialId.password.picture.isSocialLogin.type.token.status.role.description.averageRating
+export const userModelPrimitives = selectFromUser()._id.createdAt.updatedAt.first_name.last_name.name.email.socialId.password.picture.isSocialLogin.type.token.status.role.description.averageRating.notificationToken

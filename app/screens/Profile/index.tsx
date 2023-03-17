@@ -14,10 +14,13 @@ import { observer } from "mobx-react-lite"
 
 import { colors, spacing } from "../../theme"
 import { HomeTabProps } from "../../tabs"
-import { Screen, Text } from "../../components"
+import { Button, Screen, Text } from "../../components"
 import { formatName } from "../../utils/formatName"
 import { ClassifiedsTabScreen, GalleryTabView, TopicsTabScreen, VideosTabScreen } from "./tabViews"
 import { $flex1 } from "../styles"
+import { useHooks } from "../hooks"
+import { NavigationProp, useNavigation } from "@react-navigation/native"
+import { AppStackParamList } from "../../navigators"
 
 const mockDescription =
   "Nulla cupidatat deserunt amet quis aliquip nostrud do adipisicing. Adipisicing excepteur elit laborum Lorem adipisicing do duis."
@@ -27,7 +30,8 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
   const [galleryItemsTopics, setGalleryItemsTopics] = useState([])
   const [galleryItemsClassifieds, setGalleryItemsClassifieds] = useState([])
   const [galleryItemsVideos, setGalleryItemsVideos] = useState([])
-
+  const { getOrCreateRoom } = useHooks()
+  const navigation = useNavigation<NavigationProp<AppStackParamList>>()
   const layout = useWindowDimensions()
 
   const [index, setIndex] = React.useState(0)
@@ -78,6 +82,11 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
     )
   }
 
+  const onMessage = async () => {
+    const roomId = await getOrCreateRoom(user?._id)
+    navigation.navigate("P2PChat", { receiver: user, roomId })
+  }
+
   return (
     <Screen contentContainerStyle={$flex1}>
       <CollapsibleHeaderTabView
@@ -85,9 +94,17 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
           <View style={$topContainer}>
             <FastImage style={$profileImage} source={{ uri: user?.picture }} />
             <Text text={formatName(user?.name)} style={$publisherName} weight="semiBold" />
-            <Text text={user?.description || mockDescription} style={$descriptionText} />
+            {user?.description  && <Text
+              color={colors.palette.neutral900}
+              numberOfLines={3}
+              weight="normal"
+              text={user?.description}
+              style={$descriptionText}
+            />}
+            <Button preset="reversed" style={$messageButton} text="Message" onPress={onMessage} />
           </View>
         )}
+        enableSnap
         navigationState={{ index, routes }}
         renderScene={renderScene}
         renderTabBar={renderTabBar}
@@ -116,10 +133,9 @@ const $indicator: ViewStyle = {
 const $topContainer: ViewStyle = {
   backgroundColor: colors.palette.neutral100,
   alignItems: "center",
-  height: 260,
 }
 const $descriptionText: TextStyle = {
-  marginTop: spacing.extraLarge,
+  marginTop: spacing.large,
   width: Dimensions.get("screen").width - 100,
   fontSize: 14,
   lineHeight: 17,
@@ -127,9 +143,12 @@ const $descriptionText: TextStyle = {
   alignSelf: "center",
 }
 
-const $tabBar: ViewStyle = {
-  flexDirection: "row",
-  backgroundColor: colors.palette.primary100,
+const $messageButton: ViewStyle = {
+  padding: spacing.extraSmall,
+  paddingHorizontal: spacing.medium,
+  height: 45,
+  width: 148,
+  marginVertical : spacing.medium
 }
 
 const $publisherName: TextStyle = {

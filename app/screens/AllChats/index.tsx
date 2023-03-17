@@ -3,68 +3,55 @@ import React, { FC, useEffect, useState } from "react"
 import { AppStackScreenProps } from "../../navigators"
 import { $flex1 } from "../styles"
 import { Screen, Header } from "../../components"
-import { useNavigation } from "@react-navigation/native"
+import { useFocusEffect, useNavigation } from "@react-navigation/native"
 import { colors, spacing } from "../../theme"
 import { AddMessageModal, P2PUserComponent } from "./partials"
-import { FlatList, View } from "react-native"
+import { FlatList, RefreshControl, View } from "react-native"
 import { useStores } from "../../models"
-import { usersChatModelPrimitives , selectFromUsersChat} from "../../models/api"
+import { usersChatModelPrimitives, selectFromUsersChat } from "../../models/api"
+import { OptionsModal } from "./partials/OptionsModal"
+import { useHooks } from "../hooks"
+import moment from "moment"
 
 export const AllChats: FC<AppStackScreenProps<"AllChats">> = observer(function AllChats(props) {
-  const [addModalVisible, setAddModalVisible] = useState<any>()
+  const [addModalVisible, setAddModalVisible] = useState(false)
+  const [optionsVisible, setOptionsModalVisible] = useState(false)
+  const [selectedRoomId, setSelectedRoomId] = useState("")
+  const [refreshing, setRefreshing] = useState(false)
   const navigation = useNavigation()
   const {
-    allChats:{ allChatRooms },
-    userStore:{_id}
+    allChats: { allChatRooms, getLatestMessageForRoom },
+    userStore: { _id },
   } = useStores()
+  const { deleteChatRoom, syncAllChats } = useHooks()
 
-  // const handleNewMessage = (item: any) => {
-  //   console.log("handleNewMessage", item)
-  // }
+  const onLongPress = (id: string) => {
+    console.log("ID", id)
+    setSelectedRoomId(id)
+    setOptionsModalVisible(true)
+  }
 
-  // useEffect(() => {
-  //   subscribeAll()
-  // }, [])
+  const onDelete = () => {
+    console.log("selectedRoomId:onDelete", selectedRoomId)
+    deleteChatRoom(selectedRoomId)
+    setOptionsModalVisible(false)
+  }
 
-  // console.log("newMessage", newMessage)
+  const sortByLatestTime = (a, b) => {
+    const aTime = new Date(getLatestMessageForRoom(a?._id).time)?.getTime()
+    const bTime = new Date(getLatestMessageForRoom(b?._id).time).getTime()
+    return bTime - aTime
+  }
 
-  // useEffect(() => {
-  //   console.log("newMessage USEEFFECT", newMessage)
-  // }, [newMessage])
+  const onRefresh = async () => {
+    setRefreshing(true)
+    await syncAllChats()
+    setRefreshing(false)
+  }
 
-  // const [data, setData] = useState<any>([
-  //   {
-  //     __v: 0,
-  //     _id: "63c9404e5c7f5266eee17a9c",
-  //     createdAt: "2023-01-19T13:06:22.051Z",
-  //     description: "",
-  //     email: "Jirzo@gmail.com",
-  //     first_name: "Jirazo",
-  //     isSocialLogin: false,
-  //     last_name: "Kat",
-  //     name: "Jirazo Kat",
-  //     password: "43dc4952544e840d6ec4e2e3d282c09db38c8596c68fe4608ba2e9480520c60b",
-  //     picture: "https://ca.slack-edge.com/T01JZCZCSJY-U04C0Q08N4T-3e1650a7323c-512",
-  //     role: "user",
-  //     socialId: "",
-  //     status: "",
-  //     token: "",
-  //     type: "email",
-  //     updatedAt: "2023-02-16T04:59:21.972Z",
-  //   },
-  // ])
-
-  // const { getPlaylist } = useHooks()
-
-  // const syncPlaylistData = async () => {
-  //   const res = await getPlaylist(playlistId)
-
-  //   setPlaylistData(res)
-  // }
-
-  // useEffect(() => {
-  //   syncPlaylistData()
-  // }, [])
+  useEffect(() => {
+    syncAllChats()
+  }, [])
 
   return (
     <>
@@ -80,13 +67,28 @@ export const AllChats: FC<AppStackScreenProps<"AllChats">> = observer(function A
           leftIconColor={colors.palette.neutral100}
         />
         <FlatList
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor={colors.palette.primary100}
+            />
+          }
+          refreshing={refreshing}
           style={$flex1}
-          data={allChatRooms}
-          renderItem={({ item, index }) => <P2PUserComponent key={index} data={item} myId = {_id}/>}
+          data={allChatRooms.slice(0).sort(sortByLatestTime)}
+          renderItem={({ item, index }) => (
+            <P2PUserComponent onLongPress={onLongPress} key={index} data={item} myId={_id} />
+          )}
           ListFooterComponent={<View style={{ padding: spacing.medium }} />}
         />
       </Screen>
       <AddMessageModal isVisible={addModalVisible} setVisible={setAddModalVisible} />
+      <OptionsModal
+        isVisible={optionsVisible}
+        setVisible={setOptionsModalVisible}
+        onDelete={onDelete}
+      />
     </>
   )
 })

@@ -29,6 +29,7 @@ export const TopicDetailModelBase = ModelBase
     commentId: types.union(types.undefined, types.late((): any => CommentsDetailModel)),
     topiclikeId: types.union(types.undefined, types.late((): any => LikeTopicsModel)),
     topicContent: types.union(types.undefined, types.null, types.string),
+    title: types.union(types.undefined, types.null, types.string),
     attachmentType: types.union(types.undefined, types.null, types.string),
     attachmentUrl: types.union(types.undefined, types.null, types.string),
     status: types.union(types.undefined, types.null, types.string),
@@ -46,6 +47,7 @@ export class TopicDetailModelSelector extends QueryBuilder {
   get createdAt() { return this.__attr(`createdAt`) }
   get updatedAt() { return this.__attr(`updatedAt`) }
   get topicContent() { return this.__attr(`topicContent`) }
+  get title() { return this.__attr(`title`) }
   get attachmentType() { return this.__attr(`attachmentType`) }
   get attachmentUrl() { return this.__attr(`attachmentUrl`) }
   get status() { return this.__attr(`status`) }
@@ -59,4 +61,4 @@ export function selectFromTopicDetail() {
   return new TopicDetailModelSelector()
 }
 
-export const topicDetailModelPrimitives = selectFromTopicDetail()._id.createdAt.updatedAt.topicContent.attachmentType.attachmentUrl.status.likeviews.dislikeviews
+export const topicDetailModelPrimitives = selectFromTopicDetail()._id.createdAt.updatedAt.topicContent.title.attachmentType.attachmentUrl.status.likeviews.dislikeviews

@@ -155,7 +155,7 @@ export const Saved: FC<AppStackScreenProps<"Saved">> = observer(function Saved()
         leftIconColor={colors.palette.neutral600}
       />
       <FlatList
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.palette.primary100}/>}
         data={savedClassifieds}
         renderItem={({ item, index }) => (
           <SavedItem item={item} index={index} handleOnPress={handleOnPress} />

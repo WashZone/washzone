@@ -4,18 +4,27 @@ import { Keyboard, TextStyle, View, ViewStyle } from "react-native"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { color } from "react-native-reanimated"
 import { Icon, ListItem, Text } from "../../../components"
+import { useStores } from "../../../models"
 import { AppStackParamList } from "../../../navigators"
 import { colors, spacing } from "../../../theme"
 import { formatName } from "../../../utils/formatName"
+import { useHooks } from "../../hooks"
 import { $flex1, $flexRow } from "../../styles"
 
-export const ResultComponent = ({ data, setVisible }: { data: any, setVisible:(b:boolean) => void }) => {
+export const ResultComponent = ({
+  data,
+  setVisible,
+}: {
+  data: any
+  setVisible: (b: boolean) => void
+}) => {
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
-
-  const handlePress = () => {
+  const { getOrCreateRoom } = useHooks()
+  const handlePress = async () => {
+    const roomId = await getOrCreateRoom(data?._id)
     Keyboard.dismiss()
     setVisible(false)
-    navigation.navigate("P2PChat", { receiver: data , roomId: undefined })
+    navigation.navigate("P2PChat", { receiver: data, roomId })
   }
 
   return (
@@ -36,7 +45,7 @@ export const ResultComponent = ({ data, setVisible }: { data: any, setVisible:(b
       }
     >
       <View>
-        <Text text={formatName(data?.name)} color={colors.palette.neutral100}/>
+        <Text text={formatName(data?.name)} color={colors.palette.neutral100} />
         {data?.description && <Text text={formatName(data?.description)} />}
       </View>
     </ListItem>

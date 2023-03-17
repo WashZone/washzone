@@ -46,14 +46,13 @@ export const TopicInfo: FC<HomeTabProps<"TopicInfo">> = function PostInfo(props)
   }
 
   const onComment = async () => {
-    if (commentText.length > 2) {
-      setIsCommenting(true)
-      await postComment(commentText, topicDetails?._id)
-      await syncComments(topicDetails?._id)
-      setCommentText("")
-      setIsCommenting(false)
-    }
+    setIsCommenting(true)
+    await postComment(commentText, topicDetails?._id)
+    await syncComments(topicDetails?._id)
+    setCommentText("")
+    setIsCommenting(false)
   }
+  
   if (loading) {
     return (
       <View style={$loadingScreen}>

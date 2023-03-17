@@ -3,28 +3,33 @@ import { Interaction } from "../utils/enums"
 import Toast from "react-native-toast-message"
 import { toastMessages } from "../utils/toastMessages"
 import { getUniqueId } from "react-native-device-info"
+import { messageMetadataType } from "../utils"
+import messaging from "@react-native-firebase/messaging"
 
 export function useHooks() {
   const {
-    subscribeAll,
     authenticationStore: { setBlocked, setAuthToken },
     searchStore: { setResults },
     feedStore: {
       setTopics: setFeedTopics,
       topics: feedTopics,
       addToTopics: addtoFeedTopics,
+      addToHomeFeed,
+      setHomeFeed,
       setStories,
+      homeFeed,
     },
     classfieds: { setClassifieds, addToClassfieds, classifieds },
     topics: { setTopics, topics, addToTopics },
     saved: { setSavedClassifieds },
     videos: { setVideos },
-    allChats: { setChatRooms, updateRoomMessages },
+    allChats: { setChatRooms, updateRoomMessages, mergeChatPage, chatMessages },
     interaction: {
       addToDislikedTopics,
       addToLikedTopics,
       addToLikedVideos,
       addToDislikedVideos,
+
       removefromDislikedTopics,
       removefromDislikedVideos,
       removefromLikedTopics,
@@ -41,6 +46,7 @@ export function useHooks() {
       syncInteractions,
     },
     api: {
+      mutateAddNotificationToken,
       queryGetAllTopics,
       mutateCommentOnTopic,
       queryGetCommentsByTopicId,
@@ -79,6 +85,14 @@ export function useHooks() {
       queryGetAllLegalitiesData,
       mutateGetroomByUserId,
       mutateGetchatByRoomId,
+      mutateGetroomByUsers,
+      mutateCreateUserMessage,
+      mutateGetUserById,
+      mutateGetroomBymembers,
+      mutateCreateChatRoom,
+      mutateCreateUserHomePages,
+      queryGetAllHomePagesByPageNumber,
+      mutateDeleteChatRoom,
     },
     userStore,
   } = useStores()
@@ -87,6 +101,40 @@ export function useHooks() {
     try {
       const res = await queryGetAllStory(undefined, { fetchPolicy: "network-only" })
       setStories(res.getAllStory?.data || [])
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  const getAndUpdateHomeFeed = async (cache?: boolean) => {
+    const res = await queryGetAllTopics(undefined, {
+      fetchPolicy:
+        cache === undefined ? "cache-and-network" : cache ? "cache-first" : "network-only",
+    })
+    console.log()
+    setHomeFeed(res.getAllTopics)
+  }
+
+  const loadMoreHomeFeed = async () => {
+    const res = await queryGetAllHomePagesByPageNumber(
+      { pageNumber: parseInt((feedTopics.length / 10).toFixed(0)) },
+      { fetchPolicy: "network-only" },
+    )
+    const morePosts = res.getAllHomePagesByPageNumber?.data
+    if (res.getAllHomePagesByPageNumber.totalCount > homeFeed?.length) {
+      addToHomeFeed(morePosts)
+    }
+  }
+
+  const refreshHomeFeed = async () => {
+    try {
+      const res = await queryGetAllHomePagesByPageNumber(
+        { pageNumber: 1 },
+        { fetchPolicy: "network-only" },
+      )
+      console.log("HOME FEED", res.getAllHomePagesByPageNumber)
+      setHomeFeed(res.getAllHomePagesByPageNumber?.data)
+      // syncInteractedVideosAndTopics()
     } catch (err) {
       console.log(err)
     }
@@ -149,6 +197,7 @@ export function useHooks() {
   }
 
   const loadMoreTopics = async () => {
+    console.log("LOAD MORE TOPICS")
     const res = await queryGetAllTopicByPageNumber(
       { pageNumber: parseInt((topics.length / 10).toFixed(0)) },
       { fetchPolicy: "no-cache" },
@@ -166,7 +215,7 @@ export function useHooks() {
 
       await syncInteractedVideosAndTopics()
       setTopics(res.getAllTopicByPageNumber?.data)
-      await syncInteractedVideosAndTopics()
+      // await syncInteractedVideosAndTopics()
     } catch (err) {
       console.log(err)
     }
@@ -182,35 +231,70 @@ export function useHooks() {
     return res.getCommentsByTopicId.length === 1 && res.getCommentsByTopicId[0]?.comments
   }
 
-  const createTopic = async ({ content, attachment }) => {
+  const createTopic = async ({ content, attachment, title }) => {
+    if (title.length === 0 || content?.length === 0) return
     const res = await mutateCreateUserTopic({
       attachmentUrl: attachment?.uri || "",
       attachmentType: attachment?.type || "",
       topicContent: content,
       userId: userStore._id,
+      title,
     })
+    console.log("RES CREATE TOPIC", res)
     await refreshTopics()
     await loadStories()
     // setTimeout(loadStories, 1000)
   }
 
-  const updateProfile = async (firstName: string, lastName: string, picture: string) => {
+  const createPost = async ({ content, attachment }) => {
+    if (content?.length === 0) return
+    const res = await mutateCreateUserHomePages({
+      attachmentUrl: attachment?.uri || "",
+      attachmentType: attachment?.type || "",
+      userId: userStore._id,
+      discription: content,
+    })
+    await refreshHomeFeed()
+    await loadStories()
+    // setTimeout(loadStories, 1000)
+  }
+
+  const updateProfile = async (
+    firstName: string,
+    lastName: string,
+    picture: string,
+    bio: string,
+  ) => {
     const res = await mutateUpdateUser({
       user: {
         first_name: firstName,
         last_name: lastName,
         name: firstName + " " + lastName,
         picture,
+        description: bio,
       },
       userId: userStore._id,
     })
+    console.log("UPDATE USER MUTATION", res)
     userStore.setUser({
       ...userStore,
       first_name: firstName,
       last_name: lastName,
       name: firstName + " " + lastName,
       picture,
+      description: bio,
     })
+  }
+
+  const getMoreChatMessages = async ({ roomId }) => {
+    const prePage = parseInt((chatMessages[roomId]?.length / 20).toFixed(0))
+    const res = await mutateGetchatByRoomId({ roomId, pageNumber: prePage + 1 })
+    console.log("ROOM MESSAGES", res.getchatByRoomId)
+    mergeChatPage({ roomId, messages: res.getchatByRoomId?.data, previousPage: prePage })
+    if (res.getchatByRoomId?.data?.length < 20) {
+      return { lastPage: true }
+    }
+    return { lastPage: false }
   }
 
   const syncSavedInteractionsHook = async () => {
@@ -423,11 +507,12 @@ export function useHooks() {
     const currentInteraction = getInteractionOnTopic(topicId)
     const inputInteraction = getInputInteraction(buttonType, currentInteraction)
     try {
-      await mutateLikeDislikeTopic({
+      const res = await mutateLikeDislikeTopic({
         topicId,
         userId: userStore._id,
         status: inputInteraction,
       })
+      console.log("API RESP", res)
       if (inputInteraction === Interaction.like) {
         addToLikedTopics(topicId)
         removefromDislikedTopics(topicId)
@@ -440,6 +525,8 @@ export function useHooks() {
         removefromDislikedTopics(topicId)
         removefromLikedTopics(topicId)
       }
+      console.log("CURRENT INTERACTION", currentInteraction)
+      console.log("inputInteraction", inputInteraction)
     } catch (err) {}
   }
 
@@ -580,7 +667,6 @@ export function useHooks() {
 
   const onLoggedInBoot = async () => {
     console.log("RUNNING = onLoggedInBoot")
-
     await syncSavedInteractionsHook()
     await syncInteractedVideosAndTopics()
     await refreshTopics()
@@ -589,10 +675,11 @@ export function useHooks() {
     await refreshVideos()
     await loadStories()
     await syncAllChats()
-    subscribeAll()
+    await updateNotificationToken()
   }
 
   const searchKeyword = async (searchKey: string) => {
+    console.log("SEARCHING", searchKey)
     try {
       const resTopics = await queryGetSearchedTopic(
         { searchKey, pageNumber: 1 },
@@ -648,23 +735,201 @@ export function useHooks() {
   }
 
   const syncAllChats = async () => {
+    console.log("SYNCING ALL CHATS")
     try {
-      const res = await mutateGetroomByUserId({ adminId: userStore._id })
+      const res = await mutateGetroomByUsers({ memberId: userStore._id })
       console.log("SYNCING ALL CHATS", JSON.stringify(res))
-      setChatRooms(res.getroomByUserId?.data)
+      setChatRooms(res.getroomByUsers?.data)
     } catch (err) {
       console.log(err)
     }
   }
 
   const syncChatMessages = async (roomId: string) => {
+    console.log("RROM ORROMORMORMRO ID", roomId)
     try {
-      const res = await mutateGetchatByRoomId({ roomId })
-      updateRoomMessages(res.getchatByRoomId?.data || [])
+      const res = await mutateGetchatByRoomId({ roomId, pageNumber: 1 })
+      console.log("ROOM MESSAGES", res.getchatByRoomId)
+      updateRoomMessages({ roomId, messages: res.getchatByRoomId?.data || [] })
+      if (res.getchatByRoomId?.data?.length < 20) {
+        return { lastPage: true }
+      }
+      return { lastPage: false }
     } catch (err) {}
   }
 
+  const sendTextMessage = async (roomId: string, text: string, receiverId: string) => {
+    console.log("userStore._id", userStore._id)
+    console.log("receiverId", userStore._id)
+    try {
+      const res = await mutateCreateUserMessage({
+        roomId,
+        authorId: userStore._id,
+        text,
+        membersId: [{ userId1: userStore._id }, { userId1: receiverId }],
+        messageType: "text",
+        metaData: {
+          metaDataType: "",
+          amount: "",
+          currency: "",
+          data: "",
+        },
+      })
+      console.log("CREATED USER MESSAGE", res.createUserMessage)
+    } catch (err) {}
+  }
+
+  const sendCallOffer = async (roomId: string, receiverId: string, offer: string) => {
+    console.log("userStore._id", userStore._id)
+    console.log("receiverId", receiverId)
+    console.log("offer", offer)
+    try {
+      const res = await mutateCreateUserMessage({
+        roomId,
+        authorId: userStore._id,
+        text: "Initiated Call !",
+        membersId: [{ userId1: receiverId }, { userId1: userStore._id }],
+        messageType: "custom",
+        metaData: {
+          metaDataType: messageMetadataType.incomingCallOffer,
+          amount: "",
+          currency: "",
+          data: JSON.stringify(offer),
+        },
+      })
+      console.log("CREATED USER MESSAGE", res.createUserMessage)
+    } catch (err) {}
+  }
+
+  const acceptCallOffer = async (roomId: string, receiverId: string, answer: string) => {
+    console.log("userStore._id", userStore._id)
+    try {
+      const res = await mutateCreateUserMessage({
+        roomId,
+        authorId: userStore._id,
+        text: "Accepted Call !",
+        membersId: [{ userId1: receiverId }, { userId1: userStore._id }],
+        messageType: "custom",
+        metaData: {
+          metaDataType: messageMetadataType.incomingCallAnswer,
+          amount: "",
+          currency: "",
+          data: JSON.stringify(answer),
+        },
+      })
+      console.log("CREATED USER MESSAGE", res.createUserMessage)
+    } catch (err) {}
+  }
+
+  const hangUpCall = async (roomId: string, receiverId: string) => {
+    console.log("userStore._id", userStore._id)
+    try {
+      const res = await mutateCreateUserMessage({
+        roomId,
+        authorId: userStore._id,
+        text: "",
+        membersId: [{ userId1: receiverId }, { userId1: userStore._id }],
+        messageType: "custom",
+        metaData: {
+          metaDataType: messageMetadataType.hangUpCall,
+          amount: "",
+          currency: "",
+          data: "",
+        },
+      })
+      console.log("CREATED USER MESSAGE", res.createUserMessage)
+    } catch (err) {}
+  }
+
+  const getUserById = async (userId: string) => {
+    try {
+      const res = await mutateGetUserById({ userId })
+      console.log("CONNECTED USER FOR ", userStore.name, res.getUserById)
+      return res.getUserById
+    } catch (err) {
+      return undefined
+    }
+  }
+  const getOrCreateRoom = async (receiverId: string) => {
+    console.log("RECEIVER", receiverId)
+    console.log("SENDER", userStore?._id)
+    try {
+      const resCreate = await mutateCreateChatRoom({
+        membersId: [{ userId1: receiverId }, { userId1: userStore?._id }],
+        adminId: receiverId,
+      })
+      console.log("resCreate", resCreate.createChatRoom)
+      return resCreate.createChatRoom?._id
+    } catch (err) {
+      try {
+        const res = await mutateGetroomBymembers({
+          members: [{ userId1: receiverId }, { userId1: userStore?._id }],
+        })
+        console.log("ROOM FOUND", res.getroomBymembers)
+
+        return res.getroomBymembers?.data[0]?._id
+      } catch (err) {}
+    }
+  }
+
+  const sendClassfiedOffer = async (
+    roomId: string,
+    receiverId: string,
+    amount: string,
+    classifiedData: any,
+  ) => {
+    console.log("SEND CLASSIFIED OFFER , ", roomId, amount)
+    try {
+      const res = await mutateCreateUserMessage({
+        roomId,
+        authorId: userStore._id,
+        text: "Classified Offer !",
+        membersId: [{ userId1: receiverId }, { userId1: userStore._id }],
+        messageType: "custom",
+        metaData: {
+          metaDataType: messageMetadataType.classifiedOffer,
+          amount: amount,
+          currency: "$",
+          data: JSON.stringify(classifiedData),
+        },
+      })
+      console.log("CREATED USER MESSAGE", res.createUserMessage)
+    } catch (err) {}
+  }
+
+  const deleteChatRoom = async (roomId: string) => {
+    console.log("Delete Chat Room ", roomId)
+    try {
+      const res = await mutateDeleteChatRoom({
+        roomId,
+      })
+      syncAllChats()
+    } catch (err) {}
+  }
+
+  const updateNotificationToken = async () => {
+    const token = await messaging().getToken()
+    const res = await mutateAddNotificationToken({
+      userId: userStore._id,
+      notificationToken: token,
+    })
+    console.log("mutateAddNotificationToken", res)
+  }
+
   return {
+    getMoreChatMessages,
+    loadMoreHomeFeed,
+    getAndUpdateHomeFeed,
+    refreshHomeFeed,
+    deleteChatRoom,
+    sendClassfiedOffer,
+    getOrCreateRoom,
+    getUserById,
+    hangUpCall,
+    acceptCallOffer,
+    sendCallOffer,
+    syncAllChats,
+    sendTextMessage,
     syncChatMessages,
     onLoggedInBoot,
     getPlaylist,
@@ -704,5 +969,7 @@ export function useHooks() {
     rateUser,
     getLegalities,
     searchUser,
+    createPost,
+    updateNotificationToken,
   }
 }

@@ -60,7 +60,7 @@ export const ForgotPassword: FC<AppStackScreenProps<"ForgotPassword">> = functio
           style={$inputText}
           inputWrapperStyle={$inputWrapperStyle}
           placeholderTextColor={colors.palette.overlay50}
-          maxLength={20}
+          maxLength={100}
         />
 
         <Button

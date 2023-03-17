@@ -1,8 +1,9 @@
-import React, { FC, useState } from "react"
+import React, { FC, useCallback, useState } from "react"
 import { SectionList, TextStyle, TouchableOpacity, View, ViewStyle } from "react-native"
 import { observer } from "mobx-react-lite"
 import { ActivityIndicator, TextInput } from "react-native-paper"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
+import { debounce } from "lodash"
 
 import { Button, Header, Icon, Screen, Text } from "../../components"
 import { colors, spacing } from "../../theme"
@@ -38,6 +39,24 @@ export const Search: FC<AppStackScreenProps<"Search">> = observer(function Searc
       await searchKeyword(searchKey)
       setLoading(false)
     }
+  }
+
+  const handleSearch = useCallback(
+    debounce(async (text: string) => {
+      if (text.length > 1) {
+        setLoading(true)
+        await searchKeyword(text)
+        setLoading(false)
+      }
+    }, 600),
+    [],
+  )
+
+  const onChangeText = (text: string) => {
+    if (text.length > 0) {
+      handleSearch(text)
+    }
+    setSearchKey(text)
   }
 
   const sections = [
@@ -136,7 +155,7 @@ export const Search: FC<AppStackScreenProps<"Search">> = observer(function Searc
             theme={$theme}
             label="Search..."
             value={searchKey}
-            onChangeText={setSearchKey}
+            onChangeText={onChangeText}
             contentStyle={$inputContent}
             onSubmitEditing={onSearch}
           />

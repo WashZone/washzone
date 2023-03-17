@@ -15,7 +15,7 @@ import { setupRootStore } from "./setupRootStore"
  * very large), you may want to use a different strategy than immediately
  * instantiating it, although that should be rare.
  */
-const _rootStore = RootStoreModel.create({},env)
+const _rootStore = RootStoreModel.create({}, env)
 
 /**
  * The RootStoreContext provides a way to access
@@ -51,15 +51,15 @@ export const useStores = () => useContext(RootStoreContext)
 export const useInitialRootStore = (callback: () => void | Promise<void>) => {
   const rootStore = useStores()
   const [rehydrated, setRehydrated] = useState(false)
-
   // Kick off initial async loading actions, like loading fonts and rehydrating RootStore
   useEffect(() => {
     let _unsubscribe
     ;(async () => {
       // set up the RootStore (returns the state restored from AsyncStorage)
-      const { restoredState, unsubscribe } = await setupRootStore(rootStore)
+      const { rootStore :store, restoredState, unsubscribe } = await setupRootStore(rootStore)
       _unsubscribe = unsubscribe
-
+      store.subscribeAll()
+ 
       // reactotron integration with the MST root store (DEV only)
       setReactotronRootStore(rootStore, restoredState)
 

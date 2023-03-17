@@ -8,6 +8,7 @@ import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { useStores } from "../../models"
 import { observer } from "mobx-react-lite"
 
+
 export const Settings: FC<AppStackScreenProps<"Settings">> = observer(function Settings() {
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
   const {
@@ -27,10 +28,10 @@ export const Settings: FC<AppStackScreenProps<"Settings">> = observer(function S
       />
       <View style={$content}>
         <ListItem
-          onPress={() => toggleNotification()}
+          onPress={ toggleNotification}
           style={$listItemStyle}
           leftIcon="bell"
-          tx="settings.notificationToggle"
+          text="Notifications"
           RightComponent={
             <Toggle variant="switch" value={notifications} onPress={() => toggleNotification()} />
           }

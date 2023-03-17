@@ -118,7 +118,7 @@ export function Button(props: ButtonProps) {
           {!!LeftAccessory && <LeftAccessory style={$leftAccessoryStyle} pressableState={state} />}
 
           {text && (
-            <Text tx={tx} text={text} txOptions={txOptions} style={$textStyle(state)}></Text>
+            <Text weight="semiBold" tx={tx} text={text} txOptions={txOptions} style={$textStyle(state)}></Text>
           )}
           {children}
 

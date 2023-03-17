@@ -37,12 +37,20 @@ import { SaveClassifiedModel, SaveClassifiedModelType } from "./SaveClassifiedMo
 import { saveClassifiedModelPrimitives, SaveClassifiedModelSelector } from "./SaveClassifiedModel.base"
 import { FollowUserModel, FollowUserModelType } from "./FollowUserModel"
 import { followUserModelPrimitives, FollowUserModelSelector } from "./FollowUserModel.base"
+import { MetaDataModel, MetaDataModelType } from "./MetaDataModel"
+import { metaDataModelPrimitives, MetaDataModelSelector } from "./MetaDataModel.base"
+import { NotificationModel, NotificationModelType } from "./NotificationModel"
+import { notificationModelPrimitives, NotificationModelSelector } from "./NotificationModel.base"
 import { UsersChatModel, UsersChatModelType } from "./UsersChatModel"
 import { usersChatModelPrimitives, UsersChatModelSelector } from "./UsersChatModel.base"
 import { RoomChatModel, RoomChatModelType } from "./RoomChatModel"
 import { roomChatModelPrimitives, RoomChatModelSelector } from "./RoomChatModel.base"
 import { UsersModel, UsersModelType } from "./UsersModel"
 import { usersModelPrimitives, UsersModelSelector } from "./UsersModel.base"
+import { HomecommentsModel, HomecommentsModelType } from "./HomecommentsModel"
+import { homecommentsModelPrimitives, HomecommentsModelSelector } from "./HomecommentsModel.base"
+import { HomePageDetailModel, HomePageDetailModelType } from "./HomePageDetailModel"
+import { homePageDetailModelPrimitives, HomePageDetailModelSelector } from "./HomePageDetailModel.base"
 
 
 
@@ -59,6 +67,7 @@ export type InputInfo = {
 }
 export type InputTopic = {
   topicContent?: (string | null)
+  title?: (string | null)
   attachmentType?: (string | null)
   attachmentUrl?: (string | null)
   status?: (string | null)
@@ -88,6 +97,23 @@ export type InputClassified = {
 }
 export type InputUsers = {
   userId1?: (string | null)
+}
+export type InputNotification = {
+  body?: (string | null)
+  title?: (string | null)
+}
+export type InputMetaData = {
+  metaDataType?: (string | null)
+  classifiedId?: (string | null)
+  amount?: (string | null)
+  currency?: (string | null)
+  data?: (string | null)
+}
+export type InputHomePage = {
+  Discription?: (string | null)
+  attachmentType?: (string | null)
+  attachmentUrl?: (string | null)
+  status?: (string | null)
 }
 /* The TypeScript type that explicits the refs to other models in order to prevent a circular refs issue */
 type Refs = {
@@ -153,10 +179,17 @@ queryGetfollowingByUserId="queryGetfollowingByUserId",
 queryGetfollowerByFollowId="queryGetfollowerByFollowId",
 queryGetratingOnUserId="queryGetratingOnUserId",
 queryCheckUserRating="queryCheckUserRating",
-queryGetratingByratingId="queryGetratingByratingId"
+queryGetratingByratingId="queryGetratingByratingId",
+queryGetAllHomePagesByPageNumber="queryGetAllHomePagesByPageNumber",
+queryGetAllHomePagess="queryGetAllHomePagess",
+queryGetHomePagesByUserId="queryGetHomePagesByUserId",
+queryGetCommentByHomePageId="queryGetCommentByHomePageId",
+queryGetCommentsByHomePageId="queryGetCommentsByHomePageId",
+queryGetSearchedHomePages="queryGetSearchedHomePages"
 }
 export enum RootStoreBaseMutations {
 mutateCreateUser="mutateCreateUser",
+mutateAddNotificationToken="mutateAddNotificationToken",
 mutateUpdatePassword="mutateUpdatePassword",
 mutateStoreDeviceId="mutateStoreDeviceId",
 mutateGetBlockedUser="mutateGetBlockedUser",
@@ -215,8 +248,15 @@ mutateGetchatByUserId="mutateGetchatByUserId",
 mutateGetchatByRoomId="mutateGetchatByRoomId",
 mutateGetroomByUserId="mutateGetroomByUserId",
 mutateGetroomByUsers="mutateGetroomByUsers",
+mutateGetroomBymembers="mutateGetroomBymembers",
 mutateDeleteChatMessage="mutateDeleteChatMessage",
-mutateDeleteChatRoom="mutateDeleteChatRoom"
+mutateDeleteChatRoom="mutateDeleteChatRoom",
+mutateCreateUserHomePages="mutateCreateUserHomePages",
+mutateGetHomePagesByUser="mutateGetHomePagesByUser",
+mutateGetHomePagesByHomePageId="mutateGetHomePagesByHomePageId",
+mutateUpdateDeleteHomePageId="mutateUpdateDeleteHomePageId",
+mutateUpdateUserHomePages="mutateUpdateUserHomePages",
+mutateCommentOnHomepage="mutateCommentOnHomepage"
 }
 
 /**
@@ -224,7 +264,7 @@ mutateDeleteChatRoom="mutateDeleteChatRoom"
 */
 export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
   .named("RootStore")
-  .extend(configureStoreMixin([['UserRating', () => UserRatingModel], ['classifiedFeed', () => ClassifiedFeedModel], ['CommentsDetail', () => CommentsDetailModel], ['likeTopics', () => LikeTopicsModel], ['TopicDetail', () => TopicDetailModel], ['likeVideos', () => LikeVideosModel], ['VideoPlaylist', () => VideoPlaylistModel], ['VideoUploadPlaylist', () => VideoUploadPlaylistModel], ['VideoUpload', () => VideoUploadModel], ['User', () => UserModel], ['SigninUser', () => SigninUserModel], ['Legalities', () => LegalitiesModel], ['saveVideo', () => SaveVideoModel], ['storyViewerUser', () => StoryViewerUserModel], ['saveClassified', () => SaveClassifiedModel], ['followUser', () => FollowUserModel], ['usersChat', () => UsersChatModel], ['roomChat', () => RoomChatModel], ['Users', () => UsersModel]], [], "js"))
+  .extend(configureStoreMixin([['UserRating', () => UserRatingModel], ['classifiedFeed', () => ClassifiedFeedModel], ['CommentsDetail', () => CommentsDetailModel], ['likeTopics', () => LikeTopicsModel], ['TopicDetail', () => TopicDetailModel], ['likeVideos', () => LikeVideosModel], ['VideoPlaylist', () => VideoPlaylistModel], ['VideoUploadPlaylist', () => VideoUploadPlaylistModel], ['VideoUpload', () => VideoUploadModel], ['User', () => UserModel], ['SigninUser', () => SigninUserModel], ['Legalities', () => LegalitiesModel], ['saveVideo', () => SaveVideoModel], ['storyViewerUser', () => StoryViewerUserModel], ['saveClassified', () => SaveClassifiedModel], ['followUser', () => FollowUserModel], ['MetaData', () => MetaDataModel], ['Notification', () => NotificationModel], ['usersChat', () => UsersChatModel], ['roomChat', () => RoomChatModel], ['Users', () => UsersModel], ['Homecomments', () => HomecommentsModel], ['HomePageDetail', () => HomePageDetailModel]], [], "js"))
   .props({
 
   })
@@ -396,8 +436,31 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     queryGetratingByratingId(variables: { ratinguserId: string }, options: QueryOptions = {}) {
       return self.query<{ getratingByratingId: any }>(`query getratingByratingId($ratinguserId: String!) { getratingByratingId(ratinguserId: $ratinguserId) }`, variables, options)
     },
+    queryGetAllHomePagesByPageNumber(variables: { pageNumber: number }, options: QueryOptions = {}) {
+      return self.query<{ getAllHomePagesByPageNumber: any }>(`query getAllHomePagesByPageNumber($pageNumber: Float!) { getAllHomePagesByPageNumber(pageNumber: $pageNumber) }`, variables, options)
+    },
+    queryGetAllHomePagess(variables?: {  }, options: QueryOptions = {}) {
+      return self.query<{ getAllHomePagess: any }>(`query getAllHomePagess { getAllHomePagess }`, variables, options)
+    },
+    queryGetHomePagesByUserId(variables: { pageNumber: number, userId: string }, options: QueryOptions = {}) {
+      return self.query<{ getHomePagesByUserId: any }>(`query getHomePagesByUserId($pageNumber: Float!, $userId: String!) { getHomePagesByUserId(pageNumber: $pageNumber, userId: $userId) }`, variables, options)
+    },
+    queryGetCommentByHomePageId(variables: { pageNumber: number, homePageId: string }, options: QueryOptions = {}) {
+      return self.query<{ getCommentByHomePageId: any }>(`query getCommentByHomePageId($pageNumber: Float!, $homePageId: String!) { getCommentByHomePageId(pageNumber: $pageNumber, HomePageId: $homePageId) }`, variables, options)
+    },
+    queryGetCommentsByHomePageId(variables: { homePageId: string }, options: QueryOptions = {}) {
+      return self.query<{ getCommentsByHomePageId: any }>(`query getCommentsByHomePageId($homePageId: String!) { getCommentsByHomePageId(HomePageId: $homePageId) }`, variables, options)
+    },
+    queryGetSearchedHomePages(variables: { searchKey: string, pageNumber: number }, options: QueryOptions = {}) {
+      return self.query<{ getSearchedHomePages: any }>(`query getSearchedHomePages($searchKey: String!, $pageNumber: Float!) { getSearchedHomePages(searchKey: $searchKey, pageNumber: $pageNumber) }`, variables, options)
+    },
     mutateCreateUser(variables: { description?: (string | null), type: string, isSocialLogin: boolean, picture?: (string | null), lastName: string, firstName: string, socialId?: (string | null), password: string, email: string, name: string }, resultSelector: string | ((qb: UserModelSelector) => UserModelSelector) = userModelPrimitives.toString(), optimisticUpdate?: () => void) {
       return self.mutate<{ createUser: UserModelType}>(`mutation createUser($description: String, $type: String!, $isSocialLogin: Boolean!, $picture: String, $lastName: String!, $firstName: String!, $socialId: String, $password: String!, $email: String!, $name: String!) { createUser(description: $description, type: $type, isSocialLogin: $isSocialLogin, picture: $picture, last_name: $lastName, first_name: $firstName, socialId: $socialId, password: $password, email: $email, name: $name) {
+        ${typeof resultSelector === "function" ? resultSelector(new UserModelSelector()).toString() : resultSelector}
+      } }`, variables, optimisticUpdate)
+    },
+    mutateAddNotificationToken(variables: { userId: string, notificationToken: string }, resultSelector: string | ((qb: UserModelSelector) => UserModelSelector) = userModelPrimitives.toString(), optimisticUpdate?: () => void) {
+      return self.mutate<{ addNotificationToken: UserModelType}>(`mutation addNotificationToken($userId: String!, $notificationToken: String!) { addNotificationToken(userId: $userId, notificationToken: $notificationToken) {
         ${typeof resultSelector === "function" ? resultSelector(new UserModelSelector()).toString() : resultSelector}
       } }`, variables, optimisticUpdate)
     },
@@ -458,8 +521,8 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     mutateUpdateLegalInfo(variables: { legalitiesdata: InputInfo }, optimisticUpdate?: () => void) {
       return self.mutate<{ updateLegalInfo: any }>(`mutation updateLegalInfo($legalitiesdata: InputInfo!) { updateLegalInfo(Legalitiesdata: $legalitiesdata) }`, variables, optimisticUpdate)
     },
-    mutateCreateUserTopic(variables: { attachmentUrl?: (string | null), attachmentType?: (string | null), topicContent: string, commentId?: (string | null), userId: string }, resultSelector: string | ((qb: TopicDetailModelSelector) => TopicDetailModelSelector) = topicDetailModelPrimitives.toString(), optimisticUpdate?: () => void) {
-      return self.mutate<{ createUserTopic: TopicDetailModelType}>(`mutation createUserTopic($attachmentUrl: String, $attachmentType: String, $topicContent: String!, $commentId: String, $userId: String!) { createUserTopic(attachmentUrl: $attachmentUrl, attachmentType: $attachmentType, topicContent: $topicContent, commentId: $commentId, userId: $userId) {
+    mutateCreateUserTopic(variables: { title?: (string | null), attachmentUrl?: (string | null), attachmentType?: (string | null), topicContent: string, commentId?: (string | null), userId: string }, resultSelector: string | ((qb: TopicDetailModelSelector) => TopicDetailModelSelector) = topicDetailModelPrimitives.toString(), optimisticUpdate?: () => void) {
+      return self.mutate<{ createUserTopic: TopicDetailModelType}>(`mutation createUserTopic($title: String, $attachmentUrl: String, $attachmentType: String, $topicContent: String!, $commentId: String, $userId: String!) { createUserTopic(title: $title, attachmentUrl: $attachmentUrl, attachmentType: $attachmentType, topicContent: $topicContent, commentId: $commentId, userId: $userId) {
         ${typeof resultSelector === "function" ? resultSelector(new TopicDetailModelSelector()).toString() : resultSelector}
       } }`, variables, optimisticUpdate)
     },
@@ -604,22 +667,23 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
         ${typeof resultSelector === "function" ? resultSelector(new RoomChatModelSelector()).toString() : resultSelector}
       } }`, variables, optimisticUpdate)
     },
-    mutateCreateUserMessage(variables: { width?: (number | null), mimeType?: (string | null), text: string, previewData?: (string | null), uri?: (string | null), size?: (number | null), name?: (string | null), height?: (number | null), status?: (string | null), messageType?: (string | null), roomId: string, authorId: string }, resultSelector: string | ((qb: UsersChatModelSelector) => UsersChatModelSelector) = usersChatModelPrimitives.toString(), optimisticUpdate?: () => void) {
-      return self.mutate<{ createUserMessage: UsersChatModelType}>(`mutation createUserMessage($width: Float, $mimeType: String, $text: String!, $previewData: String, $uri: String, $size: Float, $name: String, $height: Float, $status: String, $messageType: String, $roomId: String!, $authorId: String!) { createUserMessage(width: $width, mimeType: $mimeType, text: $text, previewData: $previewData, uri: $uri, size: $size, name: $name, height: $height, status: $status, messageType: $messageType, roomId: $roomId, authorId: $authorId) {
-        ${typeof resultSelector === "function" ? resultSelector(new UsersChatModelSelector()).toString() : resultSelector}
-      } }`, variables, optimisticUpdate)
+    mutateCreateUserMessage(variables: { notificationMessage?: (InputNotification | null), metaData?: (InputMetaData | null), membersId: InputUsers[], width?: (number | null), mimeType?: (string | null), text: string, previewData?: (string | null), uri?: (string | null), size?: (number | null), name?: (string | null), height?: (number | null), status?: (string | null), messageType?: (string | null), roomId: string, authorId: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ createUserMessage: any }>(`mutation createUserMessage($notificationMessage: InputNotification, $metaData: InputMetaData, $membersId: [InputUsers!]!, $width: Float, $mimeType: String, $text: String!, $previewData: String, $uri: String, $size: Float, $name: String, $height: Float, $status: String, $messageType: String, $roomId: String!, $authorId: String!) { createUserMessage(notificationMessage: $notificationMessage, metaData: $metaData, membersId: $membersId, width: $width, mimeType: $mimeType, text: $text, previewData: $previewData, uri: $uri, size: $size, name: $name, height: $height, status: $status, messageType: $messageType, roomId: $roomId, authorId: $authorId) }`, variables, optimisticUpdate)
     },
     mutateGetchatByUserId(variables: { authorId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ getchatByUserId: any }>(`mutation getchatByUserId($authorId: String!) { getchatByUserId(authorId: $authorId) }`, variables, optimisticUpdate)
     },
-    mutateGetchatByRoomId(variables: { roomId: string }, optimisticUpdate?: () => void) {
-      return self.mutate<{ getchatByRoomId: any }>(`mutation getchatByRoomId($roomId: String!) { getchatByRoomId(roomId: $roomId) }`, variables, optimisticUpdate)
+    mutateGetchatByRoomId(variables: { pageNumber: number, roomId: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ getchatByRoomId: any }>(`mutation getchatByRoomId($pageNumber: Float!, $roomId: String!) { getchatByRoomId(pageNumber: $pageNumber, roomId: $roomId) }`, variables, optimisticUpdate)
     },
     mutateGetroomByUserId(variables: { adminId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ getroomByUserId: any }>(`mutation getroomByUserId($adminId: String!) { getroomByUserId(adminId: $adminId) }`, variables, optimisticUpdate)
     },
-    mutateGetroomByUsers(variables: { membersId: InputUsers[] }, optimisticUpdate?: () => void) {
-      return self.mutate<{ getroomByUsers: any }>(`mutation getroomByUsers($membersId: [InputUsers!]!) { getroomByUsers(membersId: $membersId) }`, variables, optimisticUpdate)
+    mutateGetroomByUsers(variables: { memberId: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ getroomByUsers: any }>(`mutation getroomByUsers($memberId: String!) { getroomByUsers(memberId: $memberId) }`, variables, optimisticUpdate)
+    },
+    mutateGetroomBymembers(variables: { members: InputUsers[] }, optimisticUpdate?: () => void) {
+      return self.mutate<{ getroomBymembers: any }>(`mutation getroomBymembers($members: [InputUsers!]!) { getroomBymembers(members: $members) }`, variables, optimisticUpdate)
     },
     mutateDeleteChatMessage(variables: { chatmessageId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ deleteChatMessage: boolean }>(`mutation deleteChatMessage($chatmessageId: String!) { deleteChatMessage(chatmessageId: $chatmessageId) }`, variables, optimisticUpdate)
@@ -627,13 +691,37 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     mutateDeleteChatRoom(variables: { roomId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ deleteChatRoom: boolean }>(`mutation deleteChatRoom($roomId: String!) { deleteChatRoom(roomId: $roomId) }`, variables, optimisticUpdate)
     },
+    mutateCreateUserHomePages(variables: { discription?: (string | null), attachmentUrl?: (string | null), attachmentType?: (string | null), commentId?: (string | null), userId: string }, resultSelector: string | ((qb: HomePageDetailModelSelector) => HomePageDetailModelSelector) = homePageDetailModelPrimitives.toString(), optimisticUpdate?: () => void) {
+      return self.mutate<{ createUserHomePages: HomePageDetailModelType}>(`mutation createUserHomePages($discription: String, $attachmentUrl: String, $attachmentType: String, $commentId: String, $userId: String!) { createUserHomePages(Discription: $discription, attachmentUrl: $attachmentUrl, attachmentType: $attachmentType, commentId: $commentId, userId: $userId) {
+        ${typeof resultSelector === "function" ? resultSelector(new HomePageDetailModelSelector()).toString() : resultSelector}
+      } }`, variables, optimisticUpdate)
+    },
+    mutateGetHomePagesByUser(variables: { userId: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ getHomePagesByUser: any }>(`mutation getHomePagesByUser($userId: String!) { getHomePagesByUser(userId: $userId) }`, variables, optimisticUpdate)
+    },
+    mutateGetHomePagesByHomePageId(variables: { homePageId: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ getHomePagesByHomePageId: any }>(`mutation getHomePagesByHomePageId($homePageId: String!) { getHomePagesByHomePageId(HomePageId: $homePageId) }`, variables, optimisticUpdate)
+    },
+    mutateUpdateDeleteHomePageId(variables: { pageNumber: number, homePageId: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ UpdateDeleteHomePageId: any }>(`mutation UpdateDeleteHomePageId($pageNumber: Float!, $homePageId: String!) { UpdateDeleteHomePageId(pageNumber: $pageNumber, HomePageId: $homePageId) }`, variables, optimisticUpdate)
+    },
+    mutateUpdateUserHomePages(variables: { usersHomePagesDetail: InputHomePage, homePageId: string }, resultSelector: string | ((qb: HomePageDetailModelSelector) => HomePageDetailModelSelector) = homePageDetailModelPrimitives.toString(), optimisticUpdate?: () => void) {
+      return self.mutate<{ updateUserHomePages: HomePageDetailModelType}>(`mutation updateUserHomePages($usersHomePagesDetail: InputHomePage!, $homePageId: String!) { updateUserHomePages(UsersHomePagesDetail: $usersHomePagesDetail, HomePageId: $homePageId) {
+        ${typeof resultSelector === "function" ? resultSelector(new HomePageDetailModelSelector()).toString() : resultSelector}
+      } }`, variables, optimisticUpdate)
+    },
+    mutateCommentOnHomepage(variables: { acttachmentType?: (string | null), acttachmentUrl?: (string | null), comment?: (string | null), homepageId: string, userId: string }, resultSelector: string | ((qb: HomecommentsModelSelector) => HomecommentsModelSelector) = homecommentsModelPrimitives.toString(), optimisticUpdate?: () => void) {
+      return self.mutate<{ commentOnHomepage: HomecommentsModelType}>(`mutation commentOnHomepage($acttachmentType: String, $acttachmentUrl: String, $comment: String, $homepageId: String!, $userId: String!) { commentOnHomepage(acttachmentType: $acttachmentType, acttachmentUrl: $acttachmentUrl, comment: $comment, HomepageId: $homepageId, userId: $userId) {
+        ${typeof resultSelector === "function" ? resultSelector(new HomecommentsModelSelector()).toString() : resultSelector}
+      } }`, variables, optimisticUpdate)
+    },
     subscribeNewMessageadd(variables?: {  }, resultSelector: string | ((qb: RoomChatModelSelector) => RoomChatModelSelector) = roomChatModelPrimitives.toString(), onData?: (item: any) => void, onError?: (error: Error) => void) {
       return self.subscribe<{ newMessageadd: RoomChatModelType}>(`subscription newMessageadd { newMessageadd {
         ${typeof resultSelector === "function" ? resultSelector(new RoomChatModelSelector()).toString() : resultSelector}
       } }`, variables, onData, onError)
     },
-    subscribeNewuserchat(variables?: {  }, resultSelector: string | ((qb: UsersChatModelSelector) => UsersChatModelSelector) = usersChatModelPrimitives.toString(), onData?: (item: any) => void, onError?: (error: Error) => void) {
-      return self.subscribe<{ newuserchat: UsersChatModelType}>(`subscription newuserchat { newuserchat {
+    subscribeNewuserchat(variables: { userId: string }, resultSelector: string | ((qb: UsersChatModelSelector) => UsersChatModelSelector) = usersChatModelPrimitives.toString(), onData?: (item: any) => void, onError?: (error: Error) => void) {
+      return self.subscribe<{ newuserchat: UsersChatModelType}>(`subscription newuserchat($userId: String!) { newuserchat(userId: $userId) {
         ${typeof resultSelector === "function" ? resultSelector(new UsersChatModelSelector()).toString() : resultSelector}
       } }`, variables, onData, onError)
     },

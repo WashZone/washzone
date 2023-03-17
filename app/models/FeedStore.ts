@@ -6,6 +6,7 @@ export const FeedStoreModel = types
   .props({
     topics: types.frozen(),
     stories: types.frozen(),
+    homeFeed : types.frozen(),
   })
   .actions(withSetPropAction)
   .actions((self) => ({
@@ -15,9 +16,16 @@ export const FeedStoreModel = types
     addToTopics(topics: any) {
       self.topics = [...self.topics, ...topics]
     },
+    setHomeFeed(homeFeed: any) {
+      self.homeFeed = [...homeFeed]
+    },
+    addToHomeFeed(homeFeed: any) {
+      self.homeFeed = [...self.homeFeed, ...homeFeed]
+    },
     clear() {
       self.topics = []
       self.stories = []
+      self.homeFeed = []
     },
     setStories(stories: any) {
       self.stories = stories

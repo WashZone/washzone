@@ -59,7 +59,7 @@ export const ResetPassword: FC<AppStackScreenProps<"ResetPassword">> = function 
           style={$inputText}
           inputWrapperStyle={$inputWrapperStyle}
           placeholderTextColor={colors.palette.overlay50}
-          maxLength={20}
+          maxLength={100}
         />
 
         <TextField
@@ -72,7 +72,7 @@ export const ResetPassword: FC<AppStackScreenProps<"ResetPassword">> = function 
           style={$inputText}
           inputWrapperStyle={$inputWrapperStyle}
           placeholderTextColor={colors.palette.overlay50}
-          maxLength={20}
+          maxLength={100}
         />
 
         <TextField

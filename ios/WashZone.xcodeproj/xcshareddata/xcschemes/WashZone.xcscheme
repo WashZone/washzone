@@ -38,16 +38,6 @@
                ReferencedContainer = "container:WashZone.xcodeproj">
             </BuildableReference>
          </TestableReference>
-         <!-- <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "4F1BCCC3299E0AF0006BB322"
-               BuildableName = "ApplovinSDKTests.xctest"
-               BlueprintName = "ApplovinSDKTests"
-               ReferencedContainer = "container:WashZone.xcodeproj">
-            </BuildableReference>
-         </TestableReference> -->
       </Testables>
    </TestAction>
    <LaunchAction

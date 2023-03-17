@@ -115,7 +115,7 @@ export const LoginView = observer(() => {
 
       <Button
         testID="login-button"
-        tx="loginScreen.Login"
+        text='Log In'
         style={$tapButton}
         preset="reversed"
         onPress={login}
@@ -123,7 +123,7 @@ export const LoginView = observer(() => {
       />
       <Pressable onPress={() => navigation.navigate("Signup")} style={$footer}>
         <Text tx="loginScreen.noAccont" size="sm" weight="light" style={$hint} />
-        <Text tx="loginScreen.signUp" size="sm" weight="bold" style={$footerText} />
+        <Text tx='loginScreen.signUp' size="sm" weight="bold" style={$footerText} />
       </Pressable>
     </Screen>
   )

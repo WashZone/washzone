@@ -2,7 +2,7 @@ import { observer } from "mobx-react-lite"
 import React, { FC, useEffect, useState } from "react"
 import { AppStackParamList, AppStackScreenProps } from "../../navigators"
 import { $contentCenter, $flex1, $flexRow, $justifyCenter } from "../styles"
-import { Screen, Header, Icon } from "../../components"
+import { Screen, Text, Icon } from "../../components"
 import { Chat, MessageType } from "@flyerhq/react-native-chat-ui"
 import { PreviewData } from "@flyerhq/react-native-link-preview"
 // import DocumentPicker from 'react-native-document-picker'
@@ -10,27 +10,46 @@ import FileViewer from "react-native-file-viewer"
 import { launchImageLibrary } from "react-native-image-picker"
 import { v4 as uuidv4 } from "uuid"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
-import { Pressable, TextStyle, TouchableOpacity, View } from "react-native"
+import { Pressable, TextStyle, TouchableOpacity, View, ViewStyle } from "react-native"
 import { colors, spacing } from "../../theme"
 import { MediaPicker } from "../../utils/device/MediaPicker"
 import { MessageOptionsModal } from "./partials/MessageOptionsModal"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
-import { P2PHeader } from "./partials"
+import { CustomChatMessage, P2PHeader } from "./partials"
 import { useStores } from "../../models"
 import { useHooks } from "../hooks"
+import { fromNow } from "../../utils/agoFromNow"
+import { messageMetadataType } from "../../utils"
+
+const getColorFromType = (type: any) => {
+  switch (type) {
+    case messageMetadataType.incomingCallOffer:
+      return colors.palette.status.away
+    case messageMetadataType.incomingCallAnswer:
+      return colors.palette.success100
+    case messageMetadataType.hangUpCall:
+      return colors.palette.angry100
+    case messageMetadataType.classifiedOffer:
+      return colors.palette.success100
+    default:
+      return colors.palette.neutral100
+  }
+}
 
 export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2PChat(props) {
   const { receiver, roomId } = props.route.params
-  console.log("ROOMID", roomId)
   const {
     userStore,
-    allChats: {allChatRooms, chatMessages, getRoomMessages },
+    allChats: { allChatRooms, chatMessages, getRoomMessages },
   } = useStores()
-  const {syncChatMessages} = useHooks()
-
-  // const [messages, setMessages] = useState(data as Array<any>)
+  const { syncChatMessages, sendTextMessage, getMoreChatMessages } = useHooks()
   const [optionsModalVisible, setOptionsModalVisible] = useState(false)
-  const [selectedMessage, setSelectedMessage] = useState<any>({ tpye: "unsupported" })
+  const [isLastPage, setIsLastPage] = useState(false)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [sending, setSending] = useState(false)
+  const [syncing, setSyncing] = useState(true)
+
+  const [selectedMessage, setSelectedMessage] = useState<any>({ type: "unsupported" })
   const user = {
     id: userStore._id,
     imageUrl: userStore?.picture,
@@ -46,54 +65,88 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
     }
   }
 
-  const syncChat = async() =>{
-    await syncChatMessages(roomId)
-    console.log(allChatRooms)
+  const syncChat = async () => {
+    const res = await syncChatMessages(roomId)
+    setIsLastPage(res.lastPage)
+    setTimeout(() => setSyncing(false), 500) 
   }
 
-  useEffect(() =>{
+  useEffect(() => {
     syncChat()
-  },[])
-
-  // const handleSendPress = (message: MessageType.PartialText) => {
-  //   const textMessage: MessageType.Text = {
-  //     author: user,
-  //     createdAt: Date.now(),
-  //     id: uuidv4(),
-  //     text: message.text,
-  //     type: 'text',
-  //   }
-  //   addMessage(textMessage)
-  // }
-
-  // const { getPlaylist } = useHooks()
-
-  // const syncPlaylistData = async () => {
-  //   const res = await getPlaylist(playlistId)
-
-  //   setPlaylistData(res)
-  // }
-
-  // useEffect(() => {
-  //   syncPlaylistData()
-  // }, [])
+  }, [])
 
   const onAttachmentPress = async () => {
     const res = await MediaPicker()
   }
 
-  const handleSendPress = (text:MessageType.PartialText) => {}
+  const handleSendPress = async (text: MessageType.PartialText) => {
+    setSending(true)
+    !syncing && !loadingMore && (await sendTextMessage(roomId, text.text, receiver._id))
+    setSending(false)
+
+  }
 
   const handleOnMessageLongPress = (message) => {
     setSelectedMessage(message)
     setOptionsModalVisible(true)
   }
 
+  const onChatEndReached = async () => {
+    setLoadingMore(true)
+    if (!isLastPage &&  !sending && !syncing) {
+        console.log("END REACHD")
+        const res = await getMoreChatMessages({ roomId })
+        setIsLastPage(res.lastPage)
+    }
+    setLoadingMore(false)
+
+  }
+
+  const renderBubble = (payload: {
+    child: React.ReactNode
+    message: MessageType.Any
+    nextMessageInGroup: boolean
+  }) => {
+    const { child, message, nextMessageInGroup } = payload
+    const isAuthorMe = message?.author?.id === userStore._id
+    const isLog =
+      message?.type === "custom" &&
+      [
+        messageMetadataType.hangUpCall,
+        messageMetadataType.incomingCallAnswer,
+        messageMetadataType.incomingCallOffer,
+        messageMetadataType.classifiedOffer,
+      ].includes(message?.metaData?.metaDataType)
+    return (
+      <View
+        style={[
+          {
+            backgroundColor: isLog
+              ? getColorFromType(message?.metaData?.metaDataType)
+              : isAuthorMe
+              ? colors.palette.primary200
+              : colors.palette.neutral100,
+            padding: spacing.tiny,
+            paddingHorizontal: spacing.extraSmall,
+            borderRadius: isLog ? 2 : 10,
+            alignItems: isAuthorMe ? "flex-end" : "flex-start",
+          },
+          !isLog && {
+            borderBottomRightRadius: isAuthorMe ? 0 : 10,
+            borderBottomLeftRadius: !isAuthorMe ? 0 : 10,
+          },
+        ]}
+      >
+        {child}
+      </View>
+    )
+  }
+
   return (
     <View style={$flex1}>
-      <P2PHeader data={receiver} />
+      <P2PHeader data={receiver} roomId={roomId} />
       <Chat
-        showUserAvatars
+        onEndReached={onChatEndReached}
         theme={{
           insets: {
             messageInsetsHorizontal: 10,
@@ -129,92 +182,24 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
           borders: { inputBorderRadius: 10, messageBorderRadius: 10 },
         }}
         messages={getRoomMessages({ roomId })}
+        renderCustomMessage={(message, messageWidth) => <CustomChatMessage message={message} />}
         onAttachmentPress={onAttachmentPress}
         onMessagePress={handleMessagePress}
         onMessageLongPress={handleOnMessageLongPress}
-        // onPreviewDataFetched={handlePreviewDataFetched}
         onSendPress={handleSendPress}
         user={user}
+        renderBubble={renderBubble}
+        enableAnimation
+        isLastPage={isLastPage}
       />
-      {/* <HeaderComponent playlistData={playlistData} />
-        <FlatList
-          style={$flex1}
-          ListHeaderComponent={<PlaylistDescription />}
-          data={playlistData?.VideoDetail}
-          renderItem={({ item, index }) => (
-            <VideoBlock key={index} index={index} videoDetails={item} />
-          )}
-        /> */}
       <MessageOptionsModal
         message={selectedMessage}
         isVisible={optionsModalVisible}
         setVisible={setOptionsModalVisible}
+        metadata={selectedMessage?.metadata}
       />
     </View>
   )
 })
 
 const testTextStyle: TextStyle = {}
-// const testData = [
-//   {
-//     author: {
-//       createdAt: 1677025650,
-//       firstName: "Jirazo",
-//       id: "06c33e8b-e835-4736-80f4-63f44b66666d",
-//       imageUrl: receiver?.picture,
-//       lastSeen: 1677025650,
-//     },
-//     createdAt: 1677025650,
-//     id: 1,
-//     status: "sent",
-//     type: "image",
-//     uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQfOiUfb4VFnytmuO25W3RGvUAwj3S1fDc0eq3nVdAM0w&s",
-//     size: 20,
-//     text: "Hi There!",
-//   },
-//   {
-//     author: {
-//       createdAt: 1677025650,
-//       firstName: "Jirazo",
-//       id: "06c33e8b-e835-4736-80f4-63f44b66666c",
-//       imageUrl: receiver?.picture,
-//       lastSeen: 1677025650,
-//     },
-//     createdAt: 1677025650,
-//     id: 2,
-//     status: "sent",
-//     type: "image",
-//     uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTZbid4L4Db-UU3xKTLC-rF-wcVO2nEAKkPgvKmEU4TnA&s",
-//     size: 20,
-//     text: "Hi There!",
-//   },
-
-//   {
-//     author: {
-//       createdAt: 1677025650,
-//       firstName: "Jirazo",
-//       id: "06c33e8b-e835-4736-80f4-63f44b66666c",
-//       imageUrl: receiver?.picture,
-//       lastSeen: 1677025650,
-//     },
-//     createdAt: 1677025650,
-//     id: 4,
-//     status: "sent",
-//     type: "text",
-//     text: "Hi There!",
-//   },
-//   {
-//     author: {
-//       createdAt: 1677025650,
-//       firstName: "Jirazo",
-//       id: "06c33e8b-e835-4736-80f-63f44b66666c",
-//       imageUrl: receiver?.picture,
-//       lastSeen: 1677025650,
-//     },
-//     createdAt: 1677025650,
-//     id: 5,
-//     status: "sent",
-//     type: "text",
-//     text: "Hi There!",
-//   },
-// ]
