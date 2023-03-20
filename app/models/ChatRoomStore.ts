@@ -85,11 +85,12 @@ export const ChatRoomStoreModel = types
       // }
     },
     async addToMessages(props: { roomId: string; message: any }) {
-      // console.log("self.chatMessages[props.roomId]", self.chatMessages[props.roomId])
+      console.log("ADDING to room:self.chatMessages", self.chatMessages)
+      console.log("self.chatMessages[props.roomId]", self.chatMessages[props.roomId])
       // if (self.chatMessages[props.roomId].length > 0) {
       console.log("ADDING to room", props)
       const temp = { ...self.chatMessages }
-      temp[props.roomId] = [props.message, ...self.chatMessages[props.roomId]]
+      temp[props.roomId] = [props.message, ...(self.chatMessages?.[props.roomId]||[])]
       self.setProp("chatMessages", temp)
       // }
       // else {

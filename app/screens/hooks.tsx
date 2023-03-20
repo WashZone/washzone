@@ -8,6 +8,7 @@ import messaging from "@react-native-firebase/messaging"
 
 export function useHooks() {
   const {
+    subscribeAll,
     authenticationStore: { setBlocked, setAuthToken },
     searchStore: { setResults },
     feedStore: {
@@ -667,6 +668,8 @@ export function useHooks() {
 
   const onLoggedInBoot = async () => {
     console.log("RUNNING = onLoggedInBoot")
+    subscribeAll()
+    await syncAllChats()
     await syncSavedInteractionsHook()
     await syncInteractedVideosAndTopics()
     await refreshTopics()
@@ -674,7 +677,6 @@ export function useHooks() {
     await refreshClassifieds()
     await refreshVideos()
     await loadStories()
-    await syncAllChats()
     await updateNotificationToken()
   }
 
@@ -908,12 +910,12 @@ export function useHooks() {
   }
 
   const updateNotificationToken = async () => {
-    const token = await messaging().getToken()
+    try{const token = await messaging().getToken()
     const res = await mutateAddNotificationToken({
       userId: userStore._id,
       notificationToken: token,
     })
-    console.log("mutateAddNotificationToken", res)
+    console.log("mutateAddNotificationToken", res)}catch(err){console.log("ERR", err)}
   }
 
   return {

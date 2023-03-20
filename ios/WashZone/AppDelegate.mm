@@ -6,6 +6,8 @@
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
 #import <React/RCTLinkingManager.h>
+#import <Firebase.h>
+
 #import <UserNotifications/UserNotifications.h>
 #import <RNCPushNotificationIOS.h>
 
@@ -87,7 +89,12 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+
   RCTAppSetupPrepareApp(application);
+  if ([FIRApp defaultApp] == nil) {
+    [FIRApp configure];
+  }
+
   UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
   center.delegate = self;
 

@@ -26,9 +26,9 @@ import Config from "./config"
 // import AppLovinMAX from "react-native-applovin-max/src/index"
 import { useHooks } from "./screens/hooks"
 import Toast from "react-native-toast-message"
-import { configureNotifications } from "./utils"
+import { notificationHandler } from "./utils"
 
-configureNotifications()
+// configureNotifications()
 
 // Set up Reactotron, which is a free desktop app for inspecting and debugging
 // React Native apps. Learn more here: https://github.com/infinitered/reactotron
@@ -56,17 +56,16 @@ const config = {
 interface AppProps {
   hideSplashScreen: () => Promise<void>
 }
+ notificationHandler()
 
 function App(props: AppProps) {
   const { hideSplashScreen } = props
   const { onBoot } = useHooks()
-  const { subscribeAll } = useStores()
   // const SDK_KEY =
   //   "U0OTon6ehwaUryCOnQkOPUyWxZJn8XLdTl5KVBzC5ThxUuJGI2fhWbDS9XEI4ZxcI0xpCu0IRhEwZTBtarZ5Rn"
 
   const [AppLovinSDKRegistered, setAppLovinSDKRegistered] = React.useState(true)
   useEffect(() => {
-  //  notificationHandler()
      
     // navigationRef.navigate('TestNotification')
     // MAX Consent Flow for iOS 14.5+

@@ -53,6 +53,7 @@ export const RootStoreModel = types
   })
   .actions(withSetPropAction)
   .actions((self) => ({
+
     subscribeAll() {
       console.log("SUBSCRIBING", self.userStore.name, self.userStore._id)
       // const navigation = useNavigation<NavigationProp<AppStackParamList>>()
@@ -93,7 +94,7 @@ export const RootStoreModel = types
           }
           console.log("roomId:chatMessages", message?.roomId?._id)
           console.log("allChats:chatMessages", self.allChats.chatMessages[message?.roomId?._id])
-          const isNewRoom = self.allChats.chatMessages[message?.roomId?._id].length === 0
+          const isNewRoom =  (!self.allChats.chatMessages[message?.roomId?._id]?.length)|| (self.allChats.chatMessages[message?.roomId?._id]?.length === 0) 
           if (isNewRoom) {
             const res = await self.api.mutateGetroomByUsers({ memberId: self.userStore._id })
             console.log("SYNCING ALL CHATS IN ROOTSTORE", JSON.stringify(res))

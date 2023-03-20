@@ -1,5 +1,5 @@
 // import notifee, { TimestampTrigger, TriggerType, RepeatFrequency } from "@notifee/react-native"
-// import messaging, { FirebaseMessagingTypes } from "@react-native-firebase/messaging"
+import messaging, { FirebaseMessagingTypes } from "@react-native-firebase/messaging"
 
 import PushNotification from 'react-native-push-notification';
 import PushNotificationIOS from '@react-native-community/push-notification-ios';
@@ -149,25 +149,25 @@ export {
 //   await displayNotification({ title: "TEST", body: 'TEST' })
 // }
 
-// export const notificationHandler = async () => {
-//     const authStatus = await messaging().requestPermission();
-//     const enabled =
-//       authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-//       authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+export const notificationHandler = async () => {
+    const authStatus = await messaging().requestPermission();
+    const enabled =
+      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
   
-//     if (enabled) {
-//       console.log('Authorization status:', authStatus);
-//     }
+    if (enabled) {
+      console.log('Authorization status:', authStatus);
+    }
 
-//   if (!messaging().isDeviceRegisteredForRemoteMessages) {
-//     await messaging().registerDeviceForRemoteMessages();
-//   }
+  if (!messaging().isDeviceRegisteredForRemoteMessages) {
+    await messaging().registerDeviceForRemoteMessages();
+  }
   
-//   const token = await messaging().getToken()
-//   console.log("FCM TOKEN", token)
+  const token = await messaging().getToken()
+  console.log("FCM TOKEN", token)
 
-//   // messaging().onMessage(onMessageReceived)
-//   // messaging().setBackgroundMessageHandler(onMessageReceived)
+  // messaging().onMessage(onMessageReceived)
+  // messaging().setBackgroundMessageHandler(onMessageReceived)
 
-//   // Get the token
-// }
+  // Get the token
+}
