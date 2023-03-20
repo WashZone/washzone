@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from "react"
-import { Pressable, RefreshControl, TextStyle, View, ViewStyle } from "react-native"
+import { Dimensions, Pressable, RefreshControl, TextStyle, View, ViewStyle } from "react-native"
 import { Header, Icon, IconTypes, ListItem, Screen, Text } from "../../components"
 import { colors, spacing } from "../../theme"
 
@@ -12,6 +12,7 @@ import { FlatList } from "react-native-gesture-handler"
 import { useStores } from "../../models"
 import { observer } from "mobx-react-lite"
 import * as Linking from "expo-linking"
+import { $flex1, $flexRow } from "../styles"
 
 interface ActionProps {
   icon: IconTypes
@@ -33,20 +34,10 @@ const BottomActions = ({ classified, type }: { classified: any; type: "video" | 
       title: "Share",
       onPress: () =>
         Share.open({
-          message: `washzone://shared-classified/${classified?._id}`,
+          message: `washzone://shared-${type}/${classified?._id}`,
           title: "",
           url: "",
-        })
-          .then((res) => {
-          })
-          .catch((err) => {
-
-          }),
-    },
-    {
-      icon: "offer",
-      title: "Send Offer",
-      onPress: () => console.log("ALERT"),
+        }),
     },
   ]
 
@@ -84,7 +75,12 @@ const SavedItem = ({ item, index, handleOnPress }) => {
         rightIcon="caretRight"
       >
         <View style={$textContainer}>
-          <Text text={videoDetails?.videoHeading} weight="semiBold" numberOfLines={1} />
+          <Text
+            text={videoDetails?.videoHeading}
+            weight="semiBold"
+            numberOfLines={1}
+            style={{ width: Dimensions.get("window").width - 200 }}
+          />
           <Text text={videoDetails?.description} weight="medium" size="xs" numberOfLines={1} />
           <Text text={videoDetails?.users?.name} style={$byText} />
           <BottomActions classified={item} type="video" />
@@ -109,8 +105,8 @@ const SavedItem = ({ item, index, handleOnPress }) => {
       rightIcon="caretRight"
     >
       <View style={$textContainer}>
-        <Text text={classifiedDetails?.title} weight="semiBold" numberOfLines={1} />
-        <Text text={"$ " + classifiedDetails?.prize} weight="medium" />
+        <Text text={classifiedDetails?.title} weight="semiBold" numberOfLines={1}  style={{ width: Dimensions.get("window").width - 200 }}/>
+        <Text text={"$ " + classifiedDetails?.prize} weight="medium" style={{ width: Dimensions.get("window").width - 200 }} />
         <Text text={classifiedDetails?.users?.name} style={$byText} />
         <BottomActions classified={classifiedDetails} type="classified" />
       </View>
@@ -155,7 +151,13 @@ export const Saved: FC<AppStackScreenProps<"Saved">> = observer(function Saved()
         leftIconColor={colors.palette.neutral600}
       />
       <FlatList
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.palette.primary100}/>}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={colors.palette.primary100}
+          />
+        }
         data={savedClassifieds}
         renderItem={({ item, index }) => (
           <SavedItem item={item} index={index} handleOnPress={handleOnPress} />

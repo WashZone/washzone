@@ -104,7 +104,7 @@ export const CreatePost = observer(function CreatePost() {
 
   const previewImage: ImageStyle = {
     height: selectedImage.uri ? 80 : 0,
-    width: selectedImage.uri ? (80 * selectedImage?.width) / selectedImage?.height : 0,
+    width: selectedImage.uri ?  80 : 0,
     alignItems: "center",
     borderRadius: 10,
   }
@@ -112,14 +112,13 @@ export const CreatePost = observer(function CreatePost() {
   const animatedPreviewContainer = useAnimatedStyle(() => {
     const height = interpolate(progress.value, [0.5, 1], [0, 80])
     const opacity = interpolate(progress.value, [0.5, 1], [0, 1])
-    const marginBottom = interpolate(progress.value, [0.5, 1], [0, 10])
+    // const marginBottom = interpolate(progress.value, [0.5, 1], [0, 10])
 
     return {
       height,
       width: (80 * selectedImage?.width) / selectedImage?.height,
       marginHorizontal: 20,
       justifyContent: "center",
-      marginBottom,
       opacity,
     }
   })
@@ -163,7 +162,7 @@ export const CreatePost = observer(function CreatePost() {
   })
 
   return (
-    <>
+    <View >
       <View style={$container}>
         <FastImage source={{ uri: picture }} style={$picture} resizeMode="contain" />
         <View style={$contentContainer}>
@@ -184,10 +183,10 @@ export const CreatePost = observer(function CreatePost() {
       <Animated.View style={animatedMediaContainer}>
         <Animated.View style={animatedPreviewContainer}>
           <FastImage source={{ uri: selectedImage?.uri }} style={previewImage} />
-          <Pressable style={$deleteIcon} onPress={onDeletePress}>
-            <Icon icon="delete" size={selectedImage.uri ? 20 : 0.0001} />
-          </Pressable>
         </Animated.View>
+        <Pressable style={$deleteIcon} onPress={onDeletePress}>
+            <Icon icon="delete" size={selectedImage.uri ? 24 : 0.0001} />
+          </Pressable>
         <View style={$bottomActionContainer}>
           <View style={$actionButtonsContainer}>
             <Pressable onPress={onGalleryPress}>
@@ -212,7 +211,7 @@ export const CreatePost = observer(function CreatePost() {
           </AnimatedPressable>
         </View>
       </Animated.View>
-    </>
+    </View>
   )
 })
 
@@ -223,7 +222,7 @@ const $loadingIndicator: ViewStyle = {
 const $deleteIcon: ViewStyle = {
   position: "absolute",
   top: 3,
-  right: 3,
+  right: spacing.small,
 }
 
 const $actionButtonsContainer: ViewStyle = {
@@ -241,7 +240,7 @@ const $bottomActionContainer: ViewStyle = {
   flexDirection: "row",
   justifyContent: "space-between",
   paddingHorizontal: 20,
-  marginBottom: 10,
+  // marginBottom: 10,
 }
 
 const $picture: ImageStyle = {
@@ -281,8 +280,8 @@ const $container: ViewStyle = {
   paddingHorizontal: spacing.homeScreen,
   flexDirection: "row",
   alignItems: "center",
-  borderBottomWidth: 0.5,
-  borderBottomColor: colors.background,
+  // borderBottomWidth: 0.5,
+  // borderBottomColor: colors.background,
   shadowColor: colors.background,
   shadowRadius: 10,
   shadowOpacity: 0.8,

@@ -1,5 +1,5 @@
 import React, { FC, useState } from "react"
-import { View, Pressable, FlatList, TextStyle, ViewStyle, RefreshControl } from "react-native"
+import { View, Pressable, FlatList, TextStyle, ViewStyle, RefreshControl, Dimensions } from "react-native"
 import { Icon, Screen, Text } from "../../components"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { TopicsTabParamList, TopicsTabProps } from "../../tabs"
@@ -16,7 +16,9 @@ import { MREC_AD_UNIT_ID } from "../../utils/AppLovin"
 import { $flex1 } from "../styles"
 import Share from "react-native-share"
 import { getIconForInteraction } from "../../utils/helpers"
-import { defaultImages } from "../../utils"
+import { defaultImages, DEFAULT_LOADING } from "../../utils"
+import LinearGradient from "react-native-linear-gradient"
+import ShimmerPlaceholder from "react-native-shimmer-placeholder"
 
 const Actions = observer(function ActionButtons({ item }: { item: any }) {
   const [loading, setLoading] = useState<boolean>(false)
@@ -66,12 +68,6 @@ const Actions = observer(function ActionButtons({ item }: { item: any }) {
           size={25}
           onPress={() =>
             Share.open({ message: "", title: "", url: `washzone://shared-topic/${item?._id}` })
-              .then((res) => {
-
-              })
-              .catch((err) => {
-
-              })
           }
         />
       </View>
@@ -80,8 +76,8 @@ const Actions = observer(function ActionButtons({ item }: { item: any }) {
 })
 
 export const TopicComponent = ({ topic, index }) => {
+  const [loaded, setLoaded] = useState(false)
   const navigation = useNavigation<NavigationProp<TopicsTabParamList>>()
-console.log('TOPIC TOPIC<' , topic)
   const topicDetails = {
     picture: topic?.userId?.picture,
     first_name: topic?.userId?.first_name,
@@ -114,20 +110,26 @@ console.log('TOPIC TOPIC<' , topic)
               <Text text={fromNow(topicDetails.createdAt)} style={$agoStamp} />
             </View>
           </View>
-          <Text style={$postContent} text={topicDetails.title} numberOfLines={1} />
+          <Text style={$postContent} text={topicDetails.title} numberOfLines={1} weight='medium'/>
           <Text style={$postContent} text={topicDetails.content} numberOfLines={3} />
           <Actions item={topic} />
         </View>
         <View style={$contentCenter}>
+        <ShimmerPlaceholder
+          visible={loaded}
+          shimmerStyle={$attachment}
+          LinearGradient={LinearGradient}
+        >
           <FastImage
             style={$attachment}
             source={{
               uri:
-                topic?.attachmentUrl ||
-                "https://www.classify24.com/wp-content/uploads/2015/11/no-image.png",
+                topic?.attachmentUrl
             }}
+            onLoadEnd={() => setLoaded(true)}
             resizeMode="cover"
           />
+          </ShimmerPlaceholder>
         </View>
       </Pressable>
       {/* {index % 5 === 0 && (
@@ -143,7 +145,7 @@ console.log('TOPIC TOPIC<' , topic)
 
 export const TopicsFeed: FC<TopicsTabProps<"TopicsFeed">> = observer(function TopicsFeed(_props) {
   const { refreshTopics, loadMoreTopics } = useHooks()
-  const { topics } = useStores()
+  const { topics :{topics} } = useStores()
 
   const [refreshing, setRefreshing] = useState(false)
 
@@ -160,8 +162,8 @@ export const TopicsFeed: FC<TopicsTabProps<"TopicsFeed">> = observer(function To
         style={$container}
         onEndReached={loadMoreTopics}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}tintColor={colors.palette.primary100} />}
-        data={topics.topics}
-        renderItem={({ item, index }) => <TopicComponent topic={item} index={index} />}
+        data={topics}
+        renderItem={({ item, index }) => <TopicComponent topic={item} index={item?._id} />}
       />
     </Screen>
   )

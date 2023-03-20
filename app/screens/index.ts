@@ -24,4 +24,5 @@ export * from "./Legal"
 export * from "./Support"
 export * from "./AllChats"
 export * from "./P2PChatScreen"
+export * from './PostInfo'
 export * from "./CallScreen"

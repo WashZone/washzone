@@ -1,11 +1,10 @@
 import React, { FC, useEffect, useState } from "react"
-import { View, TextStyle, ViewStyle, Dimensions, ScrollView, ActivityIndicator } from "react-native"
+import { View, TextStyle, ViewStyle, Dimensions, ScrollView, ActivityIndicator, Share } from "react-native"
 import { Button, Icon, IconTypes, Screen, Text } from "../../components"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { VideosTabProps } from "../../tabs"
 import { colors, spacing } from "../../theme"
 import { observer } from "mobx-react-lite"
-import Share from "react-native-share"
 
 import { fromNow } from "../../utils/agoFromNow"
 import { formatName } from "../../utils/formatName"
@@ -59,17 +58,9 @@ const ActionButtons = observer(function TopicsFeed({ data }: { data: any }) {
       label: "Share",
       icon: "forward",
       onPress: () =>
-        Share.open({
-          message: `washzone://shared-video/${data?._id}`,
-          title: "",
-          url: "",
+        Share.share({
+          message: data?.videoHeading + `washzone://shared-video/${data?._id}`,
         })
-          .then((res) => {
-
-          })
-          .catch((err) => {
-
-          }),
     },
     {
       label: "Save",
@@ -188,17 +179,9 @@ export const VideoDetails: FC<VideosTabProps<"VideoDetails">> = observer(functio
   }, [data])
 
   const shareVideo = () => {
-    Share.open({
-      message: "",
-      title: `washzone://shared-video/${data?._id}`,
-      url: `washzone://shared-video/${data?._id}`,
+    Share.share({
+      message: data?.videoHeading + `washzone://shared-video/${videoDetails?._id}`,
     })
-      .then((res) => {
-   
-      })
-      .catch((err) => {
-        err && console.log(err)
-      })
   }
 
   if (loading) {

@@ -18,7 +18,9 @@ import { useHooks } from "../hooks"
 import { useStores } from "../../models"
 import { $flex1 } from "../styles"
 import { AppStackParamList } from "../../navigators"
-import { defaultImages } from "../../utils"
+import { BROKEN_IMAGE, defaultImages } from "../../utils"
+import LinearGradient from "react-native-linear-gradient"
+import ShimmerPlaceholder from "react-native-shimmer-placeholder"
 
 export const ClassifiedComponent = ({
   classified,
@@ -28,17 +30,26 @@ export const ClassifiedComponent = ({
   disabled?: boolean
 }) => {
   const navigation = useNavigation<NavigationProp<ClassifiedsTabParamList>>()
+  const [loaded, setLoaded] = useState(false)
   return (
     <Pressable
       style={$postContainer}
       onPress={() => !disabled && navigation.navigate("ClassifiedsDetails", { classified })}
     >
-      <FastImage
-        source={{
-          uri: classified?.attachmentUrl || defaultImages.noImage,
-        }}
-        style={$attachment}
-      />
+      <ShimmerPlaceholder
+        visible={loaded}
+        shimmerStyle={$attachment}
+        LinearGradient={LinearGradient}
+      >
+        <FastImage
+          defaultSource={BROKEN_IMAGE}
+          source={{
+            uri: classified?.attachmentUrl,
+          }}
+          style={$attachment}
+          onLoadEnd={() => setLoaded(true)}
+        />
+      </ShimmerPlaceholder>
 
       <Text
         style={$postContent}
@@ -74,9 +85,15 @@ export const ClassifiedsFeed: FC<ClassifiedsTabProps<"ClassifiedsFeed">> = obser
           showsVerticalScrollIndicator={false}
           columnWrapperStyle={$flatlistContentContainer}
           ListHeaderComponent={<View style={$headerSpace} />}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.palette.primary100}/>}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor={colors.palette.primary100}
+            />
+          }
           data={classifieds}
-          renderItem={({ item }) => <ClassifiedComponent classified={item} />}
+          renderItem={({ item }) => <ClassifiedComponent key={item?._id} classified={item} />}
           numColumns={2}
           ListFooterComponent={<View style={$footerSpace} />}
         />

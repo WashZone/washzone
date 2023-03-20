@@ -21,6 +21,7 @@ import { $flex1 } from "../styles"
 import { useHooks } from "../hooks"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { AppStackParamList } from "../../navigators"
+import { useStores } from "../../models"
 
 const mockDescription =
   "Nulla cupidatat deserunt amet quis aliquip nostrud do adipisicing. Adipisicing excepteur elit laborum Lorem adipisicing do duis."
@@ -33,6 +34,10 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
   const { getOrCreateRoom } = useHooks()
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
   const layout = useWindowDimensions()
+  const {
+    userStore: { _id },
+  } = useStores()
+  const isUser = user?._id === _id
 
   const [index, setIndex] = React.useState(0)
   const [routes] = React.useState([
@@ -94,14 +99,18 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
           <View style={$topContainer}>
             <FastImage style={$profileImage} source={{ uri: user?.picture }} />
             <Text text={formatName(user?.name)} style={$publisherName} weight="semiBold" />
-            {user?.description  && <Text
-              color={colors.palette.neutral900}
-              numberOfLines={3}
-              weight="normal"
-              text={user?.description}
-              style={$descriptionText}
-            />}
-            <Button preset="reversed" style={$messageButton} text="Message" onPress={onMessage} />
+            {user?.description && (
+              <Text
+                color={colors.palette.neutral900}
+                numberOfLines={3}
+                weight="normal"
+                text={user?.description}
+                style={$descriptionText}
+              />
+            )}
+            {!isUser && (
+              <Button preset="reversed" style={$messageButton} text="Message" onPress={onMessage} />
+            )}
           </View>
         )}
         enableSnap
@@ -133,6 +142,7 @@ const $indicator: ViewStyle = {
 const $topContainer: ViewStyle = {
   backgroundColor: colors.palette.neutral100,
   alignItems: "center",
+  paddingBottom: spacing.medium,
 }
 const $descriptionText: TextStyle = {
   marginTop: spacing.large,
@@ -148,7 +158,7 @@ const $messageButton: ViewStyle = {
   paddingHorizontal: spacing.medium,
   height: 45,
   width: 148,
-  marginVertical : spacing.medium
+  marginTop: spacing.medium,
 }
 
 const $publisherName: TextStyle = {

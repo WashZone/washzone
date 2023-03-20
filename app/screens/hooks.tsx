@@ -5,6 +5,8 @@ import { toastMessages } from "../utils/toastMessages"
 import { getUniqueId } from "react-native-device-info"
 import { messageMetadataType } from "../utils"
 import messaging from "@react-native-firebase/messaging"
+import { RNS3 } from "react-native-upload-aws-s3"
+import { Alert } from "react-native"
 
 export function useHooks() {
   const {
@@ -213,9 +215,9 @@ export function useHooks() {
   const refreshTopics = async () => {
     try {
       const res = await queryGetAllTopicByPageNumber({ pageNumber: 1 }, { fetchPolicy: "no-cache" })
-
-      await syncInteractedVideosAndTopics()
+      console.log("DATA:queryGetAllTopicByPageNumber", res)
       setTopics(res.getAllTopicByPageNumber?.data)
+      await syncInteractedVideosAndTopics()
       // await syncInteractedVideosAndTopics()
     } catch (err) {
       console.log(err)
@@ -234,29 +236,53 @@ export function useHooks() {
 
   const createTopic = async ({ content, attachment, title }) => {
     if (title.length === 0 || content?.length === 0) return
-    const res = await mutateCreateUserTopic({
-      attachmentUrl: attachment?.uri || "",
-      attachmentType: attachment?.type || "",
-      topicContent: content,
-      userId: userStore._id,
-      title,
-    })
-    console.log("RES CREATE TOPIC", res)
-    await refreshTopics()
-    await loadStories()
+    const imageUrl = attachment
+      ? await uploadToS3({
+          uri: attachment?.uri,
+          type: attachment?.type,
+          name: attachment?.fileName,
+        })
+      : undefined
+
+      console.log("IMAGE URL", imageUrl)
+      try {
+        const res = await mutateCreateUserTopic({
+          attachmentUrl: imageUrl ,
+          attachmentType: attachment?.type || "",
+          topicContent: content,
+          userId: userStore._id,
+          title,
+        })
+        console.log("RES CREATE TOPIC", res)
+      } catch (err) {
+        Alert.alert(err)
+      }
+    } 
+    // refreshTopics()
+    // loadStories()
     // setTimeout(loadStories, 1000)
-  }
+
 
   const createPost = async ({ content, attachment }) => {
     if (content?.length === 0) return
-    const res = await mutateCreateUserHomePages({
-      attachmentUrl: attachment?.uri || "",
-      attachmentType: attachment?.type || "",
-      userId: userStore._id,
-      discription: content,
-    })
-    await refreshHomeFeed()
-    await loadStories()
+  const imageUrl = attachment
+    ? await uploadToS3({
+        uri: attachment?.uri,
+        type: attachment?.type,
+        name: attachment?.fileName,
+      })
+    : undefined
+
+    console.log("IMAGE URL", imageUrl)
+    console.log("createPost:imageUrl", imageUrl)
+   try{ await mutateCreateUserHomePages({
+        attachmentUrl: imageUrl,
+        attachmentType: attachment?.type || "",
+        userId: userStore._id,
+        discription: content,
+      })}catch(err) {Alert.alert('Something Went Wrong!')}
+   refreshHomeFeed()
+  loadStories()
     // setTimeout(loadStories, 1000)
   }
 
@@ -594,8 +620,10 @@ export function useHooks() {
   }
 
   const createClassified = async ({ attachmentUrl, title, prize, classifiedDetail, condition }) => {
+ const imageUrl  = await uploadToS3({uri:attachmentUrl, name:title, type:"image"})
+
     const res = await mutateCreateClassifiedDetail({
-      attachmentUrl,
+      attachmentUrl:imageUrl,
       attachmentType: "image",
       title,
       prize,
@@ -910,12 +938,49 @@ export function useHooks() {
   }
 
   const updateNotificationToken = async () => {
-    try{const token = await messaging().getToken()
-    const res = await mutateAddNotificationToken({
-      userId: userStore._id,
-      notificationToken: token,
-    })
-    console.log("mutateAddNotificationToken", res)}catch(err){console.log("ERR", err)}
+    try {
+      const token = await messaging().getToken()
+      const res = await mutateAddNotificationToken({
+        userId: userStore._id,
+        notificationToken: token,
+      })
+      console.log("mutateAddNotificationToken", res)
+    } catch (err) {
+      console.log("ERR:mutateAddNotificationToken", err)
+    }
+  }
+
+  const uploadToS3 = async ({ uri, name, type }) => {
+    const file = {
+      // `uri` can also be a file system path (i.e. file://)
+      uri,
+      name,
+      type,
+    }
+
+    const options = {
+      keyPrefix: "uploads/",
+      bucket: "washzone-23",
+      region: "us-west-2",
+      // accessKey: "AKIAY5ERXJV4XD5VEE5R",
+      // secretKey: "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",
+      accessKey: "AKIAY5ERXJV45W2GS2H2",
+      secretKey: "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",
+      successActionStatus: 201,
+    }
+    console.log("FILE", file)
+    try {
+      console.log("UPLOADING")
+      const response = await RNS3.put(file, options).progress((e) => console.log("PRGORESS", e))
+      console.log("UPLOADED")
+      if (response.status === 201) {
+        return response.body?.postResponse?.location
+      } else {
+        return undefined
+      }
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   return {
@@ -973,5 +1038,6 @@ export function useHooks() {
     searchUser,
     createPost,
     updateNotificationToken,
+    uploadToS3,
   }
 }

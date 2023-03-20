@@ -347,24 +347,25 @@ export const CallScreen: FC<AppStackScreenProps<"CallScreen">> = observer(functi
     // }
   }
 
-  //when we got an answer from a remote user
+  // when we got an answer from a remote user
   const handleAnswer = () => {
     console.log("handleAnswer:handleAnswer", answer)
     setCalling(false)
     setCallActive(true)
+//     yourConn.current.setRemoteDescription(new RTCSessionDescription(JSON.parse(answer)))
 
-    yourConn.current.setRemoteDescription(JSON.parse(answer))
+    yourConn.current.setRemoteDescription(new RTCSessionDescription(JSON.parse(answer)))
     setStatus(CallStatus.connected)
   }
 
-  //when we got an ice candidate from a remote user
+  // when we got an ice candidate from a remote user
   const handleCandidate = (candidate) => {
     setCalling(false)
     // console.log('Candidate ----------------->', candidate);
     yourConn.current.addIceCandidate(new RTCIceCandidate(candidate))
   }
 
-  //hang up
+  // hang up
   // const hangUp = () => {
   //   send({
   //     type: 'leave',

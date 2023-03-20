@@ -11,6 +11,9 @@ import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { useHooks } from "../hooks"
 import { useStores } from "../../models"
 import { AppStackParamList } from "../../navigators"
+import ShimmerPlaceholder from "react-native-shimmer-placeholder"
+import LinearGradient from "react-native-linear-gradient"
+import { BROKEN_IMAGE } from "../../utils"
 
 export const VideoBlock = ({
   videoDetails,
@@ -19,11 +22,11 @@ export const VideoBlock = ({
   videoDetails: any
   disabled?: boolean
 }) => {
+  const [loaded, setLoaded] = useState(false)
   const navigation = useNavigation<NavigationProp<VideosTabParamList>>()
 
   const handleOnPress = () => {
     if (!disabled) {
-    
       if (videoDetails?.vedioPlaylistId && videoDetails?.vedioPlaylistId !== "") {
         navigation.navigate("Playlist", { playlistId: videoDetails?.vedioPlaylistId })
       } else {
@@ -34,13 +37,23 @@ export const VideoBlock = ({
 
   return (
     <Pressable style={$videoBlockContainer} onPress={handleOnPress}>
-      <FastImage
-        source={{
-          uri: `https://img.youtube.com/vi/${videoDetails.attachmentVideoUrl.split("=")[1]}/0.jpg`,
-        }}
-        style={$videoPoster}
-        resizeMode="cover"
-      />
+      <ShimmerPlaceholder
+        shimmerStyle={$videoPoster}
+        visible={loaded}
+        LinearGradient={LinearGradient}
+      >
+        <FastImage
+        defaultSource={BROKEN_IMAGE}
+          source={{
+            uri: `https://img.youtube.com/vi/${
+              videoDetails.attachmentVideoUrl.split("=")[1]
+            }/0.jpg`,
+          }}
+          style={$videoPoster}
+          resizeMode="cover"
+          onLoadEnd={() => setLoaded(true)}
+        />
+      </ShimmerPlaceholder>
       <View style={$videoDetailsContent}>
         <View style={$flex1}>
           <Text

@@ -5,6 +5,7 @@ import {
   Pressable,
   RefreshControl,
   TextStyle,
+  TouchableOpacity,
   View,
   ViewStyle,
 } from "react-native"
@@ -21,32 +22,38 @@ import { useStores } from "../../../models"
 import { Stories } from "./Stories"
 import { $flex1 } from "../../styles"
 import { NATIVE_AD_UNIT_ID } from "../../../utils/AppLovin"
-// import NativeAdView from "../../../utils/NativeAd"
-import { defaultImages } from "../../../utils"
+import ShimmerPlaceHolder from "react-native-shimmer-placeholder"
 
-export interface TopicComponentProps {
-  topic: any
+// import NativeAdView from "../../../utils/NativeAd"
+import { defaultImages, DEFAULT_LOADING } from "../../../utils"
+import LinearGradient from "react-native-linear-gradient"
+
+export interface PostComponentProps {
+  post: any
   navigateOnPress?: boolean
   index: number
 }
 
-export const PostComponent = ({ topic, navigateOnPress, index }: TopicComponentProps) => {
+export const PostComponent = ({ post, navigateOnPress, index }: PostComponentProps) => {
+  const size = Dimensions.get("window").width
+  const [loaded, setLoaded] = useState(false)
   const [attachmentDimensions, setAttachmentDimensions] = useState({ height: 0, width: 0 })
   const navigation = useNavigation<NavigationProp<HomeTabParamList>>()
   const onContainerPress = () => {
     if (navigateOnPress !== undefined && navigateOnPress) {
-      navigation.navigate("TopicInfo", {
-        topic,
+      navigation.navigate("PostInfo", {
+        post,
       })
     }
   }
 
-  const topicDetails = {
-    picture: topic?.userId?.picture,
-    first_name: topic?.userId?.first_name,
-    last_name: topic?.userId?.last_name,
-    attachmentUrl: topic?.attachmentUrl,
-    createdAt: topic?.createdAt,
+  const postDetails = {
+    picture: post?.userId?.picture,
+    first_name: post?.userId?.first_name,
+    last_name: post?.userId?.last_name,
+    attachmentUrl: post?.attachmentUrl,
+    createdAt: post?.createdAt,
+    content: post?.Discription,
   }
 
   const windowWidth = Dimensions.get("window").width
@@ -60,36 +67,47 @@ export const PostComponent = ({ topic, navigateOnPress, index }: TopicComponentP
   // }, [nativeAdViewRef.current])
   return (
     <>
-      <View style={$postContainer}>
+      <Pressable onPress={onContainerPress} style={$postContainer}>
         <View style={$publisherInfoContainer}>
-          <Pressable onPress={() => navigation.navigate("Profile", { user: topic?.userId })}>
+          <Pressable onPress={() => navigation.navigate("Profile", { user: post?.userId })}>
             <FastImage
               source={{
-                uri: topicDetails.picture || defaultImages.profile,
+                uri: postDetails.picture || defaultImages.profile,
               }}
               style={$picture}
             />
           </Pressable>
           <View style={$textContainer}>
             <Text
-              text={formatName(topicDetails?.first_name + " " + topicDetails?.last_name)}
+              text={formatName(postDetails?.first_name + " " + postDetails?.last_name)}
               preset="subheading2"
             />
-            <Text text={fromNow(topic?.createdAt)} style={$agoStamp} />
+            <Text text={fromNow(post?.createdAt)} style={$agoStamp} />
           </View>
         </View>
-        <Text style={$postContent} text={topic?.topicContent} />
-        <FastImage
-          style={[{ ...attachmentDimensions }, $bottomCurve]}
-          source={{ uri: topicDetails.attachmentUrl }}
-          onLoad={(res) =>
-            setAttachmentDimensions({
-              height: (windowWidth * res.nativeEvent.height) / res.nativeEvent.width,
-              width: windowWidth,
-            })
-          }
-        />
-      </View>
+
+        <Text style={$postContent} text={postDetails.content} />
+        <ShimmerPlaceHolder
+          visible={loaded}
+          shimmerStyle={{
+            height: windowWidth,
+            width: windowWidth,
+          }}
+          LinearGradient={LinearGradient}
+        >
+          <FastImage
+            style={[{ ...attachmentDimensions }, $bottomCurve]}
+            source={{ uri: postDetails.attachmentUrl }}
+            onLoad={(res) => {
+              setAttachmentDimensions({
+                height: (windowWidth * res.nativeEvent.height) / res.nativeEvent.width,
+                width: windowWidth,
+              })
+            }}
+            onLoadEnd={() => setLoaded(true)}
+          />
+        </ShimmerPlaceHolder>
+      </Pressable>
       {/* {index % 5 === 0 && (
         // <NativeAdView adUnitId={NATIVE_AD_UNIT_ID} ref={nativeAdViewRef} />
         // <AppLovinMAX.AdView
@@ -104,7 +122,7 @@ export const PostComponent = ({ topic, navigateOnPress, index }: TopicComponentP
 
 export const Posts = observer(() => {
   const {
-    feedStore: { homeFeed},
+    feedStore: { homeFeed },
   } = useStores()
   const { refreshHomeFeed, loadMoreHomeFeed, loadStories } = useHooks()
   const [refreshing, setRefreshing] = useState<boolean>(false)
@@ -118,16 +136,22 @@ export const Posts = observer(() => {
     loadStories()
     setRefreshing(false)
   }
-console.log("FFEED IN PIOSITST", homeFeed)
+
   return (
     <View style={$flex1}>
       <FlatList
         ListHeaderComponent={<Stories />}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.palette.primary100}/>}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={colors.palette.primary100}
+          />
+        }
         onEndReached={loadMoreHomeFeed}
         data={homeFeed}
         renderItem={({ item, index }) => (
-          <PostComponent key={item?._id} topic={item} navigateOnPress={true} index={index} />
+          <PostComponent key={item?._id} post={item} navigateOnPress={true} index={index} />
         )}
       />
     </View>

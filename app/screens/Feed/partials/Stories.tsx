@@ -4,7 +4,12 @@ import { NavigationProp, useNavigation } from "@react-navigation/native"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import LinearGradient from "react-native-linear-gradient"
 
-import { TopicsTabParamList, ClassifiedsTabParamList, VideosTabParamList } from "../../../tabs"
+import {
+  TopicsTabParamList,
+  ClassifiedsTabParamList,
+  VideosTabParamList,
+  HomeTabParamList,
+} from "../../../tabs"
 import { useHooks } from "../../hooks"
 import { useStores } from "../../../models"
 import { formatName } from "../../../utils/formatName"
@@ -15,6 +20,7 @@ import { observer } from "mobx-react-lite"
 interface StoryComponentProps {
   item: any
   index: number
+  handleStoryUrl: (a: any) => void
 }
 
 export const Stories = observer(() => {
@@ -30,9 +36,21 @@ export const Stories = observer(() => {
   const navigationTopic = useNavigation<NavigationProp<TopicsTabParamList>>()
   const navigationClassified = useNavigation<NavigationProp<ClassifiedsTabParamList>>()
   const navigationVideo = useNavigation<NavigationProp<VideosTabParamList>>()
+  const navigationHome = useNavigation<NavigationProp<HomeTabParamList>>()
 
   const handleStoryURL = (linkUrl: string) => {
+    console.log("URL LINK",linkUrl )
     let valid = false
+    if (/story-post/.test(linkUrl)) {
+      valid = true
+      setTimeout(
+        () =>
+          navigationHome.navigate("PostInfo", {
+            post: linkUrl?.split("/")[linkUrl?.split("/")?.length - 1],
+          }),
+        200,
+      )
+    }
     if (/story-classified/.test(linkUrl)) {
       valid = true
       setTimeout(
@@ -45,7 +63,6 @@ export const Stories = observer(() => {
     }
     if (/story-topic/.test(linkUrl)) {
       valid = true
-
       setTimeout(() => {
         navigationTopic.navigate("TopicInfo", {
           topic: linkUrl?.split("/")[linkUrl?.split("/")?.length - 1],
@@ -70,38 +87,40 @@ export const Stories = observer(() => {
     }
   }
 
-  const StoryComponent = ({ item, index }: StoryComponentProps) => {
-    return (
-      <Pressable
-        style={$storyContainer}
-        key={index}
-        onPress={() => {
-          handleStoryURL(item?.attachmentUrl)
-        }}
-      >
-        <FastImage source={{ uri: item?.thumbnailUrl }} resizeMode="cover" style={$story} />
-        <View style={$pictureContainer}>
-          <FastImage source={{ uri: item?.userId?.picture }} style={$picture} />
-        </View>
-        <LinearGradient colors={["transparent", colors.palette.primary200]} style={$nameContainer}>
-          <Text text={formatName(item?.userId?.name)} style={$name} numberOfLines={1} />
-        </LinearGradient>
-      </Pressable>
-    )
-  }
-
   return (
     <View style={$container}>
       <FlatList
         data={stories}
         horizontal
-        renderItem={({ item, index }) => <StoryComponent item={item} index={index} />}
+        renderItem={({ item, index }) => (
+          <StoryComponent handleStoryUrl={handleStoryURL} item={item} index={index} />
+        )}
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={$storyList}
       />
     </View>
   )
 })
+
+const StoryComponent = ({ item, index, handleStoryUrl }: StoryComponentProps) => {
+  return (
+    <Pressable
+      style={$storyContainer}
+      key={index}
+      onPress={() => {
+        handleStoryUrl(item?.attachmentUrl)
+      }}
+    >
+      <FastImage source={{ uri: item?.thumbnailUrl }} resizeMode="cover" style={$story} />
+      <View style={$pictureContainer}>
+        <FastImage source={{ uri: item?.userId?.picture }} style={$picture} />
+      </View>
+      <LinearGradient colors={["transparent", colors.palette.primary200]} style={$nameContainer}>
+        <Text text={formatName(item?.userId?.name)} style={$name} numberOfLines={1} />
+      </LinearGradient>
+    </Pressable>
+  )
+}
 
 const storyContainerRadius = 10
 

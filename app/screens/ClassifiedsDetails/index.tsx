@@ -7,14 +7,16 @@ import {
   Dimensions,
   ScrollView,
   TouchableOpacity,
+  Alert,
+  Touchable,
 } from "react-native"
 import { Text, Screen, IconTypes, Icon } from "../../components"
-import { ClassifiedsTabProps } from "../../tabs"
+import { ClassifiedsTabProps, HomeTabParamList } from "../../tabs"
 import { colors, spacing } from "../../theme"
 import { observer } from "mobx-react-lite"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import Share from "react-native-share"
-import { useNavigation } from "@react-navigation/native"
+import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { ActivityIndicator } from "react-native-paper"
 
 import { useHooks } from "../hooks"
@@ -33,11 +35,13 @@ interface ActionProps {
 
 const PublisherDetails = ({ publisher }: { publisher: any }) => {
   const [rateUserModalVisible, setRateUserModalVisible] = useState(false)
+  const navigation = useNavigation<NavigationProp<HomeTabParamList>>()
   return (
     <>
       <View style={$publisherContainer}>
         <View style={$flexHori}>
-          <FastImage style={$publisherPicture} source={{ uri: publisher?.picture }} />
+          <TouchableOpacity onPress={() => navigation.navigate('Profile' , {user:publisher})}><FastImage style={$publisherPicture} source={{ uri: publisher?.picture }} />
+          </TouchableOpacity>
           <View>
             <Text text={publisher?.name} />
             <TouchableOpacity onPress={() => setRateUserModalVisible(true)}>
@@ -87,6 +91,10 @@ const BottomActions = ({ classified }: { classified: any }) => {
   const { interactWithSaveOnClassified } = useHooks()
   const [isSaving, setSaving] = useState(false)
   const [sendOfferModal, setSendOfferModal] = useState(false)
+  const {
+    userStore: { _id },
+  } = useStores()
+  console.log("SEND OFFER VISIBLE", _id, classified?.userId?._id)
 
   const bottomOptions: Array<ActionProps> = [
     {
@@ -107,7 +115,7 @@ const BottomActions = ({ classified }: { classified: any }) => {
         Share.open({
           message: "",
           title: classified?.classifiedDetail,
-          url: `washzone://shared-classified/${classified._id}`,
+          url: `washzone:// /${classified._id}`,
         })
           .then((res) => {
             console.log(res)
@@ -119,28 +127,38 @@ const BottomActions = ({ classified }: { classified: any }) => {
     {
       icon: "offer",
       title: "Send Offer",
-      onPress: () => setSendOfferModal(true),
+      onPress: () => {
+        if (_id === classified?.userId?._id) {
+          Alert.alert("Cannot make and Offer on your own classified!")
+        } else {
+          setSendOfferModal(true)
+        }
+      },
     },
   ]
 
   return (
     <>
-    <View style={$bottomActionsContainer}>
-      {bottomOptions.map((option) => (
-        <View style={$singleActionContainer} key={option.title}>
-          <TouchableOpacity style={$actionIconContainer} onPress={option.onPress}>
-            {isSaving && option.icon === "save" ? (
-              <ActivityIndicator animating color={colors.palette.primary100} />
-            ) : (
-              <Icon icon={option.icon} />
-            )}
-          </TouchableOpacity>
-          <Text text={option.title} />
-        </View>
-      ))}
-    </View>
-    <SendOfferModal classified={classified} isVisible={sendOfferModal} setVisible={setSendOfferModal} receiver={classified?.UserId || classified?.userId
-    }/>
+      <View style={$bottomActionsContainer}>
+        {bottomOptions.map((option) => (
+          <View style={$singleActionContainer} key={option.title}>
+            <TouchableOpacity style={$actionIconContainer} onPress={option.onPress}>
+              {isSaving && option.icon === "save" ? (
+                <ActivityIndicator animating color={colors.palette.primary100} />
+              ) : (
+                <Icon icon={option.icon} />
+              )}
+            </TouchableOpacity>
+            <Text text={option.title} />
+          </View>
+        ))}
+      </View>
+      <SendOfferModal
+        classified={classified}
+        isVisible={sendOfferModal}
+        setVisible={setSendOfferModal}
+        receiver={classified?.UserId || classified?.userId}
+      />
     </>
   )
 }
@@ -183,7 +201,7 @@ export const ClassifiedsDetails: FC<ClassifiedsTabProps<"ClassifiedsDetails">> =
     }
 
     return (
-      <View style={[$flex1, {backgroundColor:colors.background}]}>
+      <View style={[$flex1, { backgroundColor: colors.background }]}>
         <ScrollView style={$flex1}>
           <FastImage
             source={{ uri: classifiedDetails?.attachmentUrl }}

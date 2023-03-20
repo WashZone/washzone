@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react"
+import React, { useEffect, useMemo, useRef, useState } from "react"
 import {
   Image,
   TextInput,
@@ -34,28 +34,20 @@ export function CreateTopic() {
   const inputTitleRef = useRef<TextInput>()
   const [selectedImage, setSelectedImage] = useState<any>({ height: 1, width: 1 })
   const { createTopic, loadStories, refreshTopics } = useHooks()
+
+
   const onPost = async () => {
     setIsPosting(true)
-    // const data = new FormData()
-    // data.append('uri',selectedImage?.uri)
-    // data.append('uri',selectedImage?.uri)
-    // data.append('uri',selectedImage?.uri)
 
     try {
-      // await uploadFile(selectedImage)
-      // const res = await mutateUploadFile({
-      //   uri: selectedImage?.uri,
-      //   type: selectedImage?.type,
-      //   fileName: selectedImage?.fileName,
-      // })
-
       await createTopic({
         content: topicDescription,
         attachment: selectedImage,
         title: topicTitle,
       })
-      await refreshTopics()
-      await loadStories()
+      refreshTopics()
+      loadStories()
+    
     } catch (error) {
     } finally {
       setIsPosting(false)
@@ -63,6 +55,7 @@ export function CreateTopic() {
       setSelectedImage({ height: 1, windth: 1 })
       inputRef.current.clear()
       inputTitleRef.current.clear()
+      inputTitleRef.current.blur()
       inputRef.current.blur()
     }
   }
