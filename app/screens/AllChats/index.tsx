@@ -2,16 +2,14 @@ import { observer } from "mobx-react-lite"
 import React, { FC, useEffect, useState } from "react"
 import { AppStackScreenProps } from "../../navigators"
 import { $flex1 } from "../styles"
-import { Screen, Header } from "../../components"
-import { useFocusEffect, useNavigation } from "@react-navigation/native"
+import { Screen, Header, EmptyState } from "../../components"
+import { useNavigation } from "@react-navigation/native"
 import { colors, spacing } from "../../theme"
 import { AddMessageModal, P2PUserComponent } from "./partials"
 import { FlatList, RefreshControl, View } from "react-native"
 import { useStores } from "../../models"
-import { usersChatModelPrimitives, selectFromUsersChat } from "../../models/api"
 import { OptionsModal } from "./partials/OptionsModal"
 import { useHooks } from "../hooks"
-import moment from "moment"
 
 export const AllChats: FC<AppStackScreenProps<"AllChats">> = observer(function AllChats(props) {
   const [addModalVisible, setAddModalVisible] = useState(false)
@@ -66,22 +64,27 @@ export const AllChats: FC<AppStackScreenProps<"AllChats">> = observer(function A
           onLeftPress={() => navigation.goBack()}
           leftIconColor={colors.palette.neutral100}
         />
-        <FlatList
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              tintColor={colors.palette.primary100}
-            />
-          }
-          refreshing={refreshing}
-          style={$flex1}
-          data={allChatRooms.slice(0).sort(sortByLatestTime)}
-          renderItem={({ item, index }) => (
-            <P2PUserComponent onLongPress={onLongPress} key={index} data={item} myId={_id} />
-          )}
-          ListFooterComponent={<View style={{ padding: spacing.medium }} />}
-        />
+
+        {allChatRooms?.length === 0 ? (
+          <EmptyState preset="allChats" buttonOnPress={() => setAddModalVisible(true)}/>
+        ) : (
+          <FlatList
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                tintColor={colors.palette.primary100}
+              />
+            }
+            refreshing={refreshing}
+            style={$flex1}
+            data={allChatRooms.slice(0).sort(sortByLatestTime)}
+            renderItem={({ item, index }) => (
+              <P2PUserComponent onLongPress={onLongPress} key={index} data={item} myId={_id} />
+            )}
+            ListFooterComponent={<View style={{ padding: spacing.medium }} />}
+          />
+        )}
       </Screen>
       <AddMessageModal isVisible={addModalVisible} setVisible={setAddModalVisible} />
       <OptionsModal

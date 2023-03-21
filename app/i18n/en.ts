@@ -31,6 +31,21 @@ const en = {
       content: "No data found yet. Try clicking the button to refresh or reload the app.",
       button: "Let's try this again",
     },
+    allChats: {
+      heading: "Welcome to your Chats!",
+      content: "Start a conversation and connect with someone today! This chat screen is ready for your messages.",
+      button: "Chat Now!",
+    },
+    saved: {
+      heading: "Your Saved Videos and Classifieds",
+      content: "You currently have no saved videos or classifieds, but you can start saving your favorite content and ads for easy access in the future. Check back here to see your saved items!",
+      button: "Go Back!",
+    },
+    notifications: {
+      heading: "No Notifications Found!",
+      content: "You currently have no new notifications, but keep an eye on this screen for updates and alerts. Stay in the loop with important information by checking your notifications regularly!",
+      button: "Go Back!",
+    },
   },
 
   errors: {
@@ -188,6 +203,9 @@ const en = {
     },
     incorrectCredentials: {
       text1: "Incorrect Credentials!",
+    },
+    success: {
+      text1: "Successfully Saved !",
     },
     emailAlreadyExists: {
       text1: "Email already Registered!",

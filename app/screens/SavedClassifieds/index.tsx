@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useState } from "react"
 import { Dimensions, Pressable, RefreshControl, TextStyle, View, ViewStyle } from "react-native"
-import { Header, Icon, IconTypes, ListItem, Screen, Text } from "../../components"
+import { EmptyState, Header, Icon, IconTypes, ListItem, Screen, Text } from "../../components"
 import { colors, spacing } from "../../theme"
 
 import { AppStackParamList, AppStackScreenProps } from "../../navigators"
@@ -105,8 +105,17 @@ const SavedItem = ({ item, index, handleOnPress }) => {
       rightIcon="caretRight"
     >
       <View style={$textContainer}>
-        <Text text={classifiedDetails?.title} weight="semiBold" numberOfLines={1}  style={{ width: Dimensions.get("window").width - 200 }}/>
-        <Text text={"$ " + classifiedDetails?.prize} weight="medium" style={{ width: Dimensions.get("window").width - 200 }} />
+        <Text
+          text={classifiedDetails?.title}
+          weight="semiBold"
+          numberOfLines={1}
+          style={{ width: Dimensions.get("window").width - 200 }}
+        />
+        <Text
+          text={"$ " + classifiedDetails?.prize}
+          weight="medium"
+          style={{ width: Dimensions.get("window").width - 200 }}
+        />
         <Text text={classifiedDetails?.users?.name} style={$byText} />
         <BottomActions classified={classifiedDetails} type="classified" />
       </View>
@@ -150,19 +159,23 @@ export const Saved: FC<AppStackScreenProps<"Saved">> = observer(function Saved()
         onLeftPress={() => navigation.goBack()}
         leftIconColor={colors.palette.neutral600}
       />
-      <FlatList
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor={colors.palette.primary100}
-          />
-        }
-        data={savedClassifieds}
-        renderItem={({ item, index }) => (
-          <SavedItem item={item} index={index} handleOnPress={handleOnPress} />
-        )}
-      />
+      {savedClassifieds?.length === 0 ? (
+        <EmptyState preset="saved" buttonOnPress={() => navigation.goBack()} />
+      ) : (
+        <FlatList
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor={colors.palette.primary100}
+            />
+          }
+          data={savedClassifieds}
+          renderItem={({ item, index }) => (
+            <SavedItem item={item} index={index} handleOnPress={handleOnPress} />
+          )}
+        />
+      )}
     </Screen>
   )
 })

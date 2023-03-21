@@ -46,6 +46,7 @@ export const UserModelBase = ModelBase
     description: types.union(types.undefined, types.null, types.string),
     averageRating: types.union(types.undefined, types.null, types.number),
     notificationToken: types.union(types.undefined, types.null, types.string),
+    notificationStatus: types.union(types.undefined, types.null, types.boolean),
   })
   .views(self => ({
     get store() {
@@ -72,6 +73,7 @@ export class UserModelSelector extends QueryBuilder {
   get description() { return this.__attr(`description`) }
   get averageRating() { return this.__attr(`averageRating`) }
   get notificationToken() { return this.__attr(`notificationToken`) }
+  get notificationStatus() { return this.__attr(`notificationStatus`) }
   ratingId(builder: string | UserRatingModelSelector | ((selector: UserRatingModelSelector) => UserRatingModelSelector) | undefined) { return this.__child(`ratingId`, UserRatingModelSelector, builder) }
   topicId(builder: string | TopicDetailModelSelector | ((selector: TopicDetailModelSelector) => TopicDetailModelSelector) | undefined) { return this.__child(`topicId`, TopicDetailModelSelector, builder) }
   classifiedId(builder: string | ClassifiedFeedModelSelector | ((selector: ClassifiedFeedModelSelector) => ClassifiedFeedModelSelector) | undefined) { return this.__child(`classifiedId`, ClassifiedFeedModelSelector, builder) }
@@ -81,4 +83,4 @@ export function selectFromUser() {
   return new UserModelSelector()
 }
 
-export const userModelPrimitives = selectFromUser()._id.createdAt.updatedAt.first_name.last_name.name.email.socialId.password.picture.isSocialLogin.type.token.status.role.description.averageRating.notificationToken
+export const userModelPrimitives = selectFromUser()._id.createdAt.updatedAt.first_name.last_name.name.email.socialId.password.picture.isSocialLogin.type.token.status.role.description.averageRating.notificationToken.notificationStatus

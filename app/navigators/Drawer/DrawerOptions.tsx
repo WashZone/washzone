@@ -9,6 +9,7 @@ import {
   ViewStyle,
   Image,
   TouchableOpacity,
+  Linking,
 } from "react-native"
 import { TxKeyPath } from "../../i18n"
 import { colors } from "../../theme"
@@ -18,6 +19,7 @@ import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { AppStackParamList } from "../AppNavigator"
 import { observer } from "mobx-react-lite"
 import { navigationRef } from "../navigationUtilities"
+import { showAlertYesNo } from "../../utils/helpers"
 
 interface DrawerOptionType {
   icon: IconTypes
@@ -69,7 +71,7 @@ export const DrawerOptions = observer(function DrawerOptions({
       icon: "support",
       label: "DrawerNavigator.support",
       onPress() {
-        Alert.alert("DrawerNavigator.support")
+        Linking.openURL('mailto:contact@washzone.com?subject=Support') 
       },
     },
     {
@@ -90,7 +92,11 @@ export const DrawerOptions = observer(function DrawerOptions({
       icon: "logout",
       label: "DrawerNavigator.logout",
       onPress() {
-        logout()
+        showAlertYesNo({
+          message: "Logout?",
+          description: "Are you sure you want to logout?",
+          onYesPress: logout,
+        })
       },
     },
   ]
@@ -101,7 +107,7 @@ export const DrawerOptions = observer(function DrawerOptions({
       <TouchableOpacity
         onPress={() => {
           toggleDrawer()
-          onPress()
+          setTimeout (onPress, 100)
         }}
         style={getActionContainerStyle(!["notifications", "logout"].includes(icon))}
       >

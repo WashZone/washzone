@@ -27,6 +27,16 @@ const ko: Translations = {
       content: "데이터가 없습니다. 버튼을 눌러서 리프레쉬 하시거나 앱을 리로드하세요.",
       button: "다시 시도해봅시다",
     },
+    allChats: {
+      heading: "Welcome to your Chats!",
+      content: "Start a conversation and connect with someone today! This chat screen is ready for your messages.",
+      button: "Chat Now!",
+    },
+    saved: {
+      heading: "So empty... so sad",
+      content: "No data found yet. Try clicking the button to refresh or reload the app.",
+      button: "Let's try this again",
+    },
   },
 
   errors: {

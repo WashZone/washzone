@@ -1,6 +1,6 @@
 import React, { FC } from "react"
 import { TextStyle, ViewStyle } from "react-native"
-import { Header, Screen } from "../../components"
+import { EmptyState, Header, Screen } from "../../components"
 import { colors } from "../../theme"
 
 import { AppStackParamList, AppStackScreenProps } from "../../navigators"
@@ -18,6 +18,7 @@ export const Notifications: FC<AppStackScreenProps<"Notifications">> = function 
         onLeftPress={() => navigation.goBack()}
         leftIconColor={colors.palette.neutral600}
       />
+      <EmptyState preset="notifications" buttonOnPress={() =>navigation.goBack()}/>
     </Screen>
   )
 }

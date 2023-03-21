@@ -190,6 +190,7 @@ queryGetSearchedHomePages="queryGetSearchedHomePages"
 export enum RootStoreBaseMutations {
 mutateCreateUser="mutateCreateUser",
 mutateAddNotificationToken="mutateAddNotificationToken",
+mutateSetNotificationStatus="mutateSetNotificationStatus",
 mutateUpdatePassword="mutateUpdatePassword",
 mutateStoreDeviceId="mutateStoreDeviceId",
 mutateGetBlockedUser="mutateGetBlockedUser",
@@ -464,6 +465,11 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
         ${typeof resultSelector === "function" ? resultSelector(new UserModelSelector()).toString() : resultSelector}
       } }`, variables, optimisticUpdate)
     },
+    mutateSetNotificationStatus(variables: { notificationStatus: boolean, userId: string }, resultSelector: string | ((qb: UserModelSelector) => UserModelSelector) = userModelPrimitives.toString(), optimisticUpdate?: () => void) {
+      return self.mutate<{ setNotificationStatus: UserModelType}>(`mutation setNotificationStatus($notificationStatus: Boolean!, $userId: String!) { setNotificationStatus(notificationStatus: $notificationStatus, userId: $userId) {
+        ${typeof resultSelector === "function" ? resultSelector(new UserModelSelector()).toString() : resultSelector}
+      } }`, variables, optimisticUpdate)
+    },
     mutateUpdatePassword(variables: { userId: string, password: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ updatePassword: any }>(`mutation updatePassword($userId: String!, $password: String!) { updatePassword(userId: $userId, password: $password) }`, variables, optimisticUpdate)
     },
@@ -667,8 +673,8 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
         ${typeof resultSelector === "function" ? resultSelector(new RoomChatModelSelector()).toString() : resultSelector}
       } }`, variables, optimisticUpdate)
     },
-    mutateCreateUserMessage(variables: { notificationMessage?: (InputNotification | null), metaData?: (InputMetaData | null), membersId: InputUsers[], width?: (number | null), mimeType?: (string | null), text: string, previewData?: (string | null), uri?: (string | null), size?: (number | null), name?: (string | null), height?: (number | null), status?: (string | null), messageType?: (string | null), roomId: string, authorId: string }, optimisticUpdate?: () => void) {
-      return self.mutate<{ createUserMessage: any }>(`mutation createUserMessage($notificationMessage: InputNotification, $metaData: InputMetaData, $membersId: [InputUsers!]!, $width: Float, $mimeType: String, $text: String!, $previewData: String, $uri: String, $size: Float, $name: String, $height: Float, $status: String, $messageType: String, $roomId: String!, $authorId: String!) { createUserMessage(notificationMessage: $notificationMessage, metaData: $metaData, membersId: $membersId, width: $width, mimeType: $mimeType, text: $text, previewData: $previewData, uri: $uri, size: $size, name: $name, height: $height, status: $status, messageType: $messageType, roomId: $roomId, authorId: $authorId) }`, variables, optimisticUpdate)
+    mutateCreateUserMessage(variables: { notificationToken?: (string | null), notificationMessage?: (InputNotification | null), metaData?: (InputMetaData | null), membersId: InputUsers[], width?: (number | null), mimeType?: (string | null), text: string, previewData?: (string | null), uri?: (string | null), size?: (number | null), name?: (string | null), height?: (number | null), status?: (string | null), messageType?: (string | null), roomId: string, authorId: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ createUserMessage: any }>(`mutation createUserMessage($notificationToken: String, $notificationMessage: InputNotification, $metaData: InputMetaData, $membersId: [InputUsers!]!, $width: Float, $mimeType: String, $text: String!, $previewData: String, $uri: String, $size: Float, $name: String, $height: Float, $status: String, $messageType: String, $roomId: String!, $authorId: String!) { createUserMessage(notificationToken: $notificationToken, notificationMessage: $notificationMessage, metaData: $metaData, membersId: $membersId, width: $width, mimeType: $mimeType, text: $text, previewData: $previewData, uri: $uri, size: $size, name: $name, height: $height, status: $status, messageType: $messageType, roomId: $roomId, authorId: $authorId) }`, variables, optimisticUpdate)
     },
     mutateGetchatByUserId(variables: { authorId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ getchatByUserId: any }>(`mutation getchatByUserId($authorId: String!) { getchatByUserId(authorId: $authorId) }`, variables, optimisticUpdate)

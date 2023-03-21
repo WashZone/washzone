@@ -1,3 +1,4 @@
+import { Alert } from "react-native"
 import { Interaction } from "./enums"
 
 export const getIconForInteraction = (i: Interaction, buttonType: "liked" | "disliked") => {
@@ -15,3 +16,35 @@ export const getIconForInteraction = (i: Interaction, buttonType: "liked" | "dis
     }
   }
 }
+
+
+export const showAlertYesNo = ({
+  message,
+  description,
+  onCancel,
+  onYesPress,
+}: {
+  message: string
+  description?: string
+  onCancel?: () => void
+  onYesPress?: () => void
+}) =>
+  Alert.alert(
+    message,
+    description,
+    [
+      {
+        text: "No",
+        onPress: onCancel,
+        style: "destructive",
+      },
+      {
+        text: "Yes",
+        onPress: onYesPress,
+        style: "cancel",
+      },
+    ],
+    {
+      cancelable: true,
+    },
+  )

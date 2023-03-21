@@ -28,6 +28,16 @@ const ar: Translations = {
       content: "لا توجد بيانات حتى الآن. حاول النقر فوق الزر لتحديث التطبيق او اعادة تحميله.",
       button: "لنحاول هذا مرّة أخرى",
     },
+    allChats: {
+      heading: "Welcome to your Chats!",
+      content: "Start a conversation and connect with someone today! This chat screen is ready for your messages.",
+      button: "Chat Now!",
+    },
+    saved: {
+      heading: "So empty... so sad",
+      content: "No data found yet. Try clicking the button to refresh or reload the app.",
+      button: "Let's try this again",
+    },
   },
 
   errors: {

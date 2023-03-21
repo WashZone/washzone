@@ -1,6 +1,7 @@
 import React from "react"
 import { Image, ImageProps, ImageStyle, StyleProp, TextStyle, View, ViewStyle } from "react-native"
 import { translate } from "../i18n"
+import { $flex1 } from "../screens/styles"
 import { spacing } from "../theme"
 import { Button, ButtonProps } from "./Button"
 import { Text, TextProps } from "./Text"
@@ -108,6 +109,24 @@ const EmptyStatePresets = {
     content: translate("emptyStateComponent.generic.content"),
     button: translate("emptyStateComponent.generic.button"),
   },
+  allChats: {
+    imageSource: sadFace,
+    heading: translate("emptyStateComponent.allChats.heading"),
+    content: translate("emptyStateComponent.allChats.content"),
+    button: translate("emptyStateComponent.allChats.button"),
+  },
+  saved: {
+    imageSource: sadFace,
+    heading: translate("emptyStateComponent.saved.heading"),
+    content: translate("emptyStateComponent.saved.content"),
+    button: translate("emptyStateComponent.saved.button"),
+  },
+  notifications:{
+    imageSource: sadFace,
+    heading: translate("emptyStateComponent.notifications.heading"),
+    content: translate("emptyStateComponent.notifications.content"),
+    button: translate("emptyStateComponent.notifications.button"),
+  },
 } as const
 
 /**
@@ -147,7 +166,7 @@ export function EmptyState(props: EmptyStateProps) {
   const isContentPresent = !!(content || contentTx)
   const isButtonPresent = !!(button || buttonTx)
 
-  const $containerStyles = [$containerStyleOverride]
+  const $containerStyles = [$flex1, { justifyContent: "center" }, $containerStyleOverride]
   const $imageStyles = [
     $image,
     (isHeadingPresent || isContentPresent || isButtonPresent) && { marginBottom: spacing.micro },
@@ -201,13 +220,14 @@ export function EmptyState(props: EmptyStateProps) {
 
       {isButtonPresent && (
         <Button
+          preset="reversed"
           onPress={buttonOnPress}
           text={button}
           tx={buttonTx}
           txOptions={buttonTxOptions}
           textStyle={$buttonTextStyleOverride}
           {...ButtonProps}
-          style={$buttonStyles}
+          style={[{ marginHorizontal: spacing.extraLarge, height: spacing.huge }, $buttonStyles]}
         />
       )}
     </View>

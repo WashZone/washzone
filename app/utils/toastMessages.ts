@@ -29,6 +29,10 @@ export const toastMessages = {
     type: "error",
     ...en.toastMessages.incorrectCredentials,
   },
+  success: {
+    type: "success",
+    ...en.toastMessages.success,
+  },
   somethingWentWrong: {
     type: "error",
     ...en.toastMessages.somethingWentWrong,

@@ -96,6 +96,7 @@ export function useHooks() {
       mutateCreateUserHomePages,
       queryGetAllHomePagesByPageNumber,
       mutateDeleteChatRoom,
+      mutateSetNotificationStatus,
     },
     userStore,
   } = useStores()
@@ -244,45 +245,48 @@ export function useHooks() {
         })
       : undefined
 
-      console.log("IMAGE URL", imageUrl)
-      try {
-        const res = await mutateCreateUserTopic({
-          attachmentUrl: imageUrl ,
-          attachmentType: attachment?.type || "",
-          topicContent: content,
-          userId: userStore._id,
-          title,
-        })
-        console.log("RES CREATE TOPIC", res)
-      } catch (err) {
-        Alert.alert(err)
-      }
-    } 
-    // refreshTopics()
-    // loadStories()
-    // setTimeout(loadStories, 1000)
-
+    console.log("IMAGE URL", imageUrl)
+    try {
+      const res = await mutateCreateUserTopic({
+        attachmentUrl: imageUrl,
+        attachmentType: attachment?.type || "",
+        topicContent: content,
+        userId: userStore._id,
+        title,
+      })
+      console.log("RES CREATE TOPIC", res)
+    } catch (err) {
+      Alert.alert(err)
+    }
+  }
+  // refreshTopics()
+  // loadStories()
+  // setTimeout(loadStories, 1000)
 
   const createPost = async ({ content, attachment }) => {
     if (content?.length === 0) return
-  const imageUrl = attachment
-    ? await uploadToS3({
-        uri: attachment?.uri,
-        type: attachment?.type,
-        name: attachment?.fileName,
-      })
-    : undefined
+    const imageUrl = attachment
+      ? await uploadToS3({
+          uri: attachment?.uri,
+          type: attachment?.type,
+          name: attachment?.fileName,
+        })
+      : undefined
 
     console.log("IMAGE URL", imageUrl)
     console.log("createPost:imageUrl", imageUrl)
-   try{ await mutateCreateUserHomePages({
+    try {
+      await mutateCreateUserHomePages({
         attachmentUrl: imageUrl,
         attachmentType: attachment?.type || "",
         userId: userStore._id,
         discription: content,
-      })}catch(err) {Alert.alert('Something Went Wrong!')}
-   refreshHomeFeed()
-  loadStories()
+      })
+    } catch (err) {
+      Alert.alert("Something Went Wrong!")
+    }
+    refreshHomeFeed()
+    loadStories()
     // setTimeout(loadStories, 1000)
   }
 
@@ -620,10 +624,10 @@ export function useHooks() {
   }
 
   const createClassified = async ({ attachmentUrl, title, prize, classifiedDetail, condition }) => {
- const imageUrl  = await uploadToS3({uri:attachmentUrl, name:title, type:"image"})
+    const imageUrl = await uploadToS3({ uri: attachmentUrl, name: title, type: "image" })
 
     const res = await mutateCreateClassifiedDetail({
-      attachmentUrl:imageUrl,
+      attachmentUrl: imageUrl,
       attachmentType: "image",
       title,
       prize,
@@ -788,6 +792,35 @@ export function useHooks() {
     } catch (err) {}
   }
 
+  const sendAttachment = async ({ roomId, attachment, receiverId }) => {
+    try {
+      const imageUrl = await uploadToS3({
+        name: attachment?.fileName,
+        uri: attachment?.uri,
+        type: attachment?.type,
+      })
+      const res = await mutateCreateUserMessage({
+        roomId,
+        authorId: userStore._id,
+        text: "",
+        membersId: [{ userId1: userStore._id }, { userId1: receiverId }],
+        messageType: "image",
+        uri: imageUrl,
+        height: attachment?.height || 0,
+        width: attachment?.width || 0,
+        metaData: {
+          metaDataType: "",
+          amount: "",
+          currency: "",
+          data: "",
+        },
+      })
+      console.log("CREATED USER MESSAGE", res.createUserMessage)
+    } catch (err) {
+      Alert.alert("Unable to Send Attachment!")
+    }
+  }
+
   const sendTextMessage = async (roomId: string, text: string, receiverId: string) => {
     console.log("userStore._id", userStore._id)
     console.log("receiverId", userStore._id)
@@ -880,6 +913,7 @@ export function useHooks() {
       return undefined
     }
   }
+
   const getOrCreateRoom = async (receiverId: string) => {
     console.log("RECEIVER", receiverId)
     console.log("SENDER", userStore?._id)
@@ -982,6 +1016,19 @@ export function useHooks() {
       console.log(error)
     }
   }
+  const setNotificationStatus = async (b: boolean) => {
+    try {
+      const res = await mutateSetNotificationStatus({
+        userId: userStore._id,
+        notificationStatus: b,
+      })
+    } catch (err) {
+      Toast.show({ ...toastMessages.somethingWentWrong })
+    }
+  }
+
+  const getNotificationStatus = async () =>
+    await mutateSetNotificationStatus({ userId: userStore._id, notificationStatus: true })
 
   return {
     getMoreChatMessages,
@@ -1039,5 +1086,8 @@ export function useHooks() {
     createPost,
     updateNotificationToken,
     uploadToS3,
+    sendAttachment,
+    setNotificationStatus,
+    getNotificationStatus,
   }
 }

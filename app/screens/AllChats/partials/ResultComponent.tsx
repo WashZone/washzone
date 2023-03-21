@@ -45,8 +45,16 @@ export const ResultComponent = ({
       }
     >
       <View>
-        <Text text={formatName(data?.name)} color={colors.palette.neutral100} />
-        {data?.description && <Text text={formatName(data?.description)} />}
+        <Text text={formatName(data?.name)} color={colors.palette.neutral100} weight="normal" />
+        {data?.description && (
+          <Text
+            text={data?.description}
+            numberOfLines={1}
+            size="xxs"
+            color={colors.palette.neutral100}
+            ellipsizeMode="tail"
+          />
+        )}
       </View>
     </ListItem>
   )

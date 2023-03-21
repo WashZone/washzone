@@ -2,7 +2,7 @@ import { observer } from "mobx-react-lite"
 import React, { FC, useEffect, useState } from "react"
 import { AppStackParamList, AppStackScreenProps } from "../../navigators"
 import { $contentCenter, $flex1, $flexRow, $justifyCenter } from "../styles"
-import { Screen, Text, Icon } from "../../components"
+import { Screen, Text, Icon, EmptyState } from "../../components"
 import { Chat, MessageType } from "@flyerhq/react-native-chat-ui"
 import { PreviewData } from "@flyerhq/react-native-link-preview"
 // import DocumentPicker from 'react-native-document-picker'
@@ -20,6 +20,7 @@ import { useStores } from "../../models"
 import { useHooks } from "../hooks"
 import { fromNow } from "../../utils/agoFromNow"
 import { messageMetadataType } from "../../utils"
+import { ActivityIndicator } from "react-native-paper"
 
 const getColorFromType = (type: any) => {
   switch (type) {
@@ -40,14 +41,15 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
   const { receiver, roomId } = props.route.params
   const {
     userStore,
-    allChats: { allChatRooms, chatMessages, getRoomMessages },
+    allChats: { getRoomMessages },
   } = useStores()
-  const { syncChatMessages, sendTextMessage, getMoreChatMessages } = useHooks()
+  const { syncChatMessages, sendTextMessage, getMoreChatMessages, sendAttachment } = useHooks()
   const [optionsModalVisible, setOptionsModalVisible] = useState(false)
   const [isLastPage, setIsLastPage] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
   const [sending, setSending] = useState(false)
   const [syncing, setSyncing] = useState(true)
+  const [isAttachmentUploading, setIsAttachmentUploading] = useState(false)
 
   const [selectedMessage, setSelectedMessage] = useState<any>({ type: "unsupported" })
   const user = {
@@ -68,7 +70,7 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
   const syncChat = async () => {
     const res = await syncChatMessages(roomId)
     setIsLastPage(res.lastPage)
-    setTimeout(() => setSyncing(false), 500) 
+    setTimeout(() => setSyncing(false), 500)
   }
 
   useEffect(() => {
@@ -77,13 +79,17 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
 
   const onAttachmentPress = async () => {
     const res = await MediaPicker()
+    if (res) {
+      setIsAttachmentUploading(true)
+      await sendAttachment({ roomId, attachment: res, receiverId: receiver._id })
+      setIsAttachmentUploading(false)
+    }
   }
 
   const handleSendPress = async (text: MessageType.PartialText) => {
     setSending(true)
     !syncing && !loadingMore && (await sendTextMessage(roomId, text.text, receiver._id))
     setSending(false)
-
   }
 
   const handleOnMessageLongPress = (message) => {
@@ -93,13 +99,12 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
 
   const onChatEndReached = async () => {
     setLoadingMore(true)
-    if (!isLastPage &&  !sending && !syncing) {
-        console.log("END REACHD")
-        const res = await getMoreChatMessages({ roomId })
-        setIsLastPage(res.lastPage)
+    if (!isLastPage && !sending && !syncing) {
+      console.log("END REACHD")
+      const res = await getMoreChatMessages({ roomId })
+      setIsLastPage(res.lastPage)
     }
     setLoadingMore(false)
-
   }
 
   const renderBubble = (payload: {
@@ -107,8 +112,9 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
     message: MessageType.Any
     nextMessageInGroup: boolean
   }) => {
-    const { child, message, nextMessageInGroup } = payload
+    const { child, message } = payload
     const isAuthorMe = message?.author?.id === userStore._id
+    const isImage = message?.type === "image"
     const isLog =
       message?.type === "custom" &&
       [
@@ -126,8 +132,8 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
               : isAuthorMe
               ? colors.palette.primary200
               : colors.palette.neutral100,
-            padding: spacing.tiny,
-            paddingHorizontal: spacing.extraSmall,
+            padding: isImage ? 0 : spacing.tiny,
+            paddingHorizontal: isImage ? 0 : spacing.extraSmall,
             borderRadius: isLog ? 2 : 10,
             alignItems: isAuthorMe ? "flex-end" : "flex-start",
           },
@@ -146,6 +152,9 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
     <View style={$flex1}>
       <P2PHeader data={receiver} roomId={roomId} />
       <Chat
+        isAttachmentUploading={isAttachmentUploading}
+        sendButtonVisibilityMode="editing"
+        emptyState={() => syncing && <ActivityIndicator />}
         onEndReached={onChatEndReached}
         theme={{
           insets: {
