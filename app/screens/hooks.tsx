@@ -356,23 +356,21 @@ export function useHooks() {
         { userId: userStore?._id },
         { fetchPolicy: "no-cache" },
       )
+
+      console.log("ALL SAVED INTERACTIONS", res)
       const savedVideoIds: Array<string> = []
       const savedClassifiedIds: Array<string> = []
       // eslint-disable-next-line array-callback-return
       res.getAllSavedByUserId?.data?.map((item: any) => {
         if (item?.savedType === "classified") {
-          savedClassifiedIds.push(
-            item?.ClassifiedFeedId?.length &&
-              typeof item?.ClassifiedFeedId[0]?._id === "string" &&
-              item?.ClassifiedFeedId[0]?._id,
-          )
+          item?.ClassifiedFeedId?.length &&
+            typeof item?.ClassifiedFeedId[0]?._id === "string" &&
+            savedClassifiedIds.push(item?.ClassifiedFeedId[0]?._id)
         }
         if (item?.savedType === "video") {
-          savedVideoIds.push(
-            item?.VideoDetail?.length &&
-              typeof item?.VideoDetail[0]?._id === "string" &&
-              item?.VideoDetail[0]?._id,
-          )
+          item?.VideoDetail?.length &&
+            typeof item?.VideoDetail[0]?._id === "string" &&
+            savedVideoIds.push(item?.VideoDetail[0]?._id)
         }
       })
       syncSavedInteractions({

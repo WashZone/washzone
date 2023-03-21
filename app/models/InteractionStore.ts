@@ -28,6 +28,12 @@ export const InteractionStoreModel = types
   })
   .actions(withSetPropAction)
   .actions((self) => ({
+    isVideoSaved(id:string){
+      return self.videos.saved.includes(id)
+    },
+    isClassifiedSaved(id:string){
+      return self.classified.saved.includes(id)
+    },
     async syncInteractions(data: {
       videos: { liked: string[]; disliked: string[] }
       topics: { liked: string[]; disliked: string[] }
@@ -49,7 +55,6 @@ export const InteractionStoreModel = types
         disliked: [...self.videos.disliked],
         saved: [...data.savedVideos],
       })
-
       self.setProp("classified", { saved: [...data.savedClassifieds] })
     },
     addToLikedTopics(id: string) {
@@ -162,6 +167,7 @@ export const InteractionStoreModel = types
         val.dislikedOffset = 1
       return val
     },
+
   }))
 
 export interface InteractionStore extends Instance<typeof InteractionStoreModel> {}

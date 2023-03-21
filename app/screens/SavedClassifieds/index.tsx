@@ -21,14 +21,29 @@ interface ActionProps {
   onPress: () => void
 }
 
-const BottomActions = ({ data, type }: { data: any; type: "video" | "classified" }) => {
-  const { interactWithSaveOnClassified , interactWithSaveOnVideo} = useHooks()
+const BottomActions = ({
+  data,
+  type,
+  refreshSavedClassifieds,
+}: {
+  data: any
+  type: "video" | "classified"
+  refreshSavedClassifieds: () => void
+}) => {
+  const { interactWithSaveOnClassified, interactWithSaveOnVideo } = useHooks()
 
   const bottomOptions: Array<ActionProps> = [
     {
       icon: "save",
       title: "Save",
-      onPress: async () =>type ==='classified' ?  await interactWithSaveOnClassified(data?._id): await interactWithSaveOnVideo(data?._id) ,
+      onPress: async () => {
+        if (type === "classified") {
+          await interactWithSaveOnClassified(data?._id)
+        } else {
+          await interactWithSaveOnVideo(data?._id)
+        }
+        refreshSavedClassifieds()
+      },
     },
     {
       icon: "share",
@@ -55,7 +70,7 @@ const BottomActions = ({ data, type }: { data: any; type: "video" | "classified"
   )
 }
 
-const SavedItem = ({ item, index, handleOnPress }) => {
+const SavedItem = ({ item, index, handleOnPress, refreshSavedClassifieds }) => {
   const videoDetails = item?.VideoDetail[0]
   const classifiedDetails = item?.ClassifiedFeedId[0]
 
@@ -118,7 +133,11 @@ const SavedItem = ({ item, index, handleOnPress }) => {
           style={{ width: Dimensions.get("window").width - 200 }}
         />
         <Text text={classifiedDetails?.users?.name} style={$byText} />
-        <BottomActions data={classifiedDetails} type="classified" />
+        <BottomActions
+          data={classifiedDetails}
+          type="classified"
+          refreshSavedClassifieds={refreshSavedClassifieds}
+        />
       </View>
     </ListItem>
   )
@@ -141,9 +160,9 @@ export const Saved: FC<AppStackScreenProps<"Saved">> = observer(function Saved()
   const handleOnPress = (id, type) => {
     navigation.goBack()
     if (type === "video") {
-      navigationVideos.navigate('VideoDetails', { data:id})
+      navigationVideos.navigate("VideoDetails", { data: id })
     } else {
-      navigationClassified.navigate('ClassifiedsDetails', { classified:id})
+      navigationClassified.navigate("ClassifiedsDetails", { classified: id })
     }
   }
 
@@ -175,7 +194,12 @@ export const Saved: FC<AppStackScreenProps<"Saved">> = observer(function Saved()
           }
           data={savedClassifieds}
           renderItem={({ item, index }) => (
-            <SavedItem item={item} index={index} handleOnPress={handleOnPress} />
+            <SavedItem
+              item={item}
+              index={index}
+              handleOnPress={handleOnPress}
+              refreshSavedClassifieds={refreshSavedClassifieds}
+            />
           )}
         />
       )}

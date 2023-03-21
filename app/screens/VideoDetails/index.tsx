@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from "react"
+import React, { FC, useEffect, useMemo, useState } from "react"
 import { View, TextStyle, ViewStyle, Dimensions, ScrollView, ActivityIndicator, Share } from "react-native"
 import { Button, Icon, IconTypes, Screen, Text } from "../../components"
 import FastImage, { ImageStyle } from "react-native-fast-image"
@@ -17,7 +17,7 @@ import { getIconForInteraction } from "../../utils/helpers"
 const ActionButtons = observer(function TopicsFeed({ data }: { data: any }) {
   const {
     userStore: { _id },
-    interaction: { getInteractionOnVideo, getVideoInteractionOffset },
+    interaction: { getInteractionOnVideo, getVideoInteractionOffset, isVideoSaved },
   } = useStores()
   const [loading, setLoading] = useState<boolean>(false)
   const { interactWithVideo, interactWithSaveOnVideo } = useHooks()
@@ -31,7 +31,7 @@ const ActionButtons = observer(function TopicsFeed({ data }: { data: any }) {
     onPress: () => void
     status?: boolean
     count?: any
-  }> = [
+  }> = useMemo(() =>[
     {
       label: "Like",
       icon: getIconForInteraction(interaction, "liked"),
@@ -63,7 +63,7 @@ const ActionButtons = observer(function TopicsFeed({ data }: { data: any }) {
         })
     },
     {
-      label: "Save",
+      label:isVideoSaved(data?._id)? "Saved":'Save',
       icon: "save_box",
       onPress: async () => {
         setLoading(true)
@@ -71,7 +71,8 @@ const ActionButtons = observer(function TopicsFeed({ data }: { data: any }) {
         setLoading(true)
       },
     },
-  ]
+  ], [isVideoSaved(data?._id)])
+
   return (
     <View style={$actionButtonsContainer}>
       {options.map((option) => (

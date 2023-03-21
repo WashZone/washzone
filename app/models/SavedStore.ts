@@ -17,11 +17,15 @@ export const SavedStoreModel = types
     clear() {
       self.savedClassifieds = []
     },
+    isClassifiedSaved(id : string) {
+      self.savedClassifieds.includes(id)
+    },
   }))
   .views((store) => ({
     get getSavedClassifieds() {
       return store.savedClassifieds
     },
+    
   }))
 
 export interface SavedStore extends Instance<typeof SavedStoreModel> {}

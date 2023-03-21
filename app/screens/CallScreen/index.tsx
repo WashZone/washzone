@@ -93,16 +93,16 @@ export const CallScreen: FC<AppStackScreenProps<"CallScreen">> = observer(functi
         () =>
           role === Role.initiator &&
           Alert.alert(
-            //This is title
+            // This is title
             "Call " + res?.name + " ?",
-            //This is body text
+            // This is body text
             "Are you sure you want to initiate a call?",
             [
               { text: "Yes", onPress: onCall },
               { text: "No", onPress: handleLeave },
             ],
             { cancelable: false },
-            //on clicking out side, Alert will not dismiss
+            // on clicking out side, Alert will not dismiss
           ),
         1000,
       )
@@ -245,7 +245,7 @@ export const CallScreen: FC<AppStackScreenProps<"CallScreen">> = observer(functi
   }
 
   const send = (message) => {
-    //attach the other peer username to our messages
+    // attach the other peer username to our messages
     if (connectedUser.current) {
       message.name = connectedUser.current
       // console.log('Connected iser in end----------', message);
@@ -518,6 +518,7 @@ export const CallScreen: FC<AppStackScreenProps<"CallScreen">> = observer(functi
             streamURL={remoteStream ? remoteStream.toURL() : ""}
             style={$scaleFull}
             objectFit="cover"
+            
           />
         ) : (
           <ImageBackground

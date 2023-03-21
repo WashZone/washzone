@@ -40,7 +40,8 @@ const PublisherDetails = ({ publisher }: { publisher: any }) => {
     <>
       <View style={$publisherContainer}>
         <View style={$flexHori}>
-          <TouchableOpacity onPress={() => navigation.navigate('Profile' , {user:publisher})}><FastImage style={$publisherPicture} source={{ uri: publisher?.picture }} />
+          <TouchableOpacity onPress={() => navigation.navigate("Profile", { user: publisher })}>
+            <FastImage style={$publisherPicture} source={{ uri: publisher?.picture }} />
           </TouchableOpacity>
           <View>
             <Text text={publisher?.name} />
@@ -89,6 +90,9 @@ const MoreDetails = ({ classified }: { classified: any }) => {
 
 const BottomActions = ({ classified }: { classified: any }) => {
   const { interactWithSaveOnClassified } = useHooks()
+  const {
+    interaction: { isClassifiedSaved },
+  } = useStores()
   const [isSaving, setSaving] = useState(false)
   const [sendOfferModal, setSendOfferModal] = useState(false)
   const {
@@ -99,7 +103,7 @@ const BottomActions = ({ classified }: { classified: any }) => {
   const bottomOptions: Array<ActionProps> = [
     {
       icon: "save",
-      title: "Save",
+      title: isClassifiedSaved(classified?._id) ? "Saved" : "Save",
       onPress: async () => {
         if (!isSaving) {
           setSaving(true)
@@ -166,6 +170,7 @@ const BottomActions = ({ classified }: { classified: any }) => {
 export const ClassifiedsDetails: FC<ClassifiedsTabProps<"ClassifiedsDetails">> = observer(
   function ClassifiedsDetails(props) {
     const classified = props.route.params.classified
+    console.log("ClassifiedsDetails", JSON.stringify(classified))
     const navigation = useNavigation()
     const [classifiedDetails, setClassifiedDetails] = useState<any>(classified)
     const [loading, setLoading] = useState<boolean>(typeof classified === "string")
