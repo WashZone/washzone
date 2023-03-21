@@ -1,13 +1,19 @@
-import React from "react"
+import React, { useState } from "react"
 import { Dimensions, TextStyle, View, ViewStyle } from "react-native"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { colors, spacing } from "../../theme"
 import { Text } from "../../components"
 import { fromNow } from "../../utils/agoFromNow"
 import { formatName } from "../../utils/formatName"
+import ShimmerPlaceholder from "react-native-shimmer-placeholder"
+import LinearGradient from "react-native-linear-gradient"
+const windowWidth =Dimensions.get("window").width
 
 export const CommentComponent = ({ comment }: { comment: any }) => {
+  const [loaded, setLoaded] = useState(false)
+  const [attachmentDimensions, setAttachmentDimensions] = useState({height:0, width:0})
   return (
+    <>
     <View style={$commentContainer}>
       <FastImage
         style={$profileImage}
@@ -22,7 +28,31 @@ export const CommentComponent = ({ comment }: { comment: any }) => {
         </View>
         <Text text={comment?.comment} style={$commentText} />
       </View>
+      
     </View>
+    {comment?.acttachmentUrl && (
+      <ShimmerPlaceholder
+        visible={loaded}
+        shimmerStyle={{
+          height: Dimensions.get("window").width * 0.66,
+          width: Dimensions.get("window").width,
+        }}
+        LinearGradient={LinearGradient}
+      >
+        <FastImage
+          style={{ ...attachmentDimensions }}
+          onLoad={(res) => {
+            setAttachmentDimensions({
+              height: (windowWidth * res.nativeEvent.height) / res.nativeEvent.width,
+              width: windowWidth,
+            })
+          }}
+          onLoadEnd={() => setLoaded(true)}
+          source={{ uri: comment?.acttachmentUrl }}
+        />
+      </ShimmerPlaceholder>
+    )}
+    </>
   )
 }
 

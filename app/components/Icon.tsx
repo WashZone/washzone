@@ -159,6 +159,7 @@ export const iconRegistry = {
   microphone_block: require("../../assets/icons/microphone-block.png"),
   no_audio: require("../../assets/icons/no-audio.png"),
   speaker: require("../../assets/icons/speaker.png"),
+  addImage: require("../../assets/icons/add-image.png"),
 }
 
 const $imageStyle: ImageStyle = {

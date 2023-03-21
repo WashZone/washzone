@@ -32,7 +32,6 @@ export function useHooks() {
       addToLikedTopics,
       addToLikedVideos,
       addToDislikedVideos,
-
       removefromDislikedTopics,
       removefromDislikedVideos,
       removefromLikedTopics,
@@ -225,8 +224,22 @@ export function useHooks() {
     }
   }
 
-  const postComment = async (comment: string, topicId: string) => {
-    const res = await mutateCommentOnTopic({ userId: userStore._id, comment, topicId })
+  const postComment = async (comment: string, selectedMedia: any, topicId: string) => {
+    let imageUrl = ""
+    if (selectedMedia) {
+      imageUrl = await uploadToS3({
+        uri: selectedMedia?.uri,
+        type: selectedMedia?.type,
+        name: selectedMedia?.fileName,
+      })
+    }
+    const res = await mutateCommentOnTopic({
+      userId: userStore._id,
+      acttachmentUrl: imageUrl,
+      acttachmentType: "image",
+      comment,
+      topicId,
+    })
   }
 
   const getCommentsOnPost = async (topicId: string) => {
@@ -363,8 +376,10 @@ export function useHooks() {
   }
 
   const interactWithSaveOnClassified = async (classifiedFeedId: string) => {
+   const currentStatus=  getInteractionOnClassified(classifiedFeedId)
+    console.log('CLASSIFIED:' ,classifiedFeedId, currentStatus )
     try {
-      if (getInteractionOnClassified(classifiedFeedId) === Interaction.notSaved) {
+      if (currentStatus === Interaction.notSaved) {
         const res = await mutateSaveLikedClassifiedFeed({
           classifiedFeedId,
           userId: userStore._id,
@@ -380,13 +395,16 @@ export function useHooks() {
         Toast.show(toastMessages.classifiedUnsavedSuccessfully)
       }
     } catch (err) {
+      console.log("ERR", err)
       Toast.show(toastMessages.somethingWentWrong)
     }
   }
 
   const interactWithSaveOnVideo = async (videoId: string) => {
+   const currentStatus =  getSavedInteractionOnVideo(videoId)
+    console.log("SAVE VIDEO", videoId, "Current Status : ",currentStatus)
     try {
-      if (getInteractionOnClassified(videoId) === Interaction.notSaved) {
+      if (currentStatus === Interaction.notSaved) {
         const res = await mutateSaveLikedVideo({
           videoId,
           userId: userStore._id,

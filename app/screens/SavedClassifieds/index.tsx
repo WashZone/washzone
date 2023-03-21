@@ -13,6 +13,7 @@ import { useStores } from "../../models"
 import { observer } from "mobx-react-lite"
 import * as Linking from "expo-linking"
 import { $flex1, $flexRow } from "../styles"
+import { ClassifiedsTabParamList, VideosTabParamList } from "../../tabs"
 
 interface ActionProps {
   icon: IconTypes
@@ -20,21 +21,21 @@ interface ActionProps {
   onPress: () => void
 }
 
-const BottomActions = ({ classified, type }: { classified: any; type: "video" | "classified" }) => {
-  const { interactWithSaveOnClassified } = useHooks()
+const BottomActions = ({ data, type }: { data: any; type: "video" | "classified" }) => {
+  const { interactWithSaveOnClassified , interactWithSaveOnVideo} = useHooks()
 
   const bottomOptions: Array<ActionProps> = [
     {
       icon: "save",
       title: "Save",
-      onPress: async () => await interactWithSaveOnClassified(classified?._id),
+      onPress: async () =>type ==='classified' ?  await interactWithSaveOnClassified(data?._id): await interactWithSaveOnVideo(data?._id) ,
     },
     {
       icon: "share",
       title: "Share",
       onPress: () =>
         Share.open({
-          message: `washzone://shared-${type}/${classified?._id}`,
+          message: `washzone://shared-${type}/${data?._id}`,
           title: "",
           url: "",
         }),
@@ -83,7 +84,7 @@ const SavedItem = ({ item, index, handleOnPress }) => {
           />
           <Text text={videoDetails?.description} weight="medium" size="xs" numberOfLines={1} />
           <Text text={videoDetails?.users?.name} style={$byText} />
-          <BottomActions classified={item} type="video" />
+          <BottomActions data={item} type="video" />
         </View>
       </ListItem>
     )
@@ -117,7 +118,7 @@ const SavedItem = ({ item, index, handleOnPress }) => {
           style={{ width: Dimensions.get("window").width - 200 }}
         />
         <Text text={classifiedDetails?.users?.name} style={$byText} />
-        <BottomActions classified={classifiedDetails} type="classified" />
+        <BottomActions data={classifiedDetails} type="classified" />
       </View>
     </ListItem>
   )
@@ -125,6 +126,8 @@ const SavedItem = ({ item, index, handleOnPress }) => {
 
 export const Saved: FC<AppStackScreenProps<"Saved">> = observer(function Saved() {
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
+  const navigationVideos = useNavigation<NavigationProp<VideosTabParamList>>()
+  const navigationClassified = useNavigation<NavigationProp<ClassifiedsTabParamList>>()
   const { refreshSavedClassifieds } = useHooks()
   const {
     saved: { savedClassifieds },
@@ -138,9 +141,9 @@ export const Saved: FC<AppStackScreenProps<"Saved">> = observer(function Saved()
   const handleOnPress = (id, type) => {
     navigation.goBack()
     if (type === "video") {
-      Linking.openURL(`washzone://shared-video/${id}`)
+      navigationVideos.navigate('VideoDetails', { data:id})
     } else {
-      Linking.openURL(`washzone://shared-classified/${id}`)
+      navigationClassified.navigate('ClassifiedsDetails', { classified:id})
     }
   }
 

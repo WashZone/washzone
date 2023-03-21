@@ -24,11 +24,14 @@ export const SendOfferModal = ({ isVisible, setVisible, receiver, classified }) 
       description: classified?.classifiedDetail,
       image: classified?.attachmentUrl,
     })
-    Keyboard.dismiss()
-    setLoading(false)
-    setVisible(false)
-    navigation.navigate("P2PChat", { receiver: receiver, roomId: roomId })
-    setAmount("")
+  
+    setTimeout(() => {
+      Keyboard.dismiss()
+      setVisible(false)
+      setLoading(false)
+      navigation.navigate("P2PChat", { receiver, roomId })
+      setAmount("")
+    }, 3000)
   }
 
   return (

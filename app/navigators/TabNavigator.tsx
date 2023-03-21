@@ -42,36 +42,41 @@ export function TabNavigator() {
   const url = Linking.useURL()
 
   const handleStoryURL = (linkUrl: string) => {
+    if(!url) return
     if (/shared-classified/.test(linkUrl)) {
-      navigation.navigate("Classifieds")
+      // navigation.navigate("Classifieds")
       setTimeout(
         () =>
-          navigationClassified.navigate("ClassifiedsDetails", {
+         { navigationClassified.navigate("ClassifiedsDetails", {
             classified: linkUrl?.split("/")[linkUrl?.split("/").length - 1],
-          }),
+          });
+          Linking.openURL('')
+        },
         200,
-        Linking.openURL(null),
       )
     }
     if (/shared-topic/.test(linkUrl)) {
-      navigation.navigate("Topics")
+      // navigation.navigate("Topics")
       setTimeout(() => {
         navigationTopic.navigate("TopicInfo", {
           topic: linkUrl?.split("/")[linkUrl?.split("/").length - 1],
         })
+        Linking.openURL('')
       }, 200)
-      Linking.openURL(null)
+      
     }
     if (/shared-video/.test(linkUrl)) {
-      navigation.navigate("Videos")
       setTimeout(
         () =>
+         { 
+          // navigation.navigate("Videos")
           navigationVideo.navigate("VideoDetails", {
             data: linkUrl?.split("/")[linkUrl?.split("/").length - 1],
-          }),
+          })
+          Linking.openURL('')},
         200,
       )
-      Linking.openURL(null)
+     
     }
   }
 

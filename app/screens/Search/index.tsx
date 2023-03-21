@@ -192,6 +192,7 @@ export const Search: FC<AppStackScreenProps<"Search">> = observer(function Searc
             style={$resetButton}
             textStyle={$resetText}
             onPress={() => {
+              setSearchKey('')
               setResults({ classifieds: [], users: [], topics: [], videos: [] })
             }}
           />

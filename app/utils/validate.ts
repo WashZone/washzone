@@ -1,6 +1,6 @@
 export function validateEmail(email: string) {
   if (email.length === 0) return "Email Address Required"
-  if (email.length < 6) return "Must be at least 6 characters"
+  // if (email.length < 6) return "Must be at least 6 characters"
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "Must be a valid email address"
   return ""
 }

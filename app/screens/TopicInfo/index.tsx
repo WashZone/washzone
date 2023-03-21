@@ -4,12 +4,13 @@ import { Icon, Screen } from "../../components"
 import { colors, spacing } from "../../theme"
 import { HomeTabProps } from "../../tabs/Home"
 // import { PostComponent } from "../Feed/partials"
-import { Capture } from "../../utils/device/MediaPicker"
+import { Capture, MediaPicker } from "../../utils/device/MediaPicker"
 import { useHooks } from "../hooks"
 import { CommentComponent } from "./Comments"
 import { useStores } from "../../models"
 import { ActivityIndicator } from "react-native-paper"
 import { TopicComponent } from "../TopicsFeed"
+import FastImage from "react-native-fast-image"
 
 export const TopicInfo: FC<HomeTabProps<"TopicInfo">> = function PostInfo(props) {
   const { topic } = props.route.params
@@ -17,6 +18,7 @@ export const TopicInfo: FC<HomeTabProps<"TopicInfo">> = function PostInfo(props)
   const { postComment, getCommentsOnPost } = useHooks()
   const [comments, setComments] = useState<Array<any>>([])
   const [isCommenting, setIsCommenting] = useState<boolean>(false)
+  const [selectedMedia, setSelectedMedia] = useState<any>()
   const [topicDetails, setTopicDetails] = useState<any>(topic)
   const [loading, setLoading] = useState<boolean>(typeof topic === "string")
   const {
@@ -43,17 +45,24 @@ export const TopicInfo: FC<HomeTabProps<"TopicInfo">> = function PostInfo(props)
 
   async function syncComments(id: string) {
     const data = await getCommentsOnPost(id)
+    console.log("ALL COMMENTS", data)
     setComments(data || [])
   }
 
   const onComment = async () => {
     setIsCommenting(true)
-    await postComment(commentText, topicDetails?._id)
+    await postComment(commentText, selectedMedia ,  topicDetails?._id)
     await syncComments(topicDetails?._id)
+    setSelectedMedia(undefined)
     setCommentText("")
     setIsCommenting(false)
   }
-  
+
+  const onAddImage = async () => {
+    const res = await MediaPicker()
+    setSelectedMedia(res)
+  }
+
   if (loading) {
     return (
       <View style={$loadingScreen}>
@@ -70,8 +79,21 @@ export const TopicInfo: FC<HomeTabProps<"TopicInfo">> = function PostInfo(props)
           <CommentComponent comment={c} key={c?._id} />
         ))}
       </ScrollView>
+     {selectedMedia && <View style={{position:'absolute', bottom:54}}>
+        <FastImage
+          source={{ uri: selectedMedia?.uri }}
+          style={{ height: 100, width: 100, borderRadius: 10 }}
+        />
+        <Icon
+          icon="x"
+          size={20}
+          onPress={() => setSelectedMedia(undefined)}
+          containerStyle={$iconXContainer}
+          disabled={isCommenting}
+        />
+      </View>}
       <View style={$postCommentContainer}>
-        <Icon icon="camera" size={28} onPress={Capture} />
+        <Icon icon="addImage" disabled={isCommenting} size={28} onPress={onAddImage} />
         <TextInput
           value={commentText}
           onChangeText={setCommentText}
@@ -94,6 +116,17 @@ export const TopicInfo: FC<HomeTabProps<"TopicInfo">> = function PostInfo(props)
       </View>
     </Screen>
   )
+}
+const $iconXContainer: ViewStyle = {
+  height: 24,
+  width: 24,
+  justifyContent: "center",
+  alignItems: "center",
+  borderRadius: 8,
+  backgroundColor: colors.background,
+  position: "absolute",
+  top: -5,
+  left: 85,
 }
 
 const $loadingScreen: ViewStyle = {

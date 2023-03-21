@@ -21,15 +21,21 @@ export function DrawerNavigator() {
   const progress = useSharedValue(0)
 
   const toggleDrawer = () => {
-    if (!open) {
+    if (!drawerRef.current.state.drawerOpened) {
       Keyboard.dismiss()
+      console.log("OPENING,")
       drawerRef.current?.openDrawer({ speed: 2 })
-      setOpen(true)
+      // setOpen(true)
     } else {
+      console.log("CLOSING,")
       drawerRef.current?.closeDrawer({ speed: 10 })
-      setOpen(false)
+      // setOpen(false)
     }
   }
+
+const closeDrawer =() =>{
+  drawerRef.current?.closeDrawer({ speed: 10 })
+}
 
   useEffect(() => {
     return () => timeout.current && clearTimeout(timeout.current)
@@ -44,8 +50,6 @@ export function DrawerNavigator() {
   const handleChatPress = () => {
     appNavigaion.navigate("AllChats")
   }
-
-
 
   return (
     <DrawerLayout
@@ -70,7 +74,7 @@ export function DrawerNavigator() {
       }}
       renderNavigationView={() => (
         <View style={[$drawer, $drawerInsets]}>
-          <DrawerOptions toggleDrawer={() => toggleDrawer()} />
+          <DrawerOptions closeDrawer={closeDrawer} />
           <View style={$versionContainer}>
             <Text tx="DrawerNavigator.version" style={$versionText} />
           </View>
@@ -84,11 +88,11 @@ export function DrawerNavigator() {
         contentContainerStyle={$screenContainer}
       >
         <View style={$headerContainer}>
-          <View style={{ position: 'absolute', left: 0 }}>
+          <View style={{ position: "absolute", left: 0 }}>
             <DrawerIconButton onPress={toggleDrawer} {...{ open, progress }} />
           </View>
           <Icon icon="appLogo" size={45} />
-          <View style={[$flexRow, { position: 'absolute', right: 10 }]}>
+          <View style={[$flexRow, { position: "absolute", right: 10 }]}>
             <Pressable style={$searchContainer} onPress={handleChatPress}>
               <Icon icon="chatMessage" size={24} />
             </Pressable>

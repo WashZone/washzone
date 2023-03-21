@@ -32,9 +32,9 @@ interface Action {
 }
 
 export const DrawerOptions = observer(function DrawerOptions({
-  toggleDrawer,
+  closeDrawer,
 }: {
-  toggleDrawer: () => void
+  closeDrawer: () => void
 }) {
   const {
     authenticationStore: { logout },
@@ -106,8 +106,8 @@ export const DrawerOptions = observer(function DrawerOptions({
     return (
       <TouchableOpacity
         onPress={() => {
-          toggleDrawer()
-          setTimeout (onPress, 100)
+          closeDrawer();
+          setTimeout(onPress, 50)
         }}
         style={getActionContainerStyle(!["notifications", "logout"].includes(icon))}
       >

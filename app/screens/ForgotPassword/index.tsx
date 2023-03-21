@@ -1,11 +1,12 @@
 import React, { FC, useState } from "react"
-import { ActivityIndicator, TextStyle, View, ViewStyle } from "react-native"
+import { ActivityIndicator, Alert, TextStyle, View, ViewStyle } from "react-native"
 import { Button, Header, Icon, Screen, Text, TextField } from "../../components"
 import { colors, spacing } from "../../theme"
 
 import { AppStackParamList, AppStackScreenProps } from "../../navigators"
 import { useStores } from "../../models"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
+import { validateEmail } from "../../utils/validate"
 
 export const ForgotPassword: FC<AppStackScreenProps<"ForgotPassword">> = function ForgotPassword() {
   const {
@@ -13,18 +14,30 @@ export const ForgotPassword: FC<AppStackScreenProps<"ForgotPassword">> = functio
     userStore: { _id },
   } = useStores()
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
-  const [currentPass, setCurrentPass] = useState("")
+  const [email, setEmail] = useState("")
+  const [error, setError] = useState("")
   const [buttonLoading, setButtonLoading] = useState<boolean>(false)
-
-  const isActive = currentPass !== ""
 
   const onReset = async () => {
     setButtonLoading(true)
+    const res = validateEmail(email)
+    setError(res)
+    if (res !== "") {
+      setButtonLoading(false)
+      return
+    }
     try {
-      // const res = await mutateSendOtpOnEmailByUserId({
-      //   userId: _id,
-      // })
-      // console.log(res)
+      const res = await mutateSendOtpOnEmailByUserId({
+        userId: _id,
+        email,
+      })
+      console.log(res)
+      setButtonLoading(false)
+      setEmail('')
+      Alert.alert(
+        `Emailed ${email} !`,
+        "Check your mail for an email from washzone. It contains all the instructions to update your password.",
+      )
     } catch (e) {
       console.log("erroer", e)
       setButtonLoading(false)
@@ -52,9 +65,8 @@ export const ForgotPassword: FC<AppStackScreenProps<"ForgotPassword">> = functio
         <Text tx="resetPassword.description" weight="medium" style={$description} />
 
         <TextField
-          value={currentPass}
-          onChangeText={setCurrentPass}
-          containerStyle={$textField}
+          value={email}
+          onChangeText={setEmail}
           autoCorrect={false}
           placeholderTx="resetPassword.placeholder"
           style={$inputText}
@@ -62,13 +74,16 @@ export const ForgotPassword: FC<AppStackScreenProps<"ForgotPassword">> = functio
           placeholderTextColor={colors.palette.overlay50}
           maxLength={100}
         />
+        <Text text={error} size="xxs" color={colors.palette.angry500} />
 
         <Button
           onPress={onReset}
-          disabled={!isActive || buttonLoading}
+          disabled={buttonLoading}
           style={[
             $submitButton,
-            { backgroundColor: isActive ? colors.palette.primary100 : colors.palette.neutral400 },
+            {
+              backgroundColor: colors.palette.primary100,
+            },
           ]}
           text={"Reset"}
           textStyle={$textButton}
@@ -112,7 +127,7 @@ const $submitButton: ViewStyle = {
   alignItems: "center",
   borderWidth: 0,
   alignSelf: "center",
-  marginTop: spacing.small,
+  marginTop: spacing.extraLarge,
 }
 
 const $titleStyle: TextStyle = {
@@ -142,10 +157,6 @@ const $container: ViewStyle = {
 const $content: ViewStyle = {
   margin: spacing.extraLarge,
   marginVertical: spacing.massive,
-}
-
-const $textField: ViewStyle = {
-  marginBottom: spacing.large,
 }
 
 const $inputWrapperStyle: ViewStyle = {
