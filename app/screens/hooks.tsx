@@ -306,28 +306,37 @@ export function useHooks() {
   const updateProfile = async (
     firstName: string,
     lastName: string,
-    picture: string,
+    attachment: any,
     bio: string,
   ) => {
-    const res = await mutateUpdateUser({
-      user: {
+    try {
+      const imageUrl = await uploadToS3({
+        uri: attachment?.uri,
+        type: attachment?.type,
+        name: attachment?.fileName,
+      })
+      const res = await mutateUpdateUser({
+        user: {
+          first_name: firstName,
+          last_name: lastName,
+          name: firstName + " " + lastName,
+          picture: imageUrl,
+          description: bio,
+        },
+        userId: userStore._id,
+      })
+      console.log("UPDATE USER MUTATION", res)
+      userStore.setUser({
+        ...userStore,
         first_name: firstName,
         last_name: lastName,
         name: firstName + " " + lastName,
-        picture,
+        picture: imageUrl,
         description: bio,
-      },
-      userId: userStore._id,
-    })
-    console.log("UPDATE USER MUTATION", res)
-    userStore.setUser({
-      ...userStore,
-      first_name: firstName,
-      last_name: lastName,
-      name: firstName + " " + lastName,
-      picture,
-      description: bio,
-    })
+      })
+    } catch (err) {
+      Toast.show(toastMessages.somethingWentWrong)
+    }
   }
 
   const getMoreChatMessages = async ({ roomId }) => {
@@ -376,8 +385,8 @@ export function useHooks() {
   }
 
   const interactWithSaveOnClassified = async (classifiedFeedId: string) => {
-   const currentStatus=  getInteractionOnClassified(classifiedFeedId)
-    console.log('CLASSIFIED:' ,classifiedFeedId, currentStatus )
+    const currentStatus = getInteractionOnClassified(classifiedFeedId)
+    console.log("CLASSIFIED:", classifiedFeedId, currentStatus)
     try {
       if (currentStatus === Interaction.notSaved) {
         const res = await mutateSaveLikedClassifiedFeed({
@@ -401,8 +410,8 @@ export function useHooks() {
   }
 
   const interactWithSaveOnVideo = async (videoId: string) => {
-   const currentStatus =  getSavedInteractionOnVideo(videoId)
-    console.log("SAVE VIDEO", videoId, "Current Status : ",currentStatus)
+    const currentStatus = getSavedInteractionOnVideo(videoId)
+    console.log("SAVE VIDEO", videoId, "Current Status : ", currentStatus)
     try {
       if (currentStatus === Interaction.notSaved) {
         const res = await mutateSaveLikedVideo({

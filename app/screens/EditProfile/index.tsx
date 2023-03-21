@@ -20,7 +20,7 @@ export const EditProfile: FC<AppStackScreenProps<"EditProfile">> = function Edit
   const [firstName, setFirstName] = useState(userStore.first_name)
   const [lastName, setLastName] = useState(userStore.last_name)
   const [bio, setBio] = useState(userStore?.description || "")
-  const [picture, setPicture] = useState(userStore.picture)
+  const [picture, setPicture] = useState({uri : userStore.picture})
   const [buttonLoading, setButtonLoading] = useState<boolean>(false)
   const [justOverflowed, setJustOverflowed] = useState<boolean>(false)
 
@@ -28,8 +28,8 @@ export const EditProfile: FC<AppStackScreenProps<"EditProfile">> = function Edit
 
   const onEditPP = async () => {
     const res = await MediaPicker()
-    if (res?.uri) {
-      setPicture(res?.uri)
+    if (res) {
+      setPicture(res)
     }
   }
 
@@ -75,7 +75,7 @@ export const EditProfile: FC<AppStackScreenProps<"EditProfile">> = function Edit
       <Screen contentContainerStyle={[$container, $content]}>
         <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
           {/* <View style={}> */}
-          <FastImage source={{ uri: picture }} style={$picture} />
+          <FastImage source={{ uri: picture?.uri }} style={$picture} />
 
           <Text text="Edit Profile Picture" style={$editPP} onPress={onEditPP} />
           <TextField
