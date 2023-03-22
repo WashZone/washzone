@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   Alert,
   Touchable,
+  ColorValue,
 } from "react-native"
 import { Text, Screen, IconTypes, Icon } from "../../components"
 import { ClassifiedsTabProps, HomeTabParamList } from "../../tabs"
@@ -31,6 +32,7 @@ interface ActionProps {
   icon: IconTypes
   title: string
   onPress: () => void
+  tintColor ?: string
 }
 
 const PublisherDetails = ({ publisher }: { publisher: any }) => {
@@ -150,7 +152,8 @@ const BottomActions = ({ classified }: { classified: any }) => {
               {isSaving && option.icon === "save" ? (
                 <ActivityIndicator animating color={colors.palette.primary100} />
               ) : (
-                <Icon icon={option.icon} />
+                <Icon icon={option.icon}  color={option.tintColor} />
+                
               )}
             </TouchableOpacity>
             <Text text={option.title} />

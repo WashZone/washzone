@@ -21,6 +21,9 @@ import { useHooks } from "../hooks"
 import { fromNow } from "../../utils/agoFromNow"
 import { messageMetadataType } from "../../utils"
 import { ActivityIndicator } from "react-native-paper"
+import ShimmerPlaceholder from "react-native-shimmer-placeholder"
+import FastImage from "react-native-fast-image"
+import LinearGradient from "react-native-linear-gradient"
 
 const getColorFromType = (type: any) => {
   switch (type) {
@@ -93,8 +96,8 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
   }
 
   const handleOnMessageLongPress = (message) => {
-    setSelectedMessage(message)
-    setOptionsModalVisible(true)
+    // setSelectedMessage(message)
+    // setOptionsModalVisible(true)
   }
 
   const onChatEndReached = async () => {
@@ -148,10 +151,36 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
     )
   }
 
+  const renderImageMessage = (message: MessageType.Image, messageWidth: number) => {
+    console.log("renderImageMessage", JSON.stringify(message), messageWidth)
+    const [loaded, setLoaded] = useState(false)
+    const messageHeight =
+      message?.height && message?.width
+        ? (message.height / message?.width) * messageWidth
+        : messageWidth
+    return (
+      <ShimmerPlaceholder
+        visible={loaded}
+        shimmerStyle={{ height: messageHeight, width: messageWidth }}
+        LinearGradient={LinearGradient}
+      >
+        <FastImage
+          onLoadEnd={() => setLoaded(true)}
+          source={{ uri: message?.uri }}
+          style={{
+            height: messageHeight,
+            width: messageWidth,
+          }}
+        />
+      </ShimmerPlaceholder>
+    )
+  }
+
   return (
     <View style={$flex1}>
       <P2PHeader data={receiver} roomId={roomId} />
       <Chat
+        renderImageMessage={renderImageMessage}
         isAttachmentUploading={isAttachmentUploading}
         sendButtonVisibilityMode="editing"
         emptyState={() => syncing && <ActivityIndicator />}

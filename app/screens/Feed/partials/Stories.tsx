@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import { Alert, FlatList, Pressable, TextStyle, View, ViewStyle } from "react-native"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import FastImage, { ImageStyle } from "react-native-fast-image"
@@ -16,6 +16,8 @@ import { formatName } from "../../../utils/formatName"
 import { colors, spacing } from "../../../theme"
 import { Text } from "../../../components"
 import { observer } from "mobx-react-lite"
+import ShimmerPlaceholder from "react-native-shimmer-placeholder"
+import { BROKEN_IMAGE } from "../../../utils"
 
 interface StoryComponentProps {
   item: any
@@ -39,7 +41,7 @@ export const Stories = observer(() => {
   const navigationHome = useNavigation<NavigationProp<HomeTabParamList>>()
 
   const handleStoryURL = (linkUrl: string) => {
-    console.log("URL LINK",linkUrl )
+    console.log("URL LINK", linkUrl)
     let valid = false
     if (/story-post/.test(linkUrl)) {
       valid = true
@@ -103,22 +105,35 @@ export const Stories = observer(() => {
 })
 
 const StoryComponent = ({ item, index, handleStoryUrl }: StoryComponentProps) => {
+  const [loaded, setLoaded] = useState(false)
   return (
-    <Pressable
-      style={$storyContainer}
-      key={index}
-      onPress={() => {
-        handleStoryUrl(item?.attachmentUrl)
-      }}
+    <ShimmerPlaceholder
+      visible={loaded}
+      shimmerStyle={$storyContainer}
+      LinearGradient={LinearGradient}
     >
-      <FastImage source={{ uri: item?.thumbnailUrl }} resizeMode="cover" style={$story} />
-      <View style={$pictureContainer}>
-        <FastImage source={{ uri: item?.userId?.picture }} style={$picture} />
-      </View>
-      <LinearGradient colors={["transparent", colors.palette.primary200]} style={$nameContainer}>
-        <Text text={formatName(item?.userId?.name)} style={$name} numberOfLines={1} />
-      </LinearGradient>
-    </Pressable>
+      <Pressable
+        style={$storyContainer}
+        key={index}
+        onPress={() => {
+          handleStoryUrl(item?.attachmentUrl)
+        }}
+      >
+        <FastImage
+          onLoadEnd={() => setLoaded(true)}
+          defaultSource={BROKEN_IMAGE}
+          source={{ uri: item?.thumbnailUrl }}
+          resizeMode="cover"
+          style={$story}
+        />
+        <View style={$pictureContainer}>
+          <FastImage source={{ uri: item?.userId?.picture }} style={$picture} />
+        </View>
+        <LinearGradient colors={["transparent", colors.palette.primary200]} style={$nameContainer}>
+          <Text text={formatName(item?.userId?.name)} style={$name} numberOfLines={1} />
+        </LinearGradient>
+      </Pressable>
+    </ShimmerPlaceholder>
   )
 }
 

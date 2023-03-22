@@ -9,6 +9,7 @@ import {
 import Config from "../config"
 import type { PersistNavigationConfig } from "../config/config.base"
 import { useIsMounted } from "../utils/useIsMounted"
+import { AppStackParamList } from "./AppNavigator"
 
 /* eslint-disable */
 export const RootNavigation = {
@@ -22,7 +23,7 @@ export const RootNavigation = {
 }
 /* eslint-enable */
 
-export const navigationRef = createNavigationContainerRef()
+export const navigationRef = createNavigationContainerRef<AppStackParamList>()
 
 /**
  * Gets the current screen from any navigation state.

@@ -13,7 +13,6 @@ export enum CustomMessageType {
 
 export const CustomChatMessage = ({ message }: { message: any }) => {
   const {userStore:{_id : myId}} = useStores()
-  console.log("CUSTOM MESSAGE", message)
   const data = useMemo(() => message?.metaData, [])
   switch (data?.metaDataType) {
     case messageMetadataType.classifiedOffer: {

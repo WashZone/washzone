@@ -1,7 +1,7 @@
 import { Instance, SnapshotOut, types } from "mobx-state-tree"
 import { AuthenticationStoreModel } from "./AuthenticationStore"
 import { UserStoreModel } from "./UserStore"
-import { RootStore as APIRootStore, selectFromUsersChat, usersChatModelPrimitives } from "./api"
+import { RootStore as APIRootStore,  usersChatModelPrimitives } from "./api"
 import { createHttpClient } from "mst-gql"
 import { FeedStoreModel } from "./FeedStore"
 import { TopicsStoreModel } from "./TopicsStore"
@@ -14,8 +14,7 @@ import { SearchStoreModel } from "./SearchStore"
 import { SubscriptionClient } from "subscriptions-transport-ws"
 import { ChatRoomStoreModel } from "./ChatRoomStore"
 import { withSetPropAction } from "./helpers/withSetPropAction"
-import { NavigationProp, useNavigation } from "@react-navigation/native"
-import { AppStackParamList, getActiveRouteName, navigationRef } from "../navigators"
+import { navigationRef } from "../navigators"
 import { Role } from "../screens"
 import { messageMetadataType } from "../utils"
 import { CallStoreModel } from "./CallStore"
@@ -72,7 +71,17 @@ export const RootStoreModel = types
           console.log("SUBSCRIBED", self.userStore.name, JSON.stringify(message))
           if (message?.authorId?._id !== self.userStore._id) {
             console.log("FIRS FOR LOOP IN TO message?.authorId?._id !== self.userStore._id")
-            if (message?.metaData?.metaDataType === messageMetadataType.incomingCallOffer) {
+            if (message?.metaData?.metaDataType === messageMetadataType.incomingCallOfferAudio) {
+              navigationRef.navigate("CallScreen", {
+                mode: "audio",
+                receiverId: message?.authorId?._id,
+                role: Role.receiver,
+                roomId: message?.roomId?._id,
+                offer: message?.metaData?.data,
+              })
+              // self.callStore.setOffer(message?.metaData?.data)
+            }
+            if (message?.metaData?.metaDataType === messageMetadataType.incomingCallOfferVideo) {
               navigationRef.navigate("CallScreen", {
                 mode: "video",
                 receiverId: message?.authorId?._id,

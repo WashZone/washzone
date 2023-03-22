@@ -47,6 +47,10 @@ import { RoomChatModel, RoomChatModelType } from "./RoomChatModel"
 import { roomChatModelPrimitives, RoomChatModelSelector } from "./RoomChatModel.base"
 import { UsersModel, UsersModelType } from "./UsersModel"
 import { usersModelPrimitives, UsersModelSelector } from "./UsersModel.base"
+import { CallMetaDataModel, CallMetaDataModelType } from "./CallMetaDataModel"
+import { callMetaDataModelPrimitives, CallMetaDataModelSelector } from "./CallMetaDataModel.base"
+import { CallNotificationModel, CallNotificationModelType } from "./CallNotificationModel"
+import { callNotificationModelPrimitives, CallNotificationModelSelector } from "./CallNotificationModel.base"
 import { HomecommentsModel, HomecommentsModelType } from "./HomecommentsModel"
 import { homecommentsModelPrimitives, HomecommentsModelSelector } from "./HomecommentsModel.base"
 import { HomePageDetailModel, HomePageDetailModelType } from "./HomePageDetailModel"
@@ -103,6 +107,17 @@ export type InputNotification = {
   title?: (string | null)
 }
 export type InputMetaData = {
+  metaDataType?: (string | null)
+  classifiedId?: (string | null)
+  amount?: (string | null)
+  currency?: (string | null)
+  data?: (string | null)
+}
+export type InputCallNotification = {
+  body?: (string | null)
+  title?: (string | null)
+}
+export type InputCallMetaData = {
   metaDataType?: (string | null)
   classifiedId?: (string | null)
   amount?: (string | null)
@@ -199,8 +214,8 @@ mutateSignin="mutateSignin",
 mutateGetUserById="mutateGetUserById",
 mutateUpdateUser="mutateUpdateUser",
 mutateUpdateAverageRating="mutateUpdateAverageRating",
-mutateSendOtpOnEmailByUserId="mutateSendOtpOnEmailByUserId",
-mutateVerifyEmailByUserId="mutateVerifyEmailByUserId",
+mutateSendOtpOnEmailByEmail="mutateSendOtpOnEmailByEmail",
+mutateVerifyEmailByEmail="mutateVerifyEmailByEmail",
 mutateGenerateOTP="mutateGenerateOTP",
 mutateUpdateDeleteStatus="mutateUpdateDeleteStatus",
 mutateStoreBlockedUser="mutateStoreBlockedUser",
@@ -245,8 +260,11 @@ mutateCreateUserRating="mutateCreateUserRating",
 mutateUpdateRating="mutateUpdateRating",
 mutateCreateChatRoom="mutateCreateChatRoom",
 mutateCreateUserMessage="mutateCreateUserMessage",
+mutateCreateUserCall="mutateCreateUserCall",
 mutateGetchatByUserId="mutateGetchatByUserId",
 mutateGetchatByRoomId="mutateGetchatByRoomId",
+mutateGetcallByUserId="mutateGetcallByUserId",
+mutateGetCallByRoomId="mutateGetCallByRoomId",
 mutateGetroomByUserId="mutateGetroomByUserId",
 mutateGetroomByUsers="mutateGetroomByUsers",
 mutateGetroomBymembers="mutateGetroomBymembers",
@@ -265,7 +283,7 @@ mutateCommentOnHomepage="mutateCommentOnHomepage"
 */
 export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
   .named("RootStore")
-  .extend(configureStoreMixin([['UserRating', () => UserRatingModel], ['classifiedFeed', () => ClassifiedFeedModel], ['CommentsDetail', () => CommentsDetailModel], ['likeTopics', () => LikeTopicsModel], ['TopicDetail', () => TopicDetailModel], ['likeVideos', () => LikeVideosModel], ['VideoPlaylist', () => VideoPlaylistModel], ['VideoUploadPlaylist', () => VideoUploadPlaylistModel], ['VideoUpload', () => VideoUploadModel], ['User', () => UserModel], ['SigninUser', () => SigninUserModel], ['Legalities', () => LegalitiesModel], ['saveVideo', () => SaveVideoModel], ['storyViewerUser', () => StoryViewerUserModel], ['saveClassified', () => SaveClassifiedModel], ['followUser', () => FollowUserModel], ['MetaData', () => MetaDataModel], ['Notification', () => NotificationModel], ['usersChat', () => UsersChatModel], ['roomChat', () => RoomChatModel], ['Users', () => UsersModel], ['Homecomments', () => HomecommentsModel], ['HomePageDetail', () => HomePageDetailModel]], [], "js"))
+  .extend(configureStoreMixin([['UserRating', () => UserRatingModel], ['classifiedFeed', () => ClassifiedFeedModel], ['CommentsDetail', () => CommentsDetailModel], ['likeTopics', () => LikeTopicsModel], ['TopicDetail', () => TopicDetailModel], ['likeVideos', () => LikeVideosModel], ['VideoPlaylist', () => VideoPlaylistModel], ['VideoUploadPlaylist', () => VideoUploadPlaylistModel], ['VideoUpload', () => VideoUploadModel], ['User', () => UserModel], ['SigninUser', () => SigninUserModel], ['Legalities', () => LegalitiesModel], ['saveVideo', () => SaveVideoModel], ['storyViewerUser', () => StoryViewerUserModel], ['saveClassified', () => SaveClassifiedModel], ['followUser', () => FollowUserModel], ['MetaData', () => MetaDataModel], ['Notification', () => NotificationModel], ['usersChat', () => UsersChatModel], ['roomChat', () => RoomChatModel], ['Users', () => UsersModel], ['CallMetaData', () => CallMetaDataModel], ['CallNotification', () => CallNotificationModel], ['Homecomments', () => HomecommentsModel], ['HomePageDetail', () => HomePageDetailModel]], [], "js"))
   .props({
 
   })
@@ -502,14 +520,14 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     mutateUpdateAverageRating(variables: { averageRating: number, userId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ updateAverageRating: any }>(`mutation updateAverageRating($averageRating: Float!, $userId: String!) { updateAverageRating(averageRating: $averageRating, userId: $userId) }`, variables, optimisticUpdate)
     },
-    mutateSendOtpOnEmailByUserId(variables: { email: string, userId: string }, optimisticUpdate?: () => void) {
-      return self.mutate<{ sendOtpOnEmailByUserId: any }>(`mutation sendOtpOnEmailByUserId($email: String!, $userId: String!) { sendOtpOnEmailByUserId(email: $email, userId: $userId) }`, variables, optimisticUpdate)
+    mutateSendOtpOnEmailByEmail(variables: { email: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ sendOtpOnEmailByEmail: any }>(`mutation sendOtpOnEmailByEmail($email: String!) { sendOtpOnEmailByEmail(email: $email) }`, variables, optimisticUpdate)
     },
-    mutateVerifyEmailByUserId(variables: { email: string, otp: string, userId: string }, optimisticUpdate?: () => void) {
-      return self.mutate<{ verifyEmailByUserId: any }>(`mutation verifyEmailByUserId($email: String!, $otp: String!, $userId: String!) { verifyEmailByUserId(email: $email, Otp: $otp, userId: $userId) }`, variables, optimisticUpdate)
+    mutateVerifyEmailByEmail(variables: { password: string, email: string, otp: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ verifyEmailByEmail: any }>(`mutation verifyEmailByEmail($password: String!, $email: String!, $otp: String!) { verifyEmailByEmail(password: $password, email: $email, Otp: $otp) }`, variables, optimisticUpdate)
     },
-    mutateGenerateOTP(variables: { userId: string }, optimisticUpdate?: () => void) {
-      return self.mutate<{ generateOTP: any }>(`mutation generateOTP($userId: String!) { generateOTP(userId: $userId) }`, variables, optimisticUpdate)
+    mutateGenerateOTP(variables: { email: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ generateOTP: any }>(`mutation generateOTP($email: String!) { generateOTP(email: $email) }`, variables, optimisticUpdate)
     },
     mutateUpdateDeleteStatus(variables: { pageNumber: number, status: string, userId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ UpdateDeleteStatus: any }>(`mutation UpdateDeleteStatus($pageNumber: Float!, $status: String!, $userId: String!) { UpdateDeleteStatus(pageNumber: $pageNumber, status: $status, userId: $userId) }`, variables, optimisticUpdate)
@@ -676,11 +694,20 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     mutateCreateUserMessage(variables: { notificationToken?: (string | null), notificationMessage?: (InputNotification | null), metaData?: (InputMetaData | null), membersId: InputUsers[], width?: (number | null), mimeType?: (string | null), text: string, previewData?: (string | null), uri?: (string | null), size?: (number | null), name?: (string | null), height?: (number | null), status?: (string | null), messageType?: (string | null), roomId: string, authorId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ createUserMessage: any }>(`mutation createUserMessage($notificationToken: String, $notificationMessage: InputNotification, $metaData: InputMetaData, $membersId: [InputUsers!]!, $width: Float, $mimeType: String, $text: String!, $previewData: String, $uri: String, $size: Float, $name: String, $height: Float, $status: String, $messageType: String, $roomId: String!, $authorId: String!) { createUserMessage(notificationToken: $notificationToken, notificationMessage: $notificationMessage, metaData: $metaData, membersId: $membersId, width: $width, mimeType: $mimeType, text: $text, previewData: $previewData, uri: $uri, size: $size, name: $name, height: $height, status: $status, messageType: $messageType, roomId: $roomId, authorId: $authorId) }`, variables, optimisticUpdate)
     },
+    mutateCreateUserCall(variables: { notificationToken?: (string | null), notificationMessage?: (InputCallNotification | null), metaData?: (InputCallMetaData | null), membersId: InputUsers[], width?: (number | null), mimeType?: (string | null), text: string, previewData?: (string | null), uri?: (string | null), size?: (number | null), name?: (string | null), height?: (number | null), status?: (string | null), messageType?: (string | null), roomId: string, authorId: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ createUserCall: any }>(`mutation createUserCall($notificationToken: String, $notificationMessage: InputCallNotification, $metaData: InputCallMetaData, $membersId: [InputUsers!]!, $width: Float, $mimeType: String, $text: String!, $previewData: String, $uri: String, $size: Float, $name: String, $height: Float, $status: String, $messageType: String, $roomId: String!, $authorId: String!) { createUserCall(notificationToken: $notificationToken, notificationMessage: $notificationMessage, metaData: $metaData, membersId: $membersId, width: $width, mimeType: $mimeType, text: $text, previewData: $previewData, uri: $uri, size: $size, name: $name, height: $height, status: $status, messageType: $messageType, roomId: $roomId, authorId: $authorId) }`, variables, optimisticUpdate)
+    },
     mutateGetchatByUserId(variables: { authorId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ getchatByUserId: any }>(`mutation getchatByUserId($authorId: String!) { getchatByUserId(authorId: $authorId) }`, variables, optimisticUpdate)
     },
     mutateGetchatByRoomId(variables: { pageNumber: number, roomId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ getchatByRoomId: any }>(`mutation getchatByRoomId($pageNumber: Float!, $roomId: String!) { getchatByRoomId(pageNumber: $pageNumber, roomId: $roomId) }`, variables, optimisticUpdate)
+    },
+    mutateGetcallByUserId(variables: { authorId: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ getcallByUserId: any }>(`mutation getcallByUserId($authorId: String!) { getcallByUserId(authorId: $authorId) }`, variables, optimisticUpdate)
+    },
+    mutateGetCallByRoomId(variables: { pageNumber: number, roomId: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ getCallByRoomId: any }>(`mutation getCallByRoomId($pageNumber: Float!, $roomId: String!) { getCallByRoomId(pageNumber: $pageNumber, roomId: $roomId) }`, variables, optimisticUpdate)
     },
     mutateGetroomByUserId(variables: { adminId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ getroomByUserId: any }>(`mutation getroomByUserId($adminId: String!) { getroomByUserId(adminId: $adminId) }`, variables, optimisticUpdate)

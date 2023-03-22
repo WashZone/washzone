@@ -4,40 +4,36 @@ import { Button, Header, Icon, Screen, Text, TextField } from "../../components"
 import { colors, spacing } from "../../theme"
 
 import { AppStackParamList, AppStackScreenProps } from "../../navigators"
-import { useStores } from "../../models"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
-import { validateEmail } from "../../utils/validate"
+import { useHooks } from "../hooks"
+import OTPTextInput from "react-native-otp-textinput"
 
-export const ForgotPassword: FC<AppStackScreenProps<"ForgotPassword">> = function ForgotPassword() {
-  const {
-    api: { mutateSendOtpOnEmailByEmail },
-    userStore: { _id },
-  } = useStores()
+export const VerifyOTP: FC<AppStackScreenProps<"VerifyOTP">> = function VerifyOTP(props) {
+  const { email } = props.route.params
+  const { resetPassword } = useHooks()
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
-  const [email, setEmail] = useState("")
+  // const [email, setEmail] = useState("")
+  const [newPass, setNewPass] = useState("")
+  const [confirmPass, setConfirmPass] = useState("")
   const [error, setError] = useState("")
+  const [otp, setOtp] = useState("")
   const [buttonLoading, setButtonLoading] = useState<boolean>(false)
 
   const onReset = async () => {
     setButtonLoading(true)
-    const res = validateEmail(email)
-    setError(res)
-    if (res !== "") {
+
+    if (newPass !== confirmPass) {
       setButtonLoading(false)
+      setError("Passwords do not match!")
       return
     }
     try {
-      console.log("email", email)
-      const res = await mutateSendOtpOnEmailByEmail({
-        email,
-      })
-      console.log(res)
+      await resetPassword({ email, otp, password: newPass })
+      Alert.alert("Success!", "Your password has been changed successfully. Please Login!")
+      navigation.navigate('Login')
       setButtonLoading(false)
-      navigation.navigate("VerifyOTP", { email })
-      setEmail("")
     } catch (e) {
       console.log("erroer", e)
-      Alert.alert("Email Not Found!")
       setButtonLoading(false)
     }
   }
@@ -46,7 +42,7 @@ export const ForgotPassword: FC<AppStackScreenProps<"ForgotPassword">> = functio
     <Screen preset="fixed" contentContainerStyle={$container}>
       <Header
         leftIcon="caretLeft"
-        title="Forgot Password"
+        title="Reset Password"
         titleStyle={$titleStyle}
         onLeftPress={() => navigation.goBack()}
         leftIconColor={colors.palette.neutral600}
@@ -59,22 +55,38 @@ export const ForgotPassword: FC<AppStackScreenProps<"ForgotPassword">> = functio
           <View style={$seperator} />
         </View>
 
-        <Text tx="resetPassword.title" weight="bold" style={$title} />
-        <Text tx="resetPassword.description" weight="medium" style={$description} />
+        <Text text="Enter New Password" weight="bold" style={$title} />
+        <Text text={`OTP has been sent to ${email}.`} weight="medium" style={$description} />
+
+        <Text text={error} size="xxs" color={colors.palette.angry500} />
 
         <TextField
+          value={newPass}
+          onChangeText={setNewPass}
+          containerStyle={$inputText}
           autoCapitalize="none"
-          value={email}
-          onChangeText={setEmail}
           autoCorrect={false}
-          placeholderTx="resetPassword.placeholder"
+          placeholder="New Password"
           style={$inputText}
           inputWrapperStyle={$inputWrapperStyle}
           placeholderTextColor={colors.palette.overlay50}
           maxLength={100}
         />
-        <Text text={error} size="xxs" color={colors.palette.angry500} />
 
+        <TextField
+          value={confirmPass}
+          onChangeText={setConfirmPass}
+          containerStyle={$inputText}
+          autoCapitalize="none"
+          autoCorrect={false}
+          placeholder="Confirm Password"
+          style={$inputText}
+          inputWrapperStyle={$inputWrapperStyle}
+          placeholderTextColor={colors.palette.overlay50}
+          maxLength={20}
+        />
+
+        <OTPTextInput handleTextChange={setOtp} />
         <Button
           onPress={onReset}
           disabled={buttonLoading}
@@ -160,6 +172,7 @@ const $content: ViewStyle = {
 
 const $inputWrapperStyle: ViewStyle = {
   borderColor: colors.palette.primary100,
+  marginBottom: spacing.medium,
 }
 
 const $inputText: TextStyle = {

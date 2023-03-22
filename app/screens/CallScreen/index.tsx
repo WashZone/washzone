@@ -273,7 +273,7 @@ export const CallScreen: FC<AppStackScreenProps<"CallScreen">> = observer(functi
         console.log("Sending Ofer")
         console.log("OFFER", JSON.stringify(offer))
         setTestOffer(JSON.stringify(offer))
-        sendCallOffer(roomId, receiverId, offer)
+        sendCallOffer(roomId, receiverId, offer, mode)
         // send({
         //   type: 'offer',
         //   offer: offer,

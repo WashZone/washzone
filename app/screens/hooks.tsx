@@ -96,9 +96,15 @@ export function useHooks() {
       queryGetAllHomePagesByPageNumber,
       mutateDeleteChatRoom,
       mutateSetNotificationStatus,
+      mutateVerifyEmailByEmail,
     },
     userStore,
   } = useStores()
+
+  const resetPassword = async ({ email, otp, password }) => {
+    console.log('password',password)
+    const res = await mutateVerifyEmailByEmail({ email, otp, password })
+  }
 
   const loadStories = async () => {
     try {
@@ -814,7 +820,9 @@ export function useHooks() {
         return { lastPage: true }
       }
       return { lastPage: false }
-    } catch (err) {}
+    } catch (err) {
+      return { lastPage: false }
+    }
   }
 
   const sendAttachment = async ({ roomId, attachment, receiverId }) => {
@@ -867,7 +875,12 @@ export function useHooks() {
     } catch (err) {}
   }
 
-  const sendCallOffer = async (roomId: string, receiverId: string, offer: string) => {
+  const sendCallOffer = async (
+    roomId: string,
+    receiverId: string,
+    offer: string,
+    mode: "video" | "audio",
+  ) => {
     console.log("userStore._id", userStore._id)
     console.log("receiverId", receiverId)
     console.log("offer", offer)
@@ -879,7 +892,10 @@ export function useHooks() {
         membersId: [{ userId1: receiverId }, { userId1: userStore._id }],
         messageType: "custom",
         metaData: {
-          metaDataType: messageMetadataType.incomingCallOffer,
+          metaDataType:
+            mode === "audio"
+              ? messageMetadataType.incomingCallOfferAudio
+              : messageMetadataType.incomingCallOfferVideo,
           amount: "",
           currency: "",
           data: JSON.stringify(offer),
@@ -1114,5 +1130,6 @@ export function useHooks() {
     sendAttachment,
     setNotificationStatus,
     getNotificationStatus,
+    resetPassword,
   }
 }

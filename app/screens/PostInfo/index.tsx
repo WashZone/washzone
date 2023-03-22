@@ -1,20 +1,20 @@
 import React, { FC, useEffect, useState } from "react"
-import { ScrollView, TextInput, TextStyle, View, ViewStyle } from "react-native"
-import { Icon, Screen } from "../../components"
-import { colors, spacing } from "../../theme"
+import { ScrollView,  View, ViewStyle } from "react-native"
+import {  Screen } from "../../components"
+import { colors } from "../../theme"
 import { HomeTabProps } from "../../tabs/Home"
 import { PostComponent } from "../Feed/partials"
-import { Capture } from "../../utils/device/MediaPicker"
-import { useHooks } from "../hooks"
+// import { Capture } from "../../utils/device/MediaPicker"
+// import { useHooks } from "../hooks"
 import { useStores } from "../../models"
 import { ActivityIndicator } from "react-native-paper"
 
 export const PostInfo: FC<HomeTabProps<"PostInfo">> = function PostInfo(props) {
   const { post } = props.route.params
-  const [commentText, setCommentText] = useState<string>("")
-  const { postComment, getCommentsOnPost } = useHooks()
-  const [comments, setComments] = useState<Array<any>>([])
-  const [isCommenting, setIsCommenting] = useState<boolean>(false)
+  // const [commentText, setCommentText] = useState<string>("")
+  // const { postComment, getCommentsOnPost } = useHooks()
+  // const [comments, setComments] = useState<Array<any>>([])
+  // const [isCommenting, setIsCommenting] = useState<boolean>(false)
   const [postDetails, setPostDetails] = useState<any>(post)
   const [loading, setLoading] = useState<boolean>(typeof post === "string")
   const {
@@ -27,10 +27,10 @@ export const PostInfo: FC<HomeTabProps<"PostInfo">> = function PostInfo(props) {
       const res = await mutateGetHomePagesByHomePageId({ homePageId: post })
       const topicData = res.getHomePagesByHomePageId?.data.length === 1 && res.getHomePagesByHomePageId?.data[0]
       setPostDetails(topicData)
-      await syncComments(topicData?._id)
+      // await syncComments(topicData?._id)
       setLoading(false)
     } else {
-      await syncComments(postDetails?._id)
+      // await syncComments(postDetails?._id)
       setLoading(false)
     }
   }
@@ -39,18 +39,18 @@ export const PostInfo: FC<HomeTabProps<"PostInfo">> = function PostInfo(props) {
     handelPost()
   }, [post])
 
-  async function syncComments(id: string) {
-    const data = await getCommentsOnPost(id)
-    setComments(data || [])
-  }
+  // async function syncComments(id: string) {
+  //   const data = await getCommentsOnPost(id)
+  //   setComments(data || [])
+  // }
 
-  const onComment = async () => {
-    setIsCommenting(true)
-    await postComment(commentText, postDetails?._id)
-    await syncComments(postDetails?._id)
-    setCommentText("")
-    setIsCommenting(false)
-  }
+  // const onComment = async () => {
+  //   setIsCommenting(true)
+  //   await postComment(commentText, postDetails?._id)
+  //   await syncComments(postDetails?._id)
+  //   setCommentText("")
+  //   setIsCommenting(false)
+  // }
 
   if (loading) {
     return (
@@ -96,18 +96,18 @@ const $loadingScreen: ViewStyle = {
   alignItems: "center",
   justifyContent: "center",
 }
-const $rightIconContainer: ViewStyle = {
-  width: 28,
-}
+// const $rightIconContainer: ViewStyle = {
+//   width: 28,
+// }
 
-const $commentInput: TextStyle = {
-  flex: 1,
-  height: 48,
-  backgroundColor: colors.background,
-  marginHorizontal: 10,
-  borderRadius: 24,
-  paddingHorizontal: 10,
-}
+// const $commentInput: TextStyle = {
+//   flex: 1,
+//   height: 48,
+//   backgroundColor: colors.background,
+//   marginHorizontal: 10,
+//   borderRadius: 24,
+//   paddingHorizontal: 10,
+// }
 
 const $container: ViewStyle = {
   flex: 1,
@@ -117,10 +117,10 @@ const $contentContainer: ViewStyle = {
   flex: 1,
 }
 
-const $postCommentContainer: ViewStyle = {
-  height: 54,
-  flexDirection: "row",
-  paddingHorizontal: spacing.medium,
-  backgroundColor: colors.palette.neutral100,
-  alignItems: "center",
-}
+// const $postCommentContainer: ViewStyle = {
+//   height: 54,
+//   flexDirection: "row",
+//   paddingHorizontal: spacing.medium,
+//   backgroundColor: colors.palette.neutral100,
+//   alignItems: "center",
+// }

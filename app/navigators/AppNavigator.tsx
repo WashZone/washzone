@@ -24,6 +24,7 @@ import {
   P2PChat,
   AllChats,
   CallScreen,
+  VerifyOTP
 } from "../screens"
 import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
 import { DrawerNavigator } from "./Drawer/DrawerNavigator"
@@ -40,6 +41,7 @@ export type AppStackParamList = {
   Settings: undefined
   ResetPassword: undefined
   ForgotPassword: undefined
+  VerifyOTP: {email:string}
   Saved: undefined
   UploadVideo: undefined
   AddAClassified: undefined
@@ -132,6 +134,7 @@ const AppStack = observer(function AppStack() {
             <Stack.Screen name="Login" component={LoginScreen} />
             <Stack.Screen name="Signup" component={SignupScreen} />
             <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
+            <Stack.Screen name="VerifyOTP" component={VerifyOTP} />
           </>
         )}
       </Stack.Navigator>

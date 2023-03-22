@@ -5,7 +5,6 @@ import {
   Pressable,
   RefreshControl,
   TextStyle,
-  TouchableOpacity,
   View,
   ViewStyle,
 } from "react-native"
@@ -21,10 +20,13 @@ import { useHooks } from "../../hooks"
 import { useStores } from "../../../models"
 import { Stories } from "./Stories"
 import { $flex1 } from "../../styles"
-import { NATIVE_AD_UNIT_ID } from "../../../utils/AppLovin"
+import { MREC_AD_UNIT_ID, NATIVE_AD_UNIT_ID } from "../../../utils/AppLovin"
 import ShimmerPlaceHolder from "react-native-shimmer-placeholder"
 
-// import NativeAdView from "../../../utils/NativeAd"
+import NativeAdView from "../../../utils/NativeAd"
+import AppLovinMAX from "react-native-applovin-max/src/index"
+
+
 import { defaultImages, DEFAULT_LOADING } from "../../../utils"
 import LinearGradient from "react-native-linear-gradient"
 
@@ -35,7 +37,6 @@ export interface PostComponentProps {
 }
 
 export const PostComponent = ({ post, navigateOnPress, index }: PostComponentProps) => {
-  const size = Dimensions.get("window").width
   const [loaded, setLoaded] = useState(false)
   const [attachmentDimensions, setAttachmentDimensions] = useState({ height: 0, width: 0 })
   const navigation = useNavigation<NavigationProp<HomeTabParamList>>()
@@ -60,11 +61,11 @@ export const PostComponent = ({ post, navigateOnPress, index }: PostComponentPro
 
   const nativeAdViewRef = useRef<any>()
 
-  // useEffect(() => {
-  //   if (nativeAdViewRef?.current) {
-  //     nativeAdViewRef.current?.loadAd()
-  //   }
-  // }, [nativeAdViewRef.current])
+  useEffect(() => {
+    if (nativeAdViewRef?.current) {
+      nativeAdViewRef.current?.loadAd()
+    }
+  }, [nativeAdViewRef.current])
   return (
     <>
       <Pressable onPress={onContainerPress} style={$postContainer}>
@@ -108,14 +109,16 @@ export const PostComponent = ({ post, navigateOnPress, index }: PostComponentPro
           />
         </ShimmerPlaceHolder>
       </Pressable>
-      {/* {index % 5 === 0 && (
-        // <NativeAdView adUnitId={NATIVE_AD_UNIT_ID} ref={nativeAdViewRef} />
-        // <AppLovinMAX.AdView
-        //   adUnitId={MREC_AD_UNIT_ID}
-        //   adFormat={AppLovinMAX.AdFormat.BANNER}
-        //   style={$mrecStyle}
-        // />
-      )} */}
+      {index % 5 === 0 && (
+        <>
+        <NativeAdView ref={nativeAdViewRef} />
+        {/* <AppLovinMAX.AdView
+          adUnitId={MREC_AD_UNIT_ID}
+          adFormat={AppLovinMAX.AdFormat.BANNER}
+          // style={$mrecStyle}
+        ></AppLovinMAX.AdView> */}
+        </>
+      )}
     </>
   )
 }

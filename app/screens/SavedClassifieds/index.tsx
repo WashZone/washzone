@@ -11,8 +11,6 @@ import Share from "react-native-share"
 import { FlatList } from "react-native-gesture-handler"
 import { useStores } from "../../models"
 import { observer } from "mobx-react-lite"
-import * as Linking from "expo-linking"
-import { $flex1, $flexRow } from "../styles"
 import { ClassifiedsTabParamList, VideosTabParamList } from "../../tabs"
 
 interface ActionProps {
@@ -99,7 +97,7 @@ const SavedItem = ({ item, index, handleOnPress, refreshSavedClassifieds }) => {
           />
           <Text text={videoDetails?.description} weight="medium" size="xs" numberOfLines={1} />
           <Text text={videoDetails?.users?.name} style={$byText} />
-          <BottomActions data={item} type="video" />
+          <BottomActions data={item} type="video" refreshSavedClassifieds={refreshSavedClassifieds}/>
         </View>
       </ListItem>
     )

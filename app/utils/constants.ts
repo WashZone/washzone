@@ -5,7 +5,8 @@ export const storyUrl = {
 }
 
 export const messageMetadataType = {
-  incomingCallOffer: "incoming-call-offer",
+  incomingCallOfferAudio: "incoming-call-offer-audio",
+  incomingCallOfferVideo: "incoming-call-offer-video",
   incomingCallAnswer: "incoming-call-answer",
   hangUpCall: "hangup-call",
   classifiedOffer: "classified-offer",
