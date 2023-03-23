@@ -16,6 +16,14 @@ export const SearchStoreModel = types
   })
   .actions(withSetPropAction)
   .actions((self) => ({
+    isEmpty(){
+      let empty =  true;
+      if(self.searchResults.classifieds?.length > 0) {empty = false}
+      if(self.searchResults.users?.length > 0) {empty = false}
+      if(self.searchResults.topics?.length > 0) {empty = false}
+      if(self.searchResults.videos?.length > 0) {empty = false}
+      return empty
+    },
     setResults({
       classifieds,
       users,

@@ -24,7 +24,7 @@ import {
   P2PChat,
   AllChats,
   CallScreen,
-  VerifyOTP
+  VerifyOTP,
 } from "../screens"
 import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
 import { DrawerNavigator } from "./Drawer/DrawerNavigator"
@@ -41,7 +41,7 @@ export type AppStackParamList = {
   Settings: undefined
   ResetPassword: undefined
   ForgotPassword: undefined
-  VerifyOTP: {email:string}
+  VerifyOTP: { email: string }
   Saved: undefined
   UploadVideo: undefined
   AddAClassified: undefined
@@ -57,9 +57,9 @@ export type AppStackParamList = {
     roomId: string
     offer?: any
     answer?: any
-    cancelled ?: boolean
+    cancelled?: boolean
   }
-  TestNotification:undefined
+  TestNotification: undefined
 }
 
 const exitRoutes = Config.exitRoutes
@@ -80,6 +80,15 @@ const AppStack = observer(function AppStack() {
 
   const openUrl = () => {
     console.log("RUNNING OPEN URL", url)
+    if (url === "com.washzone://incomingcall/video/") {
+      navigationRef.navigate("CallScreen", {
+        mode: "video",
+        offer: undefined,
+        receiverId: "",
+        role: Role.receiver,
+        roomId: "",
+      })
+    }
     if (url !== null) {
       Linking.openURL(url)
     }

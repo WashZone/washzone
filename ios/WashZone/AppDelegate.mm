@@ -2,6 +2,8 @@
 #import "RNBootSplash.h"
 #import <FBSDKCoreKit/FBSDKCoreKit.h>
 #import <RNGoogleSignin/RNGoogleSignin.h>
+#import "RNCallKeep.h"
+
 #import <React/RCTBridge.h>
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
@@ -75,7 +77,9 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
 - (BOOL)application:(UIApplication *)application continueUserActivity:(nonnull NSUserActivity *)userActivity
  restorationHandler:(nonnull void (^)(NSArray<id<UIUserActivityRestoring>> * _Nullable))restorationHandler
 {
- return [RCTLinkingManager application:application
+ return [RNCallKeep application:application
+           continueUserActivity:userActivity
+           restorationHandler:restorationHandler] ||[RCTLinkingManager application:application
                   continueUserActivity:userActivity
                     restorationHandler:restorationHandler];
 }
@@ -128,6 +132,7 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
                              didFinishLaunchingWithOptions:launchOptions];
   return YES;
 }
+
 
 
 

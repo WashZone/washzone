@@ -188,6 +188,7 @@ export const AddAClassified: FC<AppStackScreenProps<"AddAClassified">> = functio
           maxLength={240}
           placeholder="Enter a short description here!"
           multiline
+          blurOnSubmit
         />
 
         <Dropdown

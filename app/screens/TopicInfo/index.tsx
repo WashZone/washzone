@@ -50,6 +50,7 @@ export const TopicInfo: FC<HomeTabProps<"TopicInfo">> = function PostInfo(props)
   }
 
   const onComment = async () => {
+    if (commentText?.length ===0)return 
     setIsCommenting(true)
     await postComment(commentText, selectedMedia ,  topicDetails?._id)
     await syncComments(topicDetails?._id)

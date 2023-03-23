@@ -102,8 +102,9 @@ export function useHooks() {
   } = useStores()
 
   const resetPassword = async ({ email, otp, password }) => {
-    console.log('password',password)
+    console.log('password',password, email, otp)
     const res = await mutateVerifyEmailByEmail({ email, otp, password })
+return res.verifyEmailByEmail?.Succes
   }
 
   const loadStories = async () => {

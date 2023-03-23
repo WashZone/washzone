@@ -9,9 +9,7 @@ import {
   ImageBackground,
   Alert,
 } from "react-native"
-import { Text } from "react-native-paper"
-import { Button } from "react-native-paper"
-import { TextInput } from "react-native-paper"
+import { Text, Button } from "../../components"
 
 import { useFocusEffect, useNavigation } from "@react-navigation/native"
 
@@ -31,9 +29,9 @@ import {
 import { AppStackScreenProps, goBack, navigationRef } from "../../navigators"
 import { observer } from "mobx-react-lite"
 import { useHooks } from "../hooks"
-import { colors } from "../../theme"
+import { colors, spacing } from "../../theme"
 import FastImage, { ImageStyle } from "react-native-fast-image"
-import { $contentCenter, $scaleFull } from "../styles"
+import { $contentCenter, $flexRow, $scaleFull } from "../styles"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { Actions, CallInititateModal } from "./partials"
 import { Ring } from "./partials/RInger"
@@ -64,8 +62,8 @@ export const CallScreen: FC<AppStackScreenProps<"CallScreen">> = observer(functi
 
   const safeArea = useSafeAreaInsets()
   console.log("OFFER FROM ", receiver?.name, offer)
-
   
+
   useEffect(() => {
     offer && setTestOffer(offer)
   }, [offer])
@@ -79,7 +77,7 @@ export const CallScreen: FC<AppStackScreenProps<"CallScreen">> = observer(functi
 
   // Fetching Receiver From Incoming Call Author's ID
   useEffect(() => {
-  InCallManager.start({media: mode});
+    InCallManager.start({ media: mode })
 
     if (role === Role.receiver) {
       // InCallManager.startRingtone("_BUNDLE_")
@@ -119,12 +117,13 @@ export const CallScreen: FC<AppStackScreenProps<"CallScreen">> = observer(functi
 
   useEffect(() => {
     console.log(":MUTING", status)
-    status !==CallStatus.processing &&  InCallManager.setMicrophoneMute(mute)
+    status !== CallStatus.processing && InCallManager.setMicrophoneMute(mute)
   }, [mute])
   useEffect(() => {
-    status !==CallStatus.processing && InCallManager.setForceSpeakerphoneOn(speaker)
+    status !== CallStatus.processing && InCallManager.setForceSpeakerphoneOn(speaker)
   }, [speaker])
 
+  
 
   const hangUp = async () => {
     await hangUpCall(roomId, receiverId)
@@ -352,7 +351,7 @@ export const CallScreen: FC<AppStackScreenProps<"CallScreen">> = observer(functi
     console.log("handleAnswer:handleAnswer", answer)
     setCalling(false)
     setCallActive(true)
-//     yourConn.current.setRemoteDescription(new RTCSessionDescription(JSON.parse(answer)))
+    //     yourConn.current.setRemoteDescription(new RTCSessionDescription(JSON.parse(answer)))
 
     yourConn.current.setRemoteDescription(new RTCSessionDescription(JSON.parse(answer)))
     setStatus(CallStatus.connected)
@@ -364,6 +363,7 @@ export const CallScreen: FC<AppStackScreenProps<"CallScreen">> = observer(functi
     // console.log('Candidate ----------------->', candidate);
     yourConn.current.addIceCandidate(new RTCIceCandidate(candidate))
   }
+
 
   // hang up
   // const hangUp = () => {
@@ -414,13 +414,12 @@ export const CallScreen: FC<AppStackScreenProps<"CallScreen">> = observer(functi
 
     yourConn.current.onicecandidate = null
     yourConn.current.ontrack = null
-    yourConn.current.setRemoteDescription(undefined)
-    yourConn.current.setLocalDescription(undefined)
+    yourConn.current.setRemoteDescription(null)
+    yourConn.current.setLocalDescription(null)
 
+    setRemoteStream({ toURL: () => null })
+    setLocalStream({ toURL: () => null })
     resetPeer()
-    initLocalVideo()
-    setRemoteStream(null)
-    setLocalStream(null)
     goBack()
 
     // console.log("Onleave");
@@ -513,26 +512,32 @@ export const CallScreen: FC<AppStackScreenProps<"CallScreen">> = observer(functi
         </Button>
       </View> */}
       <View style={$localVideoContainer}>
-        {remoteStream?.toURL() ? (
+        {remoteStream?.toURL() && mode === "video" ? (
           <RTCView
             streamURL={remoteStream ? remoteStream.toURL() : ""}
             style={$scaleFull}
             objectFit="cover"
-            
           />
         ) : (
-          <ImageBackground
-            source={{ uri: receiver?.picture }}
-            style={[$scaleFull, $contentCenter]}
-            resizeMode="cover"
-            blurRadius={20}
-          >
-            <Ring delay={0} />
-            <Ring delay={1000} />
-            <Ring delay={2000} />
-            <Ring delay={3000} />
-            <FastImage source={{ uri: receiver?.picture }} style={$receiverProfilePicture} />
-          </ImageBackground>
+          <>
+            <ImageBackground
+              source={{ uri: receiver?.picture }}
+              style={[$scaleFull, $contentCenter]}
+              resizeMode="cover"
+              blurRadius={20}
+            >
+              {status !== CallStatus.connected && (
+                <>
+                  <Ring delay={0} />
+                  <Ring delay={1000} />
+                  <Ring delay={2000} />
+                  <Ring delay={3000} />
+                </>
+              )}
+              <FastImage source={{ uri: receiver?.picture }} style={$receiverProfilePicture} />
+            </ImageBackground>
+            {status === CallStatus.connected && <Text text="Connected" />}
+          </>
         )}
         {mode === "video" && (
           <RTCView
@@ -594,9 +599,36 @@ export const CallScreen: FC<AppStackScreenProps<"CallScreen">> = observer(functi
             borderColor: "rgba(0, 0, 0, 0.1)",
           }}
         >
-          <Text>{otherId + " is calling you"}</Text>
-          <Button onPress={acceptCall}>Accept Call</Button>
-          <Button onPress={handleLeave}>Reject Call</Button>
+          <Text
+            text={"Incoming " + mode + " call !"}
+            weight="medium"
+            style={{ marginBottom: spacing.small, textAlign: "center" }}
+          />
+          <Text text={otherId} weight="semiBold" style={{ textAlign: "center" }} size="lg" />
+          <View style={[$flexRow, { marginTop: spacing.medium }]}>
+            <Button
+              onPress={handleLeave}
+              text={"Reject"}
+              style={{
+                marginHorizontal: spacing.small,
+                paddingVertical: spacing.small,
+                paddingHorizontal: spacing.medium,
+                backgroundColor: colors.palette.angry500,
+              }}
+              preset="reversed"
+            />
+            <Button
+              onPress={acceptCall}
+              text={"Accept"}
+              style={{
+                marginHorizontal: spacing.small,
+                paddingVertical: spacing.small,
+                paddingHorizontal: spacing.medium,
+                backgroundColor: colors.palette.success100,
+              }}
+              preset="reversed"
+            />
+          </View>
         </View>
       </Modal>
       <CallInititateModal

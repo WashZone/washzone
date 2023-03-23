@@ -122,6 +122,7 @@ export const UploadVideo: FC<AppStackScreenProps<"UploadVideo">> = function Uplo
           theme={$theme}
           placeholder="Enter a short description here!"
           numberOfLines={1}
+          blurOnSubmit
         />
 
         <TextInput

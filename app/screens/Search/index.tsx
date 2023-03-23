@@ -1,11 +1,11 @@
-import React, { FC, useCallback, useState } from "react"
+import React, { FC, useCallback, useEffect, useState } from "react"
 import { SectionList, TextStyle, TouchableOpacity, View, ViewStyle } from "react-native"
 import { observer } from "mobx-react-lite"
 import { ActivityIndicator, TextInput } from "react-native-paper"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { debounce } from "lodash"
 
-import { Button, Header, Icon, Screen, Text } from "../../components"
+import { Button, EmptyState, Header, Icon, Screen, Text } from "../../components"
 import { colors, spacing } from "../../theme"
 import { AppStackParamList, AppStackScreenProps } from "../../navigators"
 import { $flex1, $justifyCenter } from "../styles"
@@ -27,17 +27,30 @@ export const Search: FC<AppStackScreenProps<"Search">> = observer(function Searc
   const navigationVideos = useNavigation<NavigationProp<VideosTabParamList>>()
   const [searchKey, setSearchKey] = useState("")
   const [loading, setLoading] = useState(false)
-
+  const [noResultsFound, setNotResultsFound] = useState(false)
   const { searchKeyword } = useHooks()
   const {
-    searchStore: { searchResults, setResults },
+    searchStore: { searchResults, isEmpty, setResults },
   } = useStores()
+
+  useEffect(
+    () =>
+      debounce(() => {
+        console.log('IS EMPTY', isEmpty)
+        if (isEmpty() && searchKey !== "") setNotResultsFound(true)
+        else {
+          setNotResultsFound(false)
+        }
+      }, 600),
+    [isEmpty()],
+  )
+  console.log("search Reults", searchResults)
 
   const onSearch = async () => {
     if (searchKey.length > 2) {
       setLoading(true)
       await searchKeyword(searchKey)
-      setLoading(false)
+      setTimeout( () => setLoading(false), 1000)
     }
   }
 
@@ -46,7 +59,7 @@ export const Search: FC<AppStackScreenProps<"Search">> = observer(function Searc
       if (text.length > 1) {
         setLoading(true)
         await searchKeyword(text)
-        setLoading(false)
+        setTimeout( () => setLoading(false), 1000)
       }
     }, 600),
     [],
@@ -158,6 +171,7 @@ export const Search: FC<AppStackScreenProps<"Search">> = observer(function Searc
             onChangeText={onChangeText}
             contentStyle={$inputContent}
             onSubmitEditing={onSearch}
+            autoFocus
           />
           <Icon
             onPress={onSearch}
@@ -170,6 +184,8 @@ export const Search: FC<AppStackScreenProps<"Search">> = observer(function Searc
         <View style={$flex1}>
           {loading ? (
             <ActivityIndicator color={colors.palette.primary100} style={$loader} animating />
+          ) : noResultsFound ? (
+            <EmptyState preset="searchResults" buttonOnPress={() => navigation.goBack()}/>
           ) : (
             <SectionList
               showsVerticalScrollIndicator={false}
@@ -192,7 +208,7 @@ export const Search: FC<AppStackScreenProps<"Search">> = observer(function Searc
             style={$resetButton}
             textStyle={$resetText}
             onPress={() => {
-              setSearchKey('')
+              setSearchKey("")
               setResults({ classifieds: [], users: [], topics: [], videos: [] })
             }}
           />

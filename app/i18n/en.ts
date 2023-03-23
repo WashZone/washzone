@@ -46,6 +46,11 @@ const en = {
       content: "You currently have no new notifications, but keep an eye on this screen for updates and alerts. Stay in the loop with important information by checking your notifications regularly!",
       button: "Go Back!",
     },
+    searchResults:{
+      heading: "No Results Found!",
+      content: "We're sorry, but we couldn't find any items that match your search. Please adjust your search criteria and try again.",
+      button: "Go Back!",
+    },
   },
 
   errors: {

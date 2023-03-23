@@ -26,7 +26,25 @@ import { Platform } from "react-native"
 import AppLovinMAX from "react-native-applovin-max/src/index"
 import { useHooks } from "./screens/hooks"
 import Toast from "react-native-toast-message"
-import { notificationHandler } from "./utils"
+import { configureNotifications, notificationHandler } from "./utils"
+import RNCallKeep from "react-native-callkeep"
+import { IncomingCallHook } from "./utils/incomingCall"
+
+const options = {
+  ios: {
+    appName: "Washzone",
+  },
+  android: {
+    alertTitle: "Permissions required",
+    alertDescription: "This application needs to access your phone accounts",
+    cancelButton: "Cancel",
+    okButton: "ok",
+    imageName: "phone_account_icon",
+    additionalPermissions: [],
+  },
+}
+RNCallKeep.setup(options).then((res) => console.log("RNCALLKEEPRESPOK OK", res))
+RNCallKeep.setAvailable(true)
 
 // configureNotifications()
 
@@ -56,7 +74,7 @@ const config = {
 interface AppProps {
   hideSplashScreen: () => Promise<void>
 }
- notificationHandler()
+notificationHandler()
 
 function App(props: AppProps) {
   const { hideSplashScreen } = props
@@ -65,10 +83,47 @@ function App(props: AppProps) {
     "U0OTon6ehwaUryCOnQkOPUyWxZJn8XLdTl5KVBzC5ThxUuJGI2fhWbDS9XEI4ZxcI0xpCu0IRhEwZTBtarZ5Rn"
 
   const [AppLovinSDKRegistered, setAppLovinSDKRegistered] = React.useState(false)
+
+  const { backToForeground, endIncomingcallAnswer, displayIncomingCall, configure } =
+  IncomingCallHook()
+// const { callerInfo, type, mode } = JSON.parse(remoteMessage.data.info)
+// Linking.openURL(`com.washzone://incomingcall/video/`)
+
+// if (type === messageMetadataType.incomingCallOfferVideo) {
+  const incomingCallAnswer = ({ callUUID }) => {
+    console.log("UUID", callUUID)
+    backToForeground()
+    // updateCallStatus({
+    //   callerInfo,
+    //   type: "ACCEPTED",
+    // });
+    endIncomingcallAnswer()
+    Linking.openURL(`com.washzone://incomingcall/video/`).catch((err) => {
+      // Toast.show(`Error`, err);
+      console.log(err)
+    })
+  }
+
+  const endIncomingCall = () => {
+    endIncomingcallAnswer()
+    // updateCallStatus({ callerInfo, type: "REJECTED" });
+  }
+
+  
   useEffect(() => {
-    if (AppLovinSDKRegistered) return;
-    AppLovinMAX.setTestDeviceAdvertisingIds([]);
-   
+    configure(incomingCallAnswer, endIncomingCall)
+    // displayIncomingCall(callerInfo.name)
+    displayIncomingCall("TEST JIRAZO")
+    // backToForeground()
+    // RNCallKeep.setAvailable(true)
+
+    // if (Platform.OS === "android") {
+    //   OverlayPermissionModule.requestOverlayPermission();
+    // }
+
+    if (AppLovinSDKRegistered) return
+    AppLovinMAX.setTestDeviceAdvertisingIds([])
+
     // navigationRef.navigate('TestNotification')
     // MAX Consent Flow for iOS 14.5+
 

@@ -7,6 +7,7 @@ import { AppStackParamList, AppStackScreenProps } from "../../navigators"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { useHooks } from "../hooks"
 import OTPTextInput from "react-native-otp-textinput"
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 
 export const VerifyOTP: FC<AppStackScreenProps<"VerifyOTP">> = function VerifyOTP(props) {
   const { email } = props.route.params
@@ -21,94 +22,109 @@ export const VerifyOTP: FC<AppStackScreenProps<"VerifyOTP">> = function VerifyOT
 
   const onReset = async () => {
     setButtonLoading(true)
-
+    if (newPass.length < 8) {
+      setButtonLoading(false)
+      setError("Password should be over 8 digits!")
+      return
+    }
     if (newPass !== confirmPass) {
       setButtonLoading(false)
       setError("Passwords do not match!")
       return
     }
     try {
-      await resetPassword({ email, otp, password: newPass })
-      Alert.alert("Success!", "Your password has been changed successfully. Please Login!")
-      navigation.navigate('Login')
-      setButtonLoading(false)
+      const sucess = await resetPassword({ email, otp, password: newPass })
+      if (sucess) {
+        Alert.alert("Success!", "Your password has been changed successfully. Please Login!")
+        navigation.navigate("Login")
+        setButtonLoading(false)
+        
+      } else {
+      Alert.alert('Invalid Otp !')
+
+        setButtonLoading(false)
+      }
     } catch (e) {
+      Alert.alert('Something Went Wrong!')
       console.log("erroer", e)
       setButtonLoading(false)
     }
   }
 
   return (
-    <Screen preset="fixed" contentContainerStyle={$container}>
-      <Header
-        leftIcon="caretLeft"
-        title="Reset Password"
-        titleStyle={$titleStyle}
-        onLeftPress={() => navigation.goBack()}
-        leftIconColor={colors.palette.neutral600}
-      />
+    <View style={[$container, { backgroundColor: colors.background }]}>
+      <KeyboardAwareScrollView contentContainerStyle={{ backgroundColor: colors.background }}>
+        <Header
+          containerStyle={{ backgroundColor: colors.background }}
+          leftIcon="caretLeft"
+          title="Reset Password"
+          titleStyle={$titleStyle}
+          onLeftPress={() => navigation.goBack()}
+          leftIconColor={colors.palette.neutral600}
+        />
 
-      <View style={$content}>
-        <View style={$topContainer}>
-          <View style={$seperator} />
-          <Icon icon="key" size={53} />
-          <View style={$seperator} />
+        <View style={$content}>
+          <View style={$topContainer}>
+            <View style={$seperator} />
+            <Icon icon="key" size={53} />
+            <View style={$seperator} />
+          </View>
+
+          <Text text="Enter New Password" weight="bold" style={$title} />
+          <Text text={`OTP has been sent to ${email}.`} weight="medium" style={$description} />
+
+          <Text text={error} size="xxs" color={colors.palette.angry500} />
+
+          <TextField
+            value={newPass}
+            onChangeText={setNewPass}
+            containerStyle={$inputText}
+            autoCapitalize="none"
+            autoCorrect={false}
+            placeholder="New Password"
+            style={$inputText}
+            inputWrapperStyle={$inputWrapperStyle}
+            placeholderTextColor={colors.palette.overlay50}
+            maxLength={100}
+          />
+
+          <TextField
+            value={confirmPass}
+            onChangeText={setConfirmPass}
+            containerStyle={$inputText}
+            autoCapitalize="none"
+            autoCorrect={false}
+            placeholder="Confirm Password"
+            style={$inputText}
+            inputWrapperStyle={$inputWrapperStyle}
+            placeholderTextColor={colors.palette.overlay50}
+            maxLength={20}
+          />
+
+          <OTPTextInput handleTextChange={setOtp} />
+          <Button
+            onPress={onReset}
+            disabled={buttonLoading}
+            style={[
+              $submitButton,
+              {
+                backgroundColor: colors.palette.primary100,
+              },
+            ]}
+            text={"Reset"}
+            textStyle={$textButton}
+            RightAccessory={() => (
+              <ActivityIndicator
+                animating={buttonLoading}
+                size={20}
+                style={$indicator}
+                color={colors.palette.neutral100}
+              />
+            )}
+          />
         </View>
-
-        <Text text="Enter New Password" weight="bold" style={$title} />
-        <Text text={`OTP has been sent to ${email}.`} weight="medium" style={$description} />
-
-        <Text text={error} size="xxs" color={colors.palette.angry500} />
-
-        <TextField
-          value={newPass}
-          onChangeText={setNewPass}
-          containerStyle={$inputText}
-          autoCapitalize="none"
-          autoCorrect={false}
-          placeholder="New Password"
-          style={$inputText}
-          inputWrapperStyle={$inputWrapperStyle}
-          placeholderTextColor={colors.palette.overlay50}
-          maxLength={100}
-        />
-
-        <TextField
-          value={confirmPass}
-          onChangeText={setConfirmPass}
-          containerStyle={$inputText}
-          autoCapitalize="none"
-          autoCorrect={false}
-          placeholder="Confirm Password"
-          style={$inputText}
-          inputWrapperStyle={$inputWrapperStyle}
-          placeholderTextColor={colors.palette.overlay50}
-          maxLength={20}
-        />
-
-        <OTPTextInput handleTextChange={setOtp} />
-        <Button
-          onPress={onReset}
-          disabled={buttonLoading}
-          style={[
-            $submitButton,
-            {
-              backgroundColor: colors.palette.primary100,
-            },
-          ]}
-          text={"Reset"}
-          textStyle={$textButton}
-          RightAccessory={() => (
-            <ActivityIndicator
-              animating={buttonLoading}
-              size={20}
-              style={$indicator}
-              color={colors.palette.neutral100}
-            />
-          )}
-        />
-      </View>
-    </Screen>
+      </KeyboardAwareScrollView>
+    </View>
   )
 }
 

@@ -1,44 +1,45 @@
 // import notifee, { TimestampTrigger, TriggerType, RepeatFrequency } from "@notifee/react-native"
 import messaging, { FirebaseMessagingTypes } from "@react-native-firebase/messaging"
 
-import PushNotification from 'react-native-push-notification';
-import PushNotificationIOS from '@react-native-community/push-notification-ios';
-import { useHooks } from '../screens/hooks';
+import PushNotification from "react-native-push-notification"
+import PushNotificationIOS from "@react-native-community/push-notification-ios"
+import { useHooks } from "../screens/hooks"
+import { IncomingCallHook } from "./incomingCall"
+import * as Linking from "expo-linking"
+import { messageMetadataType } from "./constants"
+import { useEffect } from "react"
+import { Alert } from "react-native"
 
 const configureNotifications = () => {
+ 
 
-//  const  { updateNotificationToken} = useHooks()
- PushNotification.configure({
+  //  const  { updateNotificationToken} = useHooks()
+  // const configure =() => PushNotification.configure({
+  //   onRegister: function (token) {
+  //     // process token
+  //     //  updateNotificationToken(token)
+  //     console.log("TOKEN", token)
+  //   },
 
-   onRegister: function(token) {
-     //process token
-    //  updateNotificationToken(token)
-     console.log("TOKEN", token)
-   },
+  //   onNotification: function (notification) {
+  //     // process the notification
+  //     // required on iOS only
+  //     notification.finish(PushNotificationIOS.FetchResult.NoData)
+  //   },
 
-   onNotification: function(notification) {
-     // process the notification
-     // required on iOS only
-     notification.finish(PushNotificationIOS.FetchResult.NoData);
-   },
+  //   permissions: {
+  //     alert: true,
+  //     badge: true,
+  //     sound: true,
+  //   },
 
-   permissions: {
-     alert: true,
-     badge: true,
-     sound: true
-   },
+  //   popInitialNotification: true,
+  //   requestPermissions: true,
+  // })
+  return { callListener }
+}
 
-   popInitialNotification: true,
-   requestPermissions: true,
-
- });
-};
-
-
-
-export {
- configureNotifications,
-};
+export { configureNotifications }
 
 // async function displayNotification({ title, body }: { title: string; body: string }) {
 //   // Create a channel required for Android Notifications
@@ -150,19 +151,19 @@ export {
 // }
 
 export const notificationHandler = async () => {
-    const authStatus = await messaging().requestPermission();
-    const enabled =
-      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
-  
-    if (enabled) {
-      console.log('Authorization status:', authStatus);
-    }
+  const authStatus = await messaging().requestPermission()
+  const enabled =
+    authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+    authStatus === messaging.AuthorizationStatus.PROVISIONAL
+
+  if (enabled) {
+    console.log("Authorization status:", authStatus)
+  }
 
   if (!messaging().isDeviceRegisteredForRemoteMessages) {
-    await messaging().registerDeviceForRemoteMessages();
+    await messaging().registerDeviceForRemoteMessages()
   }
-  
+
   const token = await messaging().getToken()
   console.log("FCM TOKEN", token)
 

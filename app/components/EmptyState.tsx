@@ -1,7 +1,7 @@
 import React from "react"
 import { Image, ImageProps, ImageStyle, StyleProp, TextStyle, View, ViewStyle } from "react-native"
 import { translate } from "../i18n"
-import { $flex1 } from "../screens/styles"
+import { $flex1, $justifyCenter } from "../screens/styles"
 import { spacing } from "../theme"
 import { Button, ButtonProps } from "./Button"
 import { Text, TextProps } from "./Text"
@@ -127,6 +127,13 @@ const EmptyStatePresets = {
     content: translate("emptyStateComponent.notifications.content"),
     button: translate("emptyStateComponent.notifications.button"),
   },
+  searchResults: 
+  {
+    imageSource: sadFace,
+    heading: translate("emptyStateComponent.searchResults.heading"),
+    content: translate("emptyStateComponent.searchResults.content"),
+    button: translate("emptyStateComponent.searchResults.button"),
+  },
 } as const
 
 /**
@@ -166,7 +173,7 @@ export function EmptyState(props: EmptyStateProps) {
   const isContentPresent = !!(content || contentTx)
   const isButtonPresent = !!(button || buttonTx)
 
-  const $containerStyles = [$flex1, { justifyContent: "center" }, $containerStyleOverride]
+  const $containerStyles = [$flex1, $justifyCenter, $containerStyleOverride]
   const $imageStyles = [
     $image,
     (isHeadingPresent || isContentPresent || isButtonPresent) && { marginBottom: spacing.micro },
