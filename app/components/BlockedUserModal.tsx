@@ -19,7 +19,6 @@ export const BlockedUserModal = ({ isVisible }: { isVisible: boolean }) => {
       <Screen backgroundColor={colors.transparent} contentContainerStyle={$parentContainer}>
         <View style={$contentContainer}>
           <Text text={"You have been blocked!"} style={$headerTitle} weight="semiBold" size="md" />
-          {/* <Text text={"Contact us via email!"} weight="semiBold" /> */}
           <Button
             onPress={contactViaEmail}
             style={[$submitButton, { backgroundColor: colors.palette.primary100 }]}

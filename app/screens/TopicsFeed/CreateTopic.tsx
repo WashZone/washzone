@@ -156,7 +156,7 @@ export function CreateTopic() {
   return (
     <>
       <View style={$container}>
-        <FastImage source={{ uri: picture }} style={$picture} resizeMode="contain" />
+        <FastImage source={{ uri: picture }} style={$picture} resizeMode='cover' />
         <View style={$contentContainer}>
           <TextField
             value={topicTitle}

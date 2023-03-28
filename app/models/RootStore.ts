@@ -1,7 +1,7 @@
 import { Instance, SnapshotOut, types } from "mobx-state-tree"
 import { AuthenticationStoreModel } from "./AuthenticationStore"
 import { UserStoreModel } from "./UserStore"
-import { RootStore as APIRootStore,  usersChatModelPrimitives } from "./api"
+import { RootStore as APIRootStore, usersChatModelPrimitives } from "./api"
 import { createHttpClient } from "mst-gql"
 import { FeedStoreModel } from "./FeedStore"
 import { TopicsStoreModel } from "./TopicsStore"
@@ -14,9 +14,6 @@ import { SearchStoreModel } from "./SearchStore"
 import { SubscriptionClient } from "subscriptions-transport-ws"
 import { ChatRoomStoreModel } from "./ChatRoomStore"
 import { withSetPropAction } from "./helpers/withSetPropAction"
-import { navigationRef } from "../navigators"
-import { Role } from "../screens"
-import { messageMetadataType } from "../utils"
 import { CallStoreModel } from "./CallStore"
 
 const baseURL = "http://18.219.176.209:3002"
@@ -52,12 +49,9 @@ export const RootStoreModel = types
   })
   .actions(withSetPropAction)
   .actions((self) => ({
-
     subscribeAll() {
       console.log("SUBSCRIBING", self.userStore.name, self.userStore._id)
-      // const navigation = useNavigation<NavigationProp<AppStackParamList>>()
       self.api.subscribeNewuserchat(
-        // { authorId: self.userStore._id },
         { userId: self.userStore._id },
         usersChatModelPrimitives
           .roomId("_id")
@@ -66,54 +60,26 @@ export const RootStoreModel = types
           .toString(),
         // Handling New Message Arrival
         async (message) => {
-          // if(message.)
-          /* eslint-disable */
           console.log("SUBSCRIBED", self.userStore.name, JSON.stringify(message))
-          if (message?.authorId?._id !== self.userStore._id) {
-            console.log("FIRS FOR LOOP IN TO message?.authorId?._id !== self.userStore._id")
-            if (message?.metaData?.metaDataType === messageMetadataType.incomingCallOfferAudio) {
-              navigationRef.navigate("CallScreen", {
-                mode: "audio",
-                receiverId: message?.authorId?._id,
-                role: Role.receiver,
-                roomId: message?.roomId?._id,
-                offer: message?.metaData?.data,
-              })
-              // self.callStore.setOffer(message?.metaData?.data)
-            }
-            if (message?.metaData?.metaDataType === messageMetadataType.incomingCallOfferVideo) {
-              navigationRef.navigate("CallScreen", {
-                mode: "video",
-                receiverId: message?.authorId?._id,
-                role: Role.receiver,
-                roomId: message?.roomId?._id,
-                offer: message?.metaData?.data,
-              })
-              // self.callStore.setOffer(message?.metaData?.data)
-            }
-            if (message?.metaData?.metaDataType === messageMetadataType.incomingCallAnswer) {
-              self.callStore.setAnswer(message?.metaData?.data)
-              navigationRef.current.setParams({ answer: message?.metaData?.data })
-            }
-            if (message?.metaData?.metaDataType === messageMetadataType.hangUpCall) {
-              // self.callStore.setOngoingCall(false)
-              // navigationRef.current.setParams({ answer: message?.metaData?.data })
-              navigationRef.current.setParams({ cancelled: true })
-            }
-          }
           console.log("roomId:chatMessages", message?.roomId?._id)
           console.log("allChats:chatMessages", self.allChats.chatMessages[message?.roomId?._id])
-          const isNewRoom =  (!self.allChats.chatMessages[message?.roomId?._id]?.length)|| (self.allChats.chatMessages[message?.roomId?._id]?.length === 0) 
+          const isNewRoom =
+            !self.allChats.chatMessages[message?.roomId?._id]?.length ||
+            self.allChats.chatMessages[message?.roomId?._id]?.length === 0
           if (isNewRoom) {
             const res = await self.api.mutateGetroomByUsers({ memberId: self.userStore._id })
             console.log("SYNCING ALL CHATS IN ROOTSTORE", JSON.stringify(res))
             self.allChats.setChatRooms(res.getroomByUsers?.data)
           }
-         setTimeout( () =>  message?.roomId &&
-            self.allChats.addToMessages({
-              roomId: message?.roomId?._id as string,
-              message: message,
-            }), isNewRoom ? 2000 : 0)
+          setTimeout(
+            () =>
+              message?.roomId &&
+              self.allChats.addToMessages({
+                roomId: message?.roomId?._id as string,
+                message,
+              }),
+            isNewRoom ? 2000 : 0,
+          )
         },
         (err) => console.log("ERRR", err),
       )

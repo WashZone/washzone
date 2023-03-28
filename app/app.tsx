@@ -83,37 +83,9 @@ function App(props: AppProps) {
     "U0OTon6ehwaUryCOnQkOPUyWxZJn8XLdTl5KVBzC5ThxUuJGI2fhWbDS9XEI4ZxcI0xpCu0IRhEwZTBtarZ5Rn"
 
   const [AppLovinSDKRegistered, setAppLovinSDKRegistered] = React.useState(false)
-
-  const { backToForeground, endIncomingcallAnswer, displayIncomingCall, configure } =
-  IncomingCallHook()
-// const { callerInfo, type, mode } = JSON.parse(remoteMessage.data.info)
-// Linking.openURL(`com.washzone://incomingcall/video/`)
-
-// if (type === messageMetadataType.incomingCallOfferVideo) {
-  const incomingCallAnswer = ({ callUUID }) => {
-    console.log("UUID", callUUID)
-    backToForeground()
-    // updateCallStatus({
-    //   callerInfo,
-    //   type: "ACCEPTED",
-    // });
-    endIncomingcallAnswer()
-    Linking.openURL(`com.washzone://incomingcall/video/`).catch((err) => {
-      // Toast.show(`Error`, err);
-      console.log(err)
-    })
-  }
-
-  const endIncomingCall = () => {
-    endIncomingcallAnswer()
-    // updateCallStatus({ callerInfo, type: "REJECTED" });
-  }
-
   
   useEffect(() => {
-    configure(incomingCallAnswer, endIncomingCall)
-    // displayIncomingCall(callerInfo.name)
-    displayIncomingCall("TEST JIRAZO")
+    
     // backToForeground()
     // RNCallKeep.setAvailable(true)
 

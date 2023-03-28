@@ -52,7 +52,7 @@ export type AppStackParamList = {
   P2PChat: { receiver: any; roomId: string | undefined }
   CallScreen: {
     mode: "audio" | "video"
-    receiverId: string
+    receiver: any
     role: Role
     roomId: string
     offer?: any
@@ -75,25 +75,20 @@ const AppStack = observer(function AppStack() {
   const {
     authenticationStore: { isAuthenticated, isBlocked },
   } = useStores()
-  const { onLoggedInBoot } = useHooks()
+  const { onLoggedInBoot, getRoomById, getUserById } = useHooks()
+
   const url = Linking.useURL()
 
-  const openUrl = () => {
+  const openUrl = async () => {
     console.log("RUNNING OPEN URL", url)
-    if (url === "com.washzone://incomingcall/video/") {
-      navigationRef.navigate("CallScreen", {
-        mode: "video",
-        offer: undefined,
-        receiverId: "",
-        role: Role.receiver,
-        roomId: "",
-      })
-    }
-    if (url !== null) {
-      Linking.openURL(url)
-    }
+    if (url === null) return
+
   }
-  useEffect(() => openUrl(), [url])
+
+  useEffect(() => {
+    openUrl()
+  }, [url])
+
   useEffect(() => {
     isAuthenticated && onLoggedInBoot()
   }, [isAuthenticated])

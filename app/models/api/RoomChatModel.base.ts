@@ -27,6 +27,8 @@ export const RoomChatModelBase = ModelBase
     updatedAt: types.union(types.undefined, types.frozen()),
     membersId: types.union(types.undefined, types.null, types.array(types.late((): any => UsersModel))),
     roomType: types.union(types.undefined, types.null, types.string),
+    offer: types.union(types.undefined, types.null, types.string),
+    answer: types.union(types.undefined, types.null, types.string),
     adminId: types.union(types.undefined, types.null, types.late((): any => UserModel)),
     latestMessage: types.union(types.undefined, types.null, types.late((): any => UsersChatModel)),
     chatId: types.union(types.undefined, types.null, types.late((): any => UsersChatModel)),
@@ -42,6 +44,8 @@ export class RoomChatModelSelector extends QueryBuilder {
   get createdAt() { return this.__attr(`createdAt`) }
   get updatedAt() { return this.__attr(`updatedAt`) }
   get roomType() { return this.__attr(`roomType`) }
+  get offer() { return this.__attr(`offer`) }
+  get answer() { return this.__attr(`answer`) }
   membersId(builder: string | UsersModelSelector | ((selector: UsersModelSelector) => UsersModelSelector) | undefined) { return this.__child(`membersId`, UsersModelSelector, builder) }
   adminId(builder: string | UserModelSelector | ((selector: UserModelSelector) => UserModelSelector) | undefined) { return this.__child(`adminId`, UserModelSelector, builder) }
   latestMessage(builder: string | UsersChatModelSelector | ((selector: UsersChatModelSelector) => UsersChatModelSelector) | undefined) { return this.__child(`latestMessage`, UsersChatModelSelector, builder) }
@@ -51,4 +55,4 @@ export function selectFromRoomChat() {
   return new RoomChatModelSelector()
 }
 
-export const roomChatModelPrimitives = selectFromRoomChat()._id.createdAt.updatedAt.roomType
+export const roomChatModelPrimitives = selectFromRoomChat()._id.createdAt.updatedAt.roomType.offer.answer

@@ -44,6 +44,7 @@ export const UsersChatModelBase = ModelBase
     mimeType: types.union(types.undefined, types.null, types.string),
     notificationMessage: types.union(types.undefined, types.null, types.late((): any => NotificationModel)),
     notificationToken: types.union(types.undefined, types.null, types.string),
+    data: types.union(types.undefined, types.null, types.string),
     metaData: types.union(types.undefined, types.null, types.late((): any => MetaDataModel)),
   })
   .views(self => ({
@@ -67,6 +68,7 @@ export class UsersChatModelSelector extends QueryBuilder {
   get text() { return this.__attr(`text`) }
   get mimeType() { return this.__attr(`mimeType`) }
   get notificationToken() { return this.__attr(`notificationToken`) }
+  get data() { return this.__attr(`data`) }
   authorId(builder: string | UserModelSelector | ((selector: UserModelSelector) => UserModelSelector) | undefined) { return this.__child(`authorId`, UserModelSelector, builder) }
   roomId(builder: string | RoomChatModelSelector | ((selector: RoomChatModelSelector) => RoomChatModelSelector) | undefined) { return this.__child(`roomId`, RoomChatModelSelector, builder) }
   membersId(builder: string | UsersModelSelector | ((selector: UsersModelSelector) => UsersModelSelector) | undefined) { return this.__child(`membersId`, UsersModelSelector, builder) }
@@ -77,4 +79,4 @@ export function selectFromUsersChat() {
   return new UsersChatModelSelector()
 }
 
-export const usersChatModelPrimitives = selectFromUsersChat()._id.createdAt.updatedAt.messageType.status.height.name.size.uri.width.previewData.text.mimeType.notificationToken
+export const usersChatModelPrimitives = selectFromUsersChat()._id.createdAt.updatedAt.messageType.status.height.name.size.uri.width.previewData.text.mimeType.notificationToken.data

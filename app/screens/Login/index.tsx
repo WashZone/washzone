@@ -25,8 +25,8 @@ const Logo = ({ animVal }: LogoProps) => {
   const AnimatedImage = Animated.createAnimatedComponent(Image)
 
   const animatedLogo = useAnimatedStyle(() => {
-    const height = interpolate(animVal.value, [0, 1], [212, 150])
-    const width = interpolate(animVal.value, [0, 1], [212, 150])
+    const height = interpolate(animVal.value, [0, 1], [212, 120])
+    const width = interpolate(animVal.value, [0, 1], [212, 120])
 
     return {
       height,
@@ -114,7 +114,7 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
   return (
     <Screen
       androidKeyboardBehavior="height"
-      keyboardOffset={-250}
+      keyboardOffset={-265}
       preset="fixed"
       contentContainerStyle={$screenContentContainer}
     >

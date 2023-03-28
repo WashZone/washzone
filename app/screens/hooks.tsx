@@ -85,7 +85,7 @@ export function useHooks() {
       queryGetratingOnUserId,
       queryGetSearchedItem,
       queryGetAllLegalitiesData,
-      mutateGetroomByUserId,
+      mutateAddOfferanswerInRoom,
       mutateGetchatByRoomId,
       mutateGetroomByUsers,
       mutateCreateUserMessage,
@@ -97,14 +97,16 @@ export function useHooks() {
       mutateDeleteChatRoom,
       mutateSetNotificationStatus,
       mutateVerifyEmailByEmail,
+      mutateSendCallNotification,
+      mutateGetroomByroomId,
     },
     userStore,
   } = useStores()
 
   const resetPassword = async ({ email, otp, password }) => {
-    console.log('password',password, email, otp)
+    console.log("password", password, email, otp)
     const res = await mutateVerifyEmailByEmail({ email, otp, password })
-return res.verifyEmailByEmail?.Succes
+    return res.verifyEmailByEmail?.Succes
   }
 
   const loadStories = async () => {
@@ -127,7 +129,7 @@ return res.verifyEmailByEmail?.Succes
 
   const loadMoreHomeFeed = async () => {
     const res = await queryGetAllHomePagesByPageNumber(
-      { pageNumber: parseInt((feedTopics.length / 10).toFixed(0)) },
+      { pageNumber: parseInt((feedTopics.length / 10 + 1).toFixed(0)) },
       { fetchPolicy: "network-only" },
     )
     const morePosts = res.getAllHomePagesByPageNumber?.data
@@ -185,12 +187,10 @@ return res.verifyEmailByEmail?.Succes
 
   const loadMoreClassified = async () => {
     const res = await queryGetAllClassifiedFeed(
-      { pageNumber: parseInt((classifieds.length / 10).toFixed(0)) },
+      { pageNumber: parseInt((classifieds.length / 10 + 1).toFixed(0)) },
       { fetchPolicy: "no-cache" },
     )
-
     const moreClassified = res.getAllClassifiedFeed?.data
-
     if (res.getAllClassifiedFeed.totalCount > classifieds?.length) {
       addToClassfieds(moreClassified)
     }
@@ -209,13 +209,14 @@ return res.verifyEmailByEmail?.Succes
   const loadMoreTopics = async () => {
     console.log("LOAD MORE TOPICS")
     const res = await queryGetAllTopicByPageNumber(
-      { pageNumber: parseInt((topics.length / 10).toFixed(0)) },
+      { pageNumber: parseInt((topics.length / 10 + 1).toFixed(0)) },
       { fetchPolicy: "no-cache" },
     )
 
     const moreTopics = res.getAllTopicByPageNumber?.data
     if (res.getAllTopicByPageNumber.totalCount > topics?.length) {
       addToTopics(moreTopics)
+      await syncInteractedVideosAndTopics()
     }
   }
 
@@ -994,7 +995,7 @@ return res.verifyEmailByEmail?.Succes
         messageType: "custom",
         metaData: {
           metaDataType: messageMetadataType.classifiedOffer,
-          amount: amount,
+          amount,
           currency: "$",
           data: JSON.stringify(classifiedData),
         },
@@ -1072,7 +1073,41 @@ return res.verifyEmailByEmail?.Succes
   const getNotificationStatus = async () =>
     await mutateSetNotificationStatus({ userId: userStore._id, notificationStatus: true })
 
+  const sendSilentAlert = async (
+    token: string,
+    type: string,
+    roomId: string,
+    data: { offer?: string; answer?: string },
+  ) => {
+    const resAddConnectionData = await mutateAddOfferanswerInRoom({ ...data, roomId })
+    console.log("resAddConnectionData", resAddConnectionData)
+
+    console.log("mutateSendCallNotification:Input", token, " \n ", type, " \n ", roomId)
+    const { _id, name } = userStore
+    const res = await mutateSendCallNotification({
+      data: {
+        roomId,
+        type,
+        receiver: JSON.stringify({ _id, name }),
+      },
+      notificationToken: token,
+    })
+    console.log("mutateSendCallNotification", res)
+  }
+
+  const getRoomById = async (roomId: string) => {
+    try {
+      const res = await mutateGetroomByroomId({ roomId })
+      console.log("RES::getRoomById", res.getroomByroomId?.data[0])
+      return res.getroomByroomId?.data[0]
+    } catch (err) {
+      Alert.alert("Unable to Establish Connection!", "Please try again.")
+    }
+  }
+
   return {
+    getRoomById,
+    sendSilentAlert,
     getMoreChatMessages,
     loadMoreHomeFeed,
     getAndUpdateHomeFeed,
@@ -1133,4 +1168,11 @@ return res.verifyEmailByEmail?.Succes
     getNotificationStatus,
     resetPassword,
   }
+}
+
+export const enum CallTypes {
+  videoOffer = "video-offer",
+  audioOffer = "audio-offer",
+  answer = "call-answer",
+  hangup = "hangup",
 }

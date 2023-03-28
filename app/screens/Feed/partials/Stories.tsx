@@ -92,6 +92,7 @@ export const Stories = observer(() => {
   return (
     <View style={$container}>
       <FlatList
+        removeClippedSubviews
         data={stories}
         horizontal
         renderItem={({ item, index }) => (

@@ -83,7 +83,7 @@ export function Text(props: TextProps) {
     $fontWeightStyles[weight],
     $sizeStyles[size],
     $styleOverride,
-    color && { color: color },
+    color && { color },
   ]
 
   return (

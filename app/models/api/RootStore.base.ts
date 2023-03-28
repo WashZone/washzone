@@ -122,7 +122,11 @@ export type InputCallMetaData = {
   classifiedId?: (string | null)
   amount?: (string | null)
   currency?: (string | null)
-  data?: (string | null)
+}
+export type Inputdata = {
+  receiver?: (string | null)
+  roomId?: (string | null)
+  type?: (string | null)
 }
 export type InputHomePage = {
   Discription?: (string | null)
@@ -141,7 +145,6 @@ type Refs = {
 */
 export enum RootStoreBaseQueries {
 queryHello="queryHello",
-queryGetUserByEmail="queryGetUserByEmail",
 queryGetAllUsers="queryGetAllUsers",
 queryGetAdmin="queryGetAdmin",
 queryGetAllUsersAdmin="queryGetAllUsersAdmin",
@@ -230,6 +233,7 @@ mutateUpdateLikeViews="mutateUpdateLikeViews",
 mutateUpdateUserTopic="mutateUpdateUserTopic",
 mutateLikeDislikeTopic="mutateLikeDislikeTopic",
 mutateCreateStory="mutateCreateStory",
+mutateDeleteStory="mutateDeleteStory",
 mutateUploadVideoByUser="mutateUploadVideoByUser",
 mutateGetUploadVideoByUserId="mutateGetUploadVideoByUserId",
 mutateGetUploadVideoByVideoId="mutateGetUploadVideoByVideoId",
@@ -261,11 +265,14 @@ mutateUpdateRating="mutateUpdateRating",
 mutateCreateChatRoom="mutateCreateChatRoom",
 mutateCreateUserMessage="mutateCreateUserMessage",
 mutateCreateUserCall="mutateCreateUserCall",
+mutateSendCallNotification="mutateSendCallNotification",
+mutateAddOfferanswerInRoom="mutateAddOfferanswerInRoom",
 mutateGetchatByUserId="mutateGetchatByUserId",
 mutateGetchatByRoomId="mutateGetchatByRoomId",
 mutateGetcallByUserId="mutateGetcallByUserId",
 mutateGetCallByRoomId="mutateGetCallByRoomId",
 mutateGetroomByUserId="mutateGetroomByUserId",
+mutateGetroomByroomId="mutateGetroomByroomId",
 mutateGetroomByUsers="mutateGetroomByUsers",
 mutateGetroomBymembers="mutateGetroomBymembers",
 mutateDeleteChatMessage="mutateDeleteChatMessage",
@@ -290,11 +297,6 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
   .actions(self => ({
     queryHello(variables?: {  }, options: QueryOptions = {}) {
       return self.query<{ hello: string }>(`query hello { hello }`, variables, options)
-    },
-    queryGetUserByEmail(variables: { email: string }, resultSelector: string | ((qb: UserModelSelector) => UserModelSelector) = userModelPrimitives.toString(), options: QueryOptions = {}) {
-      return self.query<{ getUserByEmail: UserModelType}>(`query getUserByEmail($email: String!) { getUserByEmail(email: $email) {
-        ${typeof resultSelector === "function" ? resultSelector(new UserModelSelector()).toString() : resultSelector}
-      } }`, variables, options)
     },
     queryGetAllUsers(variables?: {  }, options: QueryOptions = {}) {
       return self.query<{ getAllUsers: any }>(`query getAllUsers { getAllUsers }`, variables, options)
@@ -580,6 +582,9 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
         ${typeof resultSelector === "function" ? resultSelector(new StoryViewerUserModelSelector()).toString() : resultSelector}
       } }`, variables, optimisticUpdate)
     },
+    mutateDeleteStory(variables: { attachmentUrl: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ deleteStory: any }>(`mutation deleteStory($attachmentUrl: String!) { deleteStory(attachmentUrl: $attachmentUrl) }`, variables, optimisticUpdate)
+    },
     mutateUploadVideoByUser(variables: { thumbnailUrl: string, view?: (string | null), attachmentVideoUrl: string, description?: (string | null), videoHeading?: (string | null), vedioPlaylistId?: (string | null), userId: string }, resultSelector: string | ((qb: VideoUploadModelSelector) => VideoUploadModelSelector) = videoUploadModelPrimitives.toString(), optimisticUpdate?: () => void) {
       return self.mutate<{ uploadVideoByUser: VideoUploadModelType}>(`mutation uploadVideoByUser($thumbnailUrl: String!, $view: String, $attachmentVideoUrl: String!, $description: String, $videoHeading: String, $vedioPlaylistId: String, $userId: String!) { uploadVideoByUser(thumbnailUrl: $thumbnailUrl, view: $view, attachmentVideoUrl: $attachmentVideoUrl, description: $description, videoHeading: $videoHeading, vedioPlaylistId: $vedioPlaylistId, userId: $userId) {
         ${typeof resultSelector === "function" ? resultSelector(new VideoUploadModelSelector()).toString() : resultSelector}
@@ -697,6 +702,12 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     mutateCreateUserCall(variables: { notificationToken?: (string | null), notificationMessage?: (InputCallNotification | null), metaData?: (InputCallMetaData | null), membersId: InputUsers[], width?: (number | null), mimeType?: (string | null), text: string, previewData?: (string | null), uri?: (string | null), size?: (number | null), name?: (string | null), height?: (number | null), status?: (string | null), messageType?: (string | null), roomId: string, authorId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ createUserCall: any }>(`mutation createUserCall($notificationToken: String, $notificationMessage: InputCallNotification, $metaData: InputCallMetaData, $membersId: [InputUsers!]!, $width: Float, $mimeType: String, $text: String!, $previewData: String, $uri: String, $size: Float, $name: String, $height: Float, $status: String, $messageType: String, $roomId: String!, $authorId: String!) { createUserCall(notificationToken: $notificationToken, notificationMessage: $notificationMessage, metaData: $metaData, membersId: $membersId, width: $width, mimeType: $mimeType, text: $text, previewData: $previewData, uri: $uri, size: $size, name: $name, height: $height, status: $status, messageType: $messageType, roomId: $roomId, authorId: $authorId) }`, variables, optimisticUpdate)
     },
+    mutateSendCallNotification(variables: { data?: (Inputdata | null), notificationToken: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ sendCallNotification: any }>(`mutation sendCallNotification($data: Inputdata, $notificationToken: String!) { sendCallNotification(data: $data, notificationToken: $notificationToken) }`, variables, optimisticUpdate)
+    },
+    mutateAddOfferanswerInRoom(variables: { answer?: (string | null), offer?: (string | null), roomId: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ addOfferanswerInRoom: any }>(`mutation addOfferanswerInRoom($answer: String, $offer: String, $roomId: String!) { addOfferanswerInRoom(answer: $answer, offer: $offer, roomId: $roomId) }`, variables, optimisticUpdate)
+    },
     mutateGetchatByUserId(variables: { authorId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ getchatByUserId: any }>(`mutation getchatByUserId($authorId: String!) { getchatByUserId(authorId: $authorId) }`, variables, optimisticUpdate)
     },
@@ -711,6 +722,9 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     },
     mutateGetroomByUserId(variables: { adminId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ getroomByUserId: any }>(`mutation getroomByUserId($adminId: String!) { getroomByUserId(adminId: $adminId) }`, variables, optimisticUpdate)
+    },
+    mutateGetroomByroomId(variables: { roomId: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ getroomByroomId: any }>(`mutation getroomByroomId($roomId: String!) { getroomByroomId(roomId: $roomId) }`, variables, optimisticUpdate)
     },
     mutateGetroomByUsers(variables: { memberId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ getroomByUsers: any }>(`mutation getroomByUsers($memberId: String!) { getroomByUsers(memberId: $memberId) }`, variables, optimisticUpdate)

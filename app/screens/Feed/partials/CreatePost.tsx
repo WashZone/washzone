@@ -164,7 +164,7 @@ export const CreatePost = observer(function CreatePost() {
   return (
     <View >
       <View style={$container}>
-        <FastImage source={{ uri: picture }} style={$picture} resizeMode="contain" />
+        <FastImage source={{ uri: picture }} style={$picture} resizeMode='cover'/>
         <View style={$contentContainer}>
           <TextField
             value={postContent}
@@ -182,7 +182,7 @@ export const CreatePost = observer(function CreatePost() {
       </View>
       <Animated.View style={animatedMediaContainer}>
         <Animated.View style={animatedPreviewContainer}>
-          <FastImage source={{ uri: selectedImage?.uri }} style={previewImage} />
+          <FastImage source={{ uri: selectedImage?.uri }} style={previewImage}  />
         </Animated.View>
         <Pressable style={$deleteIcon} onPress={onDeletePress}>
             <Icon icon="delete" size={selectedImage.uri ? 24 : 0.0001} />

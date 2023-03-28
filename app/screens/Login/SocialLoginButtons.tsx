@@ -60,16 +60,17 @@ export function SocialLogin() {
                     socialId: userInfo.user.id,
                   })
                 }
+                console.log('TEST USER GOT', resGetUserBySocialId.getUserBysocialId[0])
+                const user  = userFound ? resGetUserBySocialId.getUserBysocialId[0] : resCreateUser.createUser
                 setUser({
-                  _id: userFound
-                    ? resGetUserBySocialId.getUserBysocialId[0]?._id
-                    : resCreateUser.createUser._id,
-                  name: userInfo.user.name,
-                  email: userInfo.user.email,
-                  first_name: userInfo.user.givenName,
-                  socialId: userInfo.user.id,
-                  last_name: userInfo.user.familyName || "",
-                  picture: userInfo.user.photo,
+                  _id: user?._id,
+                  name: user?.name,
+                  email: user?.email,
+                  first_name: user?.first_name,
+                  socialId: user?.socialId,
+                  description :user?.description,
+                  last_name: user?.last_name || "",
+                  picture: user?.picture,
                   isSocialLogin: true,
                   type: "google",
                 })
@@ -79,11 +80,12 @@ export function SocialLogin() {
               }
             })
             .catch((e) => {
+              console.log(e)
             })
         }
       })
       .catch((e) => {
-
+        console.log(e)
       })
   }
 
@@ -154,8 +156,7 @@ export function SocialLogin() {
           })
         }
       },
-      (error) => {
-      },
+      (error) => {},
     )
   }
 

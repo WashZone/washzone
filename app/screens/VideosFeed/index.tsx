@@ -43,7 +43,7 @@ export const VideoBlock = ({
         LinearGradient={LinearGradient}
       >
         <FastImage
-        defaultSource={BROKEN_IMAGE}
+         defaultSource={BROKEN_IMAGE}
           source={{
             uri: `https://img.youtube.com/vi/${
               videoDetails.attachmentVideoUrl.split("=")[1]

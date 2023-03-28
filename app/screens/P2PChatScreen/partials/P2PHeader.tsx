@@ -49,7 +49,7 @@ export const P2PHeader = ({ data, roomId }) => {
              {
                navigation.navigate("CallScreen", {
                 mode: "audio",
-                receiverId: data?._id,
+                receiver: data,
                 role: Role.initiator,
                 roomId
               })}
@@ -63,7 +63,7 @@ export const P2PHeader = ({ data, roomId }) => {
             {
                navigation.navigate("CallScreen", {
                 mode: "video",
-                receiverId: data?._id,
+                receiver: data,
 
                 role: Role.initiator,
                 roomId
