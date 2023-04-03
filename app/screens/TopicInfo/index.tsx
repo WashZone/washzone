@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from "react"
-import { ScrollView, TextInput, TextStyle, View, ViewStyle } from "react-native"
+import { FlatList, ScrollView, TextInput, TextStyle, View, ViewStyle } from "react-native"
 import { Icon, Screen } from "../../components"
 import { colors, spacing } from "../../theme"
 import { HomeTabProps } from "../../tabs/Home"
@@ -50,9 +50,9 @@ export const TopicInfo: FC<HomeTabProps<"TopicInfo">> = function PostInfo(props)
   }
 
   const onComment = async () => {
-    if (commentText?.length ===0)return 
+    if (commentText?.length === 0) return
     setIsCommenting(true)
-    await postComment(commentText, selectedMedia ,  topicDetails?._id)
+    await postComment(commentText, selectedMedia, topicDetails?._id)
     await syncComments(topicDetails?._id)
     setSelectedMedia(undefined)
     setCommentText("")
@@ -74,25 +74,28 @@ export const TopicInfo: FC<HomeTabProps<"TopicInfo">> = function PostInfo(props)
 
   return (
     <Screen preset="fixed" keyboardOffset={-180} contentContainerStyle={$container}>
-      <ScrollView style={$contentContainer}>
-        <TopicComponentFullView topic={topicDetails} index={0} />
-        {comments.map((c) => (
-          <CommentComponent comment={c} key={c?._id} />
-        ))}
-      </ScrollView>
-     {selectedMedia && <View style={{position:'absolute', bottom:54}}>
-        <FastImage
-          source={{ uri: selectedMedia?.uri }}
-          style={{ height: 100, width: 100, borderRadius: 10 }}
-        />
-        <Icon
-          icon="x"
-          size={20}
-          onPress={() => setSelectedMedia(undefined)}
-          containerStyle={$iconXContainer}
-          disabled={isCommenting}
-        />
-      </View>}
+      <FlatList
+        data={comments}
+        renderItem={({ item }) => <CommentComponent comment={item} key={item?._id} />}
+        style={$contentContainer}
+        ListHeaderComponent={<TopicComponentFullView topic={topicDetails} index={0} />}
+      />
+
+      {selectedMedia && (
+        <View style={{ position: "absolute", bottom: 54 }}>
+          <FastImage
+            source={{ uri: selectedMedia?.uri }}
+            style={{ height: 100, width: 100, borderRadius: 10 }}
+          />
+          <Icon
+            icon="x"
+            size={20}
+            onPress={() => setSelectedMedia(undefined)}
+            containerStyle={$iconXContainer}
+            disabled={isCommenting}
+          />
+        </View>
+      )}
       <View style={$postCommentContainer}>
         <Icon icon="addImage" disabled={isCommenting} size={28} onPress={onAddImage} />
         <TextInput

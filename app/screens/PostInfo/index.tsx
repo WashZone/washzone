@@ -1,36 +1,40 @@
 import React, { FC, useEffect, useState } from "react"
-import { ScrollView,  View, ViewStyle } from "react-native"
-import {  Screen } from "../../components"
-import { colors } from "../../theme"
+import { FlatList, TextInput, TextStyle, View, ViewStyle } from "react-native"
+import { Icon, Screen } from "../../components"
+import { colors, spacing } from "../../theme"
 import { HomeTabProps } from "../../tabs/Home"
 import { PostComponent } from "../Feed/partials"
-// import { Capture } from "../../utils/device/MediaPicker"
-// import { useHooks } from "../hooks"
+import { MediaPicker } from "../../utils/device/MediaPicker"
+import { useHooks } from "../hooks"
 import { useStores } from "../../models"
 import { ActivityIndicator } from "react-native-paper"
+import FastImage from "react-native-fast-image"
+import { CommentComponent } from "../TopicInfo/Comments"
 
 export const PostInfo: FC<HomeTabProps<"PostInfo">> = function PostInfo(props) {
   const { post } = props.route.params
-  // const [commentText, setCommentText] = useState<string>("")
-  // const { postComment, getCommentsOnPost } = useHooks()
-  // const [comments, setComments] = useState<Array<any>>([])
-  // const [isCommenting, setIsCommenting] = useState<boolean>(false)
+  const [commentText, setCommentText] = useState<string>("")
+  const [comments, setComments] = useState<Array<any>>([])
+  const [selectedMedia, setSelectedMedia] = useState<any>()
+  const [isCommenting, setIsCommenting] = useState<boolean>(false)
   const [postDetails, setPostDetails] = useState<any>(post)
   const [loading, setLoading] = useState<boolean>(typeof post === "string")
   const {
     api: { mutateGetHomePagesByHomePageId },
   } = useStores()
+  const { getCommentsOnHomePagePost, postCommentOnHomePagePost } = useHooks()
 
   const handelPost = async () => {
     setLoading(true)
     if (typeof post === "string") {
       const res = await mutateGetHomePagesByHomePageId({ homePageId: post })
-      const topicData = res.getHomePagesByHomePageId?.data.length === 1 && res.getHomePagesByHomePageId?.data[0]
+      const topicData =
+        res.getHomePagesByHomePageId?.data.length === 1 && res.getHomePagesByHomePageId?.data[0]
       setPostDetails(topicData)
-      // await syncComments(topicData?._id)
+      await syncComments(topicData?._id)
       setLoading(false)
     } else {
-      // await syncComments(postDetails?._id)
+      await syncComments(postDetails?._id)
       setLoading(false)
     }
   }
@@ -39,18 +43,23 @@ export const PostInfo: FC<HomeTabProps<"PostInfo">> = function PostInfo(props) {
     handelPost()
   }, [post])
 
-  // async function syncComments(id: string) {
-  //   const data = await getCommentsOnPost(id)
-  //   setComments(data || [])
-  // }
+  async function syncComments(id: string) {
+    const data = await getCommentsOnHomePagePost(id)
+    setComments(data || [])
+  }
 
-  // const onComment = async () => {
-  //   setIsCommenting(true)
-  //   await postComment(commentText, postDetails?._id)
-  //   await syncComments(postDetails?._id)
-  //   setCommentText("")
-  //   setIsCommenting(false)
-  // }
+  const onComment = async () => {
+    setIsCommenting(true)
+    await postCommentOnHomePagePost(commentText, selectedMedia, postDetails?._id)
+    await syncComments(postDetails?._id)
+    setCommentText("")
+    setIsCommenting(false)
+  }
+
+  const onAddImage = async () => {
+    const res = await MediaPicker()
+    setSelectedMedia(res)
+  }
 
   if (loading) {
     return (
@@ -62,11 +71,30 @@ export const PostInfo: FC<HomeTabProps<"PostInfo">> = function PostInfo(props) {
 
   return (
     <Screen preset="fixed" keyboardOffset={-180} contentContainerStyle={$container}>
-      <ScrollView style={$contentContainer}>
-        <PostComponent post={postDetails} index={0} />
-      </ScrollView>
-      {/* <View style={$postCommentContainer}>
-        <Icon icon="camera" size={28} onPress={Capture} />
+      <FlatList
+        data={comments}
+        renderItem={({ item }) => <CommentComponent comment={item} key={item?._id} />}
+        style={$contentContainer}
+        ListHeaderComponent={<PostComponent post={postDetails} index={0} />}
+      />
+
+      {selectedMedia && (
+        <View style={{ position: "absolute", bottom: 54 }}>
+          <FastImage
+            source={{ uri: selectedMedia?.uri }}
+            style={{ height: 100, width: 100, borderRadius: 10 }}
+          />
+          <Icon
+            icon="x"
+            size={20}
+            onPress={() => setSelectedMedia(undefined)}
+            containerStyle={$iconXContainer}
+            disabled={isCommenting}
+          />
+        </View>
+      )}
+      <View style={$postCommentContainer}>
+        <Icon icon="addImage" disabled={isCommenting} size={28} onPress={onAddImage} />
         <TextInput
           value={commentText}
           onChangeText={setCommentText}
@@ -86,9 +114,42 @@ export const PostInfo: FC<HomeTabProps<"PostInfo">> = function PostInfo(props) {
             />
           )}
         </View>
-      </View> */}
+      </View>
     </Screen>
   )
+}
+
+const $iconXContainer: ViewStyle = {
+  height: 24,
+  width: 24,
+  justifyContent: "center",
+  alignItems: "center",
+  borderRadius: 8,
+  backgroundColor: colors.background,
+  position: "absolute",
+  top: -5,
+  left: 85,
+}
+
+const $rightIconContainer: ViewStyle = {
+  width: 28,
+}
+
+const $commentInput: TextStyle = {
+  flex: 1,
+  height: 48,
+  backgroundColor: colors.background,
+  marginHorizontal: 10,
+  borderRadius: 24,
+  paddingHorizontal: 10,
+}
+
+const $postCommentContainer: ViewStyle = {
+  height: 54,
+  flexDirection: "row",
+  paddingHorizontal: spacing.medium,
+  backgroundColor: colors.palette.neutral100,
+  alignItems: "center",
 }
 
 const $loadingScreen: ViewStyle = {

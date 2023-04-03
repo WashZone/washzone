@@ -77,7 +77,6 @@ const PublisherDetails = ({ publisher }: { publisher: any }) => {
 const MoreDetails = ({ classified }: { classified: any }) => {
   return (
     <View style={$moreDetialsContainer}>
-      <Text text={classified?.condition}  weight="medium" size="md" numberOfLines={1} />
       <Text text="Details" weight="semiBold" preset="h2" />
       <View style={$containerCondition}>
         <View style={$conditionContainer}>
@@ -86,6 +85,7 @@ const MoreDetails = ({ classified }: { classified: any }) => {
         </View>
         <Icon icon="caretRight" size={22} />
       </View>
+
       <Text text={classified?.classifiedDetail} style={$descriptionText} />
     </View>
   )
@@ -216,6 +216,14 @@ export const ClassifiedsDetails: FC<ClassifiedsTabProps<"ClassifiedsDetails">> =
             style={$posterImage}
             resizeMode="contain"
           />
+          {/* <Text
+            text={classified?.title}
+            weight="medium"
+            style={{
+              margin: spacing.medium,
+              textAlign:'justify'
+            }}
+          /> */}
           <PublisherDetails publisher={classifiedDetails?.UserId || classifiedDetails?.userId} />
           <MoreDetails classified={classifiedDetails} />
         </ScrollView>
@@ -250,8 +258,8 @@ const $backContainer: ViewStyle = {
 }
 
 const $descriptionText: TextStyle = {
-  marginVertical: spacing.medium,
   textAlign: "justify",
+  marginVertical: spacing.medium,
 }
 
 const $containerCondition: ViewStyle = {

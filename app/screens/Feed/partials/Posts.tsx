@@ -26,7 +26,6 @@ import ShimmerPlaceHolder from "react-native-shimmer-placeholder"
 import NativeAdView from "../../../utils/NativeAd"
 import AppLovinMAX from "react-native-applovin-max/src/index"
 
-
 import { defaultImages, DEFAULT_LOADING } from "../../../utils"
 import LinearGradient from "react-native-linear-gradient"
 
@@ -87,7 +86,7 @@ export const PostComponent = ({ post, navigateOnPress, index }: PostComponentPro
           </View>
         </View>
 
-        <Text style={$postContent} text={postDetails.content} size='xs'/>
+        <Text style={$postContent} text={postDetails.content} size="xs" />
         <ShimmerPlaceHolder
           visible={loaded}
           shimmerStyle={{
@@ -97,7 +96,7 @@ export const PostComponent = ({ post, navigateOnPress, index }: PostComponentPro
           LinearGradient={LinearGradient}
         >
           <FastImage
-            style={[{ ...attachmentDimensions }, $bottomCurve]}
+            style={attachmentDimensions}
             source={{ uri: postDetails.attachmentUrl }}
             onLoad={(res) => {
               setAttachmentDimensions({
@@ -111,8 +110,8 @@ export const PostComponent = ({ post, navigateOnPress, index }: PostComponentPro
       </Pressable>
       {index % 5 === 0 && (
         <>
-        <NativeAdView ref={nativeAdViewRef} />
-        {/* <AppLovinMAX.AdView
+          <NativeAdView ref={nativeAdViewRef} />
+          {/* <AppLovinMAX.AdView
           adUnitId={MREC_AD_UNIT_ID}
           adFormat={AppLovinMAX.AdFormat.BANNER}
           // style={$mrecStyle}
@@ -183,14 +182,14 @@ const $postContainer: ViewStyle = {
   backgroundColor: colors.palette.neutral100,
   marginBottom: 10,
   width: "100%",
-  borderRadius: postContainerRadius,
+  // borderRadius: postContainerRadius,
   justifyContent: "space-between",
 }
 
 const $publisherInfoContainer: ViewStyle = {
   height: 68,
   width: "100%",
-  borderRadius: 20,
+  // borderRadius: 20,
   alignItems: "center",
   flexDirection: "row",
   padding: spacing.homeScreen,

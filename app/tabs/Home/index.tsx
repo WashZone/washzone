@@ -19,7 +19,7 @@ const HomeTab = observer(function AppStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName={"Feed"}>
       <Stack.Screen name="Feed" component={Feed} />
-      <Stack.Screen name="TopicInfo" component={TopicInfo} />
+      {/* <Stack.Screen name="TopicInfo" component={TopicInfo} /> */}
       <Stack.Screen name="PostInfo" component={PostInfo} />
       <Stack.Screen name="Profile" component={Profile} />
     </Stack.Navigator>

@@ -48,7 +48,7 @@ const channelDetails = {
   ],
 }
 
-const VideoBlock = ({ videoDetails, index }) => {
+export const VideoBlockFullWidth = ({ videoDetails, index }) => {
   const navigation = useNavigation<NavigationProp<VideosTabParamList>>()
 
   return (
@@ -145,7 +145,7 @@ export const Playlist: FC<VideosTabProps<"Playlist">> = observer(function Playli
         ListHeaderComponent={<PlaylistDescription />}
         data={playlistData?.VideoDetail}
         renderItem={({ item, index }) => (
-          <VideoBlock key={index} index={index} videoDetails={item} />
+          <VideoBlockFullWidth key={index} index={index} videoDetails={item} />
         )}
       />
     </Screen>

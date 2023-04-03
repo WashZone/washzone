@@ -24,7 +24,7 @@ export const HomecommentsModelBase = ModelBase
     createdAt: types.union(types.undefined, types.frozen()),
     updatedAt: types.union(types.undefined, types.frozen()),
     userId: types.union(types.undefined, types.null, types.late((): any => UserModel)),
-    HomepageId: types.union(types.undefined, types.null, types.late((): any => HomePageDetailModel)),
+    HomePageId: types.union(types.undefined, types.null, types.late((): any => HomePageDetailModel)),
     comment: types.union(types.undefined, types.null, types.string),
     acttachmentUrl: types.union(types.undefined, types.null, types.string),
     acttachmentType: types.union(types.undefined, types.null, types.string),
@@ -43,7 +43,7 @@ export class HomecommentsModelSelector extends QueryBuilder {
   get acttachmentUrl() { return this.__attr(`acttachmentUrl`) }
   get acttachmentType() { return this.__attr(`acttachmentType`) }
   userId(builder: string | UserModelSelector | ((selector: UserModelSelector) => UserModelSelector) | undefined) { return this.__child(`userId`, UserModelSelector, builder) }
-  HomepageId(builder: string | HomePageDetailModelSelector | ((selector: HomePageDetailModelSelector) => HomePageDetailModelSelector) | undefined) { return this.__child(`HomepageId`, HomePageDetailModelSelector, builder) }
+  HomePageId(builder: string | HomePageDetailModelSelector | ((selector: HomePageDetailModelSelector) => HomePageDetailModelSelector) | undefined) { return this.__child(`HomePageId`, HomePageDetailModelSelector, builder) }
 }
 export function selectFromHomecomments() {
   return new HomecommentsModelSelector()

@@ -48,7 +48,7 @@ const en = {
     },
     searchResults:{
       heading: "No Results Found!",
-      content: "We're sorry, but we couldn't find any items that match your search. Please adjust your search criteria and try again.",
+      content: "",
       button: "Go Back!",
     },
   },

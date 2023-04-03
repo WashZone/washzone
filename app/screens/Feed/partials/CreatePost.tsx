@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react"
+import React, { useEffect, useMemo, useRef, useState } from "react"
 import {
   Image,
   TextInput,
@@ -74,22 +74,25 @@ export const CreatePost = observer(function CreatePost() {
     }
   }
 
+  useEffect(
+    () => () => {
+      progress.value = withTiming(0, { duration: 200 })
+    },
+    [],
+  )
+
   const onGalleryPress = async () => {
     try {
-      if (selectedImage.uri) {
-        setTimeout(() => {
-          progress.value = withTiming(0.8, { duration: 300 })
-        }, 300)
-      }
 
       const image = await MediaPicker()
       if (image?.uri) {
         setSelectedImage(image)
+        setTimeout(() => {
+          progress.value = withTiming(1, { duration: 300 })
+        }, 100)
       }
 
-      setTimeout(() => {
-        progress.value = withTiming(1, { duration: 300 })
-      }, 100)
+     
     } catch (e) {
     }
   }

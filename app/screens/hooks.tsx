@@ -99,7 +99,9 @@ export function useHooks() {
       mutateVerifyEmailByEmail,
       mutateSendCallNotification,
       mutateGetroomByroomId,
-
+      queryGetNotification,
+      queryGetCommentsByHomePageId,
+      mutateCommentOnHomepage,
     },
     userStore,
   } = useStores()
@@ -251,10 +253,39 @@ export function useHooks() {
     })
   }
 
+  const postCommentOnHomePagePost = async (
+    comment: string,
+    selectedMedia: any,
+    homePageId: string,
+  ) => {
+    let imageUrl = ""
+    if (selectedMedia) {
+      imageUrl = await uploadToS3({
+        uri: selectedMedia?.uri,
+        type: selectedMedia?.type,
+        name: selectedMedia?.fileName,
+      })
+    }
+    const res = await mutateCommentOnHomepage({
+      userId: userStore._id,
+      acttachmentUrl: imageUrl,
+      acttachmentType: "image",
+      comment,
+      homePageId,
+    })
+    console.log("postCommentOnHomePagePost", res)
+  }
+
   const getCommentsOnPost = async (topicId: string) => {
     const res = await queryGetCommentsByTopicId({ topicId }, { fetchPolicy: "network-only" })
 
     return res.getCommentsByTopicId.length === 1 && res.getCommentsByTopicId[0]?.comments
+  }
+
+  const getCommentsOnHomePagePost = async (homePageId: string) => {
+    const res = await queryGetCommentsByHomePageId({ homePageId }, { fetchPolicy: "network-only" })
+    console.log("getCommentsOnHomePagePost", res.getCommentsByHomePageId[0])
+    return res.getCommentsByHomePageId.length === 1 && res.getCommentsByHomePageId[0]?.comments
   }
 
   const createTopic = async ({ content, attachment, title }) => {
@@ -985,17 +1016,18 @@ export function useHooks() {
     classifiedData: any,
   ) => {
     console.log("SEND CLASSIFIED OFFER , ", roomId, amount)
+    const currency = "$"
     try {
       const res = await mutateCreateUserMessage({
         roomId,
         authorId: userStore._id,
-        text: "Classified Offer !",
+        text: `Offered ${currency + amount} on ${classifiedData?.title}`,
         membersId: [{ userId1: receiverId }, { userId1: userStore._id }],
         messageType: "custom",
         metaData: {
           metaDataType: messageMetadataType.classifiedOffer,
           amount,
-          currency: "$",
+          currency,
           data: JSON.stringify(classifiedData),
         },
       })
@@ -1038,8 +1070,6 @@ export function useHooks() {
       keyPrefix: "uploads/",
       bucket: "washzone-23",
       region: "us-west-2",
-      // accessKey: "AKIAY5ERXJV4XD5VEE5R",
-      // secretKey: "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",
       accessKey: "AKIAY5ERXJV45W2GS2H2",
       secretKey: "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",
       successActionStatus: 201,
@@ -1081,23 +1111,11 @@ export function useHooks() {
   ) => {
     const resAddConnectionData = await mutateAddOfferanswerInRoom({ ...data, roomId })
     console.log("resAddConnectionData", resAddConnectionData)
-
-    console.log(
-      "mutateSendCallNotification:Input",
-      token,
-      " \n ",
-      type,
-      " \n ",
-      roomId,
-      " \n",
-      setter,
-    )
     const { _id, name } = userStore
 
     // we have to send a setter alert and then a actualy display alert
     // as we send the alert twice we need a way to identify each, we will do that via a type key in receiver
     // (Why Receiver? cuz rn, i am using Stringified JSON in receiver field and that being so, i can add remove feilds as per i see fit)
-
     const res = await mutateSendCallNotification({
       data: {
         roomId,
@@ -1106,7 +1124,6 @@ export function useHooks() {
       },
       notificationToken: token,
     })
-    console.log("mutateSendCallNotification", res)
   }
 
   const getRoomById = async (roomId: string) => {
@@ -1121,16 +1138,23 @@ export function useHooks() {
 
   const getNotifications = async () => {
     try {
-      const res = await mutateGetroomByroomId({ roomId })
-      console.log("RES::getRoomById", res.getroomByroomId?.data[0])
-      return res.getroomByroomId?.data[0]
+      const res = await queryGetNotification(
+        { authorId: userStore._id },
+        { fetchPolicy: "no-cache" },
+      )
+      console.log("RES::getNoticiations", res.getNotification)
+      return res.getNotification
     } catch (err) {
-      Alert.alert("Unable to Establish Connection!", "Please try again.")
+      console.log("res.getNotificationERR", err)
+      Alert.alert(
+        "Something doesnt look right.",
+        "Please hold or try again later. Sorry for the trouble.",
+      )
     }
   }
 
-
   return {
+    getNotifications,
     getRoomById,
     sendSilentAlert,
     getMoreChatMessages,
@@ -1192,6 +1216,8 @@ export function useHooks() {
     setNotificationStatus,
     getNotificationStatus,
     resetPassword,
+    postCommentOnHomePagePost,
+    getCommentsOnHomePagePost,
   }
 }
 

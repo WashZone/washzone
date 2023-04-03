@@ -35,6 +35,10 @@ import { StoryViewerUserModel, StoryViewerUserModelType } from "./StoryViewerUse
 import { storyViewerUserModelPrimitives, StoryViewerUserModelSelector } from "./StoryViewerUserModel.base"
 import { SaveClassifiedModel, SaveClassifiedModelType } from "./SaveClassifiedModel"
 import { saveClassifiedModelPrimitives, SaveClassifiedModelSelector } from "./SaveClassifiedModel.base"
+import { HomecommentsModel, HomecommentsModelType } from "./HomecommentsModel"
+import { homecommentsModelPrimitives, HomecommentsModelSelector } from "./HomecommentsModel.base"
+import { HomePageDetailModel, HomePageDetailModelType } from "./HomePageDetailModel"
+import { homePageDetailModelPrimitives, HomePageDetailModelSelector } from "./HomePageDetailModel.base"
 import { FollowUserModel, FollowUserModelType } from "./FollowUserModel"
 import { followUserModelPrimitives, FollowUserModelSelector } from "./FollowUserModel.base"
 import { MetaDataModel, MetaDataModelType } from "./MetaDataModel"
@@ -51,10 +55,6 @@ import { CallMetaDataModel, CallMetaDataModelType } from "./CallMetaDataModel"
 import { callMetaDataModelPrimitives, CallMetaDataModelSelector } from "./CallMetaDataModel.base"
 import { CallNotificationModel, CallNotificationModelType } from "./CallNotificationModel"
 import { callNotificationModelPrimitives, CallNotificationModelSelector } from "./CallNotificationModel.base"
-import { HomecommentsModel, HomecommentsModelType } from "./HomecommentsModel"
-import { homecommentsModelPrimitives, HomecommentsModelSelector } from "./HomecommentsModel.base"
-import { HomePageDetailModel, HomePageDetailModelType } from "./HomePageDetailModel"
-import { homePageDetailModelPrimitives, HomePageDetailModelSelector } from "./HomePageDetailModel.base"
 
 
 
@@ -99,6 +99,12 @@ export type InputClassified = {
   title?: (string | null)
   condition?: (string | null)
 }
+export type InputHomePage = {
+  Discription?: (string | null)
+  attachmentType?: (string | null)
+  attachmentUrl?: (string | null)
+  status?: (string | null)
+}
 export type InputUsers = {
   userId1?: (string | null)
 }
@@ -127,12 +133,6 @@ export type Inputdata = {
   receiver?: (string | null)
   roomId?: (string | null)
   type?: (string | null)
-}
-export type InputHomePage = {
-  Discription?: (string | null)
-  attachmentType?: (string | null)
-  attachmentUrl?: (string | null)
-  status?: (string | null)
 }
 /* The TypeScript type that explicits the refs to other models in order to prevent a circular refs issue */
 type Refs = {
@@ -183,6 +183,12 @@ queryGetAllSavedClassified="queryGetAllSavedClassified",
 queryGetAllSavedByUserIdpageNumber="queryGetAllSavedByUserIdpageNumber",
 queryGetAllSavedByUserId="queryGetAllSavedByUserId",
 queryGetAllSavedByType="queryGetAllSavedByType",
+queryGetAllHomePagesByPageNumber="queryGetAllHomePagesByPageNumber",
+queryGetAllHomePagess="queryGetAllHomePagess",
+queryGetHomePagesByUserId="queryGetHomePagesByUserId",
+queryGetCommentByHomePageId="queryGetCommentByHomePageId",
+queryGetCommentsByHomePageId="queryGetCommentsByHomePageId",
+queryGetSearchedHomePages="queryGetSearchedHomePages",
 queryGetByvideoId="queryGetByvideoId",
 queryGetlikesVideoByUserId="queryGetlikesVideoByUserId",
 queryGetLikesonVideobyuser="queryGetLikesonVideobyuser",
@@ -198,12 +204,7 @@ queryGetfollowerByFollowId="queryGetfollowerByFollowId",
 queryGetratingOnUserId="queryGetratingOnUserId",
 queryCheckUserRating="queryCheckUserRating",
 queryGetratingByratingId="queryGetratingByratingId",
-queryGetAllHomePagesByPageNumber="queryGetAllHomePagesByPageNumber",
-queryGetAllHomePagess="queryGetAllHomePagess",
-queryGetHomePagesByUserId="queryGetHomePagesByUserId",
-queryGetCommentByHomePageId="queryGetCommentByHomePageId",
-queryGetCommentsByHomePageId="queryGetCommentsByHomePageId",
-queryGetSearchedHomePages="queryGetSearchedHomePages"
+queryGetNotification="queryGetNotification"
 }
 export enum RootStoreBaseMutations {
 mutateCreateUser="mutateCreateUser",
@@ -250,6 +251,11 @@ mutateUpdateUserClassified="mutateUpdateUserClassified",
 mutateSaveLikedClassifiedFeed="mutateSaveLikedClassifiedFeed",
 mutateUpdateDeletesavedclassified="mutateUpdateDeletesavedclassified",
 mutateDeleteClassfied="mutateDeleteClassfied",
+mutateCreateUserHomePages="mutateCreateUserHomePages",
+mutateGetHomePagesByUser="mutateGetHomePagesByUser",
+mutateGetHomePagesByHomePageId="mutateGetHomePagesByHomePageId",
+mutateUpdateDeleteHomePageId="mutateUpdateDeleteHomePageId",
+mutateUpdateUserHomePages="mutateUpdateUserHomePages",
 mutateSaveLikedVideo="mutateSaveLikedVideo",
 mutateUpdateDeletesavedVideo="mutateUpdateDeletesavedVideo",
 mutateDeleteVideo="mutateDeleteVideo",
@@ -277,11 +283,6 @@ mutateGetroomByUsers="mutateGetroomByUsers",
 mutateGetroomBymembers="mutateGetroomBymembers",
 mutateDeleteChatMessage="mutateDeleteChatMessage",
 mutateDeleteChatRoom="mutateDeleteChatRoom",
-mutateCreateUserHomePages="mutateCreateUserHomePages",
-mutateGetHomePagesByUser="mutateGetHomePagesByUser",
-mutateGetHomePagesByHomePageId="mutateGetHomePagesByHomePageId",
-mutateUpdateDeleteHomePageId="mutateUpdateDeleteHomePageId",
-mutateUpdateUserHomePages="mutateUpdateUserHomePages",
 mutateCommentOnHomepage="mutateCommentOnHomepage"
 }
 
@@ -290,7 +291,7 @@ mutateCommentOnHomepage="mutateCommentOnHomepage"
 */
 export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
   .named("RootStore")
-  .extend(configureStoreMixin([['UserRating', () => UserRatingModel], ['classifiedFeed', () => ClassifiedFeedModel], ['CommentsDetail', () => CommentsDetailModel], ['likeTopics', () => LikeTopicsModel], ['TopicDetail', () => TopicDetailModel], ['likeVideos', () => LikeVideosModel], ['VideoPlaylist', () => VideoPlaylistModel], ['VideoUploadPlaylist', () => VideoUploadPlaylistModel], ['VideoUpload', () => VideoUploadModel], ['User', () => UserModel], ['SigninUser', () => SigninUserModel], ['Legalities', () => LegalitiesModel], ['saveVideo', () => SaveVideoModel], ['storyViewerUser', () => StoryViewerUserModel], ['saveClassified', () => SaveClassifiedModel], ['followUser', () => FollowUserModel], ['MetaData', () => MetaDataModel], ['Notification', () => NotificationModel], ['usersChat', () => UsersChatModel], ['roomChat', () => RoomChatModel], ['Users', () => UsersModel], ['CallMetaData', () => CallMetaDataModel], ['CallNotification', () => CallNotificationModel], ['Homecomments', () => HomecommentsModel], ['HomePageDetail', () => HomePageDetailModel]], [], "js"))
+  .extend(configureStoreMixin([['UserRating', () => UserRatingModel], ['classifiedFeed', () => ClassifiedFeedModel], ['CommentsDetail', () => CommentsDetailModel], ['likeTopics', () => LikeTopicsModel], ['TopicDetail', () => TopicDetailModel], ['likeVideos', () => LikeVideosModel], ['VideoPlaylist', () => VideoPlaylistModel], ['VideoUploadPlaylist', () => VideoUploadPlaylistModel], ['VideoUpload', () => VideoUploadModel], ['User', () => UserModel], ['SigninUser', () => SigninUserModel], ['Legalities', () => LegalitiesModel], ['saveVideo', () => SaveVideoModel], ['storyViewerUser', () => StoryViewerUserModel], ['saveClassified', () => SaveClassifiedModel], ['Homecomments', () => HomecommentsModel], ['HomePageDetail', () => HomePageDetailModel], ['followUser', () => FollowUserModel], ['MetaData', () => MetaDataModel], ['Notification', () => NotificationModel], ['usersChat', () => UsersChatModel], ['roomChat', () => RoomChatModel], ['Users', () => UsersModel], ['CallMetaData', () => CallMetaDataModel], ['CallNotification', () => CallNotificationModel]], [], "js"))
   .props({
 
   })
@@ -412,6 +413,24 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     queryGetAllSavedByType(variables: { pageNumber: number, savedType: string }, options: QueryOptions = {}) {
       return self.query<{ getAllSavedByType: any }>(`query getAllSavedByType($pageNumber: Float!, $savedType: String!) { getAllSavedByType(pageNumber: $pageNumber, savedType: $savedType) }`, variables, options)
     },
+    queryGetAllHomePagesByPageNumber(variables: { pageNumber: number }, options: QueryOptions = {}) {
+      return self.query<{ getAllHomePagesByPageNumber: any }>(`query getAllHomePagesByPageNumber($pageNumber: Float!) { getAllHomePagesByPageNumber(pageNumber: $pageNumber) }`, variables, options)
+    },
+    queryGetAllHomePagess(variables?: {  }, options: QueryOptions = {}) {
+      return self.query<{ getAllHomePagess: any }>(`query getAllHomePagess { getAllHomePagess }`, variables, options)
+    },
+    queryGetHomePagesByUserId(variables: { pageNumber: number, userId: string }, options: QueryOptions = {}) {
+      return self.query<{ getHomePagesByUserId: any }>(`query getHomePagesByUserId($pageNumber: Float!, $userId: String!) { getHomePagesByUserId(pageNumber: $pageNumber, userId: $userId) }`, variables, options)
+    },
+    queryGetCommentByHomePageId(variables: { pageNumber: number, homePageId: string }, options: QueryOptions = {}) {
+      return self.query<{ getCommentByHomePageId: any }>(`query getCommentByHomePageId($pageNumber: Float!, $homePageId: String!) { getCommentByHomePageId(pageNumber: $pageNumber, HomePageId: $homePageId) }`, variables, options)
+    },
+    queryGetCommentsByHomePageId(variables: { homePageId: string }, options: QueryOptions = {}) {
+      return self.query<{ getCommentsByHomePageId: any }>(`query getCommentsByHomePageId($homePageId: String!) { getCommentsByHomePageId(HomePageId: $homePageId) }`, variables, options)
+    },
+    queryGetSearchedHomePages(variables: { searchKey: string, pageNumber: number }, options: QueryOptions = {}) {
+      return self.query<{ getSearchedHomePages: any }>(`query getSearchedHomePages($searchKey: String!, $pageNumber: Float!) { getSearchedHomePages(searchKey: $searchKey, pageNumber: $pageNumber) }`, variables, options)
+    },
     queryGetByvideoId(variables: { videoId: string }, options: QueryOptions = {}) {
       return self.query<{ getByvideoId: any }>(`query getByvideoId($videoId: String!) { getByvideoId(videoId: $videoId) }`, variables, options)
     },
@@ -457,23 +476,8 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     queryGetratingByratingId(variables: { ratinguserId: string }, options: QueryOptions = {}) {
       return self.query<{ getratingByratingId: any }>(`query getratingByratingId($ratinguserId: String!) { getratingByratingId(ratinguserId: $ratinguserId) }`, variables, options)
     },
-    queryGetAllHomePagesByPageNumber(variables: { pageNumber: number }, options: QueryOptions = {}) {
-      return self.query<{ getAllHomePagesByPageNumber: any }>(`query getAllHomePagesByPageNumber($pageNumber: Float!) { getAllHomePagesByPageNumber(pageNumber: $pageNumber) }`, variables, options)
-    },
-    queryGetAllHomePagess(variables?: {  }, options: QueryOptions = {}) {
-      return self.query<{ getAllHomePagess: any }>(`query getAllHomePagess { getAllHomePagess }`, variables, options)
-    },
-    queryGetHomePagesByUserId(variables: { pageNumber: number, userId: string }, options: QueryOptions = {}) {
-      return self.query<{ getHomePagesByUserId: any }>(`query getHomePagesByUserId($pageNumber: Float!, $userId: String!) { getHomePagesByUserId(pageNumber: $pageNumber, userId: $userId) }`, variables, options)
-    },
-    queryGetCommentByHomePageId(variables: { pageNumber: number, homePageId: string }, options: QueryOptions = {}) {
-      return self.query<{ getCommentByHomePageId: any }>(`query getCommentByHomePageId($pageNumber: Float!, $homePageId: String!) { getCommentByHomePageId(pageNumber: $pageNumber, HomePageId: $homePageId) }`, variables, options)
-    },
-    queryGetCommentsByHomePageId(variables: { homePageId: string }, options: QueryOptions = {}) {
-      return self.query<{ getCommentsByHomePageId: any }>(`query getCommentsByHomePageId($homePageId: String!) { getCommentsByHomePageId(HomePageId: $homePageId) }`, variables, options)
-    },
-    queryGetSearchedHomePages(variables: { searchKey: string, pageNumber: number }, options: QueryOptions = {}) {
-      return self.query<{ getSearchedHomePages: any }>(`query getSearchedHomePages($searchKey: String!, $pageNumber: Float!) { getSearchedHomePages(searchKey: $searchKey, pageNumber: $pageNumber) }`, variables, options)
+    queryGetNotification(variables: { authorId: string }, options: QueryOptions = {}) {
+      return self.query<{ getNotification: any }>(`query getNotification($authorId: String!) { getNotification(authorId: $authorId) }`, variables, options)
     },
     mutateCreateUser(variables: { description?: (string | null), type: string, isSocialLogin: boolean, picture?: (string | null), lastName: string, firstName: string, socialId?: (string | null), password: string, email: string, name: string }, resultSelector: string | ((qb: UserModelSelector) => UserModelSelector) = userModelPrimitives.toString(), optimisticUpdate?: () => void) {
       return self.mutate<{ createUser: UserModelType}>(`mutation createUser($description: String, $type: String!, $isSocialLogin: Boolean!, $picture: String, $lastName: String!, $firstName: String!, $socialId: String, $password: String!, $email: String!, $name: String!) { createUser(description: $description, type: $type, isSocialLogin: $isSocialLogin, picture: $picture, last_name: $lastName, first_name: $firstName, socialId: $socialId, password: $password, email: $email, name: $name) {
@@ -643,6 +647,25 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     mutateDeleteClassfied(variables: { classifiedFeedId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ deleteClassfied: boolean }>(`mutation deleteClassfied($classifiedFeedId: String!) { deleteClassfied(ClassifiedFeedId: $classifiedFeedId) }`, variables, optimisticUpdate)
     },
+    mutateCreateUserHomePages(variables: { discription?: (string | null), attachmentUrl?: (string | null), attachmentType?: (string | null), commentId?: (string | null), userId: string }, resultSelector: string | ((qb: HomePageDetailModelSelector) => HomePageDetailModelSelector) = homePageDetailModelPrimitives.toString(), optimisticUpdate?: () => void) {
+      return self.mutate<{ createUserHomePages: HomePageDetailModelType}>(`mutation createUserHomePages($discription: String, $attachmentUrl: String, $attachmentType: String, $commentId: String, $userId: String!) { createUserHomePages(Discription: $discription, attachmentUrl: $attachmentUrl, attachmentType: $attachmentType, commentId: $commentId, userId: $userId) {
+        ${typeof resultSelector === "function" ? resultSelector(new HomePageDetailModelSelector()).toString() : resultSelector}
+      } }`, variables, optimisticUpdate)
+    },
+    mutateGetHomePagesByUser(variables: { userId: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ getHomePagesByUser: any }>(`mutation getHomePagesByUser($userId: String!) { getHomePagesByUser(userId: $userId) }`, variables, optimisticUpdate)
+    },
+    mutateGetHomePagesByHomePageId(variables: { homePageId: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ getHomePagesByHomePageId: any }>(`mutation getHomePagesByHomePageId($homePageId: String!) { getHomePagesByHomePageId(HomePageId: $homePageId) }`, variables, optimisticUpdate)
+    },
+    mutateUpdateDeleteHomePageId(variables: { pageNumber: number, homePageId: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ UpdateDeleteHomePageId: any }>(`mutation UpdateDeleteHomePageId($pageNumber: Float!, $homePageId: String!) { UpdateDeleteHomePageId(pageNumber: $pageNumber, HomePageId: $homePageId) }`, variables, optimisticUpdate)
+    },
+    mutateUpdateUserHomePages(variables: { usersHomePagesDetail: InputHomePage, homePageId: string }, resultSelector: string | ((qb: HomePageDetailModelSelector) => HomePageDetailModelSelector) = homePageDetailModelPrimitives.toString(), optimisticUpdate?: () => void) {
+      return self.mutate<{ updateUserHomePages: HomePageDetailModelType}>(`mutation updateUserHomePages($usersHomePagesDetail: InputHomePage!, $homePageId: String!) { updateUserHomePages(UsersHomePagesDetail: $usersHomePagesDetail, HomePageId: $homePageId) {
+        ${typeof resultSelector === "function" ? resultSelector(new HomePageDetailModelSelector()).toString() : resultSelector}
+      } }`, variables, optimisticUpdate)
+    },
     mutateSaveLikedVideo(variables: { videoId: string, userId: string }, resultSelector: string | ((qb: SaveVideoModelSelector) => SaveVideoModelSelector) = saveVideoModelPrimitives.toString(), optimisticUpdate?: () => void) {
       return self.mutate<{ saveLikedVideo: SaveVideoModelType}>(`mutation saveLikedVideo($videoId: String!, $userId: String!) { saveLikedVideo(videoId: $videoId, userId: $userId) {
         ${typeof resultSelector === "function" ? resultSelector(new SaveVideoModelSelector()).toString() : resultSelector}
@@ -738,27 +761,8 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     mutateDeleteChatRoom(variables: { roomId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ deleteChatRoom: boolean }>(`mutation deleteChatRoom($roomId: String!) { deleteChatRoom(roomId: $roomId) }`, variables, optimisticUpdate)
     },
-    mutateCreateUserHomePages(variables: { discription?: (string | null), attachmentUrl?: (string | null), attachmentType?: (string | null), commentId?: (string | null), userId: string }, resultSelector: string | ((qb: HomePageDetailModelSelector) => HomePageDetailModelSelector) = homePageDetailModelPrimitives.toString(), optimisticUpdate?: () => void) {
-      return self.mutate<{ createUserHomePages: HomePageDetailModelType}>(`mutation createUserHomePages($discription: String, $attachmentUrl: String, $attachmentType: String, $commentId: String, $userId: String!) { createUserHomePages(Discription: $discription, attachmentUrl: $attachmentUrl, attachmentType: $attachmentType, commentId: $commentId, userId: $userId) {
-        ${typeof resultSelector === "function" ? resultSelector(new HomePageDetailModelSelector()).toString() : resultSelector}
-      } }`, variables, optimisticUpdate)
-    },
-    mutateGetHomePagesByUser(variables: { userId: string }, optimisticUpdate?: () => void) {
-      return self.mutate<{ getHomePagesByUser: any }>(`mutation getHomePagesByUser($userId: String!) { getHomePagesByUser(userId: $userId) }`, variables, optimisticUpdate)
-    },
-    mutateGetHomePagesByHomePageId(variables: { homePageId: string }, optimisticUpdate?: () => void) {
-      return self.mutate<{ getHomePagesByHomePageId: any }>(`mutation getHomePagesByHomePageId($homePageId: String!) { getHomePagesByHomePageId(HomePageId: $homePageId) }`, variables, optimisticUpdate)
-    },
-    mutateUpdateDeleteHomePageId(variables: { pageNumber: number, homePageId: string }, optimisticUpdate?: () => void) {
-      return self.mutate<{ UpdateDeleteHomePageId: any }>(`mutation UpdateDeleteHomePageId($pageNumber: Float!, $homePageId: String!) { UpdateDeleteHomePageId(pageNumber: $pageNumber, HomePageId: $homePageId) }`, variables, optimisticUpdate)
-    },
-    mutateUpdateUserHomePages(variables: { usersHomePagesDetail: InputHomePage, homePageId: string }, resultSelector: string | ((qb: HomePageDetailModelSelector) => HomePageDetailModelSelector) = homePageDetailModelPrimitives.toString(), optimisticUpdate?: () => void) {
-      return self.mutate<{ updateUserHomePages: HomePageDetailModelType}>(`mutation updateUserHomePages($usersHomePagesDetail: InputHomePage!, $homePageId: String!) { updateUserHomePages(UsersHomePagesDetail: $usersHomePagesDetail, HomePageId: $homePageId) {
-        ${typeof resultSelector === "function" ? resultSelector(new HomePageDetailModelSelector()).toString() : resultSelector}
-      } }`, variables, optimisticUpdate)
-    },
-    mutateCommentOnHomepage(variables: { acttachmentType?: (string | null), acttachmentUrl?: (string | null), comment?: (string | null), homepageId: string, userId: string }, resultSelector: string | ((qb: HomecommentsModelSelector) => HomecommentsModelSelector) = homecommentsModelPrimitives.toString(), optimisticUpdate?: () => void) {
-      return self.mutate<{ commentOnHomepage: HomecommentsModelType}>(`mutation commentOnHomepage($acttachmentType: String, $acttachmentUrl: String, $comment: String, $homepageId: String!, $userId: String!) { commentOnHomepage(acttachmentType: $acttachmentType, acttachmentUrl: $acttachmentUrl, comment: $comment, HomepageId: $homepageId, userId: $userId) {
+    mutateCommentOnHomepage(variables: { acttachmentType?: (string | null), acttachmentUrl?: (string | null), comment?: (string | null), homePageId: string, userId: string }, resultSelector: string | ((qb: HomecommentsModelSelector) => HomecommentsModelSelector) = homecommentsModelPrimitives.toString(), optimisticUpdate?: () => void) {
+      return self.mutate<{ commentOnHomepage: HomecommentsModelType}>(`mutation commentOnHomepage($acttachmentType: String, $acttachmentUrl: String, $comment: String, $homePageId: String!, $userId: String!) { commentOnHomepage(acttachmentType: $acttachmentType, acttachmentUrl: $acttachmentUrl, comment: $comment, HomePageId: $homePageId, userId: $userId) {
         ${typeof resultSelector === "function" ? resultSelector(new HomecommentsModelSelector()).toString() : resultSelector}
       } }`, variables, optimisticUpdate)
     },

@@ -14,6 +14,7 @@ import { AppStackParamList } from "../../navigators"
 import ShimmerPlaceholder from "react-native-shimmer-placeholder"
 import LinearGradient from "react-native-linear-gradient"
 import { BROKEN_IMAGE } from "../../utils"
+import { TouchableOpacity } from "react-native"
 
 export const VideoBlock = ({
   videoDetails,
@@ -43,7 +44,7 @@ export const VideoBlock = ({
         LinearGradient={LinearGradient}
       >
         <FastImage
-         defaultSource={BROKEN_IMAGE}
+          defaultSource={BROKEN_IMAGE}
           source={{
             uri: `https://img.youtube.com/vi/${
               videoDetails.attachmentVideoUrl.split("=")[1]
@@ -86,17 +87,23 @@ export const VideoBlock = ({
 }
 
 export const VideoRowList = ({ channelDetails }) => {
+  const navigation = useNavigation<NavigationProp<VideosTabParamList>>()
   return (
     <View style={$videoRowContainer}>
       <View style={$containerCondition}>
-        <View style={$conditionContainer}>
+        <TouchableOpacity
+          style={$conditionContainer}
+          onPress={() =>
+            navigation.navigate("ViewChannel", { publisher: channelDetails[0]?.userId })
+          }
+        >
           <Text
             text={channelDetails[0]?.userId?.first_name + `'s Channel`}
             weight="bold"
             style={$titleText}
           />
           <Text text="View All" weight="medium" style={$textViewAll} />
-        </View>
+        </TouchableOpacity>
         <Icon icon="caretRight" size={20} color={colors.palette.primary200} />
       </View>
       <FlatList

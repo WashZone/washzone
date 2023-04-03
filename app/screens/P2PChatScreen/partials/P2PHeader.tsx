@@ -31,7 +31,7 @@ export const P2PHeader = ({ data, roomId }) => {
             <FastImage source={{ uri: data?.picture }} style={$profileImage} />
             <View>
               <Text text={formatName(data?.name)} style={$usernameText} size="md" />
-              <View style={$flexRow}>
+              {/* <View style={$flexRow}>
                 <View style={[$statusIcon, { backgroundColor: colors.palette.status.online }]} />
                 <Text
                   text={data?.status || "Online"}
@@ -39,7 +39,7 @@ export const P2PHeader = ({ data, roomId }) => {
                   size="xxs"
                   color={colors.palette.greyOverlay100}
                 />
-              </View>
+              </View> */}
             </View>
           </TouchableOpacity>
         </View>

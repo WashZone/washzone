@@ -25,7 +25,6 @@ export function CreateTopic() {
   const {
     userStore: { picture, _id },
   } = useStores()
-  const [postContent, setPostContent] = useState<string>("")
   const [topicDescription, setTopicDescription] = useState<string>("")
   const [topicTitle, setTopicTitle] = useState<string>("")
   const [isPosting, setIsPosting] = useState<boolean>(false)
@@ -34,7 +33,6 @@ export function CreateTopic() {
   const inputTitleRef = useRef<TextInput>()
   const [selectedImage, setSelectedImage] = useState<any>({ height: 1, width: 1 })
   const { createTopic, loadStories, refreshTopics } = useHooks()
-
 
   const onPost = async () => {
     setIsPosting(true)
@@ -47,7 +45,6 @@ export function CreateTopic() {
       })
       refreshTopics()
       loadStories()
-    
     } catch (error) {
     } finally {
       setIsPosting(false)
@@ -66,22 +63,22 @@ export function CreateTopic() {
     }
   }
 
+  useEffect(
+    () => () => {
+      progress.value = withTiming(0, { duration: 200 })
+    },
+    [],
+  )
+
   const onGalleryPress = async () => {
     try {
-      if (selectedImage.uri) {
-        setTimeout(() => {
-          progress.value = withTiming(0.8, { duration: 300 })
-        }, 300)
-      }
-
       const image = await MediaPicker()
       if (image?.uri) {
         setSelectedImage(image)
+        setTimeout(() => {
+          progress.value = withTiming(1, { duration: 300 })
+        }, 100)
       }
-
-      setTimeout(() => {
-        progress.value = withTiming(1, { duration: 300 })
-      }, 100)
     } catch (e) {}
   }
 
@@ -154,9 +151,13 @@ export function CreateTopic() {
   })
 
   return (
-    <>
+    <View
+      style={{
+        marginBottom: spacing.medium,
+      }}
+    >
       <View style={$container}>
-        <FastImage source={{ uri: picture }} style={$picture} resizeMode='cover' />
+        <FastImage source={{ uri: picture }} style={$picture} resizeMode="cover" />
         <View style={$contentContainer}>
           <TextField
             value={topicTitle}
@@ -219,7 +220,7 @@ export function CreateTopic() {
           </AnimatedPressable>
         </View>
       </Animated.View>
-    </>
+    </View>
   )
 }
 

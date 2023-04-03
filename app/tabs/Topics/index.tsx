@@ -20,7 +20,6 @@ const Stack = createNativeStackNavigator<TopicsTabParamList>()
 const TopicsTab = observer(function AppStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName={"TopicsFeed"}>
-      <Stack.Screen name="TopicDetails" component={TopicDetails} />
       <Stack.Screen name="TopicsFeed" component={TopicsFeed} />
       <Stack.Screen name="TopicInfo" component={TopicInfo} />
     </Stack.Navigator>

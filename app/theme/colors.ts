@@ -16,7 +16,7 @@ const palette = {
   primary200: "#0083E2",
   primary300: "#44aaf2",
   primary400: "#619acc",
-  primary500: "#C76542",
+  primary500: "#7AAAD7",
   primary600: "#A54F31",
 
   primaryOverlay15: "rgba(0,131,226,0.15)",

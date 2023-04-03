@@ -19,12 +19,11 @@ import { useHooks } from "../hooks"
 import { observer } from "mobx-react-lite"
 import { CreateTopic } from "./CreateTopic"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
-import { MREC_AD_UNIT_ID } from "../../utils/AppLovin"
 // import AppLovinMAX from "react-native-applovin-max/src/index"
 import { $flex1, $flexRow } from "../styles"
 import Share from "react-native-share"
 import { getIconForInteraction } from "../../utils/helpers"
-import { defaultImages, DEFAULT_LOADING } from "../../utils"
+import { defaultImages } from "../../utils"
 import LinearGradient from "react-native-linear-gradient"
 import ShimmerPlaceholder from "react-native-shimmer-placeholder"
 import NativeAdView from "../../utils/NativeAd"
@@ -111,20 +110,20 @@ export const TopicComponent = ({ topic, index, fullView = false }) => {
               }}
               style={$picture}
             />
-            <View style={$textContainer}>
+            <View style={[$textContainer, { justifyContent: "center" }]}>
               <Text
                 text={formatName(topicDetails.first_name + " " + topicDetails.last_name)}
                 preset="subheading2"
               />
-              <Text text={fromNow(topicDetails.createdAt)} style={$agoStamp} />
+              <Text
+                text={fromNow(topicDetails.createdAt)}
+                size="xxs"
+                color={colors.palette.neutral500}
+              />
             </View>
           </View>
           <Text style={$postContent} text={topicDetails.title} numberOfLines={1} weight="medium" />
-          {fullView ? (
-            <Text style={$postContent} text={topicDetails.content} size="md" />
-          ) : (
-            <Text style={$postContent} text={topicDetails.content} numberOfLines={3} size="xs" />
-          )}
+          <Text style={$postContent} text={topicDetails.content} numberOfLines={3} size="xs" />
           <Actions item={topic} />
         </View>
         <View style={$contentCenter}>
@@ -184,7 +183,7 @@ export const TopicComponentFullView = ({ topic, index }) => {
         onPress={() => navigation.navigate("TopicInfo", { topic })}
       >
         <View style={$flex1}>
-          <View style={[$publisherInfoContainer, { marginBottom: spacing.extraSmall }]}>
+          <View style={$publisherInfoContainer}>
             <FastImage
               source={{
                 uri: topicDetails?.picture || defaultImages.profile,
@@ -207,10 +206,8 @@ export const TopicComponentFullView = ({ topic, index }) => {
             size="md"
           />
           <Text style={$postContent} text={topicDetails.content} size="xs" />
-
-       
         </View>
-        <View style={$contentCenter}>
+        <View style={[$contentCenter, {marginTop:spacing.tiny}]}>
           <ShimmerPlaceholder
             visible={loaded}
             shimmerStyle={$attachment}
@@ -282,10 +279,6 @@ const $actionContainer: ViewStyle = {
 
 const $contentCenter: ViewStyle = { alignSelf: "center" }
 
-const $mrecStyle: ViewStyle = { marginTop: 10, alignSelf: "center" }
-
-const postContainerRadius = 10
-
 const $container: ViewStyle = { flex: 1 }
 
 const $actionsContainer: ViewStyle = {
@@ -302,8 +295,7 @@ const $attachment: ImageStyle = {
 
 const $postContent: TextStyle = {
   marginHorizontal: spacing.homeScreen,
-  marginBottom: spacing.homeScreen,
-  // lineHeight: 20,
+  marginBottom: spacing.tiny,
 }
 
 const $agoStamp: TextStyle = {
@@ -318,14 +310,14 @@ const $postContainer: ViewStyle = {
 const $postParentContainer: ViewStyle = {
   backgroundColor: colors.palette.neutral100,
   width: "100%",
-  borderRadius: postContainerRadius,
   justifyContent: "space-between",
-  marginTop: 10,
+  borderBottomWidth: 1,
+  borderBottomColor: colors.separator,
+  // marginTop: 10,
 }
 
 const $publisherInfoContainer: ViewStyle = {
-  height: 68,
-  borderRadius: 20,
+  height: 64,
   alignItems: "center",
   flexDirection: "row",
   padding: spacing.homeScreen,
@@ -335,11 +327,12 @@ const $picture: ImageStyle = {
   height: 40,
   width: 40,
   borderRadius: 20,
-  marginRight: spacing.homeScreen,
+  marginRight: spacing.extraSmall,
 }
 
 const $textContainer: ViewStyle = {
   justifyContent: "space-between",
   flex: 1,
-  height: "90%",
+  height: "100%",
+  // backgroundColor:'red'
 }

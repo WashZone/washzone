@@ -44,15 +44,17 @@ export const ResultComponent = ({
         </View>
       }
     >
-      <View>
-        <Text text={formatName(data?.name)} color={colors.palette.neutral100} weight="normal" />
+      <View style={{ justifyContent: "center",  }}>
+        <Text text={formatName(data?.name)} color={colors.palette.neutral100} weight="medium" />
         {data?.description && (
           <Text
+
+            style={{height:20 }}
             text={data?.description}
             numberOfLines={1}
             size="xxs"
             color={colors.palette.neutral100}
-            ellipsizeMode="tail"
+            // ellipsizeMode="tail"
           />
         )}
       </View>

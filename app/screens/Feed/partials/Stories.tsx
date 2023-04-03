@@ -130,7 +130,7 @@ const StoryComponent = ({ item, index, handleStoryUrl }: StoryComponentProps) =>
         <View style={$pictureContainer}>
           <FastImage source={{ uri: item?.userId?.picture }} style={$picture} />
         </View>
-        <LinearGradient colors={["transparent", colors.palette.primary200]} style={$nameContainer}>
+        <LinearGradient colors={["transparent", colors.palette.primary500]} style={$nameContainer}>
           <Text text={formatName(item?.userId?.name)} style={$name} numberOfLines={1} />
         </LinearGradient>
       </Pressable>
@@ -161,8 +161,8 @@ const $storyContainer: ViewStyle = {
 const $pictureContainer: ViewStyle = {
   height: 44,
   width: 44,
-  borderRadius: 20,
-  backgroundColor: colors.palette.primary200,
+  borderRadius: 22,
+  backgroundColor: colors.palette.primary500,
   margin: 5,
   alignItems: "center",
   justifyContent: "center",
