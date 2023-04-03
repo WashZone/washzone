@@ -32,7 +32,7 @@ interface ActionProps {
   icon: IconTypes
   title: string
   onPress: () => void
-  tintColor ?: string
+  tintColor?: string
 }
 
 const PublisherDetails = ({ publisher }: { publisher: any }) => {
@@ -77,6 +77,7 @@ const PublisherDetails = ({ publisher }: { publisher: any }) => {
 const MoreDetails = ({ classified }: { classified: any }) => {
   return (
     <View style={$moreDetialsContainer}>
+      <Text text={classified?.condition}  weight="medium" size="md" numberOfLines={1} />
       <Text text="Details" weight="semiBold" preset="h2" />
       <View style={$containerCondition}>
         <View style={$conditionContainer}>
@@ -152,8 +153,7 @@ const BottomActions = ({ classified }: { classified: any }) => {
               {isSaving && option.icon === "save" ? (
                 <ActivityIndicator animating color={colors.palette.primary100} />
               ) : (
-                <Icon icon={option.icon}  color={option.tintColor} />
-                
+                <Icon icon={option.icon} color={option.tintColor} />
               )}
             </TouchableOpacity>
             <Text text={option.title} />
@@ -319,13 +319,12 @@ const $flexHori: ViewStyle = { flexDirection: "row" }
 const $publisherContainer: ViewStyle = {
   flexDirection: "row",
   paddingHorizontal: spacing.medium,
-  marginVertical: spacing.medium,
+  marginVertical: spacing.large,
   justifyContent: "space-between",
 }
 
 const $moreDetialsContainer: ViewStyle = {
   paddingHorizontal: spacing.medium,
-  marginTop: spacing.massive,
 }
 
 const $bottomActionsContainer: ViewStyle = {

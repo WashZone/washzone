@@ -1,5 +1,13 @@
-import React, { FC, useState } from "react"
-import { View, Pressable, FlatList, TextStyle, ViewStyle, RefreshControl, Dimensions } from "react-native"
+import React, { FC, useEffect, useRef, useState } from "react"
+import {
+  View,
+  Pressable,
+  FlatList,
+  TextStyle,
+  ViewStyle,
+  RefreshControl,
+  Dimensions,
+} from "react-native"
 import { Icon, Screen, Text } from "../../components"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { TopicsTabParamList, TopicsTabProps } from "../../tabs"
@@ -13,12 +21,13 @@ import { CreateTopic } from "./CreateTopic"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { MREC_AD_UNIT_ID } from "../../utils/AppLovin"
 // import AppLovinMAX from "react-native-applovin-max/src/index"
-import { $flex1 } from "../styles"
+import { $flex1, $flexRow } from "../styles"
 import Share from "react-native-share"
 import { getIconForInteraction } from "../../utils/helpers"
 import { defaultImages, DEFAULT_LOADING } from "../../utils"
 import LinearGradient from "react-native-linear-gradient"
 import ShimmerPlaceholder from "react-native-shimmer-placeholder"
+import NativeAdView from "../../utils/NativeAd"
 
 const Actions = observer(function ActionButtons({ item }: { item: any }) {
   const [loading, setLoading] = useState<boolean>(false)
@@ -75,7 +84,7 @@ const Actions = observer(function ActionButtons({ item }: { item: any }) {
   )
 })
 
-export const TopicComponent = ({ topic, index }) => {
+export const TopicComponent = ({ topic, index, fullView = false }) => {
   const [loaded, setLoaded] = useState(false)
   const navigation = useNavigation<NavigationProp<TopicsTabParamList>>()
   const topicDetails = {
@@ -85,13 +94,13 @@ export const TopicComponent = ({ topic, index }) => {
     attachmentUrl: topic?.attachmentUrl,
     createdAt: topic?.createdAt,
     content: topic?.topicContent,
-    title : topic?.title
+    title: topic?.title,
   }
 
   return (
     <>
       <Pressable
-        style={[$postContainer, $postParentContainer]}
+        style={[$postContainer, $postParentContainer, $flexRow]}
         onPress={() => navigation.navigate("TopicInfo", { topic })}
       >
         <View style={$flex1}>
@@ -110,25 +119,28 @@ export const TopicComponent = ({ topic, index }) => {
               <Text text={fromNow(topicDetails.createdAt)} style={$agoStamp} />
             </View>
           </View>
-          <Text style={$postContent} text={topicDetails.title} numberOfLines={1} weight='medium'/>
-          <Text style={$postContent} text={topicDetails.content} numberOfLines={3} />
+          <Text style={$postContent} text={topicDetails.title} numberOfLines={1} weight="medium" />
+          {fullView ? (
+            <Text style={$postContent} text={topicDetails.content} size="md" />
+          ) : (
+            <Text style={$postContent} text={topicDetails.content} numberOfLines={3} size="xs" />
+          )}
           <Actions item={topic} />
         </View>
         <View style={$contentCenter}>
-        <ShimmerPlaceholder
-          visible={loaded}
-          shimmerStyle={$attachment}
-          LinearGradient={LinearGradient}
-        >
-          <FastImage
-            style={$attachment}
-            source={{
-              uri:
-                topic?.attachmentUrl
-            }}
-            onLoadEnd={() => setLoaded(true)}
-            resizeMode="cover"
-          />
+          <ShimmerPlaceholder
+            visible={loaded}
+            shimmerStyle={$attachment}
+            LinearGradient={LinearGradient}
+          >
+            <FastImage
+              style={$attachment}
+              source={{
+                uri: topic?.attachmentUrl,
+              }}
+              onLoadEnd={() => setLoaded(true)}
+              resizeMode="cover"
+            />
           </ShimmerPlaceholder>
         </View>
       </Pressable>
@@ -143,9 +155,96 @@ export const TopicComponent = ({ topic, index }) => {
   )
 }
 
+export const TopicComponentFullView = ({ topic, index }) => {
+  const [loaded, setLoaded] = useState(false)
+  const [attachmentDimensions, setAttachmentDimensions] = useState({ height: 0, width: 0 })
+  const navigation = useNavigation<NavigationProp<TopicsTabParamList>>()
+  const topicDetails = {
+    picture: topic?.userId?.picture,
+    first_name: topic?.userId?.first_name,
+    last_name: topic?.userId?.last_name,
+    attachmentUrl: topic?.attachmentUrl,
+    createdAt: topic?.createdAt,
+    content: topic?.topicContent,
+    title: topic?.title,
+  }
+  const windowWidth = Dimensions.get("window").width
+  const nativeAdViewRef = useRef<any>()
+
+  useEffect(() => {
+    if (nativeAdViewRef?.current) {
+      nativeAdViewRef.current?.loadAd()
+    }
+  }, [nativeAdViewRef.current])
+
+  return (
+    <>
+      <Pressable
+        style={[$postContainer, $postParentContainer]}
+        onPress={() => navigation.navigate("TopicInfo", { topic })}
+      >
+        <View style={$flex1}>
+          <View style={[$publisherInfoContainer, { marginBottom: spacing.extraSmall }]}>
+            <FastImage
+              source={{
+                uri: topicDetails?.picture || defaultImages.profile,
+              }}
+              style={$picture}
+            />
+            <View style={[$textContainer, $flexRow, { alignItems: "center" }]}>
+              <Text
+                text={formatName(topicDetails.first_name + " " + topicDetails.last_name)}
+                preset="subheading2"
+              />
+              <Text text={fromNow(topicDetails.createdAt)} style={$agoStamp} />
+            </View>
+          </View>
+          <Text
+            style={$postContent}
+            text={topicDetails.title}
+            numberOfLines={1}
+            weight="medium"
+            size="md"
+          />
+          <Text style={$postContent} text={topicDetails.content} size="xs" />
+
+       
+        </View>
+        <View style={$contentCenter}>
+          <ShimmerPlaceholder
+            visible={loaded}
+            shimmerStyle={$attachment}
+            LinearGradient={LinearGradient}
+          >
+            <FastImage
+              style={attachmentDimensions}
+              source={{
+                uri: topic?.attachmentUrl,
+              }}
+              onLoad={(res) => {
+                setAttachmentDimensions({
+                  height: (windowWidth * res.nativeEvent.height) / res.nativeEvent.width,
+                  width: windowWidth,
+                })
+              }}
+              onLoadEnd={() => setLoaded(true)}
+              resizeMode="cover"
+            />
+          </ShimmerPlaceholder>
+        </View>
+        <Actions item={topic} />
+      </Pressable>
+
+      <NativeAdView ref={nativeAdViewRef} />
+    </>
+  )
+}
+
 export const TopicsFeed: FC<TopicsTabProps<"TopicsFeed">> = observer(function TopicsFeed(_props) {
   const { refreshTopics, loadMoreTopics } = useHooks()
-  const { topics :{topics} } = useStores()
+  const {
+    topics: { topics },
+  } = useStores()
 
   const [refreshing, setRefreshing] = useState(false)
 
@@ -161,7 +260,13 @@ export const TopicsFeed: FC<TopicsTabProps<"TopicsFeed">> = observer(function To
         stickyHeaderIndices={[0]}
         style={$container}
         onEndReached={loadMoreTopics}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}tintColor={colors.palette.primary100} />}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={colors.palette.primary100}
+          />
+        }
         data={topics}
         renderItem={({ item, index }) => <TopicComponent topic={item} index={item?._id} />}
       />
@@ -175,7 +280,7 @@ const $actionContainer: ViewStyle = {
   flexDirection: "row",
 }
 
-const $contentCenter: ViewStyle = {}
+const $contentCenter: ViewStyle = { alignSelf: "center" }
 
 const $mrecStyle: ViewStyle = { marginTop: 10, alignSelf: "center" }
 
@@ -196,10 +301,9 @@ const $attachment: ImageStyle = {
 }
 
 const $postContent: TextStyle = {
-  fontSize: 13,
   marginHorizontal: spacing.homeScreen,
   marginBottom: spacing.homeScreen,
-  lineHeight: 20,
+  // lineHeight: 20,
 }
 
 const $agoStamp: TextStyle = {
@@ -208,7 +312,7 @@ const $agoStamp: TextStyle = {
 }
 
 const $postContainer: ViewStyle = {
-  flexDirection: "row",
+  // flexDirection: "row",
 }
 
 const $postParentContainer: ViewStyle = {
@@ -235,6 +339,7 @@ const $picture: ImageStyle = {
 }
 
 const $textContainer: ViewStyle = {
-  justifyContent: "space-around",
+  justifyContent: "space-between",
+  flex: 1,
   height: "90%",
 }

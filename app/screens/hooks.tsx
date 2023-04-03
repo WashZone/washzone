@@ -99,6 +99,7 @@ export function useHooks() {
       mutateVerifyEmailByEmail,
       mutateSendCallNotification,
       mutateGetroomByroomId,
+
     },
     userStore,
   } = useStores()
@@ -536,7 +537,7 @@ export function useHooks() {
       }
     }
     const inputInteraction = getInputInteraction()
-
+    console.log("Current Interaction", videoId, buttonType, inputInteraction)
     try {
       await mutateLikeDislikeVideo({
         videoId,
@@ -802,10 +803,8 @@ export function useHooks() {
   }
 
   const syncAllChats = async () => {
-    console.log("SYNCING ALL CHATS")
     try {
       const res = await mutateGetroomByUsers({ memberId: userStore._id })
-      console.log("SYNCING ALL CHATS", JSON.stringify(res))
       setChatRooms(res.getroomByUsers?.data)
     } catch (err) {
       console.log(err)
@@ -1078,17 +1077,32 @@ export function useHooks() {
     type: string,
     roomId: string,
     data: { offer?: string; answer?: string },
+    setter?: boolean,
   ) => {
     const resAddConnectionData = await mutateAddOfferanswerInRoom({ ...data, roomId })
     console.log("resAddConnectionData", resAddConnectionData)
 
-    console.log("mutateSendCallNotification:Input", token, " \n ", type, " \n ", roomId)
+    console.log(
+      "mutateSendCallNotification:Input",
+      token,
+      " \n ",
+      type,
+      " \n ",
+      roomId,
+      " \n",
+      setter,
+    )
     const { _id, name } = userStore
+
+    // we have to send a setter alert and then a actualy display alert
+    // as we send the alert twice we need a way to identify each, we will do that via a type key in receiver
+    // (Why Receiver? cuz rn, i am using Stringified JSON in receiver field and that being so, i can add remove feilds as per i see fit)
+
     const res = await mutateSendCallNotification({
       data: {
         roomId,
         type,
-        receiver: JSON.stringify({ _id, name }),
+        receiver: JSON.stringify({ _id, name, setter }),
       },
       notificationToken: token,
     })
@@ -1104,6 +1118,17 @@ export function useHooks() {
       Alert.alert("Unable to Establish Connection!", "Please try again.")
     }
   }
+
+  const getNotifications = async () => {
+    try {
+      const res = await mutateGetroomByroomId({ roomId })
+      console.log("RES::getRoomById", res.getroomByroomId?.data[0])
+      return res.getroomByroomId?.data[0]
+    } catch (err) {
+      Alert.alert("Unable to Establish Connection!", "Please try again.")
+    }
+  }
+
 
   return {
     getRoomById,

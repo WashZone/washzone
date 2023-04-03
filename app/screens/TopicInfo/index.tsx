@@ -9,7 +9,7 @@ import { useHooks } from "../hooks"
 import { CommentComponent } from "./Comments"
 import { useStores } from "../../models"
 import { ActivityIndicator } from "react-native-paper"
-import { TopicComponent } from "../TopicsFeed"
+import { TopicComponent, TopicComponentFullView } from "../TopicsFeed"
 import FastImage from "react-native-fast-image"
 
 export const TopicInfo: FC<HomeTabProps<"TopicInfo">> = function PostInfo(props) {
@@ -75,7 +75,7 @@ export const TopicInfo: FC<HomeTabProps<"TopicInfo">> = function PostInfo(props)
   return (
     <Screen preset="fixed" keyboardOffset={-180} contentContainerStyle={$container}>
       <ScrollView style={$contentContainer}>
-        <TopicComponent topic={topicDetails} index={0} />
+        <TopicComponentFullView topic={topicDetails} index={0} />
         {comments.map((c) => (
           <CommentComponent comment={c} key={c?._id} />
         ))}

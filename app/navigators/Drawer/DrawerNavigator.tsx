@@ -11,7 +11,8 @@ import { DrawerIconButton } from "./DrawerIconButton"
 import { DrawerOptions } from "./DrawerOptions"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { AppStackParamList } from "../AppNavigator"
-import { $flexRow } from "../../screens/styles"
+import { $contentCenter, $flexRow } from "../../screens/styles"
+import { useStores } from "../../models"
 
 export function DrawerNavigator() {
   const [open, setOpen] = useState(false)
@@ -19,6 +20,9 @@ export function DrawerNavigator() {
   const drawerRef = useRef<DrawerLayout>()
   const appNavigaion = useNavigation<NavigationProp<AppStackParamList>>()
   const progress = useSharedValue(0)
+  const {
+    allChats: { getUnreadCount },
+  } = useStores()
 
   const toggleDrawer = () => {
     if (!drawerRef.current.state.drawerOpened) {
@@ -33,9 +37,9 @@ export function DrawerNavigator() {
     }
   }
 
-const closeDrawer =() =>{
-  drawerRef.current?.closeDrawer({ speed: 10 })
-}
+  const closeDrawer = () => {
+    drawerRef.current?.closeDrawer({ speed: 10 })
+  }
 
   useEffect(() => {
     return () => timeout.current && clearTimeout(timeout.current)
@@ -94,7 +98,16 @@ const closeDrawer =() =>{
           <Icon icon="appLogo" size={45} />
           <View style={[$flexRow, { position: "absolute", right: 10 }]}>
             <Pressable style={$searchContainer} onPress={handleChatPress}>
-              <Icon icon="chatMessage" size={24} />
+              <Icon icon='addMessage' size={24} />
+              {/* {getUnreadCount() > 0 && (
+                <View style={$unreadBadge}>
+                  <Text
+                    color={colors.palette.neutral100}
+                    style={$badgeText}
+                    text={getUnreadCount().toString()}
+                  />
+                </View>
+              )} */}
             </Pressable>
             <Pressable style={$searchContainer} onPress={handleSearchPress}>
               <Icon icon="search" size={24} />
@@ -105,6 +118,24 @@ const closeDrawer =() =>{
       </Screen>
     </DrawerLayout>
   )
+}
+
+const $badgeText: TextStyle = {
+  lineHeight: 12,
+  fontSize: 12,
+  textAlign: "center",
+  textAlignVertical: "center",
+}
+
+const $unreadBadge: ViewStyle = {
+  position: "absolute",
+  height: 16,
+  width: 16,
+  borderRadius: 7,
+  bottom: 10,
+  right: 0,
+  ...$contentCenter,
+  backgroundColor: colors.palette.angry500,
 }
 
 const $searchContainer: ViewStyle = {

@@ -25,5 +25,6 @@ export * from "./Support"
 export * from "./AllChats"
 export * from "./P2PChatScreen"
 export * from './PostInfo'
-export * from "./CallScreen"
+export * from "./CallScreen/audioCall"
+export * from "./CallScreen/videoCall"
 export * from './VerifyOTP'

@@ -1,6 +1,6 @@
 import React from "react"
 import { TouchableOpacity, View, ViewStyle } from "react-native"
-import { CallStatus, Role } from ".."
+import { CallStatus, Role } from "../audioCall"
 import { Icon } from "../../../components"
 import { colors, spacing } from "../../../theme"
 import { $contentCenter } from "../../styles"

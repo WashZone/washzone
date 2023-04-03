@@ -7,56 +7,55 @@ import { fromNow } from "../../utils/agoFromNow"
 import { formatName } from "../../utils/formatName"
 import ShimmerPlaceholder from "react-native-shimmer-placeholder"
 import LinearGradient from "react-native-linear-gradient"
-const windowWidth =Dimensions.get("window").width
+const windowWidth = Dimensions.get("window").width
 
 export const CommentComponent = ({ comment }: { comment: any }) => {
   const [loaded, setLoaded] = useState(false)
-  const [attachmentDimensions, setAttachmentDimensions] = useState({height:0, width:0})
+  const [attachmentDimensions, setAttachmentDimensions] = useState({ height: 0, width: 0 })
   return (
     <>
-    <View style={$commentContainer}>
-      <FastImage
-        style={$profileImage}
-        source={{
-          uri: comment?.users?.picture,
-        }}
-      />
-      <View>
-        <View style={$nameView}>
-          <Text text={formatName(comment?.users?.name)} style={$publisherName} weight="medium" />
-          <Text text={fromNow(comment?.createdAt)} style={$fromNow} />
-        </View>
-        <Text text={comment?.comment} style={$commentText} />
-      </View>
-      
-    </View>
-    {comment?.acttachmentUrl && (
-      <ShimmerPlaceholder
-        visible={loaded}
-        shimmerStyle={{
-          height: Dimensions.get("window").width * 0.66,
-          width: Dimensions.get("window").width,
-        }}
-        LinearGradient={LinearGradient}
-      >
+      <View style={$commentContainer}>
         <FastImage
-          style={{ ...attachmentDimensions }}
-          onLoad={(res) => {
-            setAttachmentDimensions({
-              height: (windowWidth * res.nativeEvent.height) / res.nativeEvent.width,
-              width: windowWidth,
-            })
+          style={$profileImage}
+          source={{
+            uri: comment?.users?.picture,
           }}
-          onLoadEnd={() => setLoaded(true)}
-          source={{ uri: comment?.acttachmentUrl }}
         />
-      </ShimmerPlaceholder>
-    )}
+        <View style={{ justifyContent: "space-around", height:46,}}>
+          <View style={$nameView}>
+            <Text text={formatName(comment?.users?.name)} style={$publisherName} weight="medium" />
+            <Text text={fromNow(comment?.createdAt)} style={$fromNow} />
+          </View>
+          <Text text={comment?.comment} style={$commentText} />
+        </View>
+      </View>
+      {comment?.acttachmentUrl && (
+        <ShimmerPlaceholder
+          visible={loaded}
+          shimmerStyle={{
+            height: Dimensions.get("window").width * 0.66,
+            width: Dimensions.get("window").width,
+          }}
+          LinearGradient={LinearGradient}
+        >
+          <FastImage
+            style={{ ...attachmentDimensions }}
+            onLoad={(res) => {
+              setAttachmentDimensions({
+                height: (windowWidth * res.nativeEvent.height) / res.nativeEvent.width,
+                width: windowWidth,
+              })
+            }}
+            onLoadEnd={() => setLoaded(true)}
+            source={{ uri: comment?.acttachmentUrl }}
+          />
+        </ShimmerPlaceholder>
+      )}
     </>
   )
 }
 
-const $nameView: ViewStyle = { flexDirection: "row", marginBottom: 5 }
+const $nameView: ViewStyle = { flexDirection: "row" }
 
 const $fromNow: TextStyle = {
   fontSize: 10,
@@ -90,5 +89,5 @@ const $profileImage: ImageStyle = {
   height: 46,
   width: 46,
   borderRadius: 23,
-  marginRight: 20,
+  marginRight: 10,
 }

@@ -1,5 +1,13 @@
 import React, { FC, useEffect, useMemo, useState } from "react"
-import { View, TextStyle, ViewStyle, Dimensions, ScrollView, ActivityIndicator, Share } from "react-native"
+import {
+  View,
+  TextStyle,
+  ViewStyle,
+  Dimensions,
+  ScrollView,
+  ActivityIndicator,
+  Share,
+} from "react-native"
 import { Button, Icon, IconTypes, Screen, Text } from "../../components"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { VideosTabProps } from "../../tabs"
@@ -16,7 +24,6 @@ import { getIconForInteraction } from "../../utils/helpers"
 
 const ActionButtons = observer(function TopicsFeed({ data }: { data: any }) {
   const {
-    userStore: { _id },
     interaction: { getInteractionOnVideo, getVideoInteractionOffset, isVideoSaved },
   } = useStores()
   const [loading, setLoading] = useState<boolean>(false)
@@ -31,47 +38,50 @@ const ActionButtons = observer(function TopicsFeed({ data }: { data: any }) {
     onPress: () => void
     status?: boolean
     count?: any
-  }> = useMemo(() =>[
-    {
-      label: "Like",
-      icon: getIconForInteraction(interaction, "liked"),
-      onPress: async () => {
-        setLoading(true)
-        await interactWithVideo(data?._id, "like")
-        setLoading(false)
+  }> = useMemo(
+    () => [
+      {
+        label: "Like",
+        icon: getIconForInteraction(interaction, "liked"),
+        onPress: async () => {
+          setLoading(true)
+          await interactWithVideo(data?._id, "like")
+          setLoading(false)
+        },
+        status: true,
+        count: data?.likeviews - interactionOffset.likedOffset,
       },
-      status: true,
-      count: data?.likeviews - interactionOffset.likedOffset,
-    },
-    {
-      label: "Dislike",
-      icon: getIconForInteraction(interaction, "disliked"),
-      onPress: async () => {
-        setLoading(true)
-        await interactWithVideo(data?._id, "dislike")
-        setLoading(false)
+      {
+        label: "Dislike",
+        icon: getIconForInteraction(interaction, "disliked"),
+        onPress: async () => {
+          setLoading(true)
+          await interactWithVideo(data?._id, "dislike")
+          setLoading(false)
+        },
+        count: data?.dislikeviews - interactionOffset.dislikedOffset,
+        status: false,
       },
-      count: data?.dislikeviews - interactionOffset.dislikedOffset,
-      status: false,
-    },
-    {
-      label: "Share",
-      icon: "forward",
-      onPress: () =>
-        Share.share({
-          message: data?.videoHeading + `washzone://shared-video/${data?._id}`,
-        })
-    },
-    {
-      label:isVideoSaved(data?._id)? "Saved":'Save',
-      icon: "save_box",
-      onPress: async () => {
-        setLoading(true)
-        await interactWithSaveOnVideo(data?._id)
-        setLoading(true)
+      {
+        label: "Share",
+        icon: "forward",
+        onPress: () =>
+          Share.share({
+            message:  `washzone://shared-video/${data?._id}`,
+          }),
       },
-    },
-  ], [isVideoSaved(data?._id)])
+      {
+        label: isVideoSaved(data?._id) ? "Saved" : "Save",
+        icon: "save_box",
+        onPress: async () => {
+          setLoading(true)
+          await interactWithSaveOnVideo(data?._id)
+          setLoading(true)
+        },
+      },
+    ],
+    [isVideoSaved(data?._id), interaction],
+  )
 
   return (
     <View style={$actionButtonsContainer}>
@@ -181,7 +191,7 @@ export const VideoDetails: FC<VideosTabProps<"VideoDetails">> = observer(functio
 
   const shareVideo = () => {
     Share.share({
-      message: data?.videoHeading + `washzone://shared-video/${videoDetails?._id}`,
+      message: `washzone://shared-video/${videoDetails?._id}`,
     })
   }
 

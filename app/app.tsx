@@ -16,7 +16,7 @@ import React, { useEffect } from "react"
 import { initialWindowMetrics, SafeAreaProvider } from "react-native-safe-area-context"
 import * as Linking from "expo-linking"
 import { useInitialRootStore, useStores } from "./models"
-import { AppNavigator, navigationRef, useNavigationPersistence } from "./navigators"
+import { AppNavigator, AppStackParamList, navigationRef, useNavigationPersistence } from "./navigators"
 import { ErrorBoundary } from "./screens/ErrorScreen/ErrorBoundary"
 import * as storage from "./utils/storage"
 import { customFontsToLoad } from "./theme"
@@ -24,11 +24,11 @@ import { setupReactotron } from "./services/reactotron"
 import Config from "./config"
 import { Platform } from "react-native"
 import AppLovinMAX from "react-native-applovin-max/src/index"
-import { useHooks } from "./screens/hooks"
+import { CallTypes, useHooks } from "./screens/hooks"
 import Toast from "react-native-toast-message"
-import { configureNotifications, notificationHandler } from "./utils"
+import {  notificationHandler } from "./utils"
 import RNCallKeep from "react-native-callkeep"
-import { IncomingCallHook } from "./utils/incomingCall"
+
 
 const options = {
   ios: {
@@ -77,6 +77,7 @@ interface AppProps {
 notificationHandler()
 
 function App(props: AppProps) {
+ 
   const { hideSplashScreen } = props
   const { onBoot } = useHooks()
   const SDK_KEY =
@@ -108,6 +109,7 @@ function App(props: AppProps) {
     AppLovinMAX.initialize(SDK_KEY, (configuration) => {
       console.log("CONFIGURATION", configuration)
       setAppLovinSDKRegistered(true)
+      // AppLovinMAX.showMediationDebugger();
       if (Platform.OS === "android") {
         if (configuration.consentDialogState === AppLovinMAX.ConsentDialogState.APPLIES) {
           // Show user consent dialog

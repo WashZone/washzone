@@ -60,15 +60,12 @@ export const RootStoreModel = types
           .toString(),
         // Handling New Message Arrival
         async (message) => {
-          console.log("SUBSCRIBED", self.userStore.name, JSON.stringify(message))
-          console.log("roomId:chatMessages", message?.roomId?._id)
-          console.log("allChats:chatMessages", self.allChats.chatMessages[message?.roomId?._id])
+          console.log("NEW MESSAGE", message)
           const isNewRoom =
             !self.allChats.chatMessages[message?.roomId?._id]?.length ||
             self.allChats.chatMessages[message?.roomId?._id]?.length === 0
           if (isNewRoom) {
             const res = await self.api.mutateGetroomByUsers({ memberId: self.userStore._id })
-            console.log("SYNCING ALL CHATS IN ROOTSTORE", JSON.stringify(res))
             self.allChats.setChatRooms(res.getroomByUsers?.data)
           }
           setTimeout(

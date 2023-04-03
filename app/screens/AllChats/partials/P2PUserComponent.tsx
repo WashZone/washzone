@@ -1,16 +1,15 @@
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { observer } from "mobx-react-lite"
-import React, { useEffect } from "react"
-import { TextStyle, View, ViewStyle } from "react-native"
+import React from "react"
+import { View, ViewStyle } from "react-native"
 import FastImage, { ImageStyle } from "react-native-fast-image"
-import { Icon, ListItem, Text } from "../../../components"
+import { ListItem, Text } from "../../../components"
 import { useStores } from "../../../models"
 import { AppStackParamList } from "../../../navigators"
 import { colors, spacing } from "../../../theme"
 import { fromNow } from "../../../utils/agoFromNow"
-import { formatDate } from "../../../utils/formatDate"
 import { formatName } from "../../../utils/formatName"
-import { $flex1, $flexRow } from "../../styles"
+
 export const P2PUserComponent = observer(function p2PUserComponent({
   data,
   myId,
@@ -18,17 +17,17 @@ export const P2PUserComponent = observer(function p2PUserComponent({
 }: {
   data: any
   myId: string
-  onLongPress: (id:string) => void
+  onLongPress: (id: string) => void
 }) {
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
   const {
-    allChats: { getLatestMessageForRoom },
+    allChats: { getLatestMessageForRoom, isRead },
   } = useStores()
 
   const receiver = data?.membersId.filter((i: any) => i._id !== myId)[0]
 
   const handlePress = () => {
-    navigation.navigate("P2PChat", { receiver: receiver, roomId: data?._id })
+    navigation.navigate("P2PChat", { receiver, roomId: data?._id })
   }
 
   return (
@@ -58,7 +57,8 @@ export const P2PUserComponent = observer(function p2PUserComponent({
           text={getLatestMessageForRoom(data?._id).message}
           numberOfLines={1}
           size="sm"
-          style={{ color: colors.palette.neutral500 }}
+          // weight={isRead(data?._id) ? "medium" : "normal"}
+          style={{ color: colors.palette.neutral700 }}
         />
       </View>
     </ListItem>

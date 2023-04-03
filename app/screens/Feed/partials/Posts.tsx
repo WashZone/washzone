@@ -87,7 +87,7 @@ export const PostComponent = ({ post, navigateOnPress, index }: PostComponentPro
           </View>
         </View>
 
-        <Text style={$postContent} text={postDetails.content} />
+        <Text style={$postContent} text={postDetails.content} size='xs'/>
         <ShimmerPlaceHolder
           visible={loaded}
           shimmerStyle={{
@@ -164,7 +164,7 @@ export const Posts = observer(() => {
 const postContainerRadius = 10
 
 const $postContent: TextStyle = {
-  fontSize: 13,
+  // fontSize: 13,
   marginHorizontal: spacing.homeScreen,
   marginBottom: spacing.homeScreen,
   lineHeight: 20,

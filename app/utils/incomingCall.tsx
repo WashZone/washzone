@@ -2,7 +2,7 @@ import { useState } from "react"
 import { Platform } from "react-native"
 import RNCallKeep from "react-native-callkeep"
 import uuid from "react-native-uuid"
-const randomUUID = 'e9ca07a4-8346-44d2-bf71-633f69fbdde3'
+const randomUUID = 'e9ca07a4-8346-44d2-bf71-633f79fbdde3'
 export const IncomingCallHook = () => {
   
   const [currentCallId, setCurrentCallId] = useState(null)
@@ -75,7 +75,8 @@ export const IncomingCallHook = () => {
 
   // These Method will end the call
   const endAllCall = () => {
-    RNCallKeep.endAllCalls()
+    // RNCallKeep.endAllCalls()
+    RNCallKeep.endCall(randomUUID)
     setCurrentCallId(null)
     removeEvents()
   }

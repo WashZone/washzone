@@ -9,7 +9,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { formatName } from "../../../utils/formatName"
 import { he } from "date-fns/locale"
-import { Role } from "../../CallScreen"
+import { Role } from "../../CallScreen/audioCall"
 import { useStores } from "../../../models"
 
 export const P2PHeader = ({ data, roomId }) => {
@@ -45,30 +45,24 @@ export const P2PHeader = ({ data, roomId }) => {
         </View>
         <View style={[$flexRow, $contentCenter]}>
           <TouchableOpacity
-            onPress={() =>
-             {
-               navigation.navigate("CallScreen", {
-                mode: "audio",
+            onPress={() => {
+              navigation.navigate("AudioCall", {
                 receiver: data,
                 role: Role.initiator,
-                roomId
-              })}
-            }
+                roomId,
+              })
+            }}
           >
             <Icon icon="audioCall" size={28} color={colors.palette.neutral100} />
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() =>
-
-            {
-               navigation.navigate("CallScreen", {
-                mode: "video",
+            onPress={() => {
+              navigation.navigate("VideoCall", {
                 receiver: data,
-
                 role: Role.initiator,
-                roomId
-              })}
-            }
+                roomId,
+              })
+            }}
           >
             <Icon
               icon="videoCall"

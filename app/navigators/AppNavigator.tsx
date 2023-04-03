@@ -1,4 +1,10 @@
-import { DarkTheme, DefaultTheme, NavigationContainer } from "@react-navigation/native"
+import {
+  DarkTheme,
+  DefaultTheme,
+  NavigationContainer,
+  NavigationProp,
+  useNavigation,
+} from "@react-navigation/native"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import { StackScreenProps } from "@react-navigation/stack"
 import { observer } from "mobx-react-lite"
@@ -23,14 +29,15 @@ import {
   Support,
   P2PChat,
   AllChats,
-  CallScreen,
   VerifyOTP,
+  Role,
+  AudioCall,
+  VideoCall,
 } from "../screens"
 import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
 import { DrawerNavigator } from "./Drawer/DrawerNavigator"
 import { useHooks } from "../screens/hooks"
 import { BlockedUserModal } from "../components/BlockedUserModal"
-import { Role } from "../screens/CallScreen"
 
 export type AppStackParamList = {
   Login: undefined
@@ -50,8 +57,15 @@ export type AppStackParamList = {
   Support: undefined
   AllChats: undefined
   P2PChat: { receiver: any; roomId: string | undefined }
-  CallScreen: {
-    mode: "audio" | "video"
+  AudioCall: {
+    receiver: any
+    role: Role
+    roomId: string
+    offer?: any
+    answer?: any
+    cancelled?: boolean
+  }
+  VideoCall: {
     receiver: any
     role: Role
     roomId: string
@@ -75,19 +89,7 @@ const AppStack = observer(function AppStack() {
   const {
     authenticationStore: { isAuthenticated, isBlocked },
   } = useStores()
-  const { onLoggedInBoot, getRoomById, getUserById } = useHooks()
-
-  const url = Linking.useURL()
-
-  const openUrl = async () => {
-    console.log("RUNNING OPEN URL", url)
-    if (url === null) return
-
-  }
-
-  useEffect(() => {
-    openUrl()
-  }, [url])
+  const { onLoggedInBoot } = useHooks()
 
   useEffect(() => {
     isAuthenticated && onLoggedInBoot()
@@ -101,7 +103,6 @@ const AppStack = observer(function AppStack() {
       >
         {isAuthenticated ? (
           <>
-            {/* <Stack.Screen name="Welcome" component={WelcomeScreen} /> */}
             <Stack.Screen name="Drawer" component={DrawerNavigator} />
             <Stack.Screen name="EditProfile" component={EditProfile} />
             <Stack.Screen name="Legal" component={Legal} />
@@ -112,8 +113,13 @@ const AppStack = observer(function AppStack() {
             <Stack.Screen name="P2PChat" component={P2PChat} />
             <Stack.Screen name="Support" component={Support} />
             <Stack.Screen
-              name="CallScreen"
-              component={CallScreen}
+              name="AudioCall"
+              component={AudioCall}
+              options={{ presentation: "containedModal" }}
+            />
+            <Stack.Screen
+              name="VideoCall"
+              component={VideoCall}
               options={{ presentation: "containedModal" }}
             />
             <Stack.Screen
