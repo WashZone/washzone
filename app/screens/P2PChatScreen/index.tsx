@@ -27,7 +27,8 @@ import LinearGradient from "react-native-linear-gradient"
 
 const getColorFromType = (type: any) => {
   switch (type) {
-    case messageMetadataType.incomingCallOffer:
+    case messageMetadataType.incomingCallOfferAudio:
+    case messageMetadataType.incomingCallOfferVideo:
       return colors.palette.status.away
     case messageMetadataType.incomingCallAnswer:
       return colors.palette.success100
@@ -44,17 +45,17 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
   const { receiver, roomId } = props.route.params
   const {
     userStore,
-    allChats: { getRoomMessages, setLastReadMessageIdForRoom },
+    allChats: { getRoomMessages, setLastReadId },
   } = useStores()
   const { syncChatMessages, sendTextMessage, getMoreChatMessages, sendAttachment } = useHooks()
-  const [optionsModalVisible, setOptionsModalVisible] = useState(false)
+  // const [optionsModalVisible, setOptionsModalVisible] = useState(false)
   const [isLastPage, setIsLastPage] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
   const [sending, setSending] = useState(false)
   const [syncing, setSyncing] = useState(true)
   const [isAttachmentUploading, setIsAttachmentUploading] = useState(false)
-
-  const [selectedMessage, setSelectedMessage] = useState<any>({ type: "unsupported" })
+  const allMessages = getRoomMessages({ roomId })
+  // const [selectedMessage, setSelectedMessage] = useState<any>({ type: "unsupported" })
   const user = {
     id: userStore._id,
     imageUrl: userStore?.picture,
@@ -76,9 +77,11 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
     setTimeout(() => setSyncing(false), 500)
   }
 
+  useEffect(() => setLastReadId(roomId, allMessages[0]?._id), [allMessages])
+
   useEffect(() => {
     syncChat()
-    setLastReadMessageIdForRoom(roomId)
+    // setLastReadMessageIdForRoom(roomId)
   }, [])
 
   const onAttachmentPress = async () => {
@@ -96,10 +99,10 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
     setSending(false)
   }
 
-  const handleOnMessageLongPress = (message) => {
-    // setSelectedMessage(message)
-    // setOptionsModalVisible(true)
-  }
+  // const handleOnMessageLongPress = (message) => {
+  // setSelectedMessage(message)
+  // setOptionsModalVisible(true)
+  // }
 
   const onChatEndReached = async () => {
     setLoadingMore(true)
@@ -121,12 +124,7 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
     const isImage = message?.type === "image"
     const isLog =
       message?.type === "custom" &&
-      [
-        messageMetadataType.hangUpCall,
-        messageMetadataType.incomingCallAnswer,
-        messageMetadataType.incomingCallOffer,
-        messageMetadataType.classifiedOffer,
-      ].includes(message?.metaData?.metaDataType)
+      [messageMetadataType.classifiedOffer].includes(message?.metaData?.metaDataType)
     return (
       <View
         style={[
@@ -224,19 +222,19 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
         renderCustomMessage={(message, messageWidth) => <CustomChatMessage message={message} />}
         onAttachmentPress={onAttachmentPress}
         onMessagePress={handleMessagePress}
-        onMessageLongPress={handleOnMessageLongPress}
+        // onMessageLongPress={handleOnMessageLongPress}
         onSendPress={handleSendPress}
         user={user}
         renderBubble={renderBubble}
         enableAnimation
         isLastPage={isLastPage}
       />
-      <MessageOptionsModal
+      {/* <MessageOptionsModal
         message={selectedMessage}
         isVisible={optionsModalVisible}
         setVisible={setOptionsModalVisible}
         metadata={selectedMessage?.metadata}
-      />
+      /> */}
     </View>
   )
 })

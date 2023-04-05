@@ -4,11 +4,12 @@ import {
   FlatList,
   Pressable,
   RefreshControl,
+  Share,
   TextStyle,
   View,
   ViewStyle,
 } from "react-native"
-import { Text } from "../../../components"
+import { Icon, Text } from "../../../components"
 import { colors, spacing } from "../../../theme"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { formatName } from "../../../utils/formatName"
@@ -22,11 +23,12 @@ import { Stories } from "./Stories"
 import { $flex1 } from "../../styles"
 import { MREC_AD_UNIT_ID, NATIVE_AD_UNIT_ID } from "../../../utils/AppLovin"
 import ShimmerPlaceHolder from "react-native-shimmer-placeholder"
+import { getIconForInteraction } from "../../../utils/helpers"
 
 import NativeAdView from "../../../utils/NativeAd"
 import AppLovinMAX from "react-native-applovin-max/src/index"
 
-import { defaultImages, DEFAULT_LOADING } from "../../../utils"
+import { defaultImages } from "../../../utils"
 import LinearGradient from "react-native-linear-gradient"
 
 export interface PostComponentProps {
@@ -34,6 +36,60 @@ export interface PostComponentProps {
   navigateOnPress?: boolean
   index: number
 }
+const Actions = observer(function ActionButtons({ item }: { item: any }) {
+  const [loading, setLoading] = useState<boolean>(false)
+  const { interactWithTopic } = useHooks()
+  const {
+    interaction: { getInteractionOnTopic, getTopicInteractionOffset },
+  } = useStores()
+
+  const interaction = getInteractionOnTopic(item?._id)
+  const interactionOffset = getTopicInteractionOffset(item?._id)
+
+  return (
+    <View style={$actionsContainer}>
+      <View style={$actionContainer}>
+        <Icon
+          icon={getIconForInteraction(interaction, "liked")}
+          size={20}
+          style={{ marginRight: spacing.extraSmall }}
+          onPress={async () => {
+            if (!loading) {
+              setLoading(true)
+              await interactWithTopic(item?._id, "like")
+              setLoading(false)
+            }
+          }}
+        />
+        <Text>{item?.likeviews - interactionOffset.likedOffset}</Text>
+      </View>
+      <View style={$actionContainer}>
+        <Icon
+          icon={getIconForInteraction(interaction, "disliked")}
+          size={20}
+          style={{ marginRight: spacing.extraSmall }}
+          onPress={async () => {
+            if (!loading) {
+              setLoading(true)
+              await interactWithTopic(item?._id, "dislike")
+              setLoading(false)
+            }
+          }}
+        />
+        <Text>{item?.dislikeviews - interactionOffset.dislikedOffset}</Text>
+      </View>
+      <View style={$actionContainer}>
+        <Icon
+          icon="share"
+          size={25}
+          onPress={() =>
+            Share.share({ message: "", title: "", url: `washzone://shared-post/${item?._id}` })
+          }
+        />
+      </View>
+    </View>
+  )
+})
 
 export const PostComponent = ({ post, navigateOnPress, index }: PostComponentProps) => {
   const [loaded, setLoaded] = useState(false)
@@ -107,6 +163,7 @@ export const PostComponent = ({ post, navigateOnPress, index }: PostComponentPro
             onLoadEnd={() => setLoaded(true)}
           />
         </ShimmerPlaceHolder>
+        <Actions item={post} />
       </Pressable>
       {index % 5 === 0 && (
         <>
@@ -160,8 +217,6 @@ export const Posts = observer(() => {
   )
 })
 
-const postContainerRadius = 10
-
 const $postContent: TextStyle = {
   // fontSize: 13,
   marginHorizontal: spacing.homeScreen,
@@ -205,4 +260,17 @@ const $picture: ImageStyle = {
 const $textContainer: ViewStyle = {
   justifyContent: "space-around",
   height: "90%",
+}
+
+const $actionContainer: ViewStyle = {
+  width: 60,
+  alignItems: "center",
+  justifyContent: "flex-start",
+  flexDirection: "row",
+}
+
+const $actionsContainer: ViewStyle = {
+  flexDirection: "row",
+  padding: spacing.medium,
+  zIndex: 999,
 }

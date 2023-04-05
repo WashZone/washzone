@@ -33,20 +33,23 @@ const en = {
     },
     allChats: {
       heading: "Welcome to your Chats!",
-      content: "Start a conversation and connect with someone today! This chat screen is ready for your messages.",
+      content:
+        "Start a conversation and connect with someone today! This chat screen is ready for your messages.",
       button: "Chat Now!",
     },
     saved: {
       heading: "Your Saved Videos and Classifieds",
-      content: "You currently have no saved videos or classifieds, but you can start saving your favorite content and ads for easy access in the future. Check back here to see your saved items!",
+      content:
+        "You currently have no saved videos or classifieds, but you can start saving your favorite content and ads for easy access in the future. Check back here to see your saved items!",
       button: "Go Back!",
     },
     notifications: {
       heading: "No Notifications Found!",
-      content: "You currently have no new notifications, but keep an eye on this screen for updates and alerts. Stay in the loop with important information by checking your notifications regularly!",
+      content:
+        "You currently have no new notifications, but keep an eye on this screen for updates and alerts. Stay in the loop with important information by checking your notifications regularly!",
       button: "Go Back!",
     },
-    searchResults:{
+    searchResults: {
       heading: "No Results Found!",
       content: "",
       button: "Go Back!",
@@ -217,7 +220,8 @@ const en = {
       text2: "Please choose another email as this one seems to be already registered.",
     },
     ytUrlNotValid: {
-      text1: "Enter a valid Youtube URL!",
+      text1: "Invalid Youtube Video",
+      text2: "Supported Format : https://www.youtube.com/watch?v=xxxxxx",
     },
     emptyDescription: {
       text1: "Description cannot be empty!",

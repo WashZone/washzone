@@ -13,6 +13,24 @@ import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { AppStackParamList } from "../AppNavigator"
 import { $contentCenter, $flexRow } from "../../screens/styles"
 import { useStores } from "../../models"
+import { observer } from "mobx-react-lite"
+
+const UnreadCountBadge = observer(() => {
+  const {
+    allChats: { unreadCount, allChatRooms },
+  } = useStores()
+  // const [count, setCount] = useState(0)
+  // useEffect(() => {
+  //   setCount(getUnreadCount())
+  // }, [allChatRooms])
+  return (
+    unreadCount > 0 && (
+      <View style={$unreadBadge}>
+        <Text color={colors.palette.neutral100} style={$badgeText} text={unreadCount.toString()} />
+      </View>
+    )
+  )
+})
 
 export function DrawerNavigator() {
   const [open, setOpen] = useState(false)
@@ -20,9 +38,6 @@ export function DrawerNavigator() {
   const drawerRef = useRef<DrawerLayout>()
   const appNavigaion = useNavigation<NavigationProp<AppStackParamList>>()
   const progress = useSharedValue(0)
-  const {
-    allChats: { getUnreadCount },
-  } = useStores()
 
   const toggleDrawer = () => {
     if (!drawerRef.current.state.drawerOpened) {
@@ -98,16 +113,8 @@ export function DrawerNavigator() {
           <Icon icon="appLogo" size={45} />
           <View style={[$flexRow, { position: "absolute", right: 10 }]}>
             <Pressable style={$searchContainer} onPress={handleChatPress}>
-              <Icon icon='addMessage' size={24} />
-              {/* {getUnreadCount() > 0 && (
-                <View style={$unreadBadge}>
-                  <Text
-                    color={colors.palette.neutral100}
-                    style={$badgeText}
-                    text={getUnreadCount().toString()}
-                  />
-                </View>
-              )} */}
+              <Icon icon="addMessage" size={24} />
+              <UnreadCountBadge />
             </Pressable>
             <Pressable style={$searchContainer} onPress={handleSearchPress}>
               <Icon icon="search" size={24} />

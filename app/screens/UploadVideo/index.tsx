@@ -33,7 +33,6 @@ export const UploadVideo: FC<AppStackScreenProps<"UploadVideo">> = function Uplo
   const { uploadVideo, refreshVideos } = useHooks()
 
   const syncAllPlaylists = async () => {
-
     const allPlaylistDropDownData = []
     const res = await queryGetVideoPlaylistByUserId(
       { userId: _id },
@@ -54,10 +53,10 @@ export const UploadVideo: FC<AppStackScreenProps<"UploadVideo">> = function Uplo
       Toast.show({ ...toastMessages.inputTitle })
       return
     }
-    // if (youtubeUrl.split("=").length !== 2) {
-    //   Toast.show({ ...toastMessages.inputYTURL })
-    //   return
-    // }
+    if (!youtubeUrl.includes("https://www.youtube.com/watch?v=")) {
+      Toast.show({ ...toastMessages.inputYTURL })
+      return
+    }
     if (description.length === 0) {
       Toast.show({ ...toastMessages.inputDescription })
       return
@@ -135,6 +134,7 @@ export const UploadVideo: FC<AppStackScreenProps<"UploadVideo">> = function Uplo
           label={"Youtube URL"}
           theme={$theme}
           maxLength={180}
+          placeholder="https://www.youtube.com/watch?v=xxxxxx"placeholderTextColor={colors.palette.grey}
         />
 
         <Dropdown

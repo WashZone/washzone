@@ -26,7 +26,7 @@ export function useHooks() {
     topics: { setTopics, topics, addToTopics },
     saved: { setSavedClassifieds },
     videos: { setVideos },
-    allChats: { setChatRooms, updateRoomMessages, mergeChatPage, chatMessages },
+    allChats: { setChatRooms, updateRoomMessages, mergeChatPage, chatMessages, setLastReadId },
     interaction: {
       addToDislikedTopics,
       addToLikedTopics,
@@ -637,8 +637,7 @@ export function useHooks() {
       const resStatusOnTopics = await queryGetlikesTopicByUserId({
         userId: userStore._id,
       })
-      // eslint-disable-next-line array-callback-return
-      resStatusOnTopics.getlikesTopicByUserId.map((item: any) => {
+      resStatusOnTopics.getlikesTopicByUserId.forEach((item: any) => {
         if (item?.status === Interaction.like) likedTopics.push(item._id)
         if (item?.status === Interaction.dislike) disLikedTopics.push(item._id)
       })
@@ -646,8 +645,7 @@ export function useHooks() {
       const resStatusOnVideos = await queryGetlikesVideoByUserId({
         userId: userStore._id,
       })
-      // eslint-disable-next-line array-callback-return
-      resStatusOnVideos.getlikesVideoByUserId.map((item: any) => {
+      resStatusOnVideos.getlikesVideoByUserId.forEach((item: any) => {
         if (item?.status === Interaction.like) likedVideos.push(item._id)
         if (item?.status === Interaction.dislike) disLikedVideos.push(item._id)
       })
@@ -766,6 +764,7 @@ export function useHooks() {
   const onLoggedInBoot = async () => {
     console.log("RUNNING = onLoggedInBoot")
     subscribeAll()
+    syncAllChats()
     await syncAllChats()
     await syncSavedInteractionsHook()
     await syncInteractedVideosAndTopics()
@@ -1139,10 +1138,10 @@ export function useHooks() {
   const getNotifications = async () => {
     try {
       const res = await queryGetNotification(
-        { authorId: userStore._id },
+        { reciverId: userStore._id },
         { fetchPolicy: "no-cache" },
       )
-      console.log("RES::getNoticiations", res.getNotification)
+      console.log("RES NOTIFICATIONS : ", res.getNotification)
       return res.getNotification
     } catch (err) {
       console.log("res.getNotificationERR", err)

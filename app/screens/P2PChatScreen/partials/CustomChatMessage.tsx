@@ -12,15 +12,18 @@ export enum CustomMessageType {
 }
 
 export const CustomChatMessage = ({ message }: { message: any }) => {
-  const {userStore:{_id : myId}} = useStores()
+  const {
+    userStore: { _id: myId },
+  } = useStores()
   const data = useMemo(() => message?.metaData, [])
   switch (data?.metaDataType) {
     case messageMetadataType.classifiedOffer: {
       const classfied = JSON.parse(data?.data || "{}")
+
       return (
         <View style={$offerContainer}>
           <Text
-            text={ "Classified Offer !"}
+            text={"Classified Offer !"}
             color={colors.palette.neutral100}
             size="sm"
             weight="semiBold"
@@ -59,7 +62,8 @@ export const CustomChatMessage = ({ message }: { message: any }) => {
         </View>
       )
     }
-    case messageMetadataType.incomingCallOffer:
+    case messageMetadataType.incomingCallOfferAudio:
+    case messageMetadataType.incomingCallOfferVideo:
       return (
         <View style={{ padding: spacing.tiny }}>
           <Text text="Initiated A Call" size="xs" weight="medium" />

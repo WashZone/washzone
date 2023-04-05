@@ -112,7 +112,6 @@ function App(props: AppProps) {
       // AppLovinMAX.showMediationDebugger();
       if (Platform.OS === "android") {
         if (configuration.consentDialogState === AppLovinMAX.ConsentDialogState.APPLIES) {
-          // Show user consent dialog
           AppLovinMAX.showConsentDialog()
         }
       }

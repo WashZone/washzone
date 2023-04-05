@@ -39,6 +39,8 @@ import { HomecommentsModel, HomecommentsModelType } from "./HomecommentsModel"
 import { homecommentsModelPrimitives, HomecommentsModelSelector } from "./HomecommentsModel.base"
 import { HomePageDetailModel, HomePageDetailModelType } from "./HomePageDetailModel"
 import { homePageDetailModelPrimitives, HomePageDetailModelSelector } from "./HomePageDetailModel.base"
+import { LikeHomePagesModel, LikeHomePagesModelType } from "./LikeHomePagesModel"
+import { likeHomePagesModelPrimitives, LikeHomePagesModelSelector } from "./LikeHomePagesModel.base"
 import { FollowUserModel, FollowUserModelType } from "./FollowUserModel"
 import { followUserModelPrimitives, FollowUserModelSelector } from "./FollowUserModel.base"
 import { MetaDataModel, MetaDataModelType } from "./MetaDataModel"
@@ -189,6 +191,10 @@ queryGetHomePagesByUserId="queryGetHomePagesByUserId",
 queryGetCommentByHomePageId="queryGetCommentByHomePageId",
 queryGetCommentsByHomePageId="queryGetCommentsByHomePageId",
 queryGetSearchedHomePages="queryGetSearchedHomePages",
+queryGetlikeshomeByUserId="queryGetlikeshomeByUserId",
+queryGetuserLikesonhome="queryGetuserLikesonhome",
+queryGetByHomePageId="queryGetByHomePageId",
+queryGetLikesOnHomeFeedByuser="queryGetLikesOnHomeFeedByuser",
 queryGetByvideoId="queryGetByvideoId",
 queryGetlikesVideoByUserId="queryGetlikesVideoByUserId",
 queryGetLikesonVideobyuser="queryGetLikesonVideobyuser",
@@ -256,6 +262,7 @@ mutateGetHomePagesByUser="mutateGetHomePagesByUser",
 mutateGetHomePagesByHomePageId="mutateGetHomePagesByHomePageId",
 mutateUpdateDeleteHomePageId="mutateUpdateDeleteHomePageId",
 mutateUpdateUserHomePages="mutateUpdateUserHomePages",
+mutateLikeDislikehome="mutateLikeDislikehome",
 mutateSaveLikedVideo="mutateSaveLikedVideo",
 mutateUpdateDeletesavedVideo="mutateUpdateDeletesavedVideo",
 mutateDeleteVideo="mutateDeleteVideo",
@@ -291,7 +298,7 @@ mutateCommentOnHomepage="mutateCommentOnHomepage"
 */
 export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
   .named("RootStore")
-  .extend(configureStoreMixin([['UserRating', () => UserRatingModel], ['classifiedFeed', () => ClassifiedFeedModel], ['CommentsDetail', () => CommentsDetailModel], ['likeTopics', () => LikeTopicsModel], ['TopicDetail', () => TopicDetailModel], ['likeVideos', () => LikeVideosModel], ['VideoPlaylist', () => VideoPlaylistModel], ['VideoUploadPlaylist', () => VideoUploadPlaylistModel], ['VideoUpload', () => VideoUploadModel], ['User', () => UserModel], ['SigninUser', () => SigninUserModel], ['Legalities', () => LegalitiesModel], ['saveVideo', () => SaveVideoModel], ['storyViewerUser', () => StoryViewerUserModel], ['saveClassified', () => SaveClassifiedModel], ['Homecomments', () => HomecommentsModel], ['HomePageDetail', () => HomePageDetailModel], ['followUser', () => FollowUserModel], ['MetaData', () => MetaDataModel], ['Notification', () => NotificationModel], ['usersChat', () => UsersChatModel], ['roomChat', () => RoomChatModel], ['Users', () => UsersModel], ['CallMetaData', () => CallMetaDataModel], ['CallNotification', () => CallNotificationModel]], [], "js"))
+  .extend(configureStoreMixin([['UserRating', () => UserRatingModel], ['classifiedFeed', () => ClassifiedFeedModel], ['CommentsDetail', () => CommentsDetailModel], ['likeTopics', () => LikeTopicsModel], ['TopicDetail', () => TopicDetailModel], ['likeVideos', () => LikeVideosModel], ['VideoPlaylist', () => VideoPlaylistModel], ['VideoUploadPlaylist', () => VideoUploadPlaylistModel], ['VideoUpload', () => VideoUploadModel], ['User', () => UserModel], ['SigninUser', () => SigninUserModel], ['Legalities', () => LegalitiesModel], ['saveVideo', () => SaveVideoModel], ['storyViewerUser', () => StoryViewerUserModel], ['saveClassified', () => SaveClassifiedModel], ['Homecomments', () => HomecommentsModel], ['HomePageDetail', () => HomePageDetailModel], ['likeHomePages', () => LikeHomePagesModel], ['followUser', () => FollowUserModel], ['MetaData', () => MetaDataModel], ['Notification', () => NotificationModel], ['usersChat', () => UsersChatModel], ['roomChat', () => RoomChatModel], ['Users', () => UsersModel], ['CallMetaData', () => CallMetaDataModel], ['CallNotification', () => CallNotificationModel]], [], "js"))
   .props({
 
   })
@@ -431,6 +438,18 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     queryGetSearchedHomePages(variables: { searchKey: string, pageNumber: number }, options: QueryOptions = {}) {
       return self.query<{ getSearchedHomePages: any }>(`query getSearchedHomePages($searchKey: String!, $pageNumber: Float!) { getSearchedHomePages(searchKey: $searchKey, pageNumber: $pageNumber) }`, variables, options)
     },
+    queryGetlikeshomeByUserId(variables: { userId: string }, options: QueryOptions = {}) {
+      return self.query<{ getlikeshomeByUserId: any }>(`query getlikeshomeByUserId($userId: String!) { getlikeshomeByUserId(userId: $userId) }`, variables, options)
+    },
+    queryGetuserLikesonhome(variables: { homePageId: string }, options: QueryOptions = {}) {
+      return self.query<{ getuserLikesonhome: any }>(`query getuserLikesonhome($homePageId: String!) { getuserLikesonhome(HomePageId: $homePageId) }`, variables, options)
+    },
+    queryGetByHomePageId(variables: { homePageId: string }, options: QueryOptions = {}) {
+      return self.query<{ getByHomePageId: any }>(`query getByHomePageId($homePageId: String!) { getByHomePageId(HomePageId: $homePageId) }`, variables, options)
+    },
+    queryGetLikesOnHomeFeedByuser(variables: { userId: string, homePageId: string }, options: QueryOptions = {}) {
+      return self.query<{ getLikesOnHomeFeedByuser: any }>(`query getLikesOnHomeFeedByuser($userId: String!, $homePageId: String!) { getLikesOnHomeFeedByuser(userId: $userId, HomePageId: $homePageId) }`, variables, options)
+    },
     queryGetByvideoId(variables: { videoId: string }, options: QueryOptions = {}) {
       return self.query<{ getByvideoId: any }>(`query getByvideoId($videoId: String!) { getByvideoId(videoId: $videoId) }`, variables, options)
     },
@@ -476,8 +495,8 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     queryGetratingByratingId(variables: { ratinguserId: string }, options: QueryOptions = {}) {
       return self.query<{ getratingByratingId: any }>(`query getratingByratingId($ratinguserId: String!) { getratingByratingId(ratinguserId: $ratinguserId) }`, variables, options)
     },
-    queryGetNotification(variables: { authorId: string }, options: QueryOptions = {}) {
-      return self.query<{ getNotification: any }>(`query getNotification($authorId: String!) { getNotification(authorId: $authorId) }`, variables, options)
+    queryGetNotification(variables: { reciverId: string }, options: QueryOptions = {}) {
+      return self.query<{ getNotification: any }>(`query getNotification($reciverId: String!) { getNotification(reciverId: $reciverId) }`, variables, options)
     },
     mutateCreateUser(variables: { description?: (string | null), type: string, isSocialLogin: boolean, picture?: (string | null), lastName: string, firstName: string, socialId?: (string | null), password: string, email: string, name: string }, resultSelector: string | ((qb: UserModelSelector) => UserModelSelector) = userModelPrimitives.toString(), optimisticUpdate?: () => void) {
       return self.mutate<{ createUser: UserModelType}>(`mutation createUser($description: String, $type: String!, $isSocialLogin: Boolean!, $picture: String, $lastName: String!, $firstName: String!, $socialId: String, $password: String!, $email: String!, $name: String!) { createUser(description: $description, type: $type, isSocialLogin: $isSocialLogin, picture: $picture, last_name: $lastName, first_name: $firstName, socialId: $socialId, password: $password, email: $email, name: $name) {
@@ -664,6 +683,11 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     mutateUpdateUserHomePages(variables: { usersHomePagesDetail: InputHomePage, homePageId: string }, resultSelector: string | ((qb: HomePageDetailModelSelector) => HomePageDetailModelSelector) = homePageDetailModelPrimitives.toString(), optimisticUpdate?: () => void) {
       return self.mutate<{ updateUserHomePages: HomePageDetailModelType}>(`mutation updateUserHomePages($usersHomePagesDetail: InputHomePage!, $homePageId: String!) { updateUserHomePages(UsersHomePagesDetail: $usersHomePagesDetail, HomePageId: $homePageId) {
         ${typeof resultSelector === "function" ? resultSelector(new HomePageDetailModelSelector()).toString() : resultSelector}
+      } }`, variables, optimisticUpdate)
+    },
+    mutateLikeDislikehome(variables: { status: string, homePageId: string, userId: string }, resultSelector: string | ((qb: LikeHomePagesModelSelector) => LikeHomePagesModelSelector) = likeHomePagesModelPrimitives.toString(), optimisticUpdate?: () => void) {
+      return self.mutate<{ likeDislikehome: LikeHomePagesModelType}>(`mutation likeDislikehome($status: String!, $homePageId: String!, $userId: String!) { likeDislikehome(status: $status, HomePageId: $homePageId, userId: $userId) {
+        ${typeof resultSelector === "function" ? resultSelector(new LikeHomePagesModelSelector()).toString() : resultSelector}
       } }`, variables, optimisticUpdate)
     },
     mutateSaveLikedVideo(variables: { videoId: string, userId: string }, resultSelector: string | ((qb: SaveVideoModelSelector) => SaveVideoModelSelector) = saveVideoModelPrimitives.toString(), optimisticUpdate?: () => void) {
