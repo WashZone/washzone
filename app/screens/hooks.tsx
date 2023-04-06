@@ -26,7 +26,8 @@ export function useHooks() {
     topics: { setTopics, topics, addToTopics },
     saved: { setSavedClassifieds },
     videos: { setVideos },
-    allChats: { setChatRooms, updateRoomMessages, mergeChatPage, chatMessages, setLastReadId },
+    allChats: { setChatRooms, updateRoomMessages, mergeChatPage, chatMessages, syncUnreadCount },
+    notificationStore: { setNotifications },
     interaction: {
       addToDislikedTopics,
       addToLikedTopics,
@@ -764,15 +765,15 @@ export function useHooks() {
   const onLoggedInBoot = async () => {
     console.log("RUNNING = onLoggedInBoot")
     subscribeAll()
-    syncAllChats()
-    await syncAllChats()
+    syncAllChats().then(() => syncUnreadCount())
+    fetchNotifications()
     await syncSavedInteractionsHook()
     await syncInteractedVideosAndTopics()
-    await refreshTopics()
-    await refreshPosts()
-    await refreshClassifieds()
-    await refreshVideos()
-    await loadStories()
+    refreshTopics()
+    refreshPosts()
+    refreshClassifieds()
+    refreshVideos()
+    loadStories()
     await updateNotificationToken()
   }
 
@@ -1135,14 +1136,14 @@ export function useHooks() {
     }
   }
 
-  const getNotifications = async () => {
+  const fetchNotifications = async () => {
     try {
       const res = await queryGetNotification(
         { reciverId: userStore._id },
         { fetchPolicy: "no-cache" },
       )
       console.log("RES NOTIFICATIONS : ", res.getNotification)
-      return res.getNotification
+      setNotifications(res.getNotification)
     } catch (err) {
       console.log("res.getNotificationERR", err)
       Alert.alert(
@@ -1153,7 +1154,7 @@ export function useHooks() {
   }
 
   return {
-    getNotifications,
+    fetchNotifications,
     getRoomById,
     sendSilentAlert,
     getMoreChatMessages,

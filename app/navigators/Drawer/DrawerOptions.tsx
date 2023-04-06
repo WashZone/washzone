@@ -1,9 +1,7 @@
 import React, { useMemo, useState } from "react"
 import {
-  Alert,
   Dimensions,
   ImageStyle,
-  Pressable,
   TextStyle,
   View,
   ViewStyle,
@@ -18,8 +16,8 @@ import { useStores } from "../../models"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { AppStackParamList } from "../AppNavigator"
 import { observer } from "mobx-react-lite"
-import { navigationRef } from "../navigationUtilities"
 import { showAlertYesNo } from "../../utils/helpers"
+import { $contentCenter } from "../../screens/styles"
 
 interface DrawerOptionType {
   icon: IconTypes
@@ -71,7 +69,7 @@ export const DrawerOptions = observer(function DrawerOptions({
       icon: "support",
       label: "DrawerNavigator.support",
       onPress() {
-        Linking.openURL('mailto:contact@washzone.com?subject=Support') 
+        Linking.openURL("mailto:contact@washzone.com?subject=Support")
       },
     },
     {
@@ -106,12 +104,15 @@ export const DrawerOptions = observer(function DrawerOptions({
     return (
       <TouchableOpacity
         onPress={() => {
-          closeDrawer();
+          closeDrawer()
           setTimeout(onPress, 50)
         }}
         style={getActionContainerStyle(!["notifications", "logout"].includes(icon))}
       >
-        <Icon icon={icon} size={22} style={$actionIcon} />
+        <View>
+          <Icon icon={icon} size={22} style={$actionIcon} />
+          {icon === "notifications" && <UnreadNotificationCountBadge />}
+        </View>
         <Text tx={label} style={$actionLabel} />
       </TouchableOpacity>
     )
@@ -144,6 +145,41 @@ export const DrawerOptions = observer(function DrawerOptions({
     </View>
   )
 })
+
+const UnreadNotificationCountBadge = observer(() => {
+  const {
+    notificationStore: { getUnreadCount },
+  } = useStores()
+  // const [count, setCount] = useState(0)
+  // useEffect(() => {
+  //   setCount(getUnreadCount())
+  // }, [allChatRooms])
+  return (
+    parseInt(getUnreadCount()) > 0 && (
+      <View style={$unreadBadge}>
+        <Text color={colors.palette.neutral100} style={$badgeText} text={getUnreadCount()} />
+      </View>
+    )
+  )
+})
+
+const $badgeText: TextStyle = {
+  lineHeight: 13,
+  fontSize: 13,
+  textAlign: "center",
+  textAlignVertical: "center",
+}
+
+const $unreadBadge: ViewStyle = {
+  position: "absolute",
+  height: 18,
+  width: 18,
+  borderRadius: 9,
+  bottom: -8,
+  left: -10,
+  ...$contentCenter,
+  backgroundColor: colors.palette.angry500,
+}
 
 const $container: ViewStyle = {
   justifyContent: "center",

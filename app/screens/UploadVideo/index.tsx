@@ -53,7 +53,10 @@ export const UploadVideo: FC<AppStackScreenProps<"UploadVideo">> = function Uplo
       Toast.show({ ...toastMessages.inputTitle })
       return
     }
-    if (!youtubeUrl.includes("https://www.youtube.com/watch?v=")) {
+    if (
+      !youtubeUrl.includes("https://www.youtube.com/watch?v=") &&
+      !youtubeUrl.includes("https://youtu.be/")
+    ) {
       Toast.show({ ...toastMessages.inputYTURL })
       return
     }
@@ -66,11 +69,20 @@ export const UploadVideo: FC<AppStackScreenProps<"UploadVideo">> = function Uplo
       return
     }
     try {
+      let parsedYtUrl = ""
+      let ytVideoId = ""
+      if (youtubeUrl.includes("https://youtu.be/")) {
+        ytVideoId = youtubeUrl.replace("https://youtu.be/", "")
+        parsedYtUrl = "https://www.youtube.com/watch?v=" + ytVideoId
+      } else {
+        ytVideoId = youtubeUrl.replace("https://www.youtube.com/watch?v=", "")
+        parsedYtUrl = youtubeUrl
+      }
       setButtonLoading(true)
       await uploadVideo({
         videoHeading: title,
-        thumbnailUrl: `https://img.youtube.com/vi/${youtubeUrl.split("=")[1]}/default.jpg`,
-        attachmentVideoUrl: youtubeUrl,
+        thumbnailUrl: `https://img.youtube.com/vi/${ytVideoId}/default.jpg`,
+        attachmentVideoUrl: parsedYtUrl,
         vedioPlaylistId: value,
       })
       await refreshVideos()
@@ -134,7 +146,8 @@ export const UploadVideo: FC<AppStackScreenProps<"UploadVideo">> = function Uplo
           label={"Youtube URL"}
           theme={$theme}
           maxLength={180}
-          placeholder="https://www.youtube.com/watch?v=xxxxxx"placeholderTextColor={colors.palette.grey}
+          placeholder="https://www.youtube.com/watch?v=xxxxxx"
+          placeholderTextColor={colors.palette.grey}
         />
 
         <Dropdown

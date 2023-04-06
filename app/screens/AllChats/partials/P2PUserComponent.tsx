@@ -1,6 +1,6 @@
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { observer } from "mobx-react-lite"
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { View, ViewStyle } from "react-native"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { ListItem, Text } from "../../../components"
@@ -21,7 +21,7 @@ export const P2PUserComponent = observer(function p2PUserComponent({
 }) {
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
   const {
-    allChats: { getLatestMessageForRoom, isRead },
+    allChats: { getLatestMessageForRoom, rooms },
   } = useStores()
 
   const receiver = data?.membersId.filter((i: any) => i._id !== myId)[0]
@@ -29,13 +29,24 @@ export const P2PUserComponent = observer(function p2PUserComponent({
   const handlePress = () => {
     navigation.navigate("P2PChat", { receiver, roomId: data?._id })
   }
+  const latestMessage = getLatestMessageForRoom(data?._id)
+  const [isRead, setIsRead] = useState(false)
+
+  useEffect(() => {
+    console.log('rooms', rooms)
+    console.log("IS READ:",rooms[data?._id], ' === ',latestMessage?.id )
+    if (rooms[data?._id] === latestMessage?.id) setIsRead(true)
+    else {
+      setIsRead(false)
+    }
+  }, [latestMessage])
 
   return (
     <ListItem
       onLongPress={() => onLongPress(data?._id)}
       onPress={handlePress}
       height={66}
-      style={{ alignItems: "center" }}
+      style={$alignCenter}
       containerStyle={$container}
       LeftComponent={
         <View>
@@ -51,13 +62,13 @@ export const P2PUserComponent = observer(function p2PUserComponent({
       <View style={$contentContainer}>
         <View style={$topContentContainer}>
           <Text text={formatName(receiver?.name)} weight="semiBold" size="md" />
-          <Text size="xxs" text={fromNow(getLatestMessageForRoom(data?._id).time)} />
+          <Text size="xxs" text={fromNow(latestMessage.time)} />
         </View>
         <Text
-          text={getLatestMessageForRoom(data?._id).message}
+          text={latestMessage.message}
           numberOfLines={1}
           size="sm"
-          // weight={isRead(data?._id) ? "medium" : "normal"}
+          weight={isRead ? "normal" : "medium"}
           style={{ color: colors.palette.neutral700 }}
         />
       </View>
@@ -70,9 +81,7 @@ const $topContentContainer: ViewStyle = {
   justifyContent: "space-between",
 }
 
-// const $lastSentMessage :TextStyle ={
-
-// }
+const $alignCenter :ViewStyle ={ alignItems: "center" }
 
 const $contentContainer: ViewStyle = {
   height: 66,

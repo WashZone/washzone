@@ -1,5 +1,6 @@
 import { Instance, SnapshotOut, types } from "mobx-state-tree"
 import { withSetPropAction } from "./helpers/withSetPropAction"
+import moment from "moment"
 
 export const ChatRoomStoreModel = types
   .model("ChatRoomStore")
@@ -12,8 +13,9 @@ export const ChatRoomStoreModel = types
   .actions(withSetPropAction)
   .actions((self) => ({
     setChatRooms(chatRooms: any) {
+      console.log("NEW CHAT ROOMS", JSON.stringify(chatRooms))
       self.allChatRooms = [...chatRooms]
-      this.syncUnreadCount()
+      this.syncLastReadOnRooms()
     },
     updateRoomMessages(props: { roomId: string; messages: Array<any> }) {
       const temp = { ...self.chatMessages }
@@ -58,6 +60,7 @@ export const ChatRoomStoreModel = types
     getUnreadCount() {
       const rooms = { ...self.rooms }
       let count = 0
+      console.log("ROOMSSSSSS, rooms", rooms)
       Object.keys(rooms).forEach((key) => {
         const latestMessageId = this.getLatestMessageForRoom(key).id
         console.log("LATEST MESSAGE ID :", latestMessageId, rooms[key])
@@ -71,6 +74,7 @@ export const ChatRoomStoreModel = types
       console.log("roomId:roomId:setLastReadId", roomId, latestMessageId)
       rooms[roomId] = latestMessageId
       self.rooms = rooms
+      this.syncUnreadCount()
       console.log("rooomsghjgkjhg", self.rooms)
       console.log("rooomsghjgkjhg", self.rooms)
     },
@@ -85,7 +89,16 @@ export const ChatRoomStoreModel = types
       console.log("ADDED TO MESSAGES SUCCESSFULLY")
       this.syncUnreadCount()
     },
+    syncLastReadOnRooms() {
+      const temp = {}
+      self.allChatRooms.forEach((i) => {
+        temp[i?._id] = self.rooms[i?._id]
+      })
+      self.setProp("rooms", temp)
+      this.syncUnreadCount()
+    },
     syncUnreadCount() {
+      console.log("SYNCING UNREAD COUNT")
       const count = this.getUnreadCount()
       self.setProp("unreadCount", count)
     },
@@ -99,27 +112,34 @@ export const ChatRoomStoreModel = types
       self.allChatRooms = []
     },
     getLatestMessageForRoom(roomId: string) {
+      // Getting the latest Message from the room Object !
       const room = self.allChatRooms.filter((room) => room?._id === roomId)[0]
-      console.log("xxxgetLatestMessageForRoomxxx", JSON.stringify(room))
-      console.log("xxxgetLatestMessageForRoomxxx ALL CHATS", JSON.stringify(self.allChatRooms))
-      if (self.chatMessages[roomId]?.length > 0) {
-        const latestMessage = self.chatMessages[roomId][0]
-        console.log("LATEST MESSAGE FOR ROOM : ", roomId, latestMessage)
-        return {
-          id: latestMessage?._id,
-          message: latestMessage?.text,
-          time: new Date(latestMessage?.createdAt),
-        }
-      } else {
-        const room = self.allChatRooms.filter((room) => room?._id === roomId)[0]
-        const latestMessage = room?.latestMessage
-        console.log("LATEST MESSAGE FOR ROOM : ", roomId, latestMessage)
-        return {
-          id: latestMessage?._id,
-          message: latestMessage?.text,
-          time: new Date(latestMessage?.createdAt),
-        }
+      const latestMessageFromRoomObject = {
+        id: room?.latestMessage?._id,
+        message: room?.latestMessage?.text,
+        time: new Date(room?.latestMessage?.createdAt),
       }
+
+      // If we have never opened the room, then just return the latest message from the Room Object
+      if (!(self.chatMessages[roomId]?.length > 0)) return latestMessageFromRoomObject
+
+      // If not, then get the latest message from the actual chats that keeps getting synced via the Subscription
+      const latestMessageFromChatMessagesForRoom = {
+        id: self.chatMessages[roomId][0]?._id,
+        message: self.chatMessages[roomId][0]?.text,
+        time: new Date(self.chatMessages[roomId][0]?.createdAt),
+      }
+
+      // return whichever message is the latest
+      if (
+        moment(latestMessageFromChatMessagesForRoom.time).isAfter(
+          moment(latestMessageFromRoomObject.time),
+        )
+      ) {
+        return latestMessageFromChatMessagesForRoom
+      }
+
+      return latestMessageFromRoomObject
     },
   }))
   .views((store) => ({

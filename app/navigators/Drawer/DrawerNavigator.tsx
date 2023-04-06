@@ -17,7 +17,7 @@ import { observer } from "mobx-react-lite"
 
 const UnreadCountBadge = observer(() => {
   const {
-    allChats: { unreadCount, allChatRooms },
+    allChats: { unreadCount },
   } = useStores()
   // const [count, setCount] = useState(0)
   // useEffect(() => {
@@ -138,7 +138,7 @@ const $unreadBadge: ViewStyle = {
   position: "absolute",
   height: 16,
   width: 16,
-  borderRadius: 7,
+  borderRadius: 8,
   bottom: 10,
   right: 0,
   ...$contentCenter,

@@ -11,38 +11,46 @@ import FastImage, { ImageStyle } from "react-native-fast-image"
 import { $flex1, $flexRow } from "../styles"
 import { formatName } from "../../utils/formatName"
 import { fromNow } from "../../utils/agoFromNow"
+import { useStores } from "../../models"
+import { observer } from "mobx-react-lite"
 
-export const Notifications: FC<AppStackScreenProps<"Notifications">> = function Notifications() {
-  const navigation = useNavigation<NavigationProp<AppStackParamList>>()
-  const { getNotifications } = useHooks()
-  const [notifications, setNotifications] = useState([])
+export const Notifications: FC<AppStackScreenProps<"Notifications">> = observer(
+  function Notifications() {
+    const navigation = useNavigation<NavigationProp<AppStackParamList>>()
+    const { fetchNotifications } = useHooks()
+    const {
+      notificationStore: { setLastRead, notifications },
+    } = useStores()
 
-  useEffect(() => {
-    getNotifications().then((res) => setNotifications(res))
-  }, [])
+    useEffect(() => {
+      fetchNotifications().then(() => {
+        notifications?.length > 0 && setLastRead(notifications[0]?.createdAt)
+      })
+    }, [])
 
-  return (
-    <Screen preset="fixed" contentContainerStyle={$container}>
-      <Header
-        leftIcon="caretLeft"
-        title="Notifications"
-        titleStyle={$titleStyle}
-        onLeftPress={() => navigation.goBack()}
-        leftIconColor={colors.palette.neutral600}
-        backgroundColor={colors.palette.neutral100}
-      />
-      {notifications ? (
-        <FlatList
-          ListHeaderComponent={<View style={{ height: spacing.homeScreen }} />}
-          data={notifications}
-          renderItem={NotificationComponent}
+    return (
+      <Screen preset="fixed" contentContainerStyle={$container}>
+        <Header
+          leftIcon="caretLeft"
+          title="Notifications"
+          titleStyle={$titleStyle}
+          onLeftPress={() => navigation.goBack()}
+          leftIconColor={colors.palette.neutral600}
+          backgroundColor={colors.palette.neutral100}
         />
-      ) : (
-        <EmptyState preset="notifications" buttonOnPress={() => navigation.goBack()} />
-      )}
-    </Screen>
-  )
-}
+        {notifications ? (
+          <FlatList
+            ListHeaderComponent={<View style={{ height: spacing.homeScreen }} />}
+            data={notifications}
+            renderItem={NotificationComponent}
+          />
+        ) : (
+          <EmptyState preset="notifications" buttonOnPress={() => navigation.goBack()} />
+        )}
+      </Screen>
+    )
+  },
+)
 
 const NotificationComponent = ({ item, index }) => {
   switch (item.metaData?.metaDataType) {
@@ -62,7 +70,13 @@ const NotificationComponent = ({ item, index }) => {
               style={$flex1}
             />
           </View>
-          <Text weight="medium" text={fromNow(item?.createdAt)} size="xxs" style={$textRight} color={colors.palette.neutral500}/>
+          <Text
+            weight="medium"
+            text={fromNow(item?.createdAt)}
+            size="xxs"
+            style={$textRight}
+            color={colors.palette.neutral500}
+          />
         </TouchableOpacity>
       )
     }

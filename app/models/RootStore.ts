@@ -15,6 +15,7 @@ import { SubscriptionClient } from "subscriptions-transport-ws"
 import { ChatRoomStoreModel } from "./ChatRoomStore"
 import { withSetPropAction } from "./helpers/withSetPropAction"
 import { CallStoreModel } from "./CallStore"
+import { NotificationStoreModel } from "./NotificationStore"
 
 const baseURL = "http://18.219.176.209:3002"
 
@@ -32,7 +33,7 @@ export const RootStoreModel = types
     userStore: types.optional(UserStoreModel, {}),
     feedStore: types.optional(FeedStoreModel, {}),
     topics: types.optional(TopicsStoreModel, {}),
-    allChats: types.optional(ChatRoomStoreModel, {unreadCount:0}),
+    allChats: types.optional(ChatRoomStoreModel, { unreadCount: 0 }),
     classfieds: types.optional(ClassifiedStoreModel, {}),
     videos: types.optional(VideosStoreModel, {}),
     saved: types.optional(SavedStoreModel, {}),
@@ -40,6 +41,7 @@ export const RootStoreModel = types
     interaction: types.optional(InteractionStoreModel, {}),
     api: types.optional(APIRootStore, {}),
     searchStore: types.optional(SearchStoreModel, {}),
+    notificationStore: types.optional(NotificationStoreModel, { lastReadDate: "" }),
     callStore: types.optional(CallStoreModel, {
       ongoingCall: false,
       offer: "",
