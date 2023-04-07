@@ -25,7 +25,7 @@ export const Capture = async () => {
       //   filePath: res,
       //   fileData: res.data,
       //   fileUri: res.uri
-      // });
+      // })
       return res
     }
   })
@@ -35,6 +35,9 @@ export const MediaPicker = async () => {
   const options: ImageLibraryOptions = {
     mediaType: "photo",
     selectionLimit: 1,
+    maxWidth: 500,
+    maxHeight: 500,
+    quality: 0.5,
   }
 
   let image: any

@@ -31,44 +31,61 @@ import NativeAdView from "../../utils/NativeAd"
 const Actions = observer(function ActionButtons({ item }: { item: any }) {
   const [loading, setLoading] = useState<boolean>(false)
   const { interactWithTopic } = useHooks()
-  const {
-    interaction: { getInteractionOnTopic, getTopicInteractionOffset },
-  } = useStores()
+  const [dynamicData, setDynamicData] = useState({
+    interaction: item?.interaction,
+    dislikeviews: item?.dislikeviews,
+    likeviews: item?.likeviews,
+  })
 
-  const interaction = getInteractionOnTopic(item?._id)
-  const interactionOffset = getTopicInteractionOffset(item?._id)
-
+  useEffect(() => {
+    console.log("CHANGING DYANMIC DATA")
+    setDynamicData({
+      interaction: item?.interaction,
+      dislikeviews: item?.dislikeviews,
+      likeviews: item?.likeviews,
+    })
+  }, [item])
   return (
     <View style={$actionsContainer}>
       <View style={$actionContainer}>
         <Icon
-          icon={getIconForInteraction(interaction, "liked")}
+          icon={getIconForInteraction(dynamicData.interaction, "liked")}
           size={20}
           style={{ marginRight: spacing.extraSmall }}
           onPress={async () => {
             if (!loading) {
               setLoading(true)
-              await interactWithTopic(item?._id, "like")
+              const res = await interactWithTopic({
+                topicId: item?._id,
+                button: "like",
+                previousData: dynamicData,
+              })
+              setDynamicData(res)
               setLoading(false)
             }
           }}
         />
-        <Text>{item?.likeviews - interactionOffset.likedOffset}</Text>
+        <Text>{dynamicData?.likeviews}</Text>
       </View>
       <View style={$actionContainer}>
         <Icon
-          icon={getIconForInteraction(interaction, "disliked")}
+          icon={getIconForInteraction(dynamicData.interaction, "disliked")}
           size={20}
           style={{ marginRight: spacing.extraSmall }}
           onPress={async () => {
             if (!loading) {
               setLoading(true)
-              await interactWithTopic(item?._id, "dislike")
+              const res = await interactWithTopic({
+                topicId: item?._id,
+                button: "dislike",
+                previousData: dynamicData,
+              })
+              setDynamicData(res)
               setLoading(false)
             }
           }}
         />
-        <Text>{item?.dislikeviews - interactionOffset.dislikedOffset}</Text>
+        <Text>{dynamicData?.dislikeviews}</Text>
       </View>
       <View style={$actionContainer}>
         <Icon
@@ -83,7 +100,7 @@ const Actions = observer(function ActionButtons({ item }: { item: any }) {
   )
 })
 
-export const TopicComponent = ({ topic, index, fullView = false }) => {
+export const TopicComponent = observer(({ topic }: { topic: any }) => {
   const [loaded, setLoaded] = useState(false)
   const navigation = useNavigation<NavigationProp<TopicsTabParamList>>()
   const topicDetails = {
@@ -152,9 +169,9 @@ export const TopicComponent = ({ topic, index, fullView = false }) => {
       )} */}
     </>
   )
-}
+})
 
-export const TopicComponentFullView = ({ topic, index }) => {
+export const TopicComponentFullView = ({ topic }) => {
   const [loaded, setLoaded] = useState(false)
   const [attachmentDimensions, setAttachmentDimensions] = useState({ height: 0, width: 0 })
   const navigation = useNavigation<NavigationProp<TopicsTabParamList>>()
@@ -207,7 +224,7 @@ export const TopicComponentFullView = ({ topic, index }) => {
           />
           <Text style={$postContent} text={topicDetails.content} size="xs" />
         </View>
-        <View style={[$contentCenter, {marginTop:spacing.tiny}]}>
+        <View style={[$contentCenter, { marginTop: spacing.tiny }]}>
           <ShimmerPlaceholder
             visible={loaded}
             shimmerStyle={$attachment}
@@ -231,7 +248,6 @@ export const TopicComponentFullView = ({ topic, index }) => {
         </View>
         <Actions item={topic} />
       </Pressable>
-
       <NativeAdView ref={nativeAdViewRef} />
     </>
   )

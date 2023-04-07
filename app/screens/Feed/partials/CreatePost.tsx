@@ -32,30 +32,16 @@ export const CreatePost = observer(function CreatePost() {
   const progress = useSharedValue(0)
   const inputRef = useRef<TextInput>()
   const [selectedImage, setSelectedImage] = useState<any>({ height: 1, width: 1 })
-  const { getAndUpdatePosts } = useHooks()
 
   const onPost = async () => {
     setIsPosting(true)
-    // const data = new FormData()
-    // data.append('uri',selectedImage?.uri)
-    // data.append('uri',selectedImage?.uri)
-    // data.append('uri',selectedImage?.uri)
-
     try {
-      // await uploadFile(selectedImage)
-      // const res = await mutateUploadFile({
-      //   uri: selectedImage?.uri,
-      //   type: selectedImage?.type,
-      //   fileName: selectedImage?.fileName,
-      // })
-      const res = await createPost({
+      await createPost({
         attachment: selectedImage,
         content: postContent,
       })
-
-      await getAndUpdatePosts(false)
     } catch (error) {
-      console.log("Create Post",error)
+      console.log("Create Post", error)
     } finally {
       setIsPosting(false)
       progress.value = withTiming(0, { duration: 400 })
@@ -64,9 +50,6 @@ export const CreatePost = observer(function CreatePost() {
       inputRef.current.blur()
     }
   }
-  // ,
-  //   [],
-  // )
 
   const onFocus = () => {
     if (progress.value < 0.5) {
@@ -83,7 +66,6 @@ export const CreatePost = observer(function CreatePost() {
 
   const onGalleryPress = async () => {
     try {
-
       const image = await MediaPicker()
       if (image?.uri) {
         setSelectedImage(image)
@@ -91,10 +73,7 @@ export const CreatePost = observer(function CreatePost() {
           progress.value = withTiming(1, { duration: 300 })
         }, 100)
       }
-
-     
-    } catch (e) {
-    }
+    } catch (e) {}
   }
 
   const onDeletePress = () => {
@@ -107,7 +86,7 @@ export const CreatePost = observer(function CreatePost() {
 
   const previewImage: ImageStyle = {
     height: selectedImage.uri ? 80 : 0,
-    width: selectedImage.uri ?  80 : 0,
+    width: selectedImage.uri ? 80 : 0,
     alignItems: "center",
     borderRadius: 10,
   }
@@ -165,9 +144,9 @@ export const CreatePost = observer(function CreatePost() {
   })
 
   return (
-    <View >
+    <View>
       <View style={$container}>
-        <FastImage source={{ uri: picture }} style={$picture} resizeMode='cover'/>
+        <FastImage source={{ uri: picture }} style={$picture} resizeMode="cover" />
         <View style={$contentContainer}>
           <TextField
             value={postContent}
@@ -185,11 +164,11 @@ export const CreatePost = observer(function CreatePost() {
       </View>
       <Animated.View style={animatedMediaContainer}>
         <Animated.View style={animatedPreviewContainer}>
-          <FastImage source={{ uri: selectedImage?.uri }} style={previewImage}  />
+          <FastImage source={{ uri: selectedImage?.uri }} style={previewImage} />
         </Animated.View>
         <Pressable style={$deleteIcon} onPress={onDeletePress}>
-            <Icon icon="delete" size={selectedImage.uri ? 24 : 0.0001} />
-          </Pressable>
+          <Icon icon="delete" size={selectedImage.uri ? 24 : 0.0001} />
+        </Pressable>
         <View style={$bottomActionContainer}>
           <View style={$actionButtonsContainer}>
             <Pressable onPress={onGalleryPress}>

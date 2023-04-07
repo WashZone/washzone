@@ -6,10 +6,20 @@ export const FeedStoreModel = types
   .props({
     topics: types.frozen(),
     stories: types.frozen(),
-    homeFeed : types.frozen(),
+    homeFeed: types.frozen(),
   })
   .actions(withSetPropAction)
   .actions((self) => ({
+    updateHomePostInteractionLocally(postId, interaction, newCount) {
+      const temp = self.homeFeed.map((i) => {
+        if (i._id === postId) {
+          return { ...i, interaction, ...newCount }
+        } else {
+          return i
+        }
+      })
+      self.homeFeed = temp
+    },
     setTopics(topics: any) {
       self.topics = topics
     },
@@ -32,7 +42,7 @@ export const FeedStoreModel = types
     },
     addToStories(stories: any) {
       self.topics = [...self.stories, ...stories]
-    }
+    },
   }))
 
 export interface FeedStore extends Instance<typeof FeedStoreModel> {}

@@ -7,6 +7,8 @@ import { QueryBuilder } from "mst-gql"
 import { ModelBase } from "./ModelBase"
 import { UserModel, UserModelType } from "./UserModel"
 import { UserModelSelector } from "./UserModel.base"
+import { VideoLikeArrayModel, VideoLikeArrayModelType } from "./VideoLikeArrayModel"
+import { VideoLikeArrayModelSelector } from "./VideoLikeArrayModel.base"
 import { VideoUploadModel, VideoUploadModelType } from "./VideoUploadModel"
 import { VideoUploadModelSelector } from "./VideoUploadModel.base"
 import { RootStoreType } from "./index"
@@ -26,6 +28,7 @@ export const LikeVideosModelBase = ModelBase
     userId: types.union(types.undefined, types.null, types.late((): any => UserModel)),
     videoId: types.union(types.undefined, types.null, types.late((): any => VideoUploadModel)),
     status: types.union(types.undefined, types.null, types.string),
+    VideoLikearrayIds: types.union(types.undefined, types.null, types.array(types.late((): any => VideoLikeArrayModel))),
   })
   .views(self => ({
     get store() {
@@ -40,6 +43,7 @@ export class LikeVideosModelSelector extends QueryBuilder {
   get status() { return this.__attr(`status`) }
   userId(builder: string | UserModelSelector | ((selector: UserModelSelector) => UserModelSelector) | undefined) { return this.__child(`userId`, UserModelSelector, builder) }
   videoId(builder: string | VideoUploadModelSelector | ((selector: VideoUploadModelSelector) => VideoUploadModelSelector) | undefined) { return this.__child(`videoId`, VideoUploadModelSelector, builder) }
+  VideoLikearrayIds(builder: string | VideoLikeArrayModelSelector | ((selector: VideoLikeArrayModelSelector) => VideoLikeArrayModelSelector) | undefined) { return this.__child(`VideoLikearrayIds`, VideoLikeArrayModelSelector, builder) }
 }
 export function selectFromLikeVideos() {
   return new LikeVideosModelSelector()

@@ -38,45 +38,62 @@ export interface PostComponentProps {
 }
 const Actions = observer(function ActionButtons({ item }: { item: any }) {
   const [loading, setLoading] = useState<boolean>(false)
-  const { interactWithTopic } = useHooks()
-  const {
-    interaction: { getInteractionOnTopic, getTopicInteractionOffset },
-  } = useStores()
+  const { interactWithHomePost } = useHooks()
+  const [dynamicData, setDynamicData] = useState({
+    interaction: item?.interaction,
+    dislikeviews: item?.dislikeviews,
+    likeviews: item?.likeviews,
+  })
 
-  const interaction = getInteractionOnTopic(item?._id)
-  const interactionOffset = getTopicInteractionOffset(item?._id)
-
+  useEffect(() => {
+    console.log("CHANGING DYANMIC DATA")
+    setDynamicData({
+      interaction: item?.interaction,
+      dislikeviews: item?.dislikeviews,
+      likeviews: item?.likeviews,
+    })
+  }, [item])
   return (
     <View style={$actionsContainer}>
       <View style={$actionContainer}>
         <Icon
-          icon={getIconForInteraction(interaction, "liked")}
+          icon={getIconForInteraction(dynamicData.interaction, "liked")}
           size={20}
           style={{ marginRight: spacing.extraSmall }}
           onPress={async () => {
             if (!loading) {
               setLoading(true)
-              await interactWithTopic(item?._id, "like")
+              const res = await interactWithHomePost({
+                postId: item?._id,
+                button: "like",
+                previousData: dynamicData,
+              })
+              setDynamicData(res)
               setLoading(false)
             }
           }}
         />
-        <Text>{item?.likeviews - interactionOffset.likedOffset}</Text>
+        <Text>{dynamicData?.likeviews}</Text>
       </View>
       <View style={$actionContainer}>
         <Icon
-          icon={getIconForInteraction(interaction, "disliked")}
+          icon={getIconForInteraction(dynamicData.interaction, "disliked")}
           size={20}
           style={{ marginRight: spacing.extraSmall }}
           onPress={async () => {
             if (!loading) {
               setLoading(true)
-              await interactWithTopic(item?._id, "dislike")
+              const res = await interactWithHomePost({
+                postId: item?._id,
+                button: "dislike",
+                previousData: dynamicData,
+              })
+              setDynamicData(res)
               setLoading(false)
             }
           }}
         />
-        <Text>{item?.dislikeviews - interactionOffset.dislikedOffset}</Text>
+        <Text>{dynamicData?.dislikeviews}</Text>
       </View>
       <View style={$actionContainer}>
         <Icon

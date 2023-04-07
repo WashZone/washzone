@@ -24,14 +24,18 @@ import { getIconForInteraction } from "../../utils/helpers"
 
 const ActionButtons = observer(function TopicsFeed({ data }: { data: any }) {
   const {
-    interaction: { getInteractionOnVideo, getVideoInteractionOffset, isVideoSaved },
+    interaction: { isVideoSaved },
   } = useStores()
   const [loading, setLoading] = useState<boolean>(false)
+
+  const [dynamicData, setDynamicData] = useState({
+    interaction: data?.interaction,
+    dislikeviews: data?.dislikeviews,
+    likeviews: data?.likeviews,
+  })
   const { interactWithVideo, interactWithSaveOnVideo } = useHooks()
 
-  const interaction = getInteractionOnVideo(data?._id)
-  const interactionOffset = getVideoInteractionOffset(data?._id)
-
+  console.log("VIDEO DATA", data)
   const options: Array<{
     label: string
     icon: IconTypes
@@ -42,24 +46,34 @@ const ActionButtons = observer(function TopicsFeed({ data }: { data: any }) {
     () => [
       {
         label: "Like",
-        icon: getIconForInteraction(interaction, "liked"),
+        icon: getIconForInteraction(dynamicData?.interaction, "liked"),
         onPress: async () => {
           setLoading(true)
-          await interactWithVideo(data?._id, "like")
+          const res = await interactWithVideo({
+            videoId: data?._id,
+            button: "like",
+            previousData: dynamicData,
+          })
+          setDynamicData(res)
           setLoading(false)
         },
         status: true,
-        count: data?.likeviews - interactionOffset.likedOffset,
+        count: dynamicData?.likeviews,
       },
       {
         label: "Dislike",
-        icon: getIconForInteraction(interaction, "disliked"),
+        icon: getIconForInteraction(dynamicData?.interaction, "disliked"),
         onPress: async () => {
           setLoading(true)
-          await interactWithVideo(data?._id, "dislike")
+          const res = await interactWithVideo({
+            videoId: data?._id,
+            button: "dislike",
+            previousData: dynamicData,
+          })
+          setDynamicData(res)
           setLoading(false)
         },
-        count: data?.dislikeviews - interactionOffset.dislikedOffset,
+        count: dynamicData?.dislikeviews,
         status: false,
       },
       {
@@ -67,7 +81,7 @@ const ActionButtons = observer(function TopicsFeed({ data }: { data: any }) {
         icon: "forward",
         onPress: () =>
           Share.share({
-            message:  `washzone://shared-video/${data?._id}`,
+            message: `washzone://shared-video/${data?._id}`,
           }),
       },
       {
@@ -80,7 +94,7 @@ const ActionButtons = observer(function TopicsFeed({ data }: { data: any }) {
         },
       },
     ],
-    [isVideoSaved(data?._id), interaction],
+    [isVideoSaved(data?._id), dynamicData],
   )
 
   return (
@@ -92,6 +106,7 @@ const ActionButtons = observer(function TopicsFeed({ data }: { data: any }) {
           key={option.label}
         >
           <Icon
+            disabled={loading}
             icon={option.icon}
             size={22}
             onPress={() => {

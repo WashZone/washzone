@@ -7,6 +7,8 @@ import { QueryBuilder } from "mst-gql"
 import { ModelBase } from "./ModelBase"
 import { TopicDetailModel, TopicDetailModelType } from "./TopicDetailModel"
 import { TopicDetailModelSelector } from "./TopicDetailModel.base"
+import { TopicIdArrayModel, TopicIdArrayModelType } from "./TopicIdArrayModel"
+import { TopicIdArrayModelSelector } from "./TopicIdArrayModel.base"
 import { UserModel, UserModelType } from "./UserModel"
 import { UserModelSelector } from "./UserModel.base"
 import { RootStoreType } from "./index"
@@ -28,6 +30,7 @@ export const LikeTopicsModelBase = ModelBase
     likeviews: types.union(types.undefined, types.null, types.number),
     dislikeviews: types.union(types.undefined, types.null, types.number),
     status: types.union(types.undefined, types.null, types.string),
+    TopicIdarrayIds: types.union(types.undefined, types.null, types.array(types.late((): any => TopicIdArrayModel))),
   })
   .views(self => ({
     get store() {
@@ -44,6 +47,7 @@ export class LikeTopicsModelSelector extends QueryBuilder {
   get status() { return this.__attr(`status`) }
   userId(builder: string | UserModelSelector | ((selector: UserModelSelector) => UserModelSelector) | undefined) { return this.__child(`userId`, UserModelSelector, builder) }
   TopicId(builder: string | TopicDetailModelSelector | ((selector: TopicDetailModelSelector) => TopicDetailModelSelector) | undefined) { return this.__child(`TopicId`, TopicDetailModelSelector, builder) }
+  TopicIdarrayIds(builder: string | TopicIdArrayModelSelector | ((selector: TopicIdArrayModelSelector) => TopicIdArrayModelSelector) | undefined) { return this.__child(`TopicIdarrayIds`, TopicIdArrayModelSelector, builder) }
 }
 export function selectFromLikeTopics() {
   return new LikeTopicsModelSelector()

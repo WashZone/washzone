@@ -17,6 +17,52 @@ export const getIconForInteraction = (i: Interaction, buttonType: "liked" | "dis
   }
 }
 
+export const getInputInteraction = (
+  button: "like" | "dislike",
+  previousInteraction: Interaction,
+) => {
+  if (button === "like") {
+    if (previousInteraction === Interaction.like) return Interaction.null
+    else return Interaction.like
+  } else {
+    if (previousInteraction === Interaction.dislike) return Interaction.null
+    else return Interaction.dislike
+  }
+}
+
+export const likeDislikeCountUpdater = (
+  previousInteraction: Interaction,
+  likeviews: number,
+  dislikeviews: number,
+  newInteraction: Interaction,
+) => {
+  let newCount = { likeviews, dislikeviews }
+  if (
+    (previousInteraction === Interaction.null || previousInteraction === null) &&
+    newInteraction === Interaction.like
+  ) {
+    newCount = { likeviews: likeviews + 1, dislikeviews }
+  }
+  if (
+    (previousInteraction === Interaction.null || previousInteraction === null) &&
+    newInteraction === Interaction.dislike
+  ) {
+    newCount = { likeviews, dislikeviews: dislikeviews + 1 }
+  }
+  if (previousInteraction === Interaction.like && newInteraction === Interaction.null) {
+    newCount = { likeviews: likeviews - 1, dislikeviews }
+  }
+  if (previousInteraction === Interaction.like && newInteraction === Interaction.dislike) {
+    newCount = { likeviews: likeviews - 1, dislikeviews: dislikeviews + 1 }
+  }
+  if (previousInteraction === Interaction.dislike && newInteraction === Interaction.null) {
+    newCount = { likeviews, dislikeviews: dislikeviews - 1 }
+  }
+  if (previousInteraction === Interaction.dislike && newInteraction === Interaction.like) {
+    newCount = { likeviews: likeviews + 1, dislikeviews: dislikeviews - 1 }
+  }
+  return newCount
+}
 
 export const showAlertYesNo = ({
   message,

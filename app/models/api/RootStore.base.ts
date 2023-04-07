@@ -13,10 +13,14 @@ import { CommentsDetailModel, CommentsDetailModelType } from "./CommentsDetailMo
 import { commentsDetailModelPrimitives, CommentsDetailModelSelector } from "./CommentsDetailModel.base"
 import { LikeTopicsModel, LikeTopicsModelType } from "./LikeTopicsModel"
 import { likeTopicsModelPrimitives, LikeTopicsModelSelector } from "./LikeTopicsModel.base"
+import { TopicIdArrayModel, TopicIdArrayModelType } from "./TopicIdArrayModel"
+import { topicIdArrayModelPrimitives, TopicIdArrayModelSelector } from "./TopicIdArrayModel.base"
 import { TopicDetailModel, TopicDetailModelType } from "./TopicDetailModel"
 import { topicDetailModelPrimitives, TopicDetailModelSelector } from "./TopicDetailModel.base"
 import { LikeVideosModel, LikeVideosModelType } from "./LikeVideosModel"
 import { likeVideosModelPrimitives, LikeVideosModelSelector } from "./LikeVideosModel.base"
+import { VideoLikeArrayModel, VideoLikeArrayModelType } from "./VideoLikeArrayModel"
+import { videoLikeArrayModelPrimitives, VideoLikeArrayModelSelector } from "./VideoLikeArrayModel.base"
 import { VideoPlaylistModel, VideoPlaylistModelType } from "./VideoPlaylistModel"
 import { videoPlaylistModelPrimitives, VideoPlaylistModelSelector } from "./VideoPlaylistModel.base"
 import { VideoUploadPlaylistModel, VideoUploadPlaylistModelType } from "./VideoUploadPlaylistModel"
@@ -41,6 +45,8 @@ import { HomePageDetailModel, HomePageDetailModelType } from "./HomePageDetailMo
 import { homePageDetailModelPrimitives, HomePageDetailModelSelector } from "./HomePageDetailModel.base"
 import { LikeHomePagesModel, LikeHomePagesModelType } from "./LikeHomePagesModel"
 import { likeHomePagesModelPrimitives, LikeHomePagesModelSelector } from "./LikeHomePagesModel.base"
+import { HomePageIdArrayModel, HomePageIdArrayModelType } from "./HomePageIdArrayModel"
+import { homePageIdArrayModelPrimitives, HomePageIdArrayModelSelector } from "./HomePageIdArrayModel.base"
 import { FollowUserModel, FollowUserModelType } from "./FollowUserModel"
 import { followUserModelPrimitives, FollowUserModelSelector } from "./FollowUserModel.base"
 import { MetaDataModel, MetaDataModelType } from "./MetaDataModel"
@@ -60,6 +66,15 @@ import { callNotificationModelPrimitives, CallNotificationModelSelector } from "
 
 
 
+export type InputTopicIdArray = {
+  TopicId?: (string | null)
+}
+export type InputHomePageIdArray = {
+  HomePageId?: (string | null)
+}
+export type InputVideoLikeArray = {
+  VideoId?: (string | null)
+}
 export type InputUser = {
   name?: (string | null)
   first_name?: (string | null)
@@ -156,6 +171,7 @@ queryGetchannelUser="queryGetchannelUser",
 queryGetSearchedUser="queryGetSearchedUser",
 queryGetAllLegalitiesData="queryGetAllLegalitiesData",
 queryGetAllTopicByPageNumber="queryGetAllTopicByPageNumber",
+queryGetAllTopicByPageNumberInteraction="queryGetAllTopicByPageNumberInteraction",
 queryGetAllTopics="queryGetAllTopics",
 queryGetTopicByUserId="queryGetTopicByUserId",
 queryGetCommentByTopicId="queryGetCommentByTopicId",
@@ -170,6 +186,7 @@ queryGetStoryByStoryId="queryGetStoryByStoryId",
 queryGetAllStory="queryGetAllStory",
 queryGetAllStoryByPage="queryGetAllStoryByPage",
 queryGetAllVideo="queryGetAllVideo",
+queryGetAllUploadedVideoss="queryGetAllUploadedVideoss",
 queryGetAllUploadedVideo="queryGetAllUploadedVideo",
 queryGetUploadedVideoByUserIdPage="queryGetUploadedVideoByUserIdPage",
 queryGetUserChannel="queryGetUserChannel",
@@ -186,6 +203,7 @@ queryGetAllSavedByUserIdpageNumber="queryGetAllSavedByUserIdpageNumber",
 queryGetAllSavedByUserId="queryGetAllSavedByUserId",
 queryGetAllSavedByType="queryGetAllSavedByType",
 queryGetAllHomePagesByPageNumber="queryGetAllHomePagesByPageNumber",
+queryGetAllHomePagesByPage="queryGetAllHomePagesByPage",
 queryGetAllHomePagess="queryGetAllHomePagess",
 queryGetHomePagesByUserId="queryGetHomePagesByUserId",
 queryGetCommentByHomePageId="queryGetCommentByHomePageId",
@@ -236,6 +254,7 @@ mutateUploadFile="mutateUploadFile",
 mutateGetTopicByUser="mutateGetTopicByUser",
 mutateGetTopicByTopicId="mutateGetTopicByTopicId",
 mutateUpdateDeleteTopicId="mutateUpdateDeleteTopicId",
+mutateDeleteDetailTopicId="mutateDeleteDetailTopicId",
 mutateUpdateLikeViews="mutateUpdateLikeViews",
 mutateUpdateUserTopic="mutateUpdateUserTopic",
 mutateLikeDislikeTopic="mutateLikeDislikeTopic",
@@ -246,6 +265,7 @@ mutateGetUploadVideoByUserId="mutateGetUploadVideoByUserId",
 mutateGetUploadVideoByVideoId="mutateGetUploadVideoByVideoId",
 mutateGetUploadVideoByPlaylistId="mutateGetUploadVideoByPlaylistId",
 mutateUpdateDeleteVideoId="mutateUpdateDeleteVideoId",
+mutateDeleteDetailVideoId="mutateDeleteDetailVideoId",
 mutateUpdateVideoViews="mutateUpdateVideoViews",
 mutateUpdatePlaylistIdVideoId="mutateUpdatePlaylistIdVideoId",
 mutateUpdateUserVideo="mutateUpdateUserVideo",
@@ -253,6 +273,7 @@ mutateCreateClassifiedDetail="mutateCreateClassifiedDetail",
 mutateGetClassifiedByUserId="mutateGetClassifiedByUserId",
 mutateGetClassifiedById="mutateGetClassifiedById",
 mutateUpdateDeleteClassifiedId="mutateUpdateDeleteClassifiedId",
+mutateDeleteDetailClassifiedId="mutateDeleteDetailClassifiedId",
 mutateUpdateUserClassified="mutateUpdateUserClassified",
 mutateSaveLikedClassifiedFeed="mutateSaveLikedClassifiedFeed",
 mutateUpdateDeletesavedclassified="mutateUpdateDeletesavedclassified",
@@ -261,6 +282,7 @@ mutateCreateUserHomePages="mutateCreateUserHomePages",
 mutateGetHomePagesByUser="mutateGetHomePagesByUser",
 mutateGetHomePagesByHomePageId="mutateGetHomePagesByHomePageId",
 mutateUpdateDeleteHomePageId="mutateUpdateDeleteHomePageId",
+mutateDeleteDetailHomePageId="mutateDeleteDetailHomePageId",
 mutateUpdateUserHomePages="mutateUpdateUserHomePages",
 mutateLikeDislikehome="mutateLikeDislikehome",
 mutateSaveLikedVideo="mutateSaveLikedVideo",
@@ -298,7 +320,7 @@ mutateCommentOnHomepage="mutateCommentOnHomepage"
 */
 export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
   .named("RootStore")
-  .extend(configureStoreMixin([['UserRating', () => UserRatingModel], ['classifiedFeed', () => ClassifiedFeedModel], ['CommentsDetail', () => CommentsDetailModel], ['likeTopics', () => LikeTopicsModel], ['TopicDetail', () => TopicDetailModel], ['likeVideos', () => LikeVideosModel], ['VideoPlaylist', () => VideoPlaylistModel], ['VideoUploadPlaylist', () => VideoUploadPlaylistModel], ['VideoUpload', () => VideoUploadModel], ['User', () => UserModel], ['SigninUser', () => SigninUserModel], ['Legalities', () => LegalitiesModel], ['saveVideo', () => SaveVideoModel], ['storyViewerUser', () => StoryViewerUserModel], ['saveClassified', () => SaveClassifiedModel], ['Homecomments', () => HomecommentsModel], ['HomePageDetail', () => HomePageDetailModel], ['likeHomePages', () => LikeHomePagesModel], ['followUser', () => FollowUserModel], ['MetaData', () => MetaDataModel], ['Notification', () => NotificationModel], ['usersChat', () => UsersChatModel], ['roomChat', () => RoomChatModel], ['Users', () => UsersModel], ['CallMetaData', () => CallMetaDataModel], ['CallNotification', () => CallNotificationModel]], [], "js"))
+  .extend(configureStoreMixin([['UserRating', () => UserRatingModel], ['classifiedFeed', () => ClassifiedFeedModel], ['CommentsDetail', () => CommentsDetailModel], ['likeTopics', () => LikeTopicsModel], ['TopicIdArray', () => TopicIdArrayModel], ['TopicDetail', () => TopicDetailModel], ['likeVideos', () => LikeVideosModel], ['VideoLikeArray', () => VideoLikeArrayModel], ['VideoPlaylist', () => VideoPlaylistModel], ['VideoUploadPlaylist', () => VideoUploadPlaylistModel], ['VideoUpload', () => VideoUploadModel], ['User', () => UserModel], ['SigninUser', () => SigninUserModel], ['Legalities', () => LegalitiesModel], ['saveVideo', () => SaveVideoModel], ['storyViewerUser', () => StoryViewerUserModel], ['saveClassified', () => SaveClassifiedModel], ['Homecomments', () => HomecommentsModel], ['HomePageDetail', () => HomePageDetailModel], ['likeHomePages', () => LikeHomePagesModel], ['HomePageIdArray', () => HomePageIdArrayModel], ['followUser', () => FollowUserModel], ['MetaData', () => MetaDataModel], ['Notification', () => NotificationModel], ['usersChat', () => UsersChatModel], ['roomChat', () => RoomChatModel], ['Users', () => UsersModel], ['CallMetaData', () => CallMetaDataModel], ['CallNotification', () => CallNotificationModel]], [], "js"))
   .props({
 
   })
@@ -333,6 +355,9 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     queryGetAllTopicByPageNumber(variables: { pageNumber: number }, options: QueryOptions = {}) {
       return self.query<{ getAllTopicByPageNumber: any }>(`query getAllTopicByPageNumber($pageNumber: Float!) { getAllTopicByPageNumber(pageNumber: $pageNumber) }`, variables, options)
     },
+    queryGetAllTopicByPageNumberInteraction(variables: { userId: string, pageNumber: number }, options: QueryOptions = {}) {
+      return self.query<{ getAllTopicByPageNumberInteraction: any }>(`query getAllTopicByPageNumberInteraction($userId: String!, $pageNumber: Float!) { getAllTopicByPageNumberInteraction(userId: $userId, pageNumber: $pageNumber) }`, variables, options)
+    },
     queryGetAllTopics(variables?: {  }, options: QueryOptions = {}) {
       return self.query<{ getAllTopics: any }>(`query getAllTopics { getAllTopics }`, variables, options)
     },
@@ -348,8 +373,8 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     queryGetSearchedTopic(variables: { searchKey: string, pageNumber: number }, options: QueryOptions = {}) {
       return self.query<{ getSearchedTopic: any }>(`query getSearchedTopic($searchKey: String!, $pageNumber: Float!) { getSearchedTopic(searchKey: $searchKey, pageNumber: $pageNumber) }`, variables, options)
     },
-    queryGetlikesTopicByUserId(variables: { userId: string }, options: QueryOptions = {}) {
-      return self.query<{ getlikesTopicByUserId: any }>(`query getlikesTopicByUserId($userId: String!) { getlikesTopicByUserId(userId: $userId) }`, variables, options)
+    queryGetlikesTopicByUserId(variables: { homePageIdarrayIds?: InputTopicIdArray[], userId: string }, options: QueryOptions = {}) {
+      return self.query<{ getlikesTopicByUserId: any }>(`query getlikesTopicByUserId($homePageIdarrayIds: [InputTopicIdArray!], $userId: String!) { getlikesTopicByUserId(HomePageIdarrayIds: $homePageIdarrayIds, userId: $userId) }`, variables, options)
     },
     queryGetuserLikesonTopic(variables: { topicId: string }, options: QueryOptions = {}) {
       return self.query<{ getuserLikesonTopic: any }>(`query getuserLikesonTopic($topicId: String!) { getuserLikesonTopic(TopicId: $topicId) }`, variables, options)
@@ -375,14 +400,17 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     queryGetAllVideo(variables?: {  }, options: QueryOptions = {}) {
       return self.query<{ getAllVideo: any }>(`query getAllVideo { getAllVideo }`, variables, options)
     },
-    queryGetAllUploadedVideo(variables: { pageNumber: number }, options: QueryOptions = {}) {
-      return self.query<{ getAllUploadedVideo: any }>(`query getAllUploadedVideo($pageNumber: Float!) { getAllUploadedVideo(pageNumber: $pageNumber) }`, variables, options)
+    queryGetAllUploadedVideoss(variables: { pageNumber: number }, options: QueryOptions = {}) {
+      return self.query<{ getAllUploadedVideoss: any }>(`query getAllUploadedVideoss($pageNumber: Float!) { getAllUploadedVideoss(pageNumber: $pageNumber) }`, variables, options)
     },
-    queryGetUploadedVideoByUserIdPage(variables: { pageNumber: number, userId: string }, options: QueryOptions = {}) {
-      return self.query<{ getUploadedVideoByUserIdPage: any }>(`query getUploadedVideoByUserIdPage($pageNumber: Float!, $userId: String!) { getUploadedVideoByUserIdPage(pageNumber: $pageNumber, userId: $userId) }`, variables, options)
+    queryGetAllUploadedVideo(variables: { userId: string, pageNumber: number }, options: QueryOptions = {}) {
+      return self.query<{ getAllUploadedVideo: any }>(`query getAllUploadedVideo($userId: String!, $pageNumber: Float!) { getAllUploadedVideo(userId: $userId, pageNumber: $pageNumber) }`, variables, options)
     },
-    queryGetUserChannel(variables?: {  }, options: QueryOptions = {}) {
-      return self.query<{ getUserChannel: any }>(`query getUserChannel { getUserChannel }`, variables, options)
+    queryGetUploadedVideoByUserIdPage(variables: { callerId?: (string | null), pageNumber: number, userId: string }, options: QueryOptions = {}) {
+      return self.query<{ getUploadedVideoByUserIdPage: any }>(`query getUploadedVideoByUserIdPage($callerId: String, $pageNumber: Float!, $userId: String!) { getUploadedVideoByUserIdPage(callerId: $callerId, pageNumber: $pageNumber, userId: $userId) }`, variables, options)
+    },
+    queryGetUserChannel(variables: { pageNumber: number, userId: string }, options: QueryOptions = {}) {
+      return self.query<{ getUserChannel: any }>(`query getUserChannel($pageNumber: Float!, $userId: String!) { getUserChannel(pageNumber: $pageNumber, userId: $userId) }`, variables, options)
     },
     queryGetSearchedItem(variables: { searchKey: string, pageNumber: number }, options: QueryOptions = {}) {
       return self.query<{ getSearchedItem: any }>(`query getSearchedItem($searchKey: String!, $pageNumber: Float!) { getSearchedItem(searchKey: $searchKey, pageNumber: $pageNumber) }`, variables, options)
@@ -420,8 +448,11 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     queryGetAllSavedByType(variables: { pageNumber: number, savedType: string }, options: QueryOptions = {}) {
       return self.query<{ getAllSavedByType: any }>(`query getAllSavedByType($pageNumber: Float!, $savedType: String!) { getAllSavedByType(pageNumber: $pageNumber, savedType: $savedType) }`, variables, options)
     },
-    queryGetAllHomePagesByPageNumber(variables: { pageNumber: number }, options: QueryOptions = {}) {
-      return self.query<{ getAllHomePagesByPageNumber: any }>(`query getAllHomePagesByPageNumber($pageNumber: Float!) { getAllHomePagesByPageNumber(pageNumber: $pageNumber) }`, variables, options)
+    queryGetAllHomePagesByPageNumber(variables: { userId: string, pageNumber: number }, options: QueryOptions = {}) {
+      return self.query<{ getAllHomePagesByPageNumber: any }>(`query getAllHomePagesByPageNumber($userId: String!, $pageNumber: Float!) { getAllHomePagesByPageNumber(userId: $userId, pageNumber: $pageNumber) }`, variables, options)
+    },
+    queryGetAllHomePagesByPage(variables: { pageNumber: number }, options: QueryOptions = {}) {
+      return self.query<{ getAllHomePagesByPage: any }>(`query getAllHomePagesByPage($pageNumber: Float!) { getAllHomePagesByPage(pageNumber: $pageNumber) }`, variables, options)
     },
     queryGetAllHomePagess(variables?: {  }, options: QueryOptions = {}) {
       return self.query<{ getAllHomePagess: any }>(`query getAllHomePagess { getAllHomePagess }`, variables, options)
@@ -438,8 +469,8 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     queryGetSearchedHomePages(variables: { searchKey: string, pageNumber: number }, options: QueryOptions = {}) {
       return self.query<{ getSearchedHomePages: any }>(`query getSearchedHomePages($searchKey: String!, $pageNumber: Float!) { getSearchedHomePages(searchKey: $searchKey, pageNumber: $pageNumber) }`, variables, options)
     },
-    queryGetlikeshomeByUserId(variables: { userId: string }, options: QueryOptions = {}) {
-      return self.query<{ getlikeshomeByUserId: any }>(`query getlikeshomeByUserId($userId: String!) { getlikeshomeByUserId(userId: $userId) }`, variables, options)
+    queryGetlikeshomeByUserId(variables: { homePageIdarrayIds?: InputHomePageIdArray[], userId: string }, options: QueryOptions = {}) {
+      return self.query<{ getlikeshomeByUserId: any }>(`query getlikeshomeByUserId($homePageIdarrayIds: [InputHomePageIdArray!], $userId: String!) { getlikeshomeByUserId(HomePageIdarrayIds: $homePageIdarrayIds, userId: $userId) }`, variables, options)
     },
     queryGetuserLikesonhome(variables: { homePageId: string }, options: QueryOptions = {}) {
       return self.query<{ getuserLikesonhome: any }>(`query getuserLikesonhome($homePageId: String!) { getuserLikesonhome(HomePageId: $homePageId) }`, variables, options)
@@ -453,8 +484,8 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     queryGetByvideoId(variables: { videoId: string }, options: QueryOptions = {}) {
       return self.query<{ getByvideoId: any }>(`query getByvideoId($videoId: String!) { getByvideoId(videoId: $videoId) }`, variables, options)
     },
-    queryGetlikesVideoByUserId(variables: { userId: string }, options: QueryOptions = {}) {
-      return self.query<{ getlikesVideoByUserId: any }>(`query getlikesVideoByUserId($userId: String!) { getlikesVideoByUserId(userId: $userId) }`, variables, options)
+    queryGetlikesVideoByUserId(variables: { videoLikearrayIds: InputVideoLikeArray[], userId: string }, options: QueryOptions = {}) {
+      return self.query<{ getlikesVideoByUserId: any }>(`query getlikesVideoByUserId($videoLikearrayIds: [InputVideoLikeArray!]!, $userId: String!) { getlikesVideoByUserId(VideoLikearrayIds: $videoLikearrayIds, userId: $userId) }`, variables, options)
     },
     queryGetLikesonVideobyuser(variables: { userId: string, videoId: string }, options: QueryOptions = {}) {
       return self.query<{ getLikesonVideobyuser: any }>(`query getLikesonVideobyuser($userId: String!, $videoId: String!) { getLikesonVideobyuser(userId: $userId, videoId: $videoId) }`, variables, options)
@@ -587,6 +618,9 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     mutateUpdateDeleteTopicId(variables: { pageNumber: number, topicId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ UpdateDeleteTopicId: any }>(`mutation UpdateDeleteTopicId($pageNumber: Float!, $topicId: String!) { UpdateDeleteTopicId(pageNumber: $pageNumber, TopicId: $topicId) }`, variables, optimisticUpdate)
     },
+    mutateDeleteDetailTopicId(variables: { topicId: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ DeleteDetailTopicId: any }>(`mutation DeleteDetailTopicId($topicId: String!) { DeleteDetailTopicId(TopicId: $topicId) }`, variables, optimisticUpdate)
+    },
     mutateUpdateLikeViews(variables: { status: string, videoIds: string, userId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ UpdateLikeViews: any }>(`mutation UpdateLikeViews($status: String!, $videoIds: String!, $userId: String!) { UpdateLikeViews(status: $status, videoIds: $videoIds, userId: $userId) }`, variables, optimisticUpdate)
     },
@@ -625,6 +659,9 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     mutateUpdateDeleteVideoId(variables: { pageNumber: number, videoId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ UpdateDeleteVideoId: any }>(`mutation UpdateDeleteVideoId($pageNumber: Float!, $videoId: String!) { UpdateDeleteVideoId(pageNumber: $pageNumber, videoId: $videoId) }`, variables, optimisticUpdate)
     },
+    mutateDeleteDetailVideoId(variables: { videoId: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ DeleteDetailVideoId: any }>(`mutation DeleteDetailVideoId($videoId: String!) { DeleteDetailVideoId(videoId: $videoId) }`, variables, optimisticUpdate)
+    },
     mutateUpdateVideoViews(variables: { videoId: string, userId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ UpdateVideoViews: any }>(`mutation UpdateVideoViews($videoId: String!, $userId: String!) { UpdateVideoViews(videoId: $videoId, userId: $userId) }`, variables, optimisticUpdate)
     },
@@ -649,6 +686,9 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     },
     mutateUpdateDeleteClassifiedId(variables: { pageNumber: number, classifiedId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ UpdateDeleteClassifiedId: any }>(`mutation UpdateDeleteClassifiedId($pageNumber: Float!, $classifiedId: String!) { UpdateDeleteClassifiedId(pageNumber: $pageNumber, classifiedId: $classifiedId) }`, variables, optimisticUpdate)
+    },
+    mutateDeleteDetailClassifiedId(variables: { classifiedId: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ DeleteDetailClassifiedId: any }>(`mutation DeleteDetailClassifiedId($classifiedId: String!) { DeleteDetailClassifiedId(classifiedId: $classifiedId) }`, variables, optimisticUpdate)
     },
     mutateUpdateUserClassified(variables: { classifiedFeed: InputClassified, classifiedId: string }, resultSelector: string | ((qb: ClassifiedFeedModelSelector) => ClassifiedFeedModelSelector) = classifiedFeedModelPrimitives.toString(), optimisticUpdate?: () => void) {
       return self.mutate<{ updateUserClassified: ClassifiedFeedModelType}>(`mutation updateUserClassified($classifiedFeed: InputClassified!, $classifiedId: String!) { updateUserClassified(ClassifiedFeed: $classifiedFeed, classifiedId: $classifiedId) {
@@ -679,6 +719,9 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     },
     mutateUpdateDeleteHomePageId(variables: { pageNumber: number, homePageId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ UpdateDeleteHomePageId: any }>(`mutation UpdateDeleteHomePageId($pageNumber: Float!, $homePageId: String!) { UpdateDeleteHomePageId(pageNumber: $pageNumber, HomePageId: $homePageId) }`, variables, optimisticUpdate)
+    },
+    mutateDeleteDetailHomePageId(variables: { homePageId: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ DeleteDetailHomePageId: any }>(`mutation DeleteDetailHomePageId($homePageId: String!) { DeleteDetailHomePageId(HomePageId: $homePageId) }`, variables, optimisticUpdate)
     },
     mutateUpdateUserHomePages(variables: { usersHomePagesDetail: InputHomePage, homePageId: string }, resultSelector: string | ((qb: HomePageDetailModelSelector) => HomePageDetailModelSelector) = homePageDetailModelPrimitives.toString(), optimisticUpdate?: () => void) {
       return self.mutate<{ updateUserHomePages: HomePageDetailModelType}>(`mutation updateUserHomePages($usersHomePagesDetail: InputHomePage!, $homePageId: String!) { updateUserHomePages(UsersHomePagesDetail: $usersHomePagesDetail, HomePageId: $homePageId) {

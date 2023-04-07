@@ -38,7 +38,7 @@ export const Notifications: FC<AppStackScreenProps<"Notifications">> = observer(
           leftIconColor={colors.palette.neutral600}
           backgroundColor={colors.palette.neutral100}
         />
-        {notifications ? (
+        {notifications?.length > 0 ? (
           <FlatList
             ListHeaderComponent={<View style={{ height: spacing.homeScreen }} />}
             data={notifications}

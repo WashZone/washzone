@@ -7,6 +7,8 @@ import { QueryBuilder } from "mst-gql"
 import { ModelBase } from "./ModelBase"
 import { HomePageDetailModel, HomePageDetailModelType } from "./HomePageDetailModel"
 import { HomePageDetailModelSelector } from "./HomePageDetailModel.base"
+import { HomePageIdArrayModel, HomePageIdArrayModelType } from "./HomePageIdArrayModel"
+import { HomePageIdArrayModelSelector } from "./HomePageIdArrayModel.base"
 import { UserModel, UserModelType } from "./UserModel"
 import { UserModelSelector } from "./UserModel.base"
 import { RootStoreType } from "./index"
@@ -28,6 +30,7 @@ export const LikeHomePagesModelBase = ModelBase
     likeviews: types.union(types.undefined, types.null, types.number),
     dislikeviews: types.union(types.undefined, types.null, types.number),
     status: types.union(types.undefined, types.null, types.string),
+    HomePageIdarrayIds: types.union(types.undefined, types.null, types.array(types.late((): any => HomePageIdArrayModel))),
   })
   .views(self => ({
     get store() {
@@ -44,6 +47,7 @@ export class LikeHomePagesModelSelector extends QueryBuilder {
   get status() { return this.__attr(`status`) }
   userId(builder: string | UserModelSelector | ((selector: UserModelSelector) => UserModelSelector) | undefined) { return this.__child(`userId`, UserModelSelector, builder) }
   HomePageId(builder: string | HomePageDetailModelSelector | ((selector: HomePageDetailModelSelector) => HomePageDetailModelSelector) | undefined) { return this.__child(`HomePageId`, HomePageDetailModelSelector, builder) }
+  HomePageIdarrayIds(builder: string | HomePageIdArrayModelSelector | ((selector: HomePageIdArrayModelSelector) => HomePageIdArrayModelSelector) | undefined) { return this.__child(`HomePageIdarrayIds`, HomePageIdArrayModelSelector, builder) }
 }
 export function selectFromLikeHomePages() {
   return new LikeHomePagesModelSelector()

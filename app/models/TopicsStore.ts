@@ -8,12 +8,22 @@ export const TopicsStoreModel = types
   })
   .actions(withSetPropAction)
   .actions((self) => ({
+    updateTopicInteractionLocally(topicId, interaction, newCount) {
+      const temp = self.topics.map((i) => {
+        if (i._id === topicId) {
+          return { ...i, interaction, ...newCount }
+        } else {
+          return i
+        }
+      })
+      self.topics = temp
+    },
     setTopics(topics: any) {
       self.topics = topics
     },
     addToTopics(topics: any) {
-        self.topics = [ ...topics, ...self.topics]
-      },  
+      self.topics = [...topics, ...self.topics]
+    },
     clear() {
       self.topics = []
     },

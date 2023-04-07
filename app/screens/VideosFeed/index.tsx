@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from "react"
-import { View, Pressable, FlatList, TextStyle, ViewStyle } from "react-native"
+import { View, Pressable, FlatList, TextStyle, ViewStyle, TouchableOpacity } from "react-native"
 import { Icon, Screen, Text } from "../../components"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { VideosTabParamList, VideosTabProps } from "../../tabs"
@@ -14,7 +14,6 @@ import { AppStackParamList } from "../../navigators"
 import ShimmerPlaceholder from "react-native-shimmer-placeholder"
 import LinearGradient from "react-native-linear-gradient"
 import { BROKEN_IMAGE } from "../../utils"
-import { TouchableOpacity } from "react-native"
 
 export const VideoBlock = ({
   videoDetails,
@@ -47,7 +46,7 @@ export const VideoBlock = ({
           defaultSource={BROKEN_IMAGE}
           source={{
             uri: `https://img.youtube.com/vi/${
-              videoDetails.attachmentVideoUrl.split("=")[1]
+              videoDetails?.attachmentVideoUrl?.split("=")[1]
             }/0.jpg`,
           }}
           style={$videoPoster}
@@ -88,6 +87,9 @@ export const VideoBlock = ({
 
 export const VideoRowList = ({ channelDetails }) => {
   const navigation = useNavigation<NavigationProp<VideosTabParamList>>()
+  const {
+    userStore: { _id },
+  } = useStores()
   return (
     <View style={$videoRowContainer}>
       <View style={$containerCondition}>
@@ -98,7 +100,12 @@ export const VideoRowList = ({ channelDetails }) => {
           }
         >
           <Text
-            text={channelDetails[0]?.userId?.first_name + `'s Channel`}
+            text={
+              channelDetails?.length > 0 &&
+              (channelDetails[0]?.userId?._id === _id
+                ? "Your"
+                : channelDetails[0]?.userId?.first_name + `'s`) + ` Channel`
+            }
             weight="bold"
             style={$titleText}
           />

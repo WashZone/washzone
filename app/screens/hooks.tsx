@@ -7,6 +7,7 @@ import { messageMetadataType } from "../utils"
 import messaging from "@react-native-firebase/messaging"
 import { RNS3 } from "react-native-upload-aws-s3"
 import { Alert } from "react-native"
+import { getInputInteraction, likeDislikeCountUpdater } from "../utils/helpers"
 
 export function useHooks() {
   const {
@@ -14,31 +15,20 @@ export function useHooks() {
     authenticationStore: { setBlocked, setAuthToken },
     searchStore: { setResults },
     feedStore: {
-      setTopics: setFeedTopics,
       topics: feedTopics,
-      addToTopics: addtoFeedTopics,
+      updateHomePostInteractionLocally,
       addToHomeFeed,
       setHomeFeed,
       setStories,
       homeFeed,
     },
     classfieds: { setClassifieds, addToClassfieds, classifieds },
-    topics: { setTopics, topics, addToTopics },
+    topics: { setTopics, topics, addToTopics, updateTopicInteractionLocally },
     saved: { setSavedClassifieds },
-    videos: { setVideos },
+    videos: { setVideos, updateVideoInteractionLocally },
     allChats: { setChatRooms, updateRoomMessages, mergeChatPage, chatMessages, syncUnreadCount },
     notificationStore: { setNotifications },
     interaction: {
-      addToDislikedTopics,
-      addToLikedTopics,
-      addToLikedVideos,
-      addToDislikedVideos,
-      removefromDislikedTopics,
-      removefromDislikedVideos,
-      removefromLikedTopics,
-      removefromLikedVideos,
-      getInteractionOnVideo,
-      getInteractionOnTopic,
       getInteractionOnClassified,
       getSavedInteractionOnVideo,
       addToSavedClassified,
@@ -46,14 +36,12 @@ export function useHooks() {
       removeFromSavedClassifieds,
       removeFromSavedVideos,
       syncSavedInteractions,
-      syncInteractions,
     },
     api: {
       mutateAddNotificationToken,
-      queryGetAllTopics,
+      queryGetAllTopicByPageNumberInteraction,
       mutateCommentOnTopic,
       queryGetCommentsByTopicId,
-      queryGetAllTopicByPageNumber,
       queryGetAllClassifiedFeed,
       mutateUpdateUser,
       mutateCreateUserTopic,
@@ -61,15 +49,13 @@ export function useHooks() {
       queryGetAllSavedByUserId,
       mutateGetClassifiedById,
       mutateUpdateDeletesavedclassified,
-      queryGetUserChannel,
       queryGetAllStory,
       mutateSaveLikedVideo,
+      queryGetUserChannel,
       queryGetTopicByUserId,
       mutateGetClassifiedByUserId,
       queryGetVideoPlaylistByPlaylistId,
       mutateGetUploadVideoByUserId,
-      queryGetlikesVideoByUserId,
-      queryGetlikesTopicByUserId,
       mutateLikeDislikeTopic,
       mutateLikeDislikeVideo,
       mutateUpdateDeletesavedVideo,
@@ -94,6 +80,7 @@ export function useHooks() {
       mutateGetroomBymembers,
       mutateCreateChatRoom,
       mutateCreateUserHomePages,
+      mutateLikeDislikehome,
       queryGetAllHomePagesByPageNumber,
       mutateDeleteChatRoom,
       mutateSetNotificationStatus,
@@ -103,6 +90,7 @@ export function useHooks() {
       queryGetNotification,
       queryGetCommentsByHomePageId,
       mutateCommentOnHomepage,
+      queryGetHomePagesByUserId,
     },
     userStore,
   } = useStores()
@@ -122,22 +110,13 @@ export function useHooks() {
     }
   }
 
-  const getAndUpdateHomeFeed = async (cache?: boolean) => {
-    const res = await queryGetAllTopics(undefined, {
-      fetchPolicy:
-        cache === undefined ? "cache-and-network" : cache ? "cache-first" : "network-only",
-    })
-    console.log()
-    setHomeFeed(res.getAllTopics)
-  }
-
   const loadMoreHomeFeed = async () => {
-    const res = await queryGetAllHomePagesByPageNumber(
-      { pageNumber: parseInt((feedTopics.length / 10 + 1).toFixed(0)) },
+    const res = await queryGetHomePagesByUserId(
+      { pageNumber: parseInt((feedTopics.length / 10 + 1).toFixed(0)), userId: userStore._id },
       { fetchPolicy: "network-only" },
     )
-    const morePosts = res.getAllHomePagesByPageNumber?.data
-    if (res.getAllHomePagesByPageNumber.totalCount > homeFeed?.length) {
+    const morePosts = res.getHomePagesByUserId?.data
+    if (res.getHomePagesByUserId.totalCount > homeFeed?.length) {
       addToHomeFeed(morePosts)
     }
   }
@@ -145,45 +124,12 @@ export function useHooks() {
   const refreshHomeFeed = async () => {
     try {
       const res = await queryGetAllHomePagesByPageNumber(
-        { pageNumber: 1 },
-        { fetchPolicy: "network-only" },
+        { pageNumber: 1, userId: userStore._id },
+        { fetchPolicy: "no-cache" },
       )
       console.log("HOME FEED", res.getAllHomePagesByPageNumber)
       setHomeFeed(res.getAllHomePagesByPageNumber?.data)
       // syncInteractedVideosAndTopics()
-    } catch (err) {
-      console.log(err)
-    }
-  }
-
-  const getAndUpdatePosts = async (cache?: boolean) => {
-    const res = await queryGetAllTopics(undefined, {
-      fetchPolicy:
-        cache === undefined ? "cache-and-network" : cache ? "cache-first" : "network-only",
-    })
-    setFeedTopics(res.getAllTopics)
-  }
-
-  const loadMorePosts = async () => {
-    const res = await queryGetAllTopicByPageNumber(
-      { pageNumber: parseInt((feedTopics.length / 10).toFixed(0)) },
-      { fetchPolicy: "network-only" },
-    )
-
-    const morePosts = res.getAllTopicByPageNumber?.data
-
-    addtoFeedTopics(morePosts)
-  }
-
-  const refreshPosts = async () => {
-    try {
-      const res = await queryGetAllTopicByPageNumber(
-        { pageNumber: 1 },
-        { fetchPolicy: "network-only" },
-      )
-
-      setFeedTopics(res.getAllTopicByPageNumber?.data)
-      syncInteractedVideosAndTopics()
     } catch (err) {
       console.log(err)
     }
@@ -212,13 +158,13 @@ export function useHooks() {
 
   const loadMoreTopics = async () => {
     console.log("LOAD MORE TOPICS")
-    const res = await queryGetAllTopicByPageNumber(
-      { pageNumber: parseInt((topics.length / 10 + 1).toFixed(0)) },
+    const res = await queryGetAllTopicByPageNumberInteraction(
+      { userId: userStore._id, pageNumber: parseInt((topics.length / 10 + 1).toFixed(0)) },
       { fetchPolicy: "no-cache" },
     )
 
-    const moreTopics = res.getAllTopicByPageNumber?.data
-    if (res.getAllTopicByPageNumber.totalCount > topics?.length) {
+    const moreTopics = res.getAllTopicByPageNumberInteraction?.data
+    if (res.getAllTopicByPageNumberInteraction.totalCount > topics?.length) {
       addToTopics(moreTopics)
       await syncInteractedVideosAndTopics()
     }
@@ -226,10 +172,13 @@ export function useHooks() {
 
   const refreshTopics = async () => {
     try {
-      const res = await queryGetAllTopicByPageNumber({ pageNumber: 1 }, { fetchPolicy: "no-cache" })
-      console.log("DATA:queryGetAllTopicByPageNumber", res)
-      setTopics(res.getAllTopicByPageNumber?.data)
-      await syncInteractedVideosAndTopics()
+      const res = await queryGetAllTopicByPageNumberInteraction(
+        { userId: userStore._id, pageNumber: 1 },
+        { fetchPolicy: "no-cache" },
+      )
+      console.log("DATA:queryGetAllTopicByPageNumber", JSON.stringify(res))
+      setTopics(res.getAllTopicByPageNumberInteraction?.data)
+      console.log("TOPICS TOPICS FROM DB", res.getAllTopicByPageNumberInteraction?.data)
       // await syncInteractedVideosAndTopics()
     } catch (err) {
       console.log(err)
@@ -341,7 +290,6 @@ export function useHooks() {
     }
     refreshHomeFeed()
     loadStories()
-    // setTimeout(loadStories, 1000)
   }
 
   const updateProfile = async (
@@ -500,11 +448,19 @@ export function useHooks() {
 
   const refreshVideos = async () => {
     try {
-      const res = await queryGetUserChannel(undefined, { fetchPolicy: "no-cache" })
-      setVideos(res.getUserChannel)
+      const res = await queryGetUserChannel(
+        { pageNumber: 1, userId: userStore._id },
+        { fetchPolicy: "no-cache" },
+      )
+      console.log("uploaded Videos", res.getUserChannel)
+      const resMyChannel = await getUserVideos(userStore._id)
+      console.log("res.resMyChannel", resMyChannel)
 
-      await syncInteractedVideosAndTopics()
-      return res.getUserChannel
+      if (resMyChannel?.length > 0) {
+        setVideos([resMyChannel, ...res.getUserChannel])
+      } else {
+        setVideos(res.getUserChannel)
+      }
     } catch (err) {
       console.log(err)
     }
@@ -558,109 +514,120 @@ export function useHooks() {
     )
   }
 
-  const interactWithVideo = async (videoId: string, buttonType: "like" | "dislike") => {
-    const getInputInteraction = () => {
-      if (buttonType === "like") {
-        if (getInteractionOnVideo(videoId) === Interaction.like) return Interaction.null
-        else return Interaction.like
-      } else {
-        if (getInteractionOnVideo(videoId) === Interaction.dislike) return Interaction.null
-        else return Interaction.dislike
-      }
-    }
-    const inputInteraction = getInputInteraction()
-    console.log("Current Interaction", videoId, buttonType, inputInteraction)
+  const interactWithVideo = async ({
+    videoId,
+    button,
+    previousData,
+  }: {
+    videoId: string
+    button: "like" | "dislike"
+    previousData: { interaction: Interaction; dislikeviews: number; likeviews: number }
+  }) => {
+    const inputInteraction = getInputInteraction(button, previousData?.interaction)
+    const newCount = likeDislikeCountUpdater(
+      previousData.interaction,
+      previousData.likeviews,
+      previousData.dislikeviews,
+      inputInteraction,
+    )
     try {
       await mutateLikeDislikeVideo({
         videoId,
         userId: userStore._id,
         status: inputInteraction,
       })
-      if (inputInteraction === Interaction.like) {
-        addToLikedVideos(videoId)
-        removefromDislikedVideos(videoId)
-      }
-      if (inputInteraction === Interaction.dislike) {
-        addToDislikedVideos(videoId)
-        removefromLikedVideos(videoId)
-      }
-      if (inputInteraction === Interaction.null) {
-        removefromDislikedVideos(videoId)
-        removefromLikedVideos(videoId)
-      }
+      updateVideoInteractionLocally(videoId, inputInteraction, newCount)
     } catch (err) {}
-  }
-  const getInputInteraction = (buttonType, currentInteraction) => {
-    if (buttonType === "like") {
-      if (currentInteraction === Interaction.like) return Interaction.null
-      else return Interaction.like
-    } else {
-      if (currentInteraction === Interaction.dislike) return Interaction.null
-      else return Interaction.dislike
-    }
+    return { interaction: inputInteraction, ...newCount }
   }
 
-  const interactWithTopic = async (topicId: string, buttonType: "like" | "dislike") => {
-    const currentInteraction = getInteractionOnTopic(topicId)
-    const inputInteraction = getInputInteraction(buttonType, currentInteraction)
+  const interactWithHomePost = async ({
+    postId,
+    button,
+    previousData,
+  }: {
+    postId: string
+    button: "like" | "dislike"
+    previousData: { interaction: Interaction; dislikeviews: number; likeviews: number }
+  }) => {
+    const inputInteraction = getInputInteraction(button, previousData?.interaction)
+    const newCount = likeDislikeCountUpdater(
+      previousData.interaction,
+      previousData.likeviews,
+      previousData.dislikeviews,
+      inputInteraction,
+    )
     try {
-      const res = await mutateLikeDislikeTopic({
+      await mutateLikeDislikehome({
+        homePageId: postId,
+        userId: userStore._id,
+        status: inputInteraction,
+      })
+      updateHomePostInteractionLocally(postId, inputInteraction, newCount)
+    } catch (err) {}
+    return { interaction: inputInteraction, ...newCount }
+  }
+
+  const interactWithTopic = async ({
+    topicId,
+    button,
+    previousData,
+  }: {
+    topicId: string
+    button: "like" | "dislike"
+    previousData: { interaction: Interaction; dislikeviews: number; likeviews: number }
+  }) => {
+    const inputInteraction = getInputInteraction(button, previousData?.interaction)
+    const newCount = likeDislikeCountUpdater(
+      previousData.interaction,
+      previousData.likeviews,
+      previousData.dislikeviews,
+      inputInteraction,
+    )
+    try {
+      await mutateLikeDislikeTopic({
         topicId,
         userId: userStore._id,
         status: inputInteraction,
       })
-      console.log("API RESP", res)
-      if (inputInteraction === Interaction.like) {
-        addToLikedTopics(topicId)
-        removefromDislikedTopics(topicId)
-      }
-      if (inputInteraction === Interaction.dislike) {
-        addToDislikedTopics(topicId)
-        removefromLikedTopics(topicId)
-      }
-      if (inputInteraction === Interaction.null) {
-        removefromDislikedTopics(topicId)
-        removefromLikedTopics(topicId)
-      }
-      console.log("CURRENT INTERACTION", currentInteraction)
-      console.log("inputInteraction", inputInteraction)
+      updateTopicInteractionLocally(topicId, inputInteraction, newCount)
     } catch (err) {}
+    return { interaction: inputInteraction, ...newCount }
   }
 
   const syncInteractedVideosAndTopics = async () => {
-    const likedTopics = []
-    const disLikedTopics = []
-    const likedVideos = []
-    const disLikedVideos = []
-
-    try {
-      // Getting Liked Topics and Mapping to just get the Ids
-      const resStatusOnTopics = await queryGetlikesTopicByUserId({
-        userId: userStore._id,
-      })
-      resStatusOnTopics.getlikesTopicByUserId.forEach((item: any) => {
-        if (item?.status === Interaction.like) likedTopics.push(item._id)
-        if (item?.status === Interaction.dislike) disLikedTopics.push(item._id)
-      })
-      // Getting Liked Videos and Mapping to just get the Ids
-      const resStatusOnVideos = await queryGetlikesVideoByUserId({
-        userId: userStore._id,
-      })
-      resStatusOnVideos.getlikesVideoByUserId.forEach((item: any) => {
-        if (item?.status === Interaction.like) likedVideos.push(item._id)
-        if (item?.status === Interaction.dislike) disLikedVideos.push(item._id)
-      })
-      syncInteractions({
-        videos: {
-          liked: likedVideos,
-          disliked: disLikedVideos,
-        },
-        topics: {
-          liked: likedTopics,
-          disliked: disLikedTopics,
-        },
-      })
-    } catch (err) {}
+    // const likedTopics = []
+    // const disLikedTopics = []
+    // const likedVideos = []
+    // const disLikedVideos = []
+    // try {
+    //   // Getting Liked Topics and Mapping to just get the Ids
+    //   const resStatusOnTopics = await queryGetlikesTopicByUserId({
+    //     userId: userStore._id,
+    //   })
+    //   resStatusOnTopics.getlikesTopicByUserId.forEach((item: any) => {
+    //     if (item?.status === Interaction.like) likedTopics.push(item._id)
+    //     if (item?.status === Interaction.dislike) disLikedTopics.push(item._id)
+    //   })
+    //   // Getting Liked Videos and Mapping to just get the Ids
+    //   const resStatusOnVideos = await queryGetlikesVideoByUserId({
+    //     userId: userStore._id,
+    //   })
+    //   resStatusOnVideos.getlikesVideoByUserId.forEach((item: any) => {
+    //     if (item?.status === Interaction.like) likedVideos.push(item._id)
+    //     if (item?.status === Interaction.dislike) disLikedVideos.push(item._id)
+    //   })
+    //   syncInteractions({
+    //     videos: {
+    //       liked: likedVideos,
+    //       disliked: disLikedVideos,
+    //     },
+    //     topics: {
+    //       liked: likedTopics,
+    //       disliked: disLikedTopics,
+    //     },
+    //   })
+    // } catch (err) {}
   }
 
   const uploadVideo = async ({
@@ -770,7 +737,6 @@ export function useHooks() {
     await syncSavedInteractionsHook()
     await syncInteractedVideosAndTopics()
     refreshTopics()
-    refreshPosts()
     refreshClassifieds()
     refreshVideos()
     loadStories()
@@ -1159,7 +1125,6 @@ export function useHooks() {
     sendSilentAlert,
     getMoreChatMessages,
     loadMoreHomeFeed,
-    getAndUpdateHomeFeed,
     refreshHomeFeed,
     deleteChatRoom,
     sendClassfiedOffer,
@@ -1174,13 +1139,10 @@ export function useHooks() {
     onLoggedInBoot,
     getPlaylist,
     loadStories,
-    getAndUpdatePosts,
     postComment,
     getCommentsOnPost,
     loadMoreTopics,
     refreshTopics,
-    loadMorePosts,
-    refreshPosts,
     updateProfile,
     createTopic,
     refreshClassifieds,
@@ -1218,6 +1180,7 @@ export function useHooks() {
     resetPassword,
     postCommentOnHomePagePost,
     getCommentsOnHomePagePost,
+    interactWithHomePost,
   }
 }
 
