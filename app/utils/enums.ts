@@ -7,3 +7,12 @@ export enum Interaction {
   saved = "SAVED",
   notSaved = "NOT-SAVED",
 }
+
+export enum NotificationType {
+  classified ='ClassifiedMessage',
+  commentOnTopic='CommentOnTopic',
+  commentOnPost='CommentOnPost',
+ likeOnVideo='LikeOnVideo',
+  likeOnPost='LikeOnPost',
+  likeOnTopic='LikeOnTopic',
+}

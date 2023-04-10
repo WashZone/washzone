@@ -18,6 +18,7 @@ import {
   VideosTabParamList,
 } from "../../tabs"
 import { formatName } from "../../utils/formatName"
+import Loading from "../../components/Loading"
 
 export const Search: FC<AppStackScreenProps<"Search">> = observer(function Search() {
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
@@ -36,7 +37,7 @@ export const Search: FC<AppStackScreenProps<"Search">> = observer(function Searc
   useEffect(
     () =>
       debounce(() => {
-        console.log('IS EMPTY', isEmpty)
+        console.log("IS EMPTY", isEmpty)
         if (isEmpty() && searchKey !== "") setNotResultsFound(true)
         else {
           setNotResultsFound(false)
@@ -50,7 +51,7 @@ export const Search: FC<AppStackScreenProps<"Search">> = observer(function Searc
     if (searchKey.length > 2) {
       setLoading(true)
       await searchKeyword(searchKey)
-      setTimeout( () => setLoading(false), 1000)
+      setTimeout(() => setLoading(false), 1000)
     }
   }
 
@@ -59,7 +60,7 @@ export const Search: FC<AppStackScreenProps<"Search">> = observer(function Searc
       if (text.length > 1) {
         setLoading(true)
         await searchKeyword(text)
-        setTimeout( () => setLoading(false), 1000)
+        setTimeout(() => setLoading(false), 1000)
       }
     }, 600),
     [],
@@ -183,9 +184,9 @@ export const Search: FC<AppStackScreenProps<"Search">> = observer(function Searc
         </View>
         <View style={$flex1}>
           {loading ? (
-            <ActivityIndicator color={colors.palette.primary100} style={$loader} animating />
+            <Loading />
           ) : noResultsFound ? (
-            <EmptyState preset="searchResults" buttonOnPress={() => navigation.goBack()}/>
+            <EmptyState preset="searchResults" buttonOnPress={() => navigation.goBack()} />
           ) : (
             <SectionList
               showsVerticalScrollIndicator={false}

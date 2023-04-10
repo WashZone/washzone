@@ -10,6 +10,7 @@ import { useStores } from "../../models"
 import { ActivityIndicator } from "react-native-paper"
 import FastImage from "react-native-fast-image"
 import { CommentComponent } from "../TopicInfo/Comments"
+import Loading from "../../components/Loading"
 
 export const PostInfo: FC<HomeTabProps<"PostInfo">> = function PostInfo(props) {
   const { post } = props.route.params
@@ -62,13 +63,8 @@ export const PostInfo: FC<HomeTabProps<"PostInfo">> = function PostInfo(props) {
   }
 
   if (loading) {
-    return (
-      <View style={$loadingScreen}>
-        <ActivityIndicator animating color={colors.palette.primary100} />
-      </View>
-    )
+    return <Loading />
   }
-
   return (
     <Screen preset="fixed" keyboardOffset={-180} contentContainerStyle={$container}>
       <FlatList

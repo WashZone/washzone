@@ -8,10 +8,8 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
-  Touchable,
-  ColorValue,
 } from "react-native"
-import { Text, Screen, IconTypes, Icon } from "../../components"
+import { Text, IconTypes, Icon } from "../../components"
 import { ClassifiedsTabProps, HomeTabParamList } from "../../tabs"
 import { colors, spacing } from "../../theme"
 import { observer } from "mobx-react-lite"
@@ -25,8 +23,8 @@ import { Rating } from "react-native-ratings"
 import { useStores } from "../../models"
 import { Interaction } from "../../utils/enums"
 import { RateUserModal } from "./RateUser"
-import { $contentCenter } from "../styles"
 import { SendOfferModal } from "./SendOfferModal"
+import Loading from "../../components/Loading"
 
 interface ActionProps {
   icon: IconTypes
@@ -201,11 +199,7 @@ export const ClassifiedsDetails: FC<ClassifiedsTabProps<"ClassifiedsDetails">> =
     }, [classified])
 
     if (loading) {
-      return (
-        <Screen contentContainerStyle={[$flex1, $contentCenter]}>
-          <ActivityIndicator animating color={colors.palette.primary100} />
-        </Screen>
-      )
+      return <Loading />
     }
 
     return (

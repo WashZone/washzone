@@ -111,14 +111,23 @@ export function useHooks() {
   }
 
   const loadMoreHomeFeed = async () => {
-    const res = await queryGetHomePagesByUserId(
-      { pageNumber: parseInt((feedTopics.length / 10 + 1).toFixed(0)), userId: userStore._id },
+    const res = await queryGetAllHomePagesByPageNumber(
+      { pageNumber: parseInt((homeFeed.length / 10 + 1).toFixed(0)), userId: userStore._id },
       { fetchPolicy: "network-only" },
     )
-    const morePosts = res.getHomePagesByUserId?.data
-    if (res.getHomePagesByUserId.totalCount > homeFeed?.length) {
+    console.log("MORE POSTS", res.getAllHomePagesByPageNumber)
+    const morePosts = res.getAllHomePagesByPageNumber?.data
+    if (res.getAllHomePagesByPageNumber.totalCount > homeFeed?.length) {
       addToHomeFeed(morePosts)
     }
+  }
+
+  const getUsersHomePosts = async (userId: string) => {
+    const res = await queryGetHomePagesByUserId(
+      { pageNumber: 1, userId },
+      { fetchPolicy: "network-only" },
+    )
+    return res.getHomePagesByUserId?.data || []
   }
 
   const refreshHomeFeed = async () => {
@@ -1181,6 +1190,7 @@ export function useHooks() {
     postCommentOnHomePagePost,
     getCommentsOnHomePagePost,
     interactWithHomePost,
+    getUsersHomePosts,
   }
 }
 

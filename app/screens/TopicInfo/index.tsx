@@ -11,6 +11,7 @@ import { useStores } from "../../models"
 import { ActivityIndicator } from "react-native-paper"
 import { TopicComponent, TopicComponentFullView } from "../TopicsFeed"
 import FastImage from "react-native-fast-image"
+import Loading from "../../components/Loading"
 
 export const TopicInfo: FC<HomeTabProps<"TopicInfo">> = function PostInfo(props) {
   const { topic } = props.route.params
@@ -65,11 +66,7 @@ export const TopicInfo: FC<HomeTabProps<"TopicInfo">> = function PostInfo(props)
   }
 
   if (loading) {
-    return (
-      <View style={$loadingScreen}>
-        <ActivityIndicator animating color={colors.palette.primary100} />
-      </View>
-    )
+    return <Loading />
   }
 
   return (
@@ -78,7 +75,7 @@ export const TopicInfo: FC<HomeTabProps<"TopicInfo">> = function PostInfo(props)
         data={comments}
         renderItem={({ item }) => <CommentComponent comment={item} key={item?._id} />}
         style={$contentContainer}
-        ListHeaderComponent={<TopicComponentFullView topic={topicDetails} index={0} />}
+        ListHeaderComponent={<TopicComponentFullView topic={topicDetails} />}
       />
 
       {selectedMedia && (

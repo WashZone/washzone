@@ -21,6 +21,7 @@ import YoutubePlayer from "react-native-youtube-iframe"
 import { $loaderContainer } from "../styles"
 import { useHooks } from "../hooks"
 import { getIconForInteraction } from "../../utils/helpers"
+import Loading from "../../components/Loading"
 
 const ActionButtons = observer(function TopicsFeed({ data }: { data: any }) {
   const {
@@ -211,15 +212,7 @@ export const VideoDetails: FC<VideosTabProps<"VideoDetails">> = observer(functio
   }
 
   if (loading) {
-    return (
-      <Screen
-        preset="fixed"
-        backgroundColor={colors.palette.neutral100}
-        contentContainerStyle={$loaderContainer}
-      >
-        <ActivityIndicator animating color={colors.palette.primary100} />
-      </Screen>
-    )
+    return <Loading />
   }
 
   return (

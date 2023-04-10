@@ -11,6 +11,7 @@ export const NotificationStoreModel = types
   .actions(withSetPropAction)
   .actions((self) => ({
     setNotifications(notifications: any[]) {
+      console.log("NOTIFICATIONS ALL : ", notifications)
       self.notifications = notifications
     },
     setLastRead(lastReadDate: string) {

@@ -7,6 +7,10 @@ import { ClassifiedComponent } from "../ClassifiedsFeed"
 import { TopicComponent } from "../TopicsFeed"
 import { AutoImage } from "../../components"
 import { HFlatList, HScrollView } from "react-native-head-tab-view"
+import { PostComponent } from "../Feed/partials"
+import { navigationRef } from "../../navigators"
+import { NavigationProp, useNavigation } from "@react-navigation/native"
+import { HomeTabParamList } from "../../tabs"
 
 const GalleryItem = ({ uri }) => {
   return (
@@ -61,6 +65,37 @@ export const GalleryTabView = ({ galleryItems }: { galleryItems: Array<any> }) =
   )
 }
 
+export const HomePostsTabScreen = ({
+  userId,
+  addToGallery,
+}: {
+  userId: string
+  addToGallery: (toAdd: Array<any>) => void
+}) => {
+  const [userPosts, setUserPosts] = React.useState([])
+  const { getUsersHomePosts } = useHooks()
+  const navigation = useNavigation<NavigationProp<HomeTabParamList>>()
+  const fetchUserPosts = async () => {
+    const res = await getUsersHomePosts(userId)
+    setUserPosts(res)
+    addToGallery(res)
+  }
+
+  useEffect(() => {
+    fetchUserPosts()
+  }, [userId])
+
+  return (
+    <HFlatList
+      index={0}
+      style={$screenContainer}
+      bounces={false}
+      data={userPosts}
+      showsVerticalScrollIndicator={false}
+      renderItem={({ item, index }) => <PostComponent post={item} navigateOnPress index={index} />}
+    />
+  )
+}
 export const TopicsTabScreen = ({
   userId,
   addToGallery,
@@ -88,7 +123,7 @@ export const TopicsTabScreen = ({
       bounces={false}
       data={userTopics}
       showsVerticalScrollIndicator={false}
-      renderItem={({ item, index }) => <TopicComponent index={index} topic={item} />}
+      renderItem={({ item, index }) => <TopicComponent topic={item} />}
     />
   )
 }
