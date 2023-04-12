@@ -45,6 +45,7 @@ export function useHooks() {
       queryGetAllClassifiedFeed,
       mutateUpdateUser,
       mutateCreateUserTopic,
+      mutateGetVideoByVideoId,
       mutateSaveLikedClassifiedFeed,
       queryGetAllSavedByUserId,
       mutateGetClassifiedById,
@@ -53,7 +54,9 @@ export function useHooks() {
       mutateSaveLikedVideo,
       queryGetUserChannel,
       queryGetTopicByUserId,
+      queryGetTopicByUsersId,
       mutateGetClassifiedByUserId,
+      queryGetUploadedVideoByUserIdPage,
       queryGetVideoPlaylistByPlaylistId,
       mutateGetUploadVideoByUserId,
       mutateLikeDislikeTopic,
@@ -91,6 +94,7 @@ export function useHooks() {
       queryGetCommentsByHomePageId,
       mutateCommentOnHomepage,
       queryGetHomePagesByUserId,
+      queryGetHomePagesByUsersId,
     },
     userStore,
   } = useStores()
@@ -123,11 +127,11 @@ export function useHooks() {
   }
 
   const getUsersHomePosts = async (userId: string) => {
-    const res = await queryGetHomePagesByUserId(
-      { pageNumber: 1, userId },
+    const res = await queryGetHomePagesByUsersId(
+      { pageNumber: 1, userId, callerId: userStore._id },
       { fetchPolicy: "network-only" },
     )
-    return res.getHomePagesByUserId?.data || []
+    return res.getHomePagesByUsersId?.data || []
   }
 
   const refreshHomeFeed = async () => {
@@ -476,30 +480,44 @@ export function useHooks() {
   }
 
   const getUserTopics = async (userId: string) => {
-    const res = await queryGetTopicByUserId({
+    const res = await queryGetTopicByUsersId({
       userId,
       pageNumber: 1,
+      callerId: userStore._id,
     })
 
-    return res.getTopicByUserId?.data
+    return res.getTopicByUsersId?.data
   }
 
   const loadMoreUserTopics = async (userId, pageNumber) => {
-    const res = await queryGetTopicByUserId({
+    const res = await queryGetTopicByUsersId({
       userId,
       pageNumber,
+      callerId: userStore._id,
     })
 
-    return res.getTopicByUserId
+    return res.getTopicByUsersId
   }
 
   const getUserVideos = async (userId: string) => {
-    const res = await mutateGetUploadVideoByUserId({
+    const res = await queryGetUploadedVideoByUserIdPage({
       userId,
+      callerId: userStore._id,
+      pageNumber: 1,
     })
 
-    return res.getUploadVideoByUserId
+    return res.getUploadedVideoByUserIdPage.data
   }
+
+  // const getVideoByVideoId = async (videoId: string) => {
+  //   const res = await queryGetUploadedVideoByUserIdPage({
+  //     userId,
+  //     callerId: userStore._id,
+  //     pageNumber: 1,
+  //   })
+
+  //   return res.getUploadedVideoByUserIdPage.data
+  // }
 
   const getUserClassifieds = async (userId: string) => {
     const res = await mutateGetClassifiedByUserId({
@@ -1117,7 +1135,7 @@ export function useHooks() {
         { reciverId: userStore._id },
         { fetchPolicy: "no-cache" },
       )
-      console.log("RES NOTIFICATIONS : ", res.getNotification)
+      console.log("RES NOTIFICATIONS : ", JSON.stringify(res))
       setNotifications(res.getNotification)
     } catch (err) {
       console.log("res.getNotificationERR", err)

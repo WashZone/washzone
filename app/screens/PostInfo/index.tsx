@@ -54,6 +54,7 @@ export const PostInfo: FC<HomeTabProps<"PostInfo">> = function PostInfo(props) {
     await postCommentOnHomePagePost(commentText, selectedMedia, postDetails?._id)
     await syncComments(postDetails?._id)
     setCommentText("")
+    setSelectedMedia(undefined)
     setIsCommenting(false)
   }
 

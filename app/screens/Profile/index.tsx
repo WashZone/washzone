@@ -16,7 +16,13 @@ import { colors, spacing } from "../../theme"
 import { HomeTabProps } from "../../tabs"
 import { Button, Screen, Text } from "../../components"
 import { formatName } from "../../utils/formatName"
-import { ClassifiedsTabScreen, GalleryTabView, TopicsTabScreen, VideosTabScreen } from "./tabViews"
+import {
+  ClassifiedsTabScreen,
+  GalleryTabView,
+  HomePostsTabScreen,
+  TopicsTabScreen,
+  VideosTabScreen,
+} from "./tabViews"
 import { $flex1 } from "../styles"
 import { useHooks } from "../hooks"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
@@ -31,6 +37,7 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
   const [galleryItemsTopics, setGalleryItemsTopics] = useState([])
   const [galleryItemsClassifieds, setGalleryItemsClassifieds] = useState([])
   const [galleryItemsVideos, setGalleryItemsVideos] = useState([])
+  const [galleryItemsHomePosts, setGalleryItemsHomePosts] = useState([])
   const { getOrCreateRoom } = useHooks()
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
   const layout = useWindowDimensions()
@@ -41,6 +48,7 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
 
   const [index, setIndex] = React.useState(0)
   const [routes] = React.useState([
+    { key: "posts", title: "Posts" },
     { key: "topic", title: "Topics" },
     { key: "classified", title: "Classifieds" },
     { key: "video", title: "Videos" },
@@ -49,6 +57,8 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
 
   const renderScene = ({ route }) => {
     switch (route.key) {
+      case "posts":
+        return <HomePostsTabScreen userId={user?._id} addToGallery={setGalleryItemsHomePosts} />
       case "topic":
         return <TopicsTabScreen userId={user?._id} addToGallery={setGalleryItemsTopics} />
       case "classified":
@@ -62,6 +72,7 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
               ...galleryItemsTopics,
               ...galleryItemsClassifieds,
               ...galleryItemsVideos,
+              ...galleryItemsHomePosts,
             ]}
           />
         )

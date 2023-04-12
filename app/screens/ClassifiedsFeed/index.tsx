@@ -7,8 +7,10 @@ import {
   ViewStyle,
   RefreshControl,
   Dimensions,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
 } from "react-native"
-import { Text, Screen, Icon } from "../../components"
+import { Text, Screen, Icon, CustomFlatlist } from "../../components"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { ClassifiedsTabParamList, ClassifiedsTabProps } from "../../tabs"
@@ -21,7 +23,10 @@ import { AppStackParamList } from "../../navigators"
 import { BROKEN_IMAGE, defaultImages } from "../../utils"
 import LinearGradient from "react-native-linear-gradient"
 import ShimmerPlaceholder from "react-native-shimmer-placeholder"
+import Lottie from "lottie-react-native"
+import Animated from "react-native-reanimated"
 
+const refreshingHeight = 80
 export const ClassifiedComponent = ({
   classified,
   disabled,
@@ -31,6 +36,7 @@ export const ClassifiedComponent = ({
 }) => {
   const navigation = useNavigation<NavigationProp<ClassifiedsTabParamList>>()
   const [loaded, setLoaded] = useState(false)
+
   return (
     <Pressable
       style={$postContainer}
@@ -50,7 +56,6 @@ export const ClassifiedComponent = ({
           onLoadEnd={() => setLoaded(true)}
         />
       </ShimmerPlaceholder>
-
       <Text
         style={$postContent}
         text={"$" + classified.prize + "  •  " + classified.title}
@@ -69,9 +74,8 @@ export const ClassifiedsFeed: FC<ClassifiedsTabProps<"ClassifiedsFeed">> = obser
     } = useStores()
     const [refreshing, setRefreshing] = useState(false)
     const navigationApp = useNavigation<NavigationProp<AppStackParamList>>()
-
-    const onRefresh = () => {
-      refreshClassifieds()
+    const onRefresh = async () => {
+      await refreshClassifieds()
       setRefreshing(false)
     }
 
@@ -81,17 +85,11 @@ export const ClassifiedsFeed: FC<ClassifiedsTabProps<"ClassifiedsFeed">> = obser
 
     return (
       <Screen contentContainerStyle={$flex1} backgroundColor={colors.palette.neutral100}>
-        <FlatList
+        <CustomFlatlist
+          customRefresh={onRefresh}
           showsVerticalScrollIndicator={false}
           columnWrapperStyle={$flatlistContentContainer}
           ListHeaderComponent={<View style={$headerSpace} />}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              tintColor={colors.palette.primary100}
-            />
-          }
           data={classifieds}
           renderItem={({ item }) => <ClassifiedComponent key={item?._id} classified={item} />}
           numColumns={2}

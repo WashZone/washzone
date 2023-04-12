@@ -184,17 +184,15 @@ export const VideoDetails: FC<VideosTabProps<"VideoDetails">> = observer(functio
   const [videoDetails, setVideoDetails] = useState<any>(data)
   const [loading, setLoading] = useState<boolean>(typeof data === "string")
   const {
-    api: { mutateGetUploadVideoByVideoId },
+    api: { queryGetByvideoId },
   } = useStores()
   console.log(data)
 
   const handleDataType = async () => {
     if (typeof data === "string") {
       setLoading(true)
-      const res = await mutateGetUploadVideoByVideoId({ videoId: data })
-      setVideoDetails(
-        res.getUploadVideoByVideoId?.data?.length === 1 && res.getUploadVideoByVideoId?.data[0],
-      )
+      const res = await queryGetByvideoId({ videoId: data })
+      setVideoDetails(res.getByvideoId?.data?.length === 1 && res.getByvideoId?.data[0])
       setLoading(false)
     } else {
       setVideoDetails(data)
