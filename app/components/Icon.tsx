@@ -160,6 +160,7 @@ export const iconRegistry = {
   no_audio: require("../../assets/icons/no-audio.png"),
   speaker: require("../../assets/icons/speaker.png"),
   addImage: require("../../assets/icons/add-image.png"),
+  shareCursive: require("../../assets/icons/share-cursive.png"),
 }
 
 const $imageStyle: ImageStyle = {

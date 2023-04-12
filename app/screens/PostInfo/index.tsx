@@ -21,16 +21,17 @@ export const PostInfo: FC<HomeTabProps<"PostInfo">> = function PostInfo(props) {
   const [postDetails, setPostDetails] = useState<any>(post)
   const [loading, setLoading] = useState<boolean>(typeof post === "string")
   const {
-    api: { mutateGetHomePagesByHomePageId },
+    userStore: { _id },
+    api: { mutateGetHomePagesById },
   } = useStores()
   const { getCommentsOnHomePagePost, postCommentOnHomePagePost } = useHooks()
 
   const handelPost = async () => {
     setLoading(true)
     if (typeof post === "string") {
-      const res = await mutateGetHomePagesByHomePageId({ homePageId: post })
+      const res = await mutateGetHomePagesById({ homePageId: post, callerId: _id })
       const topicData =
-        res.getHomePagesByHomePageId?.data.length === 1 && res.getHomePagesByHomePageId?.data[0]
+        res.getHomePagesById?.data.length === 1 && res.getHomePagesById?.data[0]
       setPostDetails(topicData)
       await syncComments(topicData?._id)
       setLoading(false)

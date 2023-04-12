@@ -28,6 +28,7 @@ const BottomActions = ({
   type: "video" | "classified"
   refreshSavedClassifieds: () => void
 }) => {
+  console.log("DATADATA SAVED", JSON.stringify(data))
   const { interactWithSaveOnClassified, interactWithSaveOnVideo } = useHooks()
 
   const bottomOptions: Array<ActionProps> = [
@@ -38,7 +39,7 @@ const BottomActions = ({
         if (type === "classified") {
           await interactWithSaveOnClassified(data?._id)
         } else {
-          await interactWithSaveOnVideo(data?._id)
+          await interactWithSaveOnVideo(data?.videoId)
         }
         refreshSavedClassifieds()
       },
@@ -97,7 +98,7 @@ const SavedItem = ({ item, index, handleOnPress, refreshSavedClassifieds }) => {
           />
           <Text text={videoDetails?.description} weight="medium" size="xs" numberOfLines={1} />
           <Text text={videoDetails?.users?.name} style={$byText} />
-          <BottomActions data={item} type="video" refreshSavedClassifieds={refreshSavedClassifieds}/>
+          <BottomActions data={item} type="video" refreshSavedClassifieds={refreshSavedClassifieds} />
         </View>
       </ListItem>
     )

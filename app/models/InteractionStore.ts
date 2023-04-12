@@ -28,26 +28,11 @@ export const InteractionStoreModel = types
   })
   .actions(withSetPropAction)
   .actions((self) => ({
-    isVideoSaved(id:string){
+    isVideoSaved(id: string) {
       return self.videos.saved.includes(id)
     },
-    isClassifiedSaved(id:string){
+    isClassifiedSaved(id: string) {
       return self.classified.saved.includes(id)
-    },
-    async syncInteractions(data: {
-      videos: { liked: string[]; disliked: string[] }
-      topics: { liked: string[]; disliked: string[] }
-    }) {
-      self.setProp("videos", {
-        ...data.videos,
-        lastSyncedLiked: data.videos.liked,
-        lastSyncedDisliked: data.videos.disliked,
-      })
-      self.setProp("topics", {
-        ...data.topics,
-        lastSyncedLiked: data.topics.liked,
-        lastSyncedDisliked: data.topics.disliked,
-      })
     },
     async syncSavedInteractions(data: { savedVideos: string[]; savedClassifieds: string[] }) {
       self.setProp("videos", {
@@ -123,6 +108,7 @@ export const InteractionStoreModel = types
       return Interaction.null
     },
     getSavedInteractionOnVideo(id: string) {
+      console.log('store.videos.saved', store.videos.saved)
       if (store.videos.saved.includes(id)) return Interaction.saved
       return Interaction.notSaved
     },
@@ -170,5 +156,5 @@ export const InteractionStoreModel = types
 
   }))
 
-export interface InteractionStore extends Instance<typeof InteractionStoreModel> {}
-export interface InteractionStoreSnapshot extends SnapshotOut<typeof InteractionStoreModel> {}
+export interface InteractionStore extends Instance<typeof InteractionStoreModel> { }
+export interface InteractionStoreSnapshot extends SnapshotOut<typeof InteractionStoreModel> { }

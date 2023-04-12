@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react"
 import { View, ViewStyle, Dimensions, ImageStyle } from "react-native"
 import { colors, spacing } from "../../theme"
 import { useHooks } from "../hooks"
-import { VideoBlock } from "../VideosFeed"
 import { ClassifiedComponent } from "../ClassifiedsFeed"
 import { TopicComponent } from "../TopicsFeed"
 import { AutoImage } from "../../components"
@@ -33,8 +32,8 @@ export const GalleryTabView = ({ galleryItems }: { galleryItems: Array<any> }) =
   useEffect(() => {
     const left = []
     const right = []
-
-    galleryItems.map((data, index) => {
+    const filtered = galleryItems.filter(e => (e?.attachmentUrl || e.thumbnailUrl))
+    filtered.map((data, index) => {
       if (index % 2 === 0) {
         left.push(data)
       } else {

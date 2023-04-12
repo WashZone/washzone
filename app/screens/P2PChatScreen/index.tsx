@@ -24,6 +24,7 @@ import { ActivityIndicator } from "react-native-paper"
 import ShimmerPlaceholder from "react-native-shimmer-placeholder"
 import FastImage from "react-native-fast-image"
 import LinearGradient from "react-native-linear-gradient"
+import Lottie from "lottie-react-native"
 
 const getColorFromType = (type: any) => {
   switch (type) {
@@ -35,7 +36,7 @@ const getColorFromType = (type: any) => {
     case messageMetadataType.hangUpCall:
       return colors.palette.angry100
     case messageMetadataType.classifiedOffer:
-      return colors.palette.success100
+      return colors.palette.primary200
     default:
       return colors.palette.neutral100
   }
@@ -67,7 +68,7 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
     if (message.type === "file") {
       try {
         await FileViewer.open(message.uri, { showOpenWithDialog: true })
-      } catch {}
+      } catch { }
     }
   }
 
@@ -132,16 +133,12 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
             backgroundColor: isLog
               ? getColorFromType(message?.metaData?.metaDataType)
               : isAuthorMe
-              ? colors.palette.primary200
-              : colors.palette.neutral100,
+                ? colors.palette.primary200
+                : colors.palette.neutral100,
             padding: isImage ? 0 : spacing.tiny,
             paddingHorizontal: isImage ? 0 : spacing.extraSmall,
-            borderRadius: isLog ? 2 : 10,
+            borderRadius: isLog ? 8 : 10,
             alignItems: isAuthorMe ? "flex-end" : "flex-start",
-          },
-          !isLog && {
-            borderBottomRightRadius: isAuthorMe ? 0 : 10,
-            borderBottomLeftRadius: !isAuthorMe ? 0 : 10,
           },
         ]}
       >
@@ -182,7 +179,12 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
         renderImageMessage={renderImageMessage}
         isAttachmentUploading={isAttachmentUploading}
         sendButtonVisibilityMode="editing"
-        emptyState={() => syncing && <ActivityIndicator />}
+        emptyState={() => syncing && <Lottie
+          style={{ height: 40 }}
+          source={require("../../../assets/lottie/loader.json")}
+          autoPlay
+          loop
+        />}
         onEndReached={onChatEndReached}
         theme={{
           insets: {

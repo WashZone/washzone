@@ -1,15 +1,15 @@
 import React, { FC, useEffect, useState } from "react"
-import { FlatList, ScrollView, TextInput, TextStyle, View, ViewStyle } from "react-native"
+import { FlatList, TextInput, TextStyle, View, ViewStyle } from "react-native"
 import { Icon, Screen } from "../../components"
 import { colors, spacing } from "../../theme"
 import { HomeTabProps } from "../../tabs/Home"
 // import { PostComponent } from "../Feed/partials"
-import { Capture, MediaPicker } from "../../utils/device/MediaPicker"
+import { MediaPicker } from "../../utils/device/MediaPicker"
 import { useHooks } from "../hooks"
 import { CommentComponent } from "./Comments"
 import { useStores } from "../../models"
 import { ActivityIndicator } from "react-native-paper"
-import { TopicComponent, TopicComponentFullView } from "../TopicsFeed"
+import { TopicComponentFullView } from "../TopicsFeed"
 import FastImage from "react-native-fast-image"
 import Loading from "../../components/Loading"
 
@@ -23,14 +23,16 @@ export const TopicInfo: FC<HomeTabProps<"TopicInfo">> = function PostInfo(props)
   const [topicDetails, setTopicDetails] = useState<any>(topic)
   const [loading, setLoading] = useState<boolean>(typeof topic === "string")
   const {
-    api: { mutateGetTopicByTopicId },
+    userStore: { _id },
+
+    api: { mutateGetTopicById },
   } = useStores()
 
   const handleTopic = async () => {
     setLoading(true)
     if (typeof topic === "string") {
-      const res = await mutateGetTopicByTopicId({ topicId: topic })
-      const topicData = res.getTopicByTopicId?.data.length === 1 && res.getTopicByTopicId?.data[0]
+      const res = await mutateGetTopicById({ topicId: topic, callerId: _id })
+      const topicData = res.getTopicById?.data.length === 1 && res.getTopicById?.data[0]
       setTopicDetails(topicData)
       await syncComments(topicData?._id)
       setLoading(false)

@@ -89,8 +89,8 @@ const Actions = observer(function ActionButtons({ item }: { item: any }) {
       </View>
       <View style={$actionContainer}>
         <Icon
-          icon="share"
-          size={25}
+          icon="shareCursive"
+          size={20}
           onPress={() =>
             Share.open({ message: "", title: "", url: `washzone://shared-topic/${item?._id}` })
           }

@@ -21,12 +21,11 @@ import { useHooks } from "../../hooks"
 import { useStores } from "../../../models"
 import { Stories } from "./Stories"
 import { $flex1 } from "../../styles"
-import { MREC_AD_UNIT_ID, NATIVE_AD_UNIT_ID } from "../../../utils/AppLovin"
 import ShimmerPlaceHolder from "react-native-shimmer-placeholder"
 import { getIconForInteraction } from "../../../utils/helpers"
 
 import NativeAdView from "../../../utils/NativeAd"
-import AppLovinMAX from "react-native-applovin-max/src/index"
+
 
 import { defaultImages } from "../../../utils"
 import LinearGradient from "react-native-linear-gradient"
@@ -97,8 +96,8 @@ const Actions = observer(function ActionButtons({ item }: { item: any }) {
       </View>
       <View style={$actionContainer}>
         <Icon
-          icon="share"
-          size={25}
+          icon="shareCursive"
+          size={20}
           onPress={() =>
             Share.share({ message: "", title: "", url: `washzone://shared-post/${item?._id}` })
           }

@@ -15,7 +15,6 @@ export function useHooks() {
     authenticationStore: { setBlocked, setAuthToken },
     searchStore: { setResults },
     feedStore: {
-      topics: feedTopics,
       updateHomePostInteractionLocally,
       addToHomeFeed,
       setHomeFeed,
@@ -45,7 +44,6 @@ export function useHooks() {
       queryGetAllClassifiedFeed,
       mutateUpdateUser,
       mutateCreateUserTopic,
-      mutateGetVideoByVideoId,
       mutateSaveLikedClassifiedFeed,
       queryGetAllSavedByUserId,
       mutateGetClassifiedById,
@@ -53,12 +51,10 @@ export function useHooks() {
       queryGetAllStory,
       mutateSaveLikedVideo,
       queryGetUserChannel,
-      queryGetTopicByUserId,
       queryGetTopicByUsersId,
       mutateGetClassifiedByUserId,
       queryGetUploadedVideoByUserIdPage,
       queryGetVideoPlaylistByPlaylistId,
-      mutateGetUploadVideoByUserId,
       mutateLikeDislikeTopic,
       mutateLikeDislikeVideo,
       mutateUpdateDeletesavedVideo,
@@ -93,7 +89,6 @@ export function useHooks() {
       queryGetNotification,
       queryGetCommentsByHomePageId,
       mutateCommentOnHomepage,
-      queryGetHomePagesByUserId,
       queryGetHomePagesByUsersId,
     },
     userStore,
@@ -207,7 +202,7 @@ export function useHooks() {
         name: selectedMedia?.fileName,
       })
     }
-    const res = await mutateCommentOnTopic({
+    await mutateCommentOnTopic({
       userId: userStore._id,
       acttachmentUrl: imageUrl,
       acttachmentType: "image",
@@ -255,10 +250,10 @@ export function useHooks() {
     if (title.length === 0 || content?.length === 0) return
     const imageUrl = attachment
       ? await uploadToS3({
-          uri: attachment?.uri,
-          type: attachment?.type,
-          name: attachment?.fileName,
-        })
+        uri: attachment?.uri,
+        type: attachment?.type,
+        name: attachment?.fileName,
+      })
       : undefined
 
     console.log("IMAGE URL", imageUrl)
@@ -283,10 +278,10 @@ export function useHooks() {
     if (content?.length === 0) return
     const imageUrl = attachment
       ? await uploadToS3({
-          uri: attachment?.uri,
-          type: attachment?.type,
-          name: attachment?.fileName,
-        })
+        uri: attachment?.uri,
+        type: attachment?.type,
+        name: attachment?.fileName,
+      })
       : undefined
 
     console.log("IMAGE URL", imageUrl)
@@ -359,22 +354,19 @@ export function useHooks() {
         { fetchPolicy: "no-cache" },
       )
 
-      console.log("ALL SAVED INTERACTIONS", res)
+      console.log("ALL SAVED INTERACTIONS", JSON.stringify(res))
       const savedVideoIds: Array<string> = []
       const savedClassifiedIds: Array<string> = []
       // eslint-disable-next-line array-callback-return
       res.getAllSavedByUserId?.data?.map((item: any) => {
         if (item?.savedType === "classified") {
-          item?.ClassifiedFeedId?.length &&
-            typeof item?.ClassifiedFeedId[0]?._id === "string" &&
-            savedClassifiedIds.push(item?.ClassifiedFeedId[0]?._id)
+          savedClassifiedIds.push(item?.ClassifiedFeedId[0]?._id)
         }
         if (item?.savedType === "video") {
-          item?.VideoDetail?.length &&
-            typeof item?.VideoDetail[0]?._id === "string" &&
-            savedVideoIds.push(item?.VideoDetail[0]?._id)
+          savedVideoIds.push(item?.VideoDetail[0]?._id)
         }
       })
+      console.log("SAVED VIDEO IDSSS", savedVideoIds)
       syncSavedInteractions({
         savedClassifieds: [...savedClassifiedIds],
         savedVideos: [...savedVideoIds],
@@ -389,7 +381,7 @@ export function useHooks() {
     console.log("CLASSIFIED:", classifiedFeedId, currentStatus)
     try {
       if (currentStatus === Interaction.notSaved) {
-        const res = await mutateSaveLikedClassifiedFeed({
+        await mutateSaveLikedClassifiedFeed({
           classifiedFeedId,
           userId: userStore._id,
         })
@@ -414,14 +406,14 @@ export function useHooks() {
     console.log("SAVE VIDEO", videoId, "Current Status : ", currentStatus)
     try {
       if (currentStatus === Interaction.notSaved) {
-        const res = await mutateSaveLikedVideo({
+        await mutateSaveLikedVideo({
           videoId,
           userId: userStore._id,
         })
         addToSavedVideos(videoId)
         Toast.show(toastMessages.videoSavedSuccessfully)
       } else {
-        const res = await mutateUpdateDeletesavedVideo({
+        await mutateUpdateDeletesavedVideo({
           videosavedId: videoId,
           userId: userStore._id,
         })
@@ -435,7 +427,7 @@ export function useHooks() {
 
   const saveVideo = async (videoId: string) => {
     const store = useStores()
-    const res = await mutateSaveLikedVideo({
+    await mutateSaveLikedVideo({
       userId: store.userStore._id,
       videoId,
     })
@@ -450,6 +442,7 @@ export function useHooks() {
       { fetchPolicy: "no-cache" },
     )
     setSavedClassifieds(res.getAllSavedByUserIdpageNumber?.data)
+    syncSavedInteractionsHook()
   }
 
   const getClassified = async (classifiedId: string) => {
@@ -564,7 +557,7 @@ export function useHooks() {
         status: inputInteraction,
       })
       updateVideoInteractionLocally(videoId, inputInteraction, newCount)
-    } catch (err) {}
+    } catch (err) { }
     return { interaction: inputInteraction, ...newCount }
   }
 
@@ -591,7 +584,7 @@ export function useHooks() {
         status: inputInteraction,
       })
       updateHomePostInteractionLocally(postId, inputInteraction, newCount)
-    } catch (err) {}
+    } catch (err) { }
     return { interaction: inputInteraction, ...newCount }
   }
 
@@ -618,7 +611,7 @@ export function useHooks() {
         status: inputInteraction,
       })
       updateTopicInteractionLocally(topicId, inputInteraction, newCount)
-    } catch (err) {}
+    } catch (err) { }
     return { interaction: inputInteraction, ...newCount }
   }
 
@@ -677,14 +670,14 @@ export function useHooks() {
     if (vedioPlaylistId) {
       body = { ...body, vedioPlaylistId }
     }
-    const res = await mutateUploadVideoByUser(body)
+    await mutateUploadVideoByUser(body)
     setTimeout(async () => await loadStories(), 1000)
   }
 
   const createClassified = async ({ attachmentUrl, title, prize, classifiedDetail, condition }) => {
     const imageUrl = await uploadToS3({ uri: attachmentUrl, name: title, type: "image" })
 
-    const res = await mutateCreateClassifiedDetail({
+    await mutateCreateClassifiedDetail({
       attachmentUrl: imageUrl,
       attachmentType: "image",
       title,
@@ -698,7 +691,7 @@ export function useHooks() {
 
   const createEmptyPlaylist = async (playListName: string) => {
     try {
-      const res = await mutateUploadVideoPlaylist({
+      await mutateUploadVideoPlaylist({
         playListName,
         userId: userStore._id,
         videoUpload: [],
@@ -712,11 +705,11 @@ export function useHooks() {
   const storeDeviceInfo = async () => {
     const deviceId = await getUniqueId()
     try {
-      const res = await mutateStoreDeviceId({
+      await mutateStoreDeviceId({
         userId: userStore._id,
         deviceId,
       })
-    } catch (err) {}
+    } catch (err) { }
   }
 
   const isUserBlocked = async () => {
@@ -730,7 +723,7 @@ export function useHooks() {
       if (res.getBlockedUser?.status) {
         setAuthToken(undefined)
       }
-    } catch (err) {}
+    } catch (err) { }
   }
 
   const rateUser = async (userId: string, rating: number) => {
@@ -897,7 +890,7 @@ export function useHooks() {
         },
       })
       console.log("CREATED USER MESSAGE", res.createUserMessage)
-    } catch (err) {}
+    } catch (err) { }
   }
 
   const sendCallOffer = async (
@@ -927,7 +920,7 @@ export function useHooks() {
         },
       })
       console.log("CREATED USER MESSAGE", res.createUserMessage)
-    } catch (err) {}
+    } catch (err) { }
   }
 
   const acceptCallOffer = async (roomId: string, receiverId: string, answer: string) => {
@@ -947,7 +940,7 @@ export function useHooks() {
         },
       })
       console.log("CREATED USER MESSAGE", res.createUserMessage)
-    } catch (err) {}
+    } catch (err) { }
   }
 
   const hangUpCall = async (roomId: string, receiverId: string) => {
@@ -967,7 +960,7 @@ export function useHooks() {
         },
       })
       console.log("CREATED USER MESSAGE", res.createUserMessage)
-    } catch (err) {}
+    } catch (err) { }
   }
 
   const getUserById = async (userId: string) => {
@@ -998,7 +991,7 @@ export function useHooks() {
         console.log("ROOM FOUND", res.getroomBymembers)
 
         return res.getroomBymembers?.data[0]?._id
-      } catch (err) {}
+      } catch (err) { }
     }
   }
 
@@ -1025,17 +1018,17 @@ export function useHooks() {
         },
       })
       console.log("CREATED USER MESSAGE", res.createUserMessage)
-    } catch (err) {}
+    } catch (err) { }
   }
 
   const deleteChatRoom = async (roomId: string) => {
     console.log("Delete Chat Room ", roomId)
     try {
-      const res = await mutateDeleteChatRoom({
+      await mutateDeleteChatRoom({
         roomId,
       })
       syncAllChats()
-    } catch (err) {}
+    } catch (err) { }
   }
 
   const updateNotificationToken = async () => {
@@ -1083,7 +1076,7 @@ export function useHooks() {
   }
   const setNotificationStatus = async (b: boolean) => {
     try {
-      const res = await mutateSetNotificationStatus({
+      await mutateSetNotificationStatus({
         userId: userStore._id,
         notificationStatus: b,
       })
@@ -1109,7 +1102,7 @@ export function useHooks() {
     // we have to send a setter alert and then a actualy display alert
     // as we send the alert twice we need a way to identify each, we will do that via a type key in receiver
     // (Why Receiver? cuz rn, i am using Stringified JSON in receiver field and that being so, i can add remove feilds as per i see fit)
-    const res = await mutateSendCallNotification({
+    await mutateSendCallNotification({
       data: {
         roomId,
         type,

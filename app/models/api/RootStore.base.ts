@@ -239,6 +239,7 @@ mutateStoreDeviceId="mutateStoreDeviceId",
 mutateGetBlockedUser="mutateGetBlockedUser",
 mutateResetPassword="mutateResetPassword",
 mutateSignin="mutateSignin",
+mutateVerifyToken="mutateVerifyToken",
 mutateGetUserById="mutateGetUserById",
 mutateUpdateUser="mutateUpdateUser",
 mutateUpdateAverageRating="mutateUpdateAverageRating",
@@ -574,6 +575,9 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
         ${typeof resultSelector === "function" ? resultSelector(new UserModelSelector()).toString() : resultSelector}
       } }`, variables, optimisticUpdate)
     },
+    mutateVerifyToken(variables: { token: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ verifyToken: any }>(`mutation verifyToken($token: String!) { verifyToken(token: $token) }`, variables, optimisticUpdate)
+    },
     mutateGetUserById(variables: { userId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ getUserById: any }>(`mutation getUserById($userId: String!) { getUserById(userId: $userId) }`, variables, optimisticUpdate)
     },
@@ -663,8 +667,8 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     mutateGetUploadVideoByPlaylistId(variables: { vedioPlaylistId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ getUploadVideoByPlaylistId: any }>(`mutation getUploadVideoByPlaylistId($vedioPlaylistId: String!) { getUploadVideoByPlaylistId(vedioPlaylistId: $vedioPlaylistId) }`, variables, optimisticUpdate)
     },
-    mutateGetVideoByVideoId(variables: { callerId?: (string | null), vedioPlaylistId: string }, optimisticUpdate?: () => void) {
-      return self.mutate<{ getVideoByVideoId: any }>(`mutation getVideoByVideoId($callerId: String, $vedioPlaylistId: String!) { getVideoByVideoId(callerId: $callerId, vedioPlaylistId: $vedioPlaylistId) }`, variables, optimisticUpdate)
+    mutateGetVideoByVideoId(variables: { callerId?: (string | null), videoId: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ getVideoByVideoId: any }>(`mutation getVideoByVideoId($callerId: String, $videoId: String!) { getVideoByVideoId(callerId: $callerId, videoId: $videoId) }`, variables, optimisticUpdate)
     },
     mutateGetVideoByPlaylistId(variables: { callerId?: (string | null), vedioPlaylistId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ getVideoByPlaylistId: any }>(`mutation getVideoByPlaylistId($callerId: String, $vedioPlaylistId: String!) { getVideoByPlaylistId(callerId: $callerId, vedioPlaylistId: $vedioPlaylistId) }`, variables, optimisticUpdate)

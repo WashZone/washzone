@@ -38,7 +38,7 @@ const en = {
       button: "Chat Now!",
     },
     saved: {
-      heading: "Your Saved Videos and Classifieds",
+      heading: "Oops !",
       content:
         "You currently have no saved videos or classifieds, but you can start saving your favorite content and ads for easy access in the future. Check back here to see your saved items!",
       button: "Go Back!",

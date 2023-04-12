@@ -5,7 +5,6 @@ import {
   ViewStyle,
   Dimensions,
   ScrollView,
-  ActivityIndicator,
   Share,
 } from "react-native"
 import { Button, Icon, IconTypes, Screen, Text } from "../../components"
@@ -18,7 +17,6 @@ import { fromNow } from "../../utils/agoFromNow"
 import { formatName } from "../../utils/formatName"
 import { useStores } from "../../models"
 import YoutubePlayer from "react-native-youtube-iframe"
-import { $loaderContainer } from "../styles"
 import { useHooks } from "../hooks"
 import { getIconForInteraction } from "../../utils/helpers"
 import Loading from "../../components/Loading"
@@ -160,7 +158,7 @@ const VideoContainer = ({ uri, videoId }: { uri: string; videoId: string }) => {
   } = useStores()
 
   const onVideoLoad = async () => {
-    const res = await mutateUpdateVideoViews({ videoId, userId: _id })
+    await mutateUpdateVideoViews({ videoId, userId: _id })
   }
 
   return (
@@ -184,15 +182,19 @@ export const VideoDetails: FC<VideosTabProps<"VideoDetails">> = observer(functio
   const [videoDetails, setVideoDetails] = useState<any>(data)
   const [loading, setLoading] = useState<boolean>(typeof data === "string")
   const {
-    api: { queryGetByvideoId },
+    userStore: { _id },
+    api: { mutateGetVideoByVideoId },
   } = useStores()
   console.log(data)
 
   const handleDataType = async () => {
     if (typeof data === "string") {
       setLoading(true)
-      const res = await queryGetByvideoId({ videoId: data })
-      setVideoDetails(res.getByvideoId?.data?.length === 1 && res.getByvideoId?.data[0])
+      console.log("DATAID", data)
+      const res = await mutateGetVideoByVideoId({ videoId: data, callerId: _id })
+      console.log("VIDEO DATA FROM API : ", res)
+
+      setVideoDetails(res.getVideoByVideoId?.data?.length === 1 && res.getVideoByVideoId?.data[0])
       setLoading(false)
     } else {
       setVideoDetails(data)
@@ -254,7 +256,6 @@ const $shareContainer: ViewStyle = {
 }
 
 const $flex1: ViewStyle = { flex: 1 }
-const $iconCountContainer: ViewStyle = { flexDirection: "row" }
 
 const screenWidth = Dimensions.get("screen").width
 

@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from "react"
+import React, { FC, useEffect } from "react"
 import { FlatList, TextStyle, TouchableOpacity, View, ViewStyle } from "react-native"
 import { EmptyState, Header, Screen, Text } from "../../components"
 import { colors, spacing } from "../../theme"
@@ -6,7 +6,6 @@ import { colors, spacing } from "../../theme"
 import { AppStackParamList, AppStackScreenProps, goBack } from "../../navigators"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { useHooks } from "../hooks"
-import { CustomMessageType } from "../P2PChatScreen/partials"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { $flex1, $flexRow } from "../styles"
 import { formatName } from "../../utils/formatName"
@@ -20,6 +19,7 @@ import {
   VideosTabParamList,
 } from "../../tabs"
 import { NotificationType } from "../../utils/enums"
+import { BROKEN_IMAGE } from "../../utils"
 
 export const Notifications: FC<AppStackScreenProps<"Notifications">> = observer(
   function Notifications() {
@@ -82,7 +82,7 @@ const UIComponent = ({ name, onPress, imageUri, count, module, type, updatedAt }
       }}
     >
       <View style={$flexRow}>
-        <FastImage source={{ uri: imageUri }} style={$notificationImage} />
+        <FastImage defaultSource={BROKEN_IMAGE} source={{ uri: imageUri }} style={$notificationImage} />
         <View style={[$flex1, { paddingVertical: spacing.tiny, paddingRight: spacing.extraSmall }]}>
           <Text
             text={
@@ -91,8 +91,8 @@ const UIComponent = ({ name, onPress, imageUri, count, module, type, updatedAt }
                   ? `${name} and ${count} others ${type} your ${module}.`
                   : `${name} ${type} your ${module}.`
                 : count > 0
-                ? `${name} and others made a total of ${count + 1} comments on your ${module}.`
-                : `${name} commented on your ${module}.`
+                  ? `${name} and others made a total of ${count + 1} comments on your ${module}.`
+                  : `${name} commented on your ${module}.`
             }
             size="xxs"
             weight="medium"
@@ -128,19 +128,19 @@ const NotificationComponent = ({
       const details =
         item?.notificationType === NotificationType.likeOnPost
           ? {
-              onPress: () =>
-                navigationHome.navigate("PostInfo", { post: item?.HomePageId[0]?._id }),
-              module: "post",
-              image: item?.HomePageId[0]?.attachmentUrl,
-            }
+            onPress: () =>
+              navigationHome.navigate("PostInfo", { post: item?.HomePageId[0]?._id }),
+            module: "post",
+            image: item?.HomePageId[0]?.attachmentUrl,
+          }
           : item?.notificationType === NotificationType.likeOnTopic
-          ? {
+            ? {
               onPress: () =>
                 navigationTopic.navigate("TopicInfo", { topic: item?.TopicId[0]?._id }),
               module: "discussion",
               image: item?.TopicId[0]?.attachmentUrl,
             }
-          : {
+            : {
               onPress: () =>
                 navigationVideo.navigate("VideoDetails", { data: item?.videoId[0]?._id }),
               module: "video",
@@ -162,21 +162,20 @@ const NotificationComponent = ({
     case NotificationType.commentOnTopic:
     case NotificationType.commentOnPost: {
       const author = item?.authorId
-      const key = item?.notificationType === NotificationType.commentOnTopic ? "discussion" : "post"
       const details =
         item?.notificationType === NotificationType.commentOnPost
           ? {
-              onPress: () =>
-                navigationHome.navigate("PostInfo", { post: item?.HomePageId[0]?._id }),
-              module: "post",
-              image: item?.HomePageId[0]?.attachmentUrl,
-            }
+            onPress: () =>
+              navigationHome.navigate("PostInfo", { post: item?.HomePageId[0]?._id }),
+            module: "post",
+            image: item?.HomePageId[0]?.attachmentUrl,
+          }
           : {
-              onPress: () =>
-                navigationTopic.navigate("TopicInfo", { topic: item?.TopicId[0]?._id }),
-              module: "discussion",
-              image: item?.TopicId[0]?.attachmentUrl,
-            }
+            onPress: () =>
+              navigationTopic.navigate("TopicInfo", { topic: item?.TopicId[0]?._id }),
+            module: "discussion",
+            image: item?.TopicId[0]?.attachmentUrl,
+          }
 
       return (
         <UIComponent
@@ -192,7 +191,7 @@ const NotificationComponent = ({
     }
     case NotificationType.classified: {
       const data = JSON.parse(item.metaData?.data)
-      const author = item?.authorId
+      const author = item?.authorId[0]
 
       return (
         <TouchableOpacity
@@ -210,9 +209,8 @@ const NotificationComponent = ({
               style={[$flex1, { paddingVertical: spacing.tiny, paddingRight: spacing.extraSmall }]}
             >
               <Text
-                text={`${formatName(author?.name)} offered ${
-                  item?.metaData?.currency + item?.metaData?.amount
-                } on ${data?.title}.`}
+                text={`${formatName(author?.name)} offered ${item?.metaData?.currency + item?.metaData?.amount
+                  } on ${data?.title}.`}
                 size="xxs"
                 weight="medium"
                 style={$flex1}
