@@ -153,7 +153,7 @@ export const VideosFeed: FC<VideosTabProps<"VideosFeed">> = observer(function Vi
       </Screen>
       <Pressable style={$uploadContainer} onPress={() => navigation.navigate("UploadVideo")}>
         <Icon icon="upload" size={20} />
-        <Text text="Upload" style={$uploadText} weight="bold" />
+        <Text text="Post a Video" style={$uploadText} weight="bold" />
       </Pressable>
     </>
   )
@@ -199,7 +199,7 @@ const $uploadContainer: ViewStyle = {
   position: "absolute",
   backgroundColor: colors.palette.primary300,
   height: 36,
-  width: 100,
+  width: 140,
   right: spacing.medium,
   top: spacing.medium,
   borderRadius: 10,

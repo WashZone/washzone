@@ -40,6 +40,7 @@ export const P2PUserComponent = observer(function p2PUserComponent({
       setIsRead(false)
     }
   }, [latestMessage])
+  if (latestMessage?.isEmpty) return null
 
   return (
     <ListItem

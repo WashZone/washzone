@@ -62,9 +62,9 @@ export const ChatRoomStoreModel = types
       let count = 0
       console.log("ROOMSSSSSS, rooms", rooms)
       Object.keys(rooms).forEach((key) => {
-        const latestMessageId = this.getLatestMessageForRoom(key).id
-        console.log("LATEST MESSAGE ID :", latestMessageId, rooms[key])
-        if (latestMessageId !== rooms[key]) count++
+        const latestMessage = this.getLatestMessageForRoom(key)
+        console.log("LATEST MESSAGE ID :", latestMessage.id, rooms[key])
+        if (latestMessage.id !== rooms[key] && !latestMessage.isEmpty) count++
       })
       console.log("UNREAD COUNT", count)
       return count
@@ -116,8 +116,9 @@ export const ChatRoomStoreModel = types
       const room = self.allChatRooms.filter((room) => room?._id === roomId)[0]
       const latestMessageFromRoomObject = {
         id: room?.latestMessage?._id,
-        message: room?.latestMessage?.text,
+        message: room?.latestMessage?.text || "sent a media !",
         time: new Date(room?.latestMessage?.createdAt),
+        isEmpty: room?.latestMessage?.membersId?.length === 0,
       }
 
       // If we have never opened the room, then just return the latest message from the Room Object
@@ -128,6 +129,7 @@ export const ChatRoomStoreModel = types
         id: self.chatMessages[roomId][0]?._id,
         message: self.chatMessages[roomId][0]?.text,
         time: new Date(self.chatMessages[roomId][0]?.createdAt),
+        isEmpty: false,
       }
 
       // return whichever message is the latest

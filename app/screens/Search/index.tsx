@@ -1,7 +1,7 @@
 import React, { FC, useCallback, useEffect, useState } from "react"
 import { SectionList, TextStyle, TouchableOpacity, View, ViewStyle } from "react-native"
 import { observer } from "mobx-react-lite"
-import { ActivityIndicator, TextInput } from "react-native-paper"
+import { TextInput } from "react-native-paper"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { debounce } from "lodash"
 

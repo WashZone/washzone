@@ -58,7 +58,7 @@ export const Settings: FC<AppStackScreenProps<"Settings">> = observer(function S
             onPress={() => navigation.navigate("ResetPassword")}
             style={$listItemStyle}
             leftIcon="reset"
-            tx="settings.reset"
+            text="Reset Password"
             rightIcon="caretRight"
           />
         )}

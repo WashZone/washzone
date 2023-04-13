@@ -6,10 +6,11 @@ import {
   Dimensions,
   ScrollView,
   Share,
+  TouchableOpacity,
 } from "react-native"
 import { Button, Icon, IconTypes, Screen, Text } from "../../components"
 import FastImage, { ImageStyle } from "react-native-fast-image"
-import { VideosTabProps } from "../../tabs"
+import { HomeTabParamList, VideosTabProps } from "../../tabs"
 import { colors, spacing } from "../../theme"
 import { observer } from "mobx-react-lite"
 
@@ -20,6 +21,8 @@ import YoutubePlayer from "react-native-youtube-iframe"
 import { useHooks } from "../hooks"
 import { getIconForInteraction } from "../../utils/helpers"
 import Loading from "../../components/Loading"
+import { NavigationProp, useNavigation } from "@react-navigation/native"
+import { AppStackParamList } from "../../navigators"
 
 const ActionButtons = observer(function TopicsFeed({ data }: { data: any }) {
   const {
@@ -121,6 +124,8 @@ const ActionButtons = observer(function TopicsFeed({ data }: { data: any }) {
 })
 
 const VideoDescription = ({ data }: { data: any }) => {
+  const navigation = useNavigation<NavigationProp<HomeTabParamList>>()
+  console.log("TEST TEST DATA", data)
   return (
     <View style={$descriptionContainer}>
       <Text style={$titleText} numberOfLines={1} text={data?.videoHeading} weight="bold" />
@@ -135,7 +140,10 @@ const VideoDescription = ({ data }: { data: any }) => {
         style={$viewsAndCreated}
       />
       <ActionButtons data={data} />
-      <View style={$publisherContainer}>
+      <TouchableOpacity
+        style={$publisherContainer}
+        onPress={() => navigation.navigate("Profile", { user: data?.userId[0] || data?.userId })}
+      >
         <FastImage
           source={{ uri: data?.userId?.length ? data?.userId[0]?.picture : data?.userId?.picture }}
           style={$avatar}
@@ -145,8 +153,11 @@ const VideoDescription = ({ data }: { data: any }) => {
           text={formatName(data?.userId?.length ? data?.userId[0]?.name : data?.userId?.name)}
           weight="semiBold"
         />
-      </View>
-      <Text text={data?.description} style={$descriptionText} />
+      </TouchableOpacity>
+      <Text
+        text={data?.userId?.length ? data?.userId[0]?.description : data?.userId?.description}
+        style={$descriptionText}
+      />
     </View>
   )
 }

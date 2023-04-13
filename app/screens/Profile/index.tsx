@@ -14,7 +14,7 @@ import { observer } from "mobx-react-lite"
 
 import { colors, spacing } from "../../theme"
 import { HomeTabProps } from "../../tabs"
-import { Button, Screen, Text } from "../../components"
+import { Button, Header, Screen, Text } from "../../components"
 import { formatName } from "../../utils/formatName"
 import {
   ClassifiedsTabScreen,
@@ -33,7 +33,7 @@ const mockDescription =
   "Nulla cupidatat deserunt amet quis aliquip nostrud do adipisicing. Adipisicing excepteur elit laborum Lorem adipisicing do duis."
 
 export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ route }) {
-  const { user } = route.params
+  const { user, header } = route.params
   const [galleryItemsTopics, setGalleryItemsTopics] = useState([])
   const [galleryItemsClassifieds, setGalleryItemsClassifieds] = useState([])
   const [galleryItemsVideos, setGalleryItemsVideos] = useState([])
@@ -105,6 +105,16 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
 
   return (
     <Screen contentContainerStyle={$flex1}>
+      {header && (
+        <Header
+          title={'Profile'}
+          titleStyle={{color:colors.palette.neutral100}}
+          leftIcon="caretLeft"
+          backgroundColor={colors.palette.primary100}
+          onLeftPress={() => navigation.goBack()}
+          leftIconColor={colors.palette.neutral100}
+        />
+      )}
       <CollapsibleHeaderTabView
         renderScrollHeader={() => (
           <View style={$topContainer}>

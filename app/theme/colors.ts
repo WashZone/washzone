@@ -50,6 +50,9 @@ const palette = {
   overlayNeutral50: "rgba(255,255,255,0.5)",
 
   glow100: "#4EFFDF",
+
+  messageAuthor:'#0c84fc',
+  messageReceiver:'#e4e3e4',
 }
 
 export const colors = {

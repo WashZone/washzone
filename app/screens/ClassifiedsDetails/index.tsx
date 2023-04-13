@@ -38,11 +38,13 @@ const PublisherDetails = ({ publisher }: { publisher: any }) => {
   const navigation = useNavigation<NavigationProp<HomeTabParamList>>()
   return (
     <>
-      <View style={$publisherContainer}>
+      <TouchableOpacity
+        onPress={() => navigation.navigate("Profile", { user: publisher })}
+        style={$publisherContainer}
+      >
         <View style={$flexHori}>
-          <TouchableOpacity onPress={() => navigation.navigate("Profile", { user: publisher })}>
-            <FastImage style={$publisherPicture} source={{ uri: publisher?.picture }} />
-          </TouchableOpacity>
+          <FastImage style={$publisherPicture} source={{ uri: publisher?.picture }} />
+
           <View>
             <Text text={publisher?.name} />
             <TouchableOpacity onPress={() => setRateUserModalVisible(true)}>
@@ -50,8 +52,15 @@ const PublisherDetails = ({ publisher }: { publisher: any }) => {
                 readonly
                 startingValue={publisher?.averageRating}
                 imageSize={22}
-                tintColor={colors.backgroundGrey}
-                style={{ backgroundColor: colors.backgroundGrey, marginTop: spacing.extraSmall }}
+                // Background
+                tintColor={colors.palette.neutral100}
+                ratingBackgroundColor={colors.palette.primary100}
+                ratingColor={colors.palette.primary100}
+                ratingTextColor={colors.palette.primary100}
+                style={{
+                  backgroundColor: colors.palette.primary100,
+                  marginTop: spacing.extraSmall,
+                }}
               />
             </TouchableOpacity>
           </View>
@@ -59,7 +68,7 @@ const PublisherDetails = ({ publisher }: { publisher: any }) => {
         {/* <Pressable style={$followButton}>
           <Text text="Follow" weight="semiBold" />
         </Pressable> */}
-      </View>
+      </TouchableOpacity>
       {/* <Pressable style={$reviewsButtonContainer}>
         <Text text="See All Reviews" weight="semiBold" />
       </Pressable> */}
@@ -134,7 +143,7 @@ const BottomActions = ({ classified }: { classified: any }) => {
       title: "Send Offer",
       onPress: () => {
         if (_id === classified?.userId?._id) {
-          Alert.alert("Cannot make and Offer on your own classified!")
+          Alert.alert("You cannot make an offer to yourself.")
         } else {
           setSendOfferModal(true)
         }
@@ -203,7 +212,7 @@ export const ClassifiedsDetails: FC<ClassifiedsTabProps<"ClassifiedsDetails">> =
     }
 
     return (
-      <View style={[$flex1, { backgroundColor: colors.background }]}>
+      <View style={[$flex1, { backgroundColor: colors.palette.neutral100 }]}>
         <ScrollView style={$flex1}>
           <FastImage
             source={{ uri: classifiedDetails?.attachmentUrl }}
@@ -222,14 +231,7 @@ export const ClassifiedsDetails: FC<ClassifiedsTabProps<"ClassifiedsDetails">> =
           <MoreDetails classified={classifiedDetails} />
         </ScrollView>
         <Pressable style={$backContainer} onPress={() => navigation.goBack()}>
-          <Icon
-            icon="back"
-            color={
-              getInteractionOnClassified(classifiedDetails?._id) === Interaction.saved
-                ? colors.palette.primary100
-                : colors.transparent
-            }
-          />
+          <Icon icon="back" color={colors.palette.primary100} />
         </Pressable>
         <BottomActions classified={classifiedDetails} />
       </View>

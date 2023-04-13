@@ -1,12 +1,21 @@
 import React from "react"
-import { Image, ImageProps, ImageStyle, StyleProp, TextStyle, View, ViewStyle } from "react-native"
+import {
+  Dimensions,
+  Image,
+  ImageProps,
+  ImageStyle,
+  StyleProp,
+  TextStyle,
+  View,
+  ViewStyle,
+} from "react-native"
 import { translate } from "../i18n"
 import { $flex1, $justifyCenter } from "../screens/styles"
-import { spacing } from "../theme"
+import { colors, spacing } from "../theme"
 import { Button, ButtonProps } from "./Button"
 import { Text, TextProps } from "./Text"
 
-const sadFace = require("../../assets/images/sad-face.png")
+const sadFace = require("../../assets/images/washzone-logo.png")
 
 interface EmptyStateProps {
   /**
@@ -121,14 +130,13 @@ const EmptyStatePresets = {
     content: translate("emptyStateComponent.saved.content"),
     button: translate("emptyStateComponent.saved.button"),
   },
-  notifications:{
+  notifications: {
     imageSource: sadFace,
     heading: translate("emptyStateComponent.notifications.heading"),
     content: translate("emptyStateComponent.notifications.content"),
     button: translate("emptyStateComponent.notifications.button"),
   },
-  searchResults: 
-  {
+  searchResults: {
     imageSource: sadFace,
     heading: translate("emptyStateComponent.searchResults.heading"),
     content: translate("emptyStateComponent.searchResults.content"),
@@ -179,6 +187,7 @@ export function EmptyState(props: EmptyStateProps) {
     (isHeadingPresent || isContentPresent || isButtonPresent) && { marginBottom: spacing.micro },
     $imageStyleOverride,
     ImageProps?.style,
+    { width: Dimensions.get("screen").width * 0.5, height: 300 },
   ]
   const $headingStyles = [
     $heading,
@@ -190,6 +199,7 @@ export function EmptyState(props: EmptyStateProps) {
   const $contentStyles = [
     $content,
     (isImagePresent || isHeadingPresent) && { marginTop: spacing.micro },
+
     isButtonPresent && { marginBottom: spacing.micro },
     $contentStyleOverride,
     ContentTextProps?.style,
@@ -202,7 +212,14 @@ export function EmptyState(props: EmptyStateProps) {
 
   return (
     <View style={$containerStyles}>
-      {isImagePresent && <Image source={imageSource} {...ImageProps} style={$imageStyles} />}
+      {isImagePresent && (
+        <Image
+          source={imageSource}
+          {...ImageProps}
+          style={[$imageStyles, { tintColor: colors.palette.primary200, }]}
+          resizeMode="contain"
+        />
+      )}
 
       {isHeadingPresent && (
         <Text

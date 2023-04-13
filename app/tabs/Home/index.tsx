@@ -8,7 +8,7 @@ export type HomeTabParamList = {
   Feed: undefined
   TopicInfo: { topic: any }
   PostInfo: { post: any }
-  Profile: {user: any}
+  Profile: {user: any, header?:boolean}
 }
 
 export type HomeTabProps<T extends keyof HomeTabParamList> = StackScreenProps<HomeTabParamList, T>

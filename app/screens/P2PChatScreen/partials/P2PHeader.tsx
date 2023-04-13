@@ -27,7 +27,10 @@ export const P2PHeader = ({ data, roomId }) => {
             <Icon icon="back" size={24} color={colors.palette.neutral100} />
           </TouchableOpacity>
 
-          <TouchableOpacity style={[$flexRow, $contentCenter]}>
+          <TouchableOpacity
+            style={[$flexRow, $contentCenter]}
+            onPress={() => navigation.navigate("UserProfile", { user: data, header: true })}
+          >
             <FastImage source={{ uri: data?.picture }} style={$profileImage} />
             <View>
               <Text text={formatName(data?.name)} style={$usernameText} size="md" />

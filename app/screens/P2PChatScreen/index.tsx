@@ -18,9 +18,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { CustomChatMessage, P2PHeader } from "./partials"
 import { useStores } from "../../models"
 import { useHooks } from "../hooks"
-import { fromNow } from "../../utils/agoFromNow"
 import { messageMetadataType } from "../../utils"
-import { ActivityIndicator } from "react-native-paper"
 import ShimmerPlaceholder from "react-native-shimmer-placeholder"
 import FastImage from "react-native-fast-image"
 import LinearGradient from "react-native-linear-gradient"
@@ -68,7 +66,7 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
     if (message.type === "file") {
       try {
         await FileViewer.open(message.uri, { showOpenWithDialog: true })
-      } catch { }
+      } catch {}
     }
   }
 
@@ -82,7 +80,6 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
 
   useEffect(() => {
     syncChat()
-    // setLastReadMessageIdForRoom(roomId)
   }, [])
 
   const onAttachmentPress = async () => {
@@ -133,12 +130,14 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
             backgroundColor: isLog
               ? getColorFromType(message?.metaData?.metaDataType)
               : isAuthorMe
-                ? colors.palette.primary200
-                : colors.palette.neutral100,
+              ? colors.palette.messageAuthor
+              : colors.palette.messageReceiver,
             padding: isImage ? 0 : spacing.tiny,
             paddingHorizontal: isImage ? 0 : spacing.extraSmall,
             borderRadius: isLog ? 8 : 10,
             alignItems: isAuthorMe ? "flex-end" : "flex-start",
+            borderBottomRightRadius: isAuthorMe ? 0 : 10,
+            borderBottomLeftRadius: isAuthorMe ? 10 : 0,
           },
         ]}
       >
@@ -179,12 +178,16 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
         renderImageMessage={renderImageMessage}
         isAttachmentUploading={isAttachmentUploading}
         sendButtonVisibilityMode="editing"
-        emptyState={() => syncing && <Lottie
-          style={{ height: 40 }}
-          source={require("../../../assets/lottie/loader.json")}
-          autoPlay
-          loop
-        />}
+        emptyState={() =>
+          syncing && (
+            <Lottie
+              style={{ height: 40 }}
+              source={require("../../../assets/lottie/loader.json")}
+              autoPlay
+              loop
+            />
+          )
+        }
         onEndReached={onChatEndReached}
         theme={{
           insets: {
@@ -192,7 +195,7 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
             messageInsetsVertical: 10,
           },
           colors: {
-            background: colors.palette.primaryOverlay15,
+            background: colors.palette.neutral100,
             inputBackground: colors.palette.primary100,
             inputText: colors.palette.neutral100,
             error: colors.palette.angry500,

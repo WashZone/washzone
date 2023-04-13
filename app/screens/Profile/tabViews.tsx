@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { View, ViewStyle, Dimensions, ImageStyle } from "react-native"
+import { View, ViewStyle, Dimensions, ImageStyle, TouchableOpacity } from "react-native"
 import { colors, spacing } from "../../theme"
 import { useHooks } from "../hooks"
 import { ClassifiedComponent } from "../ClassifiedsFeed"
@@ -11,19 +11,26 @@ import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { HomeTabParamList } from "../../tabs"
 import Loading from "../../components/Loading"
 import { VideoBlockFullWidth } from "../Playlist"
+import ImageView from "react-native-image-viewing"
 
-const GalleryItem = ({ uri }) => {
+const GalleryItem = ({ uri, onPress }) => {
+  console.log("URI:AutoImage", uri)
   return (
-    <AutoImage
-      source={{ uri }}
-      maxWidth={Dimensions.get("screen").width / 2 - 30}
-      style={$marginAutoImage}
-    />
+    <TouchableOpacity onPress={onPress}>
+      <AutoImage
+        source={{ uri }}
+        maxWidth={Dimensions.get("screen").width / 2 - 30}
+        style={$marginAutoImage}
+      />
+    </TouchableOpacity>
   )
 }
 
 export const GalleryTabView = ({ galleryItems }: { galleryItems: Array<any> }) => {
   const [loading, setLoading] = useState(true)
+  const [visible, setIsVisible] = useState(false)
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [filteredItems, setFilteredItems] = useState([])
   const [imageData, setImageData] = useState<{ left: Array<any>; right: Array<any> }>({
     left: [],
     right: [],
@@ -32,8 +39,12 @@ export const GalleryTabView = ({ galleryItems }: { galleryItems: Array<any> }) =
   useEffect(() => {
     const left = []
     const right = []
-    const filtered = galleryItems.filter(e => (e?.attachmentUrl || e.thumbnailUrl))
-    filtered.map((data, index) => {
+    const res = []
+
+    galleryItems.map((data) => {
+      if (res.filter((i) => i?.uri === data?.uri)?.length === 0) res.push(data)
+    })
+    res.map((data, index) => {
       if (index % 2 === 0) {
         left.push(data)
       } else {
@@ -42,12 +53,19 @@ export const GalleryTabView = ({ galleryItems }: { galleryItems: Array<any> }) =
       return true
     })
 
+    setFilteredItems(res)
     setImageData({
       left,
       right,
     })
     setLoading(false)
   }, [galleryItems])
+
+  const onImagePress = (e) => {
+    console.log(filteredItems.indexOf(e))
+    setCurrentIndex(filteredItems.indexOf(e))
+    setIsVisible(true)
+  }
 
   if (loading) return <Loading />
 
@@ -56,15 +74,21 @@ export const GalleryTabView = ({ galleryItems }: { galleryItems: Array<any> }) =
       <View style={$flexRow}>
         <View style={{ flex: 1 / 2 }}>
           {imageData.left.map((e, index) => (
-            <GalleryItem uri={e?.attachmentUrl || e.thumbnailUrl} key={index} />
+            <GalleryItem onPress={() => onImagePress(e)} uri={e?.uri} key={index} />
           ))}
         </View>
         <View style={{ flex: 1 / 2 }}>
           {imageData.right.map((e, index) => (
-            <GalleryItem uri={e?.attachmentUrl || e.thumbnailUrl} key={index} />
+            <GalleryItem onPress={() => onImagePress(e)} uri={e?.uri} key={index} />
           ))}
         </View>
       </View>
+      <ImageView
+        images={filteredItems}
+        imageIndex={currentIndex}
+        visible={visible}
+        onRequestClose={() => setIsVisible(false)}
+      />
     </HScrollView>
   )
 }
@@ -85,7 +109,14 @@ export const HomePostsTabScreen = ({
   const fetchUserPosts = async () => {
     const res = await getUsersHomePosts(userId)
     setUserPosts(res)
-    addToGallery(res)
+    const galleryImages = res.map((i, index) => {
+      if (i.attachmentUrl) return { uri: i?.attachmentUrl || "", id: "post" + index }
+      return { uri: "" }
+    })
+    console.log("GalleryImages", galleryImages)
+    const filteredImages = galleryImages.filter((i) => i?.uri)
+    addToGallery(filteredImages)
+
     setLoading(false)
   }
 
@@ -121,7 +152,11 @@ export const TopicsTabScreen = ({
   const fetchUserTopics = async () => {
     const res = await getUserTopics(userId)
     setUserTopics(res)
-    addToGallery(res)
+    const galleryImages = res.map((i, index) => {
+      if (i.attachmentUrl) return { uri: i?.attachmentUrl || "", id: "topic" + index }
+    })
+    const filteredImages = galleryImages.filter((i) => i?.uri)
+    addToGallery(filteredImages)
     setLoading(false)
   }
 
@@ -160,7 +195,12 @@ export const ClassifiedsTabScreen = ({
   const fetchUserClassifieds = async () => {
     const res = await getUserClassifieds(userId)
     setUserClassifieds(res)
-    addToGallery(res)
+    const galleryImages = res.map((i, index) => {
+      if (i.attachmentUrl) return { uri: i?.attachmentUrl || "", id: "classified" + index }
+    })
+    console.log("GalleryImages", galleryImages)
+    const filteredImages = galleryImages.filter((i) => i?.uri)
+    addToGallery(filteredImages)
     setLoading(false)
   }
 
@@ -203,7 +243,11 @@ export const VideosTabScreen = ({
   const fetchUserVideos = async () => {
     const res = await getUserVideos(userId)
     setUserVideos(res)
-    addToGallery(res)
+    const galleryImages = res.map((i, index) => {
+      if (i.thumbnailUrl) return { uri: i?.thumbnailUrl || "", id: "video" + index }
+    })
+    const filteredImages = galleryImages.filter((i) => i?.uri)
+    addToGallery(filteredImages)
     setLoading(false)
   }
 

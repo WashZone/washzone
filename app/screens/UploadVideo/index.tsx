@@ -103,7 +103,7 @@ export const UploadVideo: FC<AppStackScreenProps<"UploadVideo">> = function Uplo
       <Header
         backgroundColor={colors.palette.neutral100}
         leftIcon="caretLeft"
-        title="Add a Video"
+        title="Post a Video"
         titleStyle={$titleStyle}
         onLeftPress={() => navigation.goBack()}
         leftIconColor={colors.palette.neutral600}
@@ -129,10 +129,11 @@ export const UploadVideo: FC<AppStackScreenProps<"UploadVideo">> = function Uplo
           onChangeText={setDescription}
           style={[$inputContainer, $descriptionContainer]}
           mode="outlined"
-          label={"Description"}
+          label={'Description'}
           theme={$theme}
           placeholder="Enter a short description here!"
-          numberOfLines={1}
+          numberOfLines={3}
+          contentStyle={{height:120}}
           blurOnSubmit
         />
 
@@ -174,7 +175,15 @@ export const UploadVideo: FC<AppStackScreenProps<"UploadVideo">> = function Uplo
         </TouchableOpacity>
         <TouchableOpacity onPress={() => setTNCAccepted(!TNCAccepted)} style={$flexRow}>
           <Toggle onPress={() => setTNCAccepted(!TNCAccepted)} value={TNCAccepted} />
-          <Text style={$tnc} tx="addAVideo.acceptTNC" weight="medium" />
+          <Text style={$tnc} tx="addAVideo.iAgree" weight="medium" />
+          <TouchableOpacity onPress={() => navigation.navigate("Legal")} style={{marginLeft:-4}}>
+            <Text
+              color={colors.palette.primary100}
+              style={$tnc}
+              tx="addAVideo.tnc"
+              weight="medium"
+            />
+          </TouchableOpacity>
         </TouchableOpacity>
         <Button
           onPress={createVideo}
@@ -189,7 +198,7 @@ export const UploadVideo: FC<AppStackScreenProps<"UploadVideo">> = function Uplo
             />
           )}
         >
-          <Text tx="common.add" style={$submitText} weight="semiBold" />
+          <Text text="Post" style={$submitText} weight="semiBold" />
         </Button>
         <InputPlaylistInfoModal
           syncAllPlaylists={syncAllPlaylists}
@@ -215,7 +224,7 @@ const $inputContainer: ViewStyle = {
   marginVertical: spacing.extraSmall,
 }
 
-const $descriptionContainer: ViewStyle = { height: 120, paddingBottom: spacing.extraSmall }
+const $descriptionContainer: ViewStyle = {  }
 const $flexRow: ViewStyle = {
   flexDirection: "row",
   alignItems: "center",

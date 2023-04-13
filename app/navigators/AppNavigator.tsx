@@ -33,6 +33,7 @@ import {
   Role,
   AudioCall,
   VideoCall,
+  Profile
 } from "../screens"
 import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
 import { DrawerNavigator } from "./Drawer/DrawerNavigator"
@@ -56,6 +57,7 @@ export type AppStackParamList = {
   Legal: undefined
   Support: undefined
   AllChats: undefined
+  UserProfile:{user:any, header?:boolean},
   P2PChat: { receiver: any; roomId: string | undefined }
   AudioCall: {
     receiver: any
@@ -112,6 +114,7 @@ const AppStack = observer(function AppStack() {
             <Stack.Screen name="AllChats" component={AllChats} />
             <Stack.Screen name="P2PChat" component={P2PChat} />
             <Stack.Screen name="Support" component={Support} />
+            <Stack.Screen name="UserProfile" component={Profile} />
             <Stack.Screen
               name="AudioCall"
               component={AudioCall}
@@ -131,12 +134,12 @@ const AppStack = observer(function AppStack() {
             <Stack.Screen
               name="UploadVideo"
               component={UploadVideo}
-              options={{ presentation: "containedModal" }}
+              // options={{ presentation: 'modal' }}
             />
             <Stack.Screen
               name="AddAClassified"
               component={AddAClassified}
-              options={{ presentation: "containedModal" }}
+              // options={{ presentation: "containedModal" }}
             />
           </>
         ) : (

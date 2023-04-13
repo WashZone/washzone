@@ -11,42 +11,7 @@ import { formatName } from "../../utils/formatName"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { $flex1 } from "../styles"
 import { useHooks } from "../hooks"
-
-const channelDetails = {
-  title: "How to detail a Car",
-  publisher: {
-    name: "Pete Quint",
-    avatar:
-      "https://media.istockphoto.com/id/1309328823/photo/headshot-portrait-of-smiling-male-employee-in-office.jpg?b=1&s=170667a&w=0&k=20&c=MRMqc79PuLmQfxJ99fTfGqHL07EDHqHLWg0Tb4rPXQc=",
-  },
-  description: `Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.`,
-  videos: [
-    {
-      title: "How to detail a car - Part 1 ",
-      view: 736,
-      createdAt: 1669106599000,
-      poster:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQO_H8dD3eHwgp6oQUJTUaaWkNJVGEhDatMHA&usqp=CAU",
-      videoUrl: "https://youtu.be/awLX5qlY-Ts",
-    },
-    {
-      title: "How to detail a car - Part 2 ",
-      view: 736,
-      createdAt: 1669109999000,
-      poster:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_Q4Vx4R25zDCmtMbVLDiTa8yz8ZRyewF0fDSMwTNPGpkKQgpcQestsswhRXyhzqTjMn4&usqp=CAU",
-      videoUrl: "https://youtu.be/awLX5qlY-Ts",
-    },
-    {
-      title: "How to detail a car - Part 3 ",
-      view: 736,
-      createdAt: 1669109999000,
-      poster:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTWhT6OhcLOjGYg2JSn87VPbLZSDoFtVktaRWRubKPYgMK0iWEN_VqATk12-nT9ZqWSA7E&usqp=CAU",
-      videoUrl: "https://youtu.be/awLX5qlY-Ts",
-    },
-  ],
-}
+import Loading from "../../components/Loading"
 
 export const VideoBlockFullWidth = ({ videoDetails, index }) => {
   const navigation = useNavigation<NavigationProp<VideosTabParamList>>()
@@ -91,7 +56,6 @@ export const VideoBlockFullWidth = ({ videoDetails, index }) => {
 const PlaylistDescription = () => {
   return (
     <View style={$playlistDescriptionContainer}>
-      <Text style={$descriptionText} numberOfLines={2} text={channelDetails.description} />
       {/* <Button
         style={$followButton}
         LeftAccessory={() => <Icon icon="add_vector" size={20} color={colors.palette.neutral100} />}
@@ -124,25 +88,27 @@ const HeaderComponent = ({ playlistData }: { playlistData: any }) => {
 export const Playlist: FC<VideosTabProps<"Playlist">> = observer(function Playlist(props) {
   const playlistId = props.route.params?.playlistId
   const [playlistData, setPlaylistData] = useState<any>()
-
+  const [loading, setLoading] = useState(true)
   const { getPlaylist } = useHooks()
 
   const syncPlaylistData = async () => {
     const res = await getPlaylist(playlistId)
-
     setPlaylistData(res)
+    setLoading(false)
   }
 
   useEffect(() => {
     syncPlaylistData()
   }, [])
 
+  if (loading) return <Loading />
+
   return (
     <Screen preset="fixed" contentContainerStyle={$flex1}>
       <HeaderComponent playlistData={playlistData} />
       <FlatList
         style={$flex1}
-        ListHeaderComponent={<PlaylistDescription />}
+        // ListHeaderComponent={<PlaylistDescription />}
         data={playlistData?.VideoDetail}
         renderItem={({ item, index }) => (
           <VideoBlockFullWidth key={index} index={index} videoDetails={item} />

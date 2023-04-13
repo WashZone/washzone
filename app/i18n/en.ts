@@ -32,27 +32,25 @@ const en = {
       button: "Let's try this again",
     },
     allChats: {
-      heading: "Welcome to your Chats!",
+      heading: "You haven’t chatted with anyone yet!",
       content:
-        "Start a conversation and connect with someone today! This chat screen is ready for your messages.",
-      button: "Chat Now!",
+        "",
+      button: "Start a Chat",
     },
     saved: {
-      heading: "Oops !",
-      content:
-        "You currently have no saved videos or classifieds, but you can start saving your favorite content and ads for easy access in the future. Check back here to see your saved items!",
-      button: "Go Back!",
+      heading: "You don’t have any saved items at this time !",
+      content: "",
+      button: "Back",
     },
     notifications: {
-      heading: "No Notifications Found!",
-      content:
-        "You currently have no new notifications, but keep an eye on this screen for updates and alerts. Stay in the loop with important information by checking your notifications regularly!",
-      button: "Go Back!",
+      heading: "You currently do not have any notifications!",
+      content: "",
+      button: "Back",
     },
     searchResults: {
       heading: "No Results Found!",
       content: "",
-      button: "Go Back!",
+      button: "Back",
     },
   },
 
@@ -185,7 +183,8 @@ const en = {
     gallery: "GALLERY",
   },
   addAVideo: {
-    acceptTNC: "I agree to the terms of service",
+    iAgree: "I agree to the",
+    tnc:'Terms of Service.'
   },
   toastMessages: {
     videoSavedSuccessfully: {

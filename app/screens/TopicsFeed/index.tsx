@@ -2,10 +2,8 @@ import React, { FC, useEffect, useRef, useState } from "react"
 import {
   View,
   Pressable,
-  FlatList,
   TextStyle,
   ViewStyle,
-  RefreshControl,
   Dimensions,
 } from "react-native"
 import { CustomFlatlist, Icon, Screen, Text } from "../../components"
@@ -143,22 +141,24 @@ export const TopicComponent = observer(({ topic }: { topic: any }) => {
           <Text style={$postContent} text={topicDetails.content} numberOfLines={3} size="xs" />
           <Actions item={topic} />
         </View>
-        <View style={$contentCenter}>
-          <ShimmerPlaceholder
-            visible={loaded}
-            shimmerStyle={$attachment}
-            LinearGradient={LinearGradient}
-          >
-            <FastImage
-              style={$attachment}
-              source={{
-                uri: topic?.attachmentUrl,
-              }}
-              onLoadEnd={() => setLoaded(true)}
-              resizeMode="cover"
-            />
-          </ShimmerPlaceholder>
-        </View>
+        {topic?.attachmentUrl && (
+          <View style={$contentCenter}>
+            <ShimmerPlaceholder
+              visible={loaded}
+              shimmerStyle={$attachment}
+              LinearGradient={LinearGradient}
+            >
+              <FastImage
+                style={$attachment}
+                source={{
+                  uri: topic?.attachmentUrl,
+                }}
+                onLoadEnd={() => setLoaded(true)}
+                resizeMode="cover"
+              />
+            </ShimmerPlaceholder>
+          </View>
+        )}
       </Pressable>
       {/* {index % 5 === 0 && (
         <AppLovinMAX.AdView
@@ -224,28 +224,30 @@ export const TopicComponentFullView = ({ topic }) => {
           />
           <Text style={$postContent} text={topicDetails.content} size="xs" />
         </View>
-        <View style={[$contentCenter, { marginTop: spacing.tiny }]}>
-          <ShimmerPlaceholder
-            visible={loaded}
-            shimmerStyle={$attachment}
-            LinearGradient={LinearGradient}
-          >
-            <FastImage
-              style={attachmentDimensions}
-              source={{
-                uri: topic?.attachmentUrl,
-              }}
-              onLoad={(res) => {
-                setAttachmentDimensions({
-                  height: (windowWidth * res.nativeEvent.height) / res.nativeEvent.width,
-                  width: windowWidth,
-                })
-              }}
-              onLoadEnd={() => setLoaded(true)}
-              resizeMode="cover"
-            />
-          </ShimmerPlaceholder>
-        </View>
+        {topic?.attachmentUrl && (
+          <View style={[$contentCenter, { marginTop: spacing.tiny }]}>
+            <ShimmerPlaceholder
+              visible={loaded}
+              shimmerStyle={$attachment}
+              LinearGradient={LinearGradient}
+            >
+              <FastImage
+                style={attachmentDimensions}
+                source={{
+                  uri: topic?.attachmentUrl,
+                }}
+                onLoad={(res) => {
+                  setAttachmentDimensions({
+                    height: (windowWidth * res.nativeEvent.height) / res.nativeEvent.width,
+                    width: windowWidth,
+                  })
+                }}
+                onLoadEnd={() => setLoaded(true)}
+                resizeMode="cover"
+              />
+            </ShimmerPlaceholder>
+          </View>
+        )}
         <Actions item={topic} />
       </Pressable>
       <NativeAdView ref={nativeAdViewRef} />
@@ -259,10 +261,8 @@ export const TopicsFeed: FC<TopicsTabProps<"TopicsFeed">> = observer(function To
     topics: { topics },
   } = useStores()
 
-
   const onRefresh = async () => {
     await refreshTopics()
-
   }
 
   return (

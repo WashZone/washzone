@@ -57,7 +57,7 @@ export const AllChats: FC<AppStackScreenProps<"AllChats">> = observer(function A
         <Header
           titleStyle={{ color: colors.palette.neutral100 }}
           backgroundColor={colors.palette.primary100}
-          title="All Chats"
+          title="Chats"
           onRightPress={() => setAddModalVisible(true)}
           rightIcon="addMessage"
           leftIcon="back"
