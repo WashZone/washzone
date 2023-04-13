@@ -202,13 +202,14 @@ export function useHooks() {
         name: selectedMedia?.fileName,
       })
     }
-    await mutateCommentOnTopic({
+    const res = await mutateCommentOnTopic({
       userId: userStore._id,
       acttachmentUrl: imageUrl,
       acttachmentType: "image",
       comment,
       topicId,
-    })
+    }
+    )
   }
 
   const postCommentOnHomePagePost = async (

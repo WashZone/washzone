@@ -43,6 +43,8 @@ import { HomecommentsModel, HomecommentsModelType } from "./HomecommentsModel"
 import { homecommentsModelPrimitives, HomecommentsModelSelector } from "./HomecommentsModel.base"
 import { HomePageDetailModel, HomePageDetailModelType } from "./HomePageDetailModel"
 import { homePageDetailModelPrimitives, HomePageDetailModelSelector } from "./HomePageDetailModel.base"
+import { LikeHomePagesModel, LikeHomePagesModelType } from "./LikeHomePagesModel"
+import { likeHomePagesModelPrimitives, LikeHomePagesModelSelector } from "./LikeHomePagesModel.base"
 import { HomePageIdArrayModel, HomePageIdArrayModelType } from "./HomePageIdArrayModel"
 import { homePageIdArrayModelPrimitives, HomePageIdArrayModelSelector } from "./HomePageIdArrayModel.base"
 import { FollowUserModel, FollowUserModelType } from "./FollowUserModel"
@@ -324,7 +326,7 @@ mutateCommentOnHomepage="mutateCommentOnHomepage"
 */
 export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
   .named("RootStore")
-  .extend(configureStoreMixin([['UserRating', () => UserRatingModel], ['classifiedFeed', () => ClassifiedFeedModel], ['CommentsDetail', () => CommentsDetailModel], ['likeTopics', () => LikeTopicsModel], ['TopicIdArray', () => TopicIdArrayModel], ['TopicDetail', () => TopicDetailModel], ['likeVideos', () => LikeVideosModel], ['VideoLikeArray', () => VideoLikeArrayModel], ['VideoPlaylist', () => VideoPlaylistModel], ['VideoUploadPlaylist', () => VideoUploadPlaylistModel], ['VideoUpload', () => VideoUploadModel], ['User', () => UserModel], ['SigninUser', () => SigninUserModel], ['Legalities', () => LegalitiesModel], ['saveVideo', () => SaveVideoModel], ['storyViewerUser', () => StoryViewerUserModel], ['saveClassified', () => SaveClassifiedModel], ['Homecomments', () => HomecommentsModel], ['HomePageDetail', () => HomePageDetailModel], ['HomePageIdArray', () => HomePageIdArrayModel], ['followUser', () => FollowUserModel], ['MetaData', () => MetaDataModel], ['Notification', () => NotificationModel], ['usersChat', () => UsersChatModel], ['roomChat', () => RoomChatModel], ['Users', () => UsersModel], ['CallMetaData', () => CallMetaDataModel], ['CallNotification', () => CallNotificationModel]], [], "js"))
+  .extend(configureStoreMixin([['UserRating', () => UserRatingModel], ['classifiedFeed', () => ClassifiedFeedModel], ['CommentsDetail', () => CommentsDetailModel], ['likeTopics', () => LikeTopicsModel], ['TopicIdArray', () => TopicIdArrayModel], ['TopicDetail', () => TopicDetailModel], ['likeVideos', () => LikeVideosModel], ['VideoLikeArray', () => VideoLikeArrayModel], ['VideoPlaylist', () => VideoPlaylistModel], ['VideoUploadPlaylist', () => VideoUploadPlaylistModel], ['VideoUpload', () => VideoUploadModel], ['User', () => UserModel], ['SigninUser', () => SigninUserModel], ['Legalities', () => LegalitiesModel], ['saveVideo', () => SaveVideoModel], ['storyViewerUser', () => StoryViewerUserModel], ['saveClassified', () => SaveClassifiedModel], ['Homecomments', () => HomecommentsModel], ['HomePageDetail', () => HomePageDetailModel], ['likeHomePages', () => LikeHomePagesModel], ['HomePageIdArray', () => HomePageIdArrayModel], ['followUser', () => FollowUserModel], ['MetaData', () => MetaDataModel], ['Notification', () => NotificationModel], ['usersChat', () => UsersChatModel], ['roomChat', () => RoomChatModel], ['Users', () => UsersModel], ['CallMetaData', () => CallMetaDataModel], ['CallNotification', () => CallNotificationModel]], [], "js"))
   .props({
 
   })
@@ -748,8 +750,10 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
         ${typeof resultSelector === "function" ? resultSelector(new HomePageDetailModelSelector()).toString() : resultSelector}
       } }`, variables, optimisticUpdate)
     },
-    mutateLikeDislikehome(variables: { status: string, homePageId: string, userId: string }, optimisticUpdate?: () => void) {
-      return self.mutate<{ likeDislikehome: any }>(`mutation likeDislikehome($status: String!, $homePageId: String!, $userId: String!) { likeDislikehome(status: $status, HomePageId: $homePageId, userId: $userId) }`, variables, optimisticUpdate)
+    mutateLikeDislikehome(variables: { status: string, homePageId: string, userId: string }, resultSelector: string | ((qb: LikeHomePagesModelSelector) => LikeHomePagesModelSelector) = likeHomePagesModelPrimitives.toString(), optimisticUpdate?: () => void) {
+      return self.mutate<{ likeDislikehome: LikeHomePagesModelType}>(`mutation likeDislikehome($status: String!, $homePageId: String!, $userId: String!) { likeDislikehome(status: $status, HomePageId: $homePageId, userId: $userId) {
+        ${typeof resultSelector === "function" ? resultSelector(new LikeHomePagesModelSelector()).toString() : resultSelector}
+      } }`, variables, optimisticUpdate)
     },
     mutateSaveLikedVideo(variables: { videoId: string, userId: string }, resultSelector: string | ((qb: SaveVideoModelSelector) => SaveVideoModelSelector) = saveVideoModelPrimitives.toString(), optimisticUpdate?: () => void) {
       return self.mutate<{ saveLikedVideo: SaveVideoModelType}>(`mutation saveLikedVideo($videoId: String!, $userId: String!) { saveLikedVideo(videoId: $videoId, userId: $userId) {
@@ -776,8 +780,10 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     mutateUpdateVideoPlaylistbyVideoId(variables: { videoUploadId: InputVideoUploadPlaylist[], videoPlaylistId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ UpdateVideoPlaylistbyVideoId: any }>(`mutation UpdateVideoPlaylistbyVideoId($videoUploadId: [InputVideoUploadPlaylist!]!, $videoPlaylistId: String!) { UpdateVideoPlaylistbyVideoId(VideoUploadId: $videoUploadId, videoPlaylistId: $videoPlaylistId) }`, variables, optimisticUpdate)
     },
-    mutateCommentOnTopic(variables: { acttachmentType?: (string | null), acttachmentUrl?: (string | null), comment?: (string | null), topicId: string, userId: string }, optimisticUpdate?: () => void) {
-      return self.mutate<{ commentOnTopic: any }>(`mutation commentOnTopic($acttachmentType: String, $acttachmentUrl: String, $comment: String, $topicId: String!, $userId: String!) { commentOnTopic(acttachmentType: $acttachmentType, acttachmentUrl: $acttachmentUrl, comment: $comment, TopicId: $topicId, userId: $userId) }`, variables, optimisticUpdate)
+    mutateCommentOnTopic(variables: { acttachmentType?: (string | null), acttachmentUrl?: (string | null), comment?: (string | null), topicId: string, userId: string }, resultSelector: string | ((qb: CommentsDetailModelSelector) => CommentsDetailModelSelector) = commentsDetailModelPrimitives.toString(), optimisticUpdate?: () => void) {
+      return self.mutate<{ commentOnTopic: CommentsDetailModelType}>(`mutation commentOnTopic($acttachmentType: String, $acttachmentUrl: String, $comment: String, $topicId: String!, $userId: String!) { commentOnTopic(acttachmentType: $acttachmentType, acttachmentUrl: $acttachmentUrl, comment: $comment, TopicId: $topicId, userId: $userId) {
+        ${typeof resultSelector === "function" ? resultSelector(new CommentsDetailModelSelector()).toString() : resultSelector}
+      } }`, variables, optimisticUpdate)
     },
     mutateDeleteCommentbyCommentId(variables: { commentId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ deleteCommentbyCommentId: boolean }>(`mutation deleteCommentbyCommentId($commentId: String!) { deleteCommentbyCommentId(commentId: $commentId) }`, variables, optimisticUpdate)

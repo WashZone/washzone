@@ -1,17 +1,14 @@
-import React, { ReactElement, useMemo, useRef, useState } from "react"
+import React, { useRef, useState } from "react"
 import {
   FlatList,
   FlatListProps,
   NativeScrollEvent,
   NativeSyntheticEvent,
-  TextStyle,
-  ViewStyle,
+  RefreshControl,
 } from "react-native"
-import { colors, spacing } from "../theme"
+import { colors } from "../theme"
 import Lottie from "lottie-react-native"
 import Animated, {
-  Extrapolation,
-  interpolate,
   useAnimatedStyle,
   useSharedValue,
 } from "react-native-reanimated"
@@ -36,10 +33,23 @@ export function CustomFlatlist(props: CustomListProps) {
   const listRef = useRef<FlatList>()
   const $animatedLoaderContainer = useAnimatedStyle(() => {
     return {
-      position: refreshing ? "relative" : "absolute",
-      height: refreshing ? refreshHeight : loaderProgress.value * refreshHeight,
+
+      height: refreshing ? 40 : loaderProgress.value * 40,
       top: 0,
       width: "100%",
+      resizeMode: 'contain'
+    }
+  })
+
+  const $animatedLoaderParentContainer = useAnimatedStyle(() => {
+    return {
+      position: "absolute",
+      height: refreshing ? 80 : loaderProgress.value * 80,
+      top: 0,
+      width: "100%",
+      justifyContent: 'center',
+      paddingVertical: 20
+
     }
   })
   const onRefresh = async () => {
@@ -52,67 +62,34 @@ export function CustomFlatlist(props: CustomListProps) {
   const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     console.log(event.nativeEvent.contentOffset.y / refreshHeight, ":", loaderProgress.value * 24)
     if (!refreshing) {
-      loaderProgress.value = -event.nativeEvent.contentOffset.y / refreshHeight
-      setLottieProgress(loaderProgress.value * 0.5)
+      const newVal = -event.nativeEvent.contentOffset.y / refreshHeight
+      loaderProgress.value = newVal < 1 ? newVal : 1
+      setLottieProgress(newVal * 0.60)
     }
-    if (-event.nativeEvent.contentOffset.y / refreshHeight >= 1) {
-      onRefresh()
-    }
+
   }
 
   return (
     <>
-      <Animated.View style={$animatedLoaderContainer}>
-        <Lottie
-          //   resizeMode={"contain"}
-          source={require("../../assets/lottie/loader.json")}
-          autoPlay={refreshing}
-          //   loop
-          progress={lottieProgress}
-        />
-      </Animated.View>
-      {useMemo(
-        () => (
-          <FlatList ref={listRef} {...FlatListProps} onScroll={onScroll} />
-        ),
-        [props],
-      )}
+      {loaderProgress.value > 0 &&
+        <Animated.View style={$animatedLoaderParentContainer}>
+          <Animated.View style={$animatedLoaderContainer}>
+            <Lottie
+              source={require("../../assets/lottie/loader.json")}
+              autoPlay={refreshing}
+              progress={lottieProgress}
+            />
+          </Animated.View>
+        </Animated.View>}
+      <FlatList
+        refreshing={refreshing}
+        refreshControl={<RefreshControl onRefresh={onRefresh} refreshing={refreshing} tintColor={colors.transparent} />}
+        onRefresh={onRefresh}
+        ref={listRef}
+        onScroll={onScroll}
+        {...FlatListProps}
+      />
     </>
   )
 }
 
-const $separatorTop: ViewStyle = {
-  borderTopWidth: 1,
-  borderTopColor: colors.separator,
-}
-
-const $separatorBottom: ViewStyle = {
-  borderBottomWidth: 1,
-  borderBottomColor: colors.separator,
-}
-
-const $textStyle: TextStyle = {
-  paddingVertical: spacing.extraSmall,
-  alignSelf: "center",
-  flexGrow: 1,
-  flexShrink: 1,
-}
-
-const $touchableStyle: ViewStyle = {
-  flexDirection: "row",
-  width: "100%",
-  justifyContent: "space-between",
-}
-
-const $iconContainer: ViewStyle = {
-  justifyContent: "center",
-  alignItems: "center",
-  flexGrow: 0,
-}
-const $iconContainerLeft: ViewStyle = {
-  marginEnd: spacing.medium,
-}
-
-const $iconContainerRight: ViewStyle = {
-  marginStart: spacing.medium,
-}

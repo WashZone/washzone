@@ -72,11 +72,9 @@ export const ClassifiedsFeed: FC<ClassifiedsTabProps<"ClassifiedsFeed">> = obser
     const {
       classfieds: { classifieds },
     } = useStores()
-    const [refreshing, setRefreshing] = useState(false)
     const navigationApp = useNavigation<NavigationProp<AppStackParamList>>()
     const onRefresh = async () => {
       await refreshClassifieds()
-      setRefreshing(false)
     }
 
     useEffect(() => {

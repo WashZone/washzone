@@ -9,7 +9,7 @@ import {
   View,
   ViewStyle,
 } from "react-native"
-import { Icon, Text } from "../../../components"
+import { CustomFlatlist, Icon, Text } from "../../../components"
 import { colors, spacing } from "../../../theme"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { formatName } from "../../../utils/formatName"
@@ -200,29 +200,22 @@ export const Posts = observer(() => {
     feedStore: { homeFeed },
   } = useStores()
   const { refreshHomeFeed, loadMoreHomeFeed, loadStories } = useHooks()
-  const [refreshing, setRefreshing] = useState<boolean>(false)
   useEffect(() => {
     refreshHomeFeed()
     loadStories()
   }, [])
 
-  const onRefresh = () => {
-    refreshHomeFeed()
-    loadStories()
-    setRefreshing(false)
+  const onRefresh = async () => {
+    await refreshHomeFeed()
+    await loadStories()
+
   }
 
   return (
     <View style={$flex1}>
-      <FlatList
+      <CustomFlatlist
         ListHeaderComponent={<Stories />}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor={colors.palette.primary100}
-          />
-        }
+        customRefresh={onRefresh}
         onEndReached={loadMoreHomeFeed}
         data={homeFeed}
         renderItem={({ item, index }) => (

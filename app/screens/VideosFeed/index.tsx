@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useState } from "react"
 import { View, Pressable, FlatList, TextStyle, ViewStyle, TouchableOpacity } from "react-native"
-import { Icon, Screen, Text } from "../../components"
+import { CustomFlatlist, Icon, Screen, Text } from "../../components"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { VideosTabParamList, VideosTabProps } from "../../tabs"
 import { colors, spacing } from "../../theme"
@@ -45,9 +45,8 @@ export const VideoBlock = ({
         <FastImage
           defaultSource={BROKEN_IMAGE}
           source={{
-            uri: `https://img.youtube.com/vi/${
-              videoDetails?.attachmentVideoUrl?.split("=")[1]
-            }/0.jpg`,
+            uri: `https://img.youtube.com/vi/${videoDetails?.attachmentVideoUrl?.split("=")[1]
+              }/0.jpg`,
           }}
           style={$videoPoster}
           resizeMode="cover"
@@ -126,16 +125,13 @@ export const VideoRowList = ({ channelDetails }) => {
 
 export const VideosFeed: FC<VideosTabProps<"VideosFeed">> = observer(function VideosFeed(_props) {
   const { refreshVideos } = useHooks()
-  const [refreshing, setRefreshing] = useState<boolean>(false)
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
   const {
     videos: { videos },
   } = useStores()
 
   const fetchVideos = async () => {
-    setRefreshing(true)
     await refreshVideos()
-    setRefreshing(false)
   }
 
   useEffect(() => {
@@ -147,9 +143,8 @@ export const VideosFeed: FC<VideosTabProps<"VideosFeed">> = observer(function Vi
   return (
     <>
       <Screen contentContainerStyle={$container}>
-        <FlatList
-          onRefresh={fetchVideos}
-          refreshing={refreshing}
+        <CustomFlatlist
+          customRefresh={fetchVideos}
           showsVerticalScrollIndicator={false}
           ListHeaderComponent={<View style={$listHeader} />}
           data={videos}

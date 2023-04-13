@@ -8,7 +8,7 @@ import {
   RefreshControl,
   Dimensions,
 } from "react-native"
-import { Icon, Screen, Text } from "../../components"
+import { CustomFlatlist, Icon, Screen, Text } from "../../components"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { TopicsTabParamList, TopicsTabProps } from "../../tabs"
 import { colors, spacing } from "../../theme"
@@ -259,27 +259,20 @@ export const TopicsFeed: FC<TopicsTabProps<"TopicsFeed">> = observer(function To
     topics: { topics },
   } = useStores()
 
-  const [refreshing, setRefreshing] = useState(false)
 
-  const onRefresh = () => {
-    refreshTopics()
-    setRefreshing(false)
+  const onRefresh = async () => {
+    await refreshTopics()
+
   }
 
   return (
     <Screen contentContainerStyle={$container} keyboardOffset={-180}>
-      <FlatList
+      <CustomFlatlist
+        customRefresh={onRefresh}
         ListHeaderComponent={<CreateTopic />}
         stickyHeaderIndices={[0]}
         style={$container}
         onEndReached={loadMoreTopics}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor={colors.palette.primary100}
-          />
-        }
         data={topics}
         renderItem={({ item, index }) => <TopicComponent topic={item} index={item?._id} />}
       />
