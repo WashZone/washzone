@@ -20,6 +20,8 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated"
 import { useHooks } from "../hooks"
+import Toast from 'react-native-toast-message'
+import { toastMessages } from "../../utils/toastMessages"
 
 export function CreateTopic() {
   const {
@@ -36,7 +38,17 @@ export function CreateTopic() {
 
   const onPost = async () => {
     setIsPosting(true)
-
+    setIsPosting(false)
+    if (topicTitle.replace(/\s/g, '')?.length === 0) {
+      Toast.show(toastMessages.inputTitle);
+      setIsPosting(false)
+      return
+    }
+    if (topicDescription.replace(/\s/g, '')?.length === 0) {
+      Toast.show(toastMessages.inputDescription);
+      setIsPosting(false)
+      return
+    }
     try {
       await createTopic({
         content: topicDescription,
@@ -79,7 +91,7 @@ export function CreateTopic() {
           progress.value = withTiming(1, { duration: 300 })
         }, 100)
       }
-    } catch (e) {}
+    } catch (e) { }
   }
 
   const onDeletePress = () => {

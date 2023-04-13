@@ -106,6 +106,7 @@ export const VideoCall: FC<AppStackScreenProps<"VideoCall">> = observer(function
     InCallManager.start()
     // InCallManager.setKeepScreenOn(true)
     InCallManager.setSpeakerphoneOn(speaker)
+    InCallManager.setKeepScreenOn(true)
     return () => {
       InCallManager.stop()
     }

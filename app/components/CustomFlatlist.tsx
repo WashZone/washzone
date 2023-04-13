@@ -33,23 +33,21 @@ export function CustomFlatlist(props: CustomListProps) {
   const listRef = useRef<FlatList>()
   const $animatedLoaderContainer = useAnimatedStyle(() => {
     return {
-
-      height: refreshing ? 40 : loaderProgress.value * 40,
-      top: 0,
+      height: refreshing ? 30 : loaderProgress.value * 30,
       width: "100%",
-      resizeMode: 'contain'
+      resizeMode: 'contain',
+
     }
   })
 
   const $animatedLoaderParentContainer = useAnimatedStyle(() => {
     return {
-      position: "absolute",
-      height: refreshing ? 80 : loaderProgress.value * 80,
       top: 0,
+
+      position: "absolute",
+      height: refreshing ? 60 : loaderProgress.value * 60,
       width: "100%",
       justifyContent: 'center',
-      paddingVertical: 20
-
     }
   })
   const onRefresh = async () => {

@@ -175,6 +175,7 @@ export const TextField = forwardRef(function TextField(props: TextFieldProps, re
     >
       {!!(label || labelTx) && (
         <Text
+          allowFontScaling={false}
           preset="formLabel"
           text={label}
           tx={labelTx}
@@ -196,6 +197,7 @@ export const TextField = forwardRef(function TextField(props: TextFieldProps, re
 
         <TextInput
           ref={input}
+          allowFontScaling={false}
           underlineColorAndroid={colors.transparent}
           textAlignVertical="top"
           placeholder={placeholderContent}
