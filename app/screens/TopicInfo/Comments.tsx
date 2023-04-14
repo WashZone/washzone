@@ -11,7 +11,7 @@ const windowWidth = Dimensions.get("window").width
 
 export const CommentComponent = ({ comment }: { comment: any }) => {
   const [loaded, setLoaded] = useState(false)
-  const [attachmentDimensions, setAttachmentDimensions] = useState({ height: 0, width: 0 })
+  const [attachmentDimensions, setAttachmentDimensions] = useState({ height: Dimensions.get("window").width * 0.6, width: Dimensions.get("window").width })
   return (
     <>
       <View style={$commentContainer}>

@@ -44,7 +44,7 @@ function IgniteApp() {
     const { data } = remoteMessage
     const { type, receiver, roomId } = data
     const { name, _id, setter } = JSON.parse(receiver)
-    
+
     console.log("INDEX>JS MODE type", type, name, receiver)
     if (setter) {
       console.log("SETTER IDENTIFIED")
@@ -111,6 +111,7 @@ function IgniteApp() {
       case CallTypes.audioOffer: {
         const incomingCallAnswer = async () => {
           backToForeground()
+
           const res = await getRoomById(roomId)
           const receiverData = await getUserById(_id)
 

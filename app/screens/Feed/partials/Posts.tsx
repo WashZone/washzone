@@ -109,7 +109,9 @@ const Actions = observer(function ActionButtons({ item }: { item: any }) {
 
 export const PostComponent = ({ post, navigateOnPress, index }: PostComponentProps) => {
   const [loaded, setLoaded] = useState(false)
-  const [attachmentDimensions, setAttachmentDimensions] = useState({ height: 0, width: 0 })
+  const windowWidth = Dimensions.get("window").width
+
+  const [attachmentDimensions, setAttachmentDimensions] = useState({ height: windowWidth, width: windowWidth })
   const navigation = useNavigation<NavigationProp<HomeTabParamList>>()
   const onContainerPress = () => {
     if (navigateOnPress !== undefined && navigateOnPress) {
@@ -128,7 +130,6 @@ export const PostComponent = ({ post, navigateOnPress, index }: PostComponentPro
     content: post?.Discription,
   }
 
-  const windowWidth = Dimensions.get("window").width
 
   const nativeAdViewRef = useRef<any>()
 
@@ -159,7 +160,7 @@ export const PostComponent = ({ post, navigateOnPress, index }: PostComponentPro
         </View>
 
         <Text style={$postContent} text={postDetails.content} size="xs" />
-        <ShimmerPlaceHolder
+        {postDetails?.attachmentUrl && <ShimmerPlaceHolder
           visible={loaded}
           shimmerStyle={{
             height: windowWidth,
@@ -169,16 +170,19 @@ export const PostComponent = ({ post, navigateOnPress, index }: PostComponentPro
         >
           <FastImage
             style={attachmentDimensions}
-            source={{ uri: postDetails.attachmentUrl }}
+            source={{ uri: postDetails?.attachmentUrl }}
+            onLoadStart={() => console.log("LOADINGGGG STARTED")}
+            resizeMode={FastImage.resizeMode.stretch}
             onLoad={(res) => {
+              console.log("ONLOAD POST ATTACHMENT", res.nativeEvent)
               setAttachmentDimensions({
                 height: (windowWidth * res.nativeEvent.height) / res.nativeEvent.width,
                 width: windowWidth,
               })
             }}
-            onLoadEnd={() => setLoaded(true)}
+            onLoadEnd={() => { setLoaded(true) }}
           />
-        </ShimmerPlaceHolder>
+        </ShimmerPlaceHolder>}
         <Actions item={post} />
       </Pressable>
       {index % 5 === 0 && (

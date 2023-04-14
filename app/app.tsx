@@ -26,7 +26,7 @@ import { Platform } from "react-native"
 import AppLovinMAX from "react-native-applovin-max/src/index"
 import { CallTypes, useHooks } from "./screens/hooks"
 import Toast from "react-native-toast-message"
-import {  notificationHandler } from "./utils"
+import { notificationHandler } from "./utils"
 import RNCallKeep from "react-native-callkeep"
 
 
@@ -44,7 +44,7 @@ const options = {
   },
 }
 RNCallKeep.setup(options).then((res) => console.log("RNCALLKEEPRESPOK OK", res))
-RNCallKeep.setAvailable(true)
+// RNCallKeep.setAvailable(true)
 
 // configureNotifications()
 
@@ -77,16 +77,16 @@ interface AppProps {
 notificationHandler()
 
 function App(props: AppProps) {
- 
+
   const { hideSplashScreen } = props
   const { onBoot } = useHooks()
   const SDK_KEY =
     "U0OTon6ehwaUryCOnQkOPUyWxZJn8XLdTl5KVBzC5ThxUuJGI2fhWbDS9XEI4ZxcI0xpCu0IRhEwZTBtarZ5Rn"
 
   const [AppLovinSDKRegistered, setAppLovinSDKRegistered] = React.useState(false)
-  
+
   useEffect(() => {
-    
+
     // backToForeground()
     // RNCallKeep.setAvailable(true)
 
@@ -122,9 +122,9 @@ function App(props: AppProps) {
       AppLovinMAX.addEventListener("OnMRecAdLoadFailedEvent", (errorInfo) => {
         console.log(
           "MREC ad failed to load with error code " +
-            errorInfo.code +
-            " and message: " +
-            errorInfo.message,
+          errorInfo.code +
+          " and message: " +
+          errorInfo.message,
         )
       })
       AppLovinMAX.addEventListener("OnMRecAdClickedEvent", (adInfo) => {

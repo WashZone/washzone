@@ -7,7 +7,7 @@ export const MREC_AD_UNIT_ID = Platform.select({
 
 export const NATIVE_AD_UNIT_ID = Platform.select({
   ios: "f27e81e9917fe419",
-  android: "ENTER_ANDROID_NATIVE_AD_UNIT_ID_HERE",
+  android: "68abd4bc210310f1",
 })
 
 export const SDK_KEY =

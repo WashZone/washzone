@@ -18,7 +18,7 @@ export const AllChats: FC<AppStackScreenProps<"AllChats">> = observer(function A
   const [refreshing, setRefreshing] = useState(false)
   const navigation = useNavigation()
   const {
-    allChats: { allChatRooms, getLatestMessageForRoom },
+    allChats: { allChatRooms, getLatestMessageForRoom, getChatRooms },
     userStore: { _id },
   } = useStores()
   const { deleteChatRoom, syncAllChats } = useHooks()
@@ -65,8 +65,8 @@ export const AllChats: FC<AppStackScreenProps<"AllChats">> = observer(function A
           leftIconColor={colors.palette.neutral100}
         />
 
-        {allChatRooms?.length === 0 ? (
-          <EmptyState preset="allChats" buttonOnPress={() => setAddModalVisible(true)}/>
+        {getChatRooms()?.length === 0 ? (
+          <EmptyState preset="allChats" buttonOnPress={() => setAddModalVisible(true)} />
         ) : (
           <FlatList
             refreshControl={

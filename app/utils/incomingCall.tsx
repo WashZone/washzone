@@ -4,18 +4,21 @@ import RNCallKeep from "react-native-callkeep"
 import uuid from "react-native-uuid"
 const randomUUID = 'e9ca07a4-8346-44d2-bf71-633f79fbdde3'
 export const IncomingCallHook = () => {
-  
+
   const [currentCallId, setCurrentCallId] = useState(null)
 
-  const muteCall = () => RNCallKeep.setMutedCall(randomUUID,true)
+  const muteCall = () => RNCallKeep.setMutedCall(randomUUID, true)
 
-  const unmuteCall = () => RNCallKeep.setMutedCall(randomUUID,false)
+  const unmuteCall = () => RNCallKeep.setMutedCall(randomUUID, false)
 
   const configure = (incomingcallAnswer, endIncomingCall) => {
     try {
       // setupCallKeep()
       Platform.OS === "android" && RNCallKeep.setAvailable(true)
-      RNCallKeep.addEventListener("answerCall", incomingcallAnswer)
+      RNCallKeep.addEventListener("answerCall", () => {
+        incomingcallAnswer();
+        RNCallKeep.setCurrentCallActive(randomUUID);
+      })
       RNCallKeep.addEventListener("endCall", endIncomingCall)
     } catch (error) {
       console.error("initializeCallKeep error:", error?.message)
@@ -90,7 +93,7 @@ export const IncomingCallHook = () => {
     displayIncomingCall,
     endIncomingcallAnswer,
     reportEndCallWithUUID,
-    unmuteCall, 
+    unmuteCall,
     muteCall
   }
 }

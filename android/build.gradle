@@ -4,7 +4,7 @@ import org.apache.tools.ant.taskdefs.condition.Os
 buildscript {
     ext {
         buildToolsVersion = "31.0.0"
-        minSdkVersion = 23
+        minSdkVersion = 24
         compileSdkVersion = 31
         targetSdkVersion = 31
         kotlin_version = "1.6.0" // Update this to your version
@@ -21,6 +21,8 @@ buildscript {
     repositories {
         google()
         mavenCentral()
+         maven { url 'https://artifacts.applovin.com/android' }
+        
     }
     dependencies {
         classpath("com.android.tools.build:gradle:7.1.1")
@@ -28,7 +30,9 @@ buildscript {
         classpath("com.facebook.react:react-native-gradle-plugin")
         classpath("de.undercouch:gradle-download-task:5.0.1") // <--- use this version or newer
         classpath("com.google.gms:google-services:+")
-        
+        classpath "com.applovin.quality:AppLovinQualityServiceGradlePlugin:+"
+
+
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -36,6 +40,7 @@ buildscript {
 }
 
 allprojects {
+    
     repositories {
         maven {
             // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
@@ -45,6 +50,8 @@ allprojects {
             // Android JSC is installed from npm
             url(new File(["node", "--print", "require.resolve('jsc-android/package.json')"].execute().text.trim(), "../dist"))
         }
+               
+
         mavenCentral {
             // We don't want to fetch react-native from Maven Central as there are
             // older versions over there.

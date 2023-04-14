@@ -1,10 +1,46 @@
 {
-    "web": {
-        "client_id": "13619163176-1na00l0e80pvlbs9u1ggvfih13c0t06k.apps.googleusercontent.com",
-        "project_id": "washzone",
-        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-        "token_uri": "https://oauth2.googleapis.com/token",
-        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-        "client_secret": "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"
+  "project_info": {
+    "project_number": "801053055110",
+    "project_id": "washv01",
+    "storage_bucket": "washv01.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:801053055110:android:c29909f97763ca4c53d907",
+        "android_client_info": {
+          "package_name": "com.washzone"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "801053055110-qjigsd0o5uk4bntecq68p5b5216h923c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA2n0NPtlYZ51dFwhUSk6wUKg0giG9I0aA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "801053055110-qjigsd0o5uk4bntecq68p5b5216h923c.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "801053055110-7i8u483irj11gaovpcu7srko4hv73ga8.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.washzone.washv01"
+              }
+            }
+          ]
+        }
+      }
     }
+  ],
+  "configuration_version": "1"
 }

@@ -12,6 +12,10 @@ export const ChatRoomStoreModel = types
   })
   .actions(withSetPropAction)
   .actions((self) => ({
+    getChatRooms() {
+      const res = self.allChatRooms.filter(i => !this.getLatestMessageForRoom(i?._id).isEmpty)
+      return res
+    },
     setChatRooms(chatRooms: any) {
       console.log("NEW CHAT ROOMS", JSON.stringify(chatRooms))
       self.allChatRooms = [...chatRooms]
@@ -26,13 +30,13 @@ export const ChatRoomStoreModel = types
       if (self.chatMessages) {
         const parsedMessages = this.roomChatsAvailable({ roomId: props.roomId })
           ? self.chatMessages[props.roomId].map((i: any) => {
-              return {
-                ...i,
-                id: i._id,
-                author: { ...i?.authorId, id: i?.authorId?._id, imageUrl: i?.authorId?.picture },
-                type: i?.messageType || "text",
-              }
-            })
+            return {
+              ...i,
+              id: i._id,
+              author: { ...i?.authorId, id: i?.authorId?._id, imageUrl: i?.authorId?.picture },
+              type: i?.messageType || "text",
+            }
+          })
           : []
         return parsedMessages
       }
@@ -150,5 +154,5 @@ export const ChatRoomStoreModel = types
     },
   }))
 
-export interface ChatRoomStore extends Instance<typeof ChatRoomStoreModel> {}
-export interface ChatRoomStoreSnapshot extends SnapshotOut<typeof ChatRoomStoreModel> {}
+export interface ChatRoomStore extends Instance<typeof ChatRoomStoreModel> { }
+export interface ChatRoomStoreSnapshot extends SnapshotOut<typeof ChatRoomStoreModel> { }

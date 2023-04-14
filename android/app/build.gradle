@@ -95,12 +95,12 @@ apply from: new File(["node", "--print", "require.resolve('react-native/package.
  * Upload all the APKs to the Play Store and people will download
  * the correct one based on the CPU architecture of their device.
  */
-def enableSeparateBuildPerCPUArchitecture = false
+def enableSeparateBuildPerCPUArchitecture = true
 
 /**
  * Run Proguard to shrink the Java bytecode in release builds.
  */
-def enableProguardInReleaseBuilds = false
+def enableProguardInReleaseBuilds = true
 
 /**
  * The preferred build flavor of JavaScriptCore.
@@ -137,6 +137,11 @@ android {
 
     compileSdkVersion rootProject.ext.compileSdkVersion
 
+compileOptions {
+	sourceCompatibility JavaVersion.VERSION_1_8
+	targetCompatibility JavaVersion.VERSION_1_8
+}
+
     defaultConfig {
         applicationId "com.washzone"
         minSdkVersion rootProject.ext.minSdkVersion
@@ -144,6 +149,7 @@ android {
         versionCode 1
         versionName "1.0"
         buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
+    multiDexEnabled true
 
         if (isNewArchitectureEnabled()) {
             // We configure the NDK build only if you decide to opt-in for the New Architecture.
@@ -243,6 +249,10 @@ android {
             signingConfig signingConfigs.debug
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+        //     debuggable false
+        // minifyEnabled true
+        // proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
         }
     }
 
@@ -269,6 +279,9 @@ dependencies {
     implementation "com.facebook.react:react-native:+"  // From node_modules
     implementation 'com.facebook.android:facebook-android-sdk:latest.release'
     implementation 'com.google.firebase:firebase-analytics:17.3.0'
+    implementation 'com.android.support:multidex:2.0.1'
+implementation 'com.applovin:applovin-sdk:+'
+
 
     // implementation project(':react-native-fbsdk')
     implementation 'androidx.work:work-runtime:2.7.0-alpha05'
@@ -343,6 +356,11 @@ if (isNewArchitectureEnabled()) {
     }
 }
 apply plugin: 'com.google.gms.google-services'
+
+apply plugin: 'applovin-quality-service'
+applovin {
+    apiKey "G7yKneOHE5eNE1uh4Jm3TqXFC27tTR51gUGIBoaS3_NT3_pQJuwVeTfLewyPTynF8mQHiX78ZKRhtW634VSibf"    
+}
 
 // Run this once to be able to run the application with BUCK
 // puts all compile dependencies into folder libs for BUCK to use

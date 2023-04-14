@@ -173,7 +173,9 @@ export const TopicComponent = observer(({ topic }: { topic: any }) => {
 
 export const TopicComponentFullView = ({ topic }) => {
   const [loaded, setLoaded] = useState(false)
-  const [attachmentDimensions, setAttachmentDimensions] = useState({ height: 0, width: 0 })
+  const windowWidth = Dimensions.get("window").width
+
+  const [attachmentDimensions, setAttachmentDimensions] = useState({ dth: windowWidth, height: windowWidth * 9 / 16 })
   const navigation = useNavigation<NavigationProp<TopicsTabParamList>>()
   const topicDetails = {
     picture: topic?.userId?.picture,
@@ -184,7 +186,6 @@ export const TopicComponentFullView = ({ topic }) => {
     content: topic?.topicContent,
     title: topic?.title,
   }
-  const windowWidth = Dimensions.get("window").width
   const nativeAdViewRef = useRef<any>()
 
   useEffect(() => {
@@ -228,10 +229,12 @@ export const TopicComponentFullView = ({ topic }) => {
           <View style={[$contentCenter, { marginTop: spacing.tiny }]}>
             <ShimmerPlaceholder
               visible={loaded}
-              shimmerStyle={$attachment}
+              shimmerStyle={{ width: windowWidth, height: windowWidth * 9 / 16 }}
               LinearGradient={LinearGradient}
             >
               <FastImage
+                resizeMode={FastImage.resizeMode.stretch}
+
                 style={attachmentDimensions}
                 source={{
                   uri: topic?.attachmentUrl,
@@ -243,7 +246,6 @@ export const TopicComponentFullView = ({ topic }) => {
                   })
                 }}
                 onLoadEnd={() => setLoaded(true)}
-                resizeMode="cover"
               />
             </ShimmerPlaceholder>
           </View>

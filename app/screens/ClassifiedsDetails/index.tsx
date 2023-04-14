@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native"
-import { Text, IconTypes, Icon } from "../../components"
+import { Text, IconTypes, Icon, StarRating } from "../../components"
 import { ClassifiedsTabProps, HomeTabParamList } from "../../tabs"
 import { colors, spacing } from "../../theme"
 import { observer } from "mobx-react-lite"
@@ -19,9 +19,7 @@ import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { ActivityIndicator } from "react-native-paper"
 
 import { useHooks } from "../hooks"
-import { Rating } from "react-native-ratings"
 import { useStores } from "../../models"
-import { Interaction } from "../../utils/enums"
 import { RateUserModal } from "./RateUser"
 import { SendOfferModal } from "./SendOfferModal"
 import Loading from "../../components/Loading"
@@ -48,20 +46,7 @@ const PublisherDetails = ({ publisher }: { publisher: any }) => {
           <View>
             <Text text={publisher?.name} />
             <TouchableOpacity onPress={() => setRateUserModalVisible(true)}>
-              <Rating
-                readonly
-                startingValue={publisher?.averageRating}
-                imageSize={22}
-                // Background
-                tintColor={colors.palette.neutral100}
-                ratingBackgroundColor={colors.palette.primary100}
-                ratingColor={colors.palette.primary100}
-                ratingTextColor={colors.palette.primary100}
-                style={{
-                  backgroundColor: colors.palette.primary100,
-                  marginTop: spacing.extraSmall,
-                }}
-              />
+              <StarRating initialVal={3} size={24} disabled onPress={() => console.log("DSABLEd")} />
             </TouchableOpacity>
           </View>
         </View>
