@@ -1,5 +1,5 @@
 import React from "react"
-import { TextStyle, View, ViewStyle } from "react-native"
+import { ColorValue, TextStyle, View, ViewStyle } from "react-native"
 import Modal from "react-native-modal"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { colors } from "../theme"
@@ -16,6 +16,7 @@ interface CustomModalProps {
   title?: string
   propagateSwipe?: boolean
   avoidKeyboard?: boolean
+  backgroundColor?: ColorValue
 }
 
 export const BottomModal = ({
@@ -25,6 +26,7 @@ export const BottomModal = ({
   children,
   title,
   avoidKeyboard,
+  backgroundColor
 }: CustomModalProps) => {
   const safeArea = useSafeAreaInsets()
   const closeModal = () => setVisible(false)
@@ -40,12 +42,12 @@ export const BottomModal = ({
     >
       <View>
         <Handle />
-        <View style={[$content, { paddingBottom: safeArea.bottom }]}>
+        <View style={[$content, { paddingBottom: safeArea.bottom }, backgroundColor && { backgroundColor }]}>
           <Text text={title} style={$title} weight="semiBold" />
           {children}
         </View>
       </View>
-    </Modal>
+    </Modal >
   )
 }
 

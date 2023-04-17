@@ -2,13 +2,10 @@ import React, { FC, useEffect, useState } from "react"
 import {
   View,
   Pressable,
-  FlatList,
   TextStyle,
   ViewStyle,
-  RefreshControl,
+
   Dimensions,
-  NativeSyntheticEvent,
-  NativeScrollEvent,
 } from "react-native"
 import { Text, Screen, Icon, CustomFlatlist } from "../../components"
 import FastImage, { ImageStyle } from "react-native-fast-image"
@@ -20,14 +17,11 @@ import { useHooks } from "../hooks"
 import { useStores } from "../../models"
 import { $flex1 } from "../styles"
 import { AppStackParamList } from "../../navigators"
-import { BROKEN_IMAGE, defaultImages } from "../../utils"
+import { BROKEN_IMAGE } from "../../utils"
 import LinearGradient from "react-native-linear-gradient"
 import ShimmerPlaceholder from "react-native-shimmer-placeholder"
-import Lottie from "lottie-react-native"
-import Animated from "react-native-reanimated"
 
-const refreshingHeight = 80
-export const ClassifiedComponent = ({
+export const ClassifiedComponent = observer(({
   classified,
   disabled,
 }: {
@@ -40,7 +34,7 @@ export const ClassifiedComponent = ({
   return (
     <Pressable
       style={$postContainer}
-      onPress={() => !disabled && navigation.navigate("ClassifiedsDetails", { classified })}
+      onPress={() => !disabled && navigation.navigate("ClassifiedsDetails", { classified: classified?._id })}
     >
       <ShimmerPlaceholder
         visible={loaded}
@@ -64,7 +58,7 @@ export const ClassifiedComponent = ({
       />
     </Pressable>
   )
-}
+})
 
 export const ClassifiedsFeed: FC<ClassifiedsTabProps<"ClassifiedsFeed">> = observer(
   function TopicsFeed(_props) {

@@ -1,30 +1,35 @@
 import React, { useEffect, useRef, useState } from "react"
-import { ViewStyle, View, ActivityIndicator, TextStyle } from "react-native"
-import { Text, Screen, Button, BottomModal } from "../../components"
-import Modal from "react-native-modal"
+import { ViewStyle, View, ActivityIndicator, TextStyle, Platform } from "react-native"
+import { Text, Button, BottomModal } from "../../components"
 import { colors, spacing } from "../../theme"
 import { Rating } from "react-native-ratings"
 import SwipeRating from "react-native-ratings/dist/SwipeRating"
 import { useHooks } from "../hooks"
-import Toast from "react-native-toast-message"
+import Loading from "../../components/Loading"
 
 export const RateUserModal = ({
   isVisible,
   setModalVisible,
   userId,
+  onRateUser
 }: {
   isVisible: boolean
   setModalVisible: (b: boolean) => void
   userId: string
+  onRateUser: (n: number) => Promise<void>
 }) => {
   const [buttonLoading, setButtonLoading] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(false)
   const [rating, setRating] = useState<any>()
   const ratingRef = useRef<SwipeRating>()
-  const { getRatingOnUser, rateUser } = useHooks()
+  const { getRatingOnUser } = useHooks()
 
   const syncRating = async () => {
+    setLoading(true)
     const res = await getRatingOnUser(userId)
+    console.log("syncRating", res)
     setRating(res)
+    setLoading(false)
   }
 
   useEffect(() => {
@@ -33,48 +38,71 @@ export const RateUserModal = ({
 
   const onSubmit = async () => {
     setButtonLoading(true)
-    const res = await rateUser(userId, rating)
-    if (res) {
-      setModalVisible(false)
-      Toast.show({ type: "success", text1: `Rated ${rating} starred.` })
-    }
+    await onRateUser(rating)
     setButtonLoading(false)
   }
 
   return (
-    <BottomModal isVisible={isVisible} setVisible={setModalVisible}>
+    <BottomModal
+      isVisible={isVisible}
+      setVisible={setModalVisible}
+      backgroundColor={colors.palette.neutral250}
+    >
       <View style={$contentContainer}>
-        <Text text={"Rate User  "} style={$headerTitle} weight="semiBold" />
-        <Rating
-          ref={ratingRef}
-          onFinishRating={(rating) => setRating(rating)}
-          ratingColor={colors.palette.primary100}
-          ratingTextColor={colors.palette.neutral100}
-          ratingBackgroundColor={colors.palette.primary100}
-          showRating
-          tintColor={colors.palette.primary100}
-          startingValue={rating}
-          imageSize={40}
-          style={{ backgroundColor: colors.palette.primary100, marginTop: spacing.extraSmall }}
-        />
-        {/* <TextInput mode="outlined" label={"Title"} value={title} onChangeText={setTitle} />
-          <Text text={error} style={$errorText} weight="medium" /> */}
-        <Button
-          onPress={onSubmit}
-          disabled={buttonLoading}
-          style={[$submitButton, { backgroundColor: colors.palette.neutral100 }]}
-          textStyle={{ color: colors.palette.primary100 }}
-        >
-          {buttonLoading ? (
-            <ActivityIndicator
-              animating={buttonLoading}
-              size={20}
+        {loading ? (
+          <Loading />
+        ) : (
+          <>
+            <Text
+              text={"Rate User  "}
+              style={$headerTitle}
+              weight="semiBold"
               color={colors.palette.primary100}
             />
-          ) : (
-            <Text tx="common.submit" style={$submitText} weight="semiBold" />
-          )}
-        </Button>
+            <Text
+              text={"Rated By You : " + rating + "/5"}
+              style={$headerTitle}
+              weight="semiBold"
+              color={colors.palette.primary100}
+              size="md"
+            />
+            <Rating
+              ref={ratingRef}
+              type="custom"
+              onFinishRating={(rating) => setRating(rating)}
+              ratingColor={colors.palette.primary100}
+              ratingTextColor={colors.palette.neutral100}
+              ratingBackgroundColor={colors.palette.neutral400}
+              // showRating
+              tintColor={colors.palette.neutral250}
+              startingValue={rating}
+              imageSize={40}
+              style={{ marginTop: spacing.medium }}
+              jumpValue={1}
+
+              fractions={0}
+            />
+
+            {/* <TextInput mode="outlined" label={"Title"} value={title} onChangeText={setTitle} />
+          <Text text={error} style={$errorText} weight="medium" /> */}
+            <Button
+              onPress={onSubmit}
+              disabled={buttonLoading}
+              style={[$submitButton, { backgroundColor: colors.palette.primary100 }]}
+              textStyle={{ color: colors.palette.primary100 }}
+            >
+              {buttonLoading ? (
+                <ActivityIndicator
+                  animating={buttonLoading}
+                  size={20}
+                  color={colors.palette.primary100}
+                />
+              ) : (
+                <Text tx="common.submit" style={$submitText} weight="semiBold" />
+              )}
+            </Button>
+          </>
+        )}
       </View>
     </BottomModal>
   )
@@ -84,11 +112,9 @@ const $headerTitle: TextStyle = {
   color: colors.palette.neutral100,
 }
 
-const $parentContainer: ViewStyle = { justifyContent: "center", flex: 1, height: 500 }
-
 const $submitText: TextStyle = {
   fontSize: 18,
-  color: colors.palette.primary100,
+  color: colors.palette.neutral100,
 }
 
 const $submitButton: ViewStyle = {
@@ -103,4 +129,5 @@ const $submitButton: ViewStyle = {
 
 const $contentContainer: ViewStyle = {
   padding: spacing.medium,
+  height: Platform.OS === 'android' ? 200 : 180,
 }

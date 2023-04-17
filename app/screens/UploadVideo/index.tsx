@@ -84,6 +84,7 @@ export const UploadVideo: FC<AppStackScreenProps<"UploadVideo">> = function Uplo
         thumbnailUrl: `https://img.youtube.com/vi/${ytVideoId}/default.jpg`,
         attachmentVideoUrl: parsedYtUrl,
         vedioPlaylistId: value,
+        description
       })
       await refreshVideos()
       navigation.goBack()
@@ -133,7 +134,7 @@ export const UploadVideo: FC<AppStackScreenProps<"UploadVideo">> = function Uplo
           theme={$theme}
           placeholder="Enter a short description here!"
           numberOfLines={3}
-          contentStyle={{height:120}}
+          contentStyle={{ height: 120 }}
           blurOnSubmit
         />
 
@@ -146,6 +147,7 @@ export const UploadVideo: FC<AppStackScreenProps<"UploadVideo">> = function Uplo
           mode="outlined"
           label={"Youtube URL"}
           theme={$theme}
+          autoCapitalize={'none'}
           maxLength={180}
           placeholder="https://www.youtube.com/watch?v=xxxxxx"
           placeholderTextColor={colors.palette.grey}
@@ -154,6 +156,10 @@ export const UploadVideo: FC<AppStackScreenProps<"UploadVideo">> = function Uplo
         <Dropdown
           data={allPlaylists}
           search
+          placeholderStyle={{ color: colors.palette.neutral900 }}
+          itemTextStyle={{ color: colors.palette.neutral700 }}
+          selectedTextStyle={{ color: colors.palette.neutral900 }}
+          inputSearchStyle={{ color: colors.palette.neutral700 }}
           maxHeight={300}
           style={[$dropdown, isFocus && { borderColor: colors.palette.primary100 }]}
           labelField="label"
@@ -176,7 +182,7 @@ export const UploadVideo: FC<AppStackScreenProps<"UploadVideo">> = function Uplo
         <TouchableOpacity onPress={() => setTNCAccepted(!TNCAccepted)} style={$flexRow}>
           <Toggle onPress={() => setTNCAccepted(!TNCAccepted)} value={TNCAccepted} />
           <Text style={$tnc} tx="addAVideo.iAgree" weight="medium" />
-          <TouchableOpacity onPress={() => navigation.navigate("Legal")} style={{marginLeft:-4}}>
+          <TouchableOpacity onPress={() => navigation.navigate("Legal")} style={{ marginLeft: -4 }}>
             <Text
               color={colors.palette.primary100}
               style={$tnc}
@@ -224,7 +230,7 @@ const $inputContainer: ViewStyle = {
   marginVertical: spacing.extraSmall,
 }
 
-const $descriptionContainer: ViewStyle = {  }
+const $descriptionContainer: ViewStyle = {}
 const $flexRow: ViewStyle = {
   flexDirection: "row",
   alignItems: "center",

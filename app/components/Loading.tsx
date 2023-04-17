@@ -8,7 +8,7 @@ export default function Loading() {
   return (
     <Screen contentContainerStyle={[$flex1, $contentCenter, { backgroundColor: colors.transparent }]}>
       <Lottie
-        style={{ height: 40 }}
+        style={{ height: 40, backgroundColor: colors.transparent }}
         source={require("../../assets/lottie/loader.json")}
         autoPlay
         loop

@@ -1,8 +1,7 @@
-import React, { FC, useEffect, useState } from "react"
+import React, { FC, useState } from "react"
 import {
   ActivityIndicator,
   Dimensions,
-  ImageStyle,
   TextStyle,
   TouchableOpacity,
   ScrollView,
@@ -188,7 +187,7 @@ export const AddAClassified: FC<AppStackScreenProps<"AddAClassified">> = functio
           maxLength={240}
           placeholder="Enter a short description here!"
           multiline
-          contentStyle={{height:120}}
+          contentStyle={{ height: 120 }}
           blurOnSubmit
         />
 
@@ -199,6 +198,9 @@ export const AddAClassified: FC<AppStackScreenProps<"AddAClassified">> = functio
           style={[$dropdown, isFocus && { borderColor: colors.palette.primary100, borderWidth: 2 }]}
           labelField="label"
           valueField="value"
+          placeholderStyle={{ color: colors.palette.neutral900 }}
+          itemTextStyle={{ color: colors.palette.neutral700 }}
+          selectedTextStyle={{ color: colors.palette.neutral900 }}
           placeholder={"Condition"}
           searchPlaceholder="Search..."
           value={value}
@@ -216,16 +218,16 @@ export const AddAClassified: FC<AppStackScreenProps<"AddAClassified">> = functio
         <Pressable onPress={() => setTNCAccepted(!TNCAccepted)} style={[$flexRow]}>
           <Toggle onPress={() => setTNCAccepted(!TNCAccepted)} value={TNCAccepted} />
           <TouchableOpacity onPress={() => setTNCAccepted(!TNCAccepted)} style={$flexRow}>
-          <Text style={$tnc} tx="addAVideo.iAgree" weight="medium" />
-          <TouchableOpacity onPress={() => navigation.navigate("Legal")} style={{marginLeft:-4}}>
-            <Text
-              color={colors.palette.primary100}
-              style={$tnc}
-              tx="addAVideo.tnc"
-              weight="medium"
-            />
+            <Text style={$tnc} tx="addAVideo.iAgree" weight="medium" />
+            <TouchableOpacity onPress={() => navigation.navigate("Legal")} style={{ marginLeft: -4 }}>
+              <Text
+                color={colors.palette.primary100}
+                style={$tnc}
+                tx="addAVideo.tnc"
+                weight="medium"
+              />
+            </TouchableOpacity>
           </TouchableOpacity>
-        </TouchableOpacity>
         </Pressable>
 
         <Button
@@ -262,7 +264,7 @@ const $inputContainer: ViewStyle = {
   marginVertical: spacing.extraSmall,
 }
 
-const $descriptionContainer: ViewStyle = {  }
+const $descriptionContainer: ViewStyle = {}
 
 const $flexRow: ViewStyle = {
   flexDirection: "row",

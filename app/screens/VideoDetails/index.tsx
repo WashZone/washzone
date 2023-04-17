@@ -155,7 +155,7 @@ const VideoDescription = ({ data }: { data: any }) => {
         />
       </TouchableOpacity>
       <Text
-        text={data?.userId?.length ? data?.userId[0]?.description : data?.userId?.description}
+        text={data?.description}
         style={$descriptionText}
       />
     </View>

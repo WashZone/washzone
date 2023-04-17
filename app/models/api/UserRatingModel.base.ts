@@ -22,7 +22,7 @@ export const UserRatingModelBase = ModelBase
     createdAt: types.union(types.undefined, types.frozen()),
     updatedAt: types.union(types.undefined, types.frozen()),
     userId: types.union(types.undefined, types.null, types.late((): any => UserModel)),
-    ratinguserId: types.union(types.undefined, types.null, types.late((): any => UserModel)),
+    ratingByUserId: types.union(types.undefined, types.null, types.late((): any => UserModel)),
     ratingStar: types.union(types.undefined, types.null, types.number),
     averageRating: types.union(types.undefined, types.null, types.number),
     status: types.union(types.undefined, types.null, types.string),
@@ -41,7 +41,7 @@ export class UserRatingModelSelector extends QueryBuilder {
   get averageRating() { return this.__attr(`averageRating`) }
   get status() { return this.__attr(`status`) }
   userId(builder: string | UserModelSelector | ((selector: UserModelSelector) => UserModelSelector) | undefined) { return this.__child(`userId`, UserModelSelector, builder) }
-  ratinguserId(builder: string | UserModelSelector | ((selector: UserModelSelector) => UserModelSelector) | undefined) { return this.__child(`ratinguserId`, UserModelSelector, builder) }
+  ratingByUserId(builder: string | UserModelSelector | ((selector: UserModelSelector) => UserModelSelector) | undefined) { return this.__child(`ratingByUserId`, UserModelSelector, builder) }
 }
 export function selectFromUserRating() {
   return new UserRatingModelSelector()

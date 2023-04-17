@@ -532,11 +532,11 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     queryGetratingOnUserId(variables: { userId: string }, options: QueryOptions = {}) {
       return self.query<{ getratingOnUserId: any }>(`query getratingOnUserId($userId: String!) { getratingOnUserId(userId: $userId) }`, variables, options)
     },
-    queryCheckUserRating(variables: { ratinguserId: string, userId: string }, options: QueryOptions = {}) {
-      return self.query<{ checkUserRating: any }>(`query checkUserRating($ratinguserId: String!, $userId: String!) { checkUserRating(ratinguserId: $ratinguserId, userId: $userId) }`, variables, options)
+    queryCheckUserRating(variables: { ratingByUserId: string, userId: string }, options: QueryOptions = {}) {
+      return self.query<{ checkUserRating: any }>(`query checkUserRating($ratingByUserId: String!, $userId: String!) { checkUserRating(ratingByUserId: $ratingByUserId, userId: $userId) }`, variables, options)
     },
-    queryGetratingByratingId(variables: { ratinguserId: string }, options: QueryOptions = {}) {
-      return self.query<{ getratingByratingId: any }>(`query getratingByratingId($ratinguserId: String!) { getratingByratingId(ratinguserId: $ratinguserId) }`, variables, options)
+    queryGetratingByratingId(variables: { ratingByUserId: string }, options: QueryOptions = {}) {
+      return self.query<{ getratingByratingId: any }>(`query getratingByratingId($ratingByUserId: String!) { getratingByratingId(ratingByUserId: $ratingByUserId) }`, variables, options)
     },
     queryGetNotification(variables: { reciverId: string }, options: QueryOptions = {}) {
       return self.query<{ getNotification: any }>(`query getNotification($reciverId: String!) { getNotification(reciverId: $reciverId) }`, variables, options)
@@ -793,13 +793,13 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
         ${typeof resultSelector === "function" ? resultSelector(new FollowUserModelSelector()).toString() : resultSelector}
       } }`, variables, optimisticUpdate)
     },
-    mutateCreateUserRating(variables: { ratingStar?: (number | null), ratinguserId: string, userId: string }, resultSelector: string | ((qb: UserRatingModelSelector) => UserRatingModelSelector) = userRatingModelPrimitives.toString(), optimisticUpdate?: () => void) {
-      return self.mutate<{ createUserRating: UserRatingModelType}>(`mutation createUserRating($ratingStar: Float, $ratinguserId: String!, $userId: String!) { createUserRating(ratingStar: $ratingStar, ratinguserId: $ratinguserId, userId: $userId) {
+    mutateCreateUserRating(variables: { ratingStar?: (number | null), ratingByUserId: string, userId: string }, resultSelector: string | ((qb: UserRatingModelSelector) => UserRatingModelSelector) = userRatingModelPrimitives.toString(), optimisticUpdate?: () => void) {
+      return self.mutate<{ createUserRating: UserRatingModelType}>(`mutation createUserRating($ratingStar: Float, $ratingByUserId: String!, $userId: String!) { createUserRating(ratingStar: $ratingStar, ratingByUserId: $ratingByUserId, userId: $userId) {
         ${typeof resultSelector === "function" ? resultSelector(new UserRatingModelSelector()).toString() : resultSelector}
       } }`, variables, optimisticUpdate)
     },
-    mutateUpdateRating(variables: { ratingStar: number, ratinguserId: string }, optimisticUpdate?: () => void) {
-      return self.mutate<{ UpdateRating: any }>(`mutation UpdateRating($ratingStar: Float!, $ratinguserId: String!) { UpdateRating(ratingStar: $ratingStar, ratinguserId: $ratinguserId) }`, variables, optimisticUpdate)
+    mutateUpdateRating(variables: { ratingStar: number, ratingByUserId: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ UpdateRating: any }>(`mutation UpdateRating($ratingStar: Float!, $ratingByUserId: String!) { UpdateRating(ratingStar: $ratingStar, ratingByUserId: $ratingByUserId) }`, variables, optimisticUpdate)
     },
     mutateCreateChatRoom(variables: { membersId: InputUsers[], roomType?: (string | null), adminId: string }, resultSelector: string | ((qb: RoomChatModelSelector) => RoomChatModelSelector) = roomChatModelPrimitives.toString(), optimisticUpdate?: () => void) {
       return self.mutate<{ createChatRoom: RoomChatModelType}>(`mutation createChatRoom($membersId: [InputUsers!]!, $roomType: String, $adminId: String!) { createChatRoom(membersId: $membersId, roomType: $roomType, adminId: $adminId) {

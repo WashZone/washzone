@@ -8,6 +8,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
+  Touchable,
 } from "react-native"
 import { Text, IconTypes, Icon, StarRating } from "../../components"
 import { ClassifiedsTabProps, HomeTabParamList } from "../../tabs"
@@ -23,6 +24,8 @@ import { useStores } from "../../models"
 import { RateUserModal } from "./RateUser"
 import { SendOfferModal } from "./SendOfferModal"
 import Loading from "../../components/Loading"
+import { Rating } from "react-native-ratings"
+import Toast from "react-native-toast-message"
 
 interface ActionProps {
   icon: IconTypes
@@ -33,34 +36,54 @@ interface ActionProps {
 
 const PublisherDetails = ({ publisher }: { publisher: any }) => {
   const [rateUserModalVisible, setRateUserModalVisible] = useState(false)
+  const [avgRating, setAvgRating] = useState(publisher?.averageRating)
+  const { rateUser } = useHooks()
   const navigation = useNavigation<NavigationProp<HomeTabParamList>>()
+  console.log("PUBLISHER RATING", publisher)
+
+  const onRateUser = async (rating: number) => {
+    const res = await rateUser(publisher?._id, rating)
+    if (res) {
+      setRateUserModalVisible(false)
+      Toast.show({ type: "success", text1: `Rated ${rating} starred.` })
+      setAvgRating(res.avg)
+    }
+
+  }
+
   return (
     <>
-      <TouchableOpacity
-        onPress={() => navigation.navigate("Profile", { user: publisher })}
+      <View
+
         style={$publisherContainer}
       >
         <View style={$flexHori}>
-          <FastImage style={$publisherPicture} source={{ uri: publisher?.picture }} />
-
-          <View>
+          <TouchableOpacity onPress={() => navigation.navigate("Profile", { user: publisher })}><FastImage style={$publisherPicture} source={{ uri: publisher?.picture }} />
+          </TouchableOpacity>
+          <View style={{ justifyContent: 'space-around', marginVertical: spacing.tiny, alignItems: 'flex-start' }}>
             <Text text={publisher?.name} />
             <TouchableOpacity onPress={() => setRateUserModalVisible(true)}>
-              <StarRating initialVal={3} size={24} disabled onPress={() => console.log("DSABLEd")} />
+              <Rating
+                type='custom'
+                imageSize={20}
+                tintColor={colors.palette.neutral100}
+                ratingColor={colors.palette.primary100}
+                ratingTextColor={colors.palette.primary100}
+                ratingBackgroundColor={colors.palette.neutral400}
+                // style={{ backgroundColor: colors.palette.primary100 }}
+                startingValue={avgRating}
+                readonly />
             </TouchableOpacity>
           </View>
         </View>
-        {/* <Pressable style={$followButton}>
-          <Text text="Follow" weight="semiBold" />
-        </Pressable> */}
-      </TouchableOpacity>
-      {/* <Pressable style={$reviewsButtonContainer}>
-        <Text text="See All Reviews" weight="semiBold" />
-      </Pressable> */}
+
+      </View>
+
       <RateUserModal
         userId={publisher?._id}
         isVisible={rateUserModalVisible}
         setModalVisible={setRateUserModalVisible}
+        onRateUser={onRateUser}
       />
     </>
   )
@@ -171,19 +194,16 @@ export const ClassifiedsDetails: FC<ClassifiedsTabProps<"ClassifiedsDetails">> =
     const [loading, setLoading] = useState<boolean>(typeof classified === "string")
     const {
       api: { mutateGetClassifiedById },
-      interaction: { getInteractionOnClassified },
     } = useStores()
 
     const handleStringTypeClassified = async () => {
       setLoading(true)
       if (typeof classified === "string") {
         const res = await mutateGetClassifiedById({ classifiedId: classified })
-
         setClassifiedDetails(res.getClassifiedById?.length === 1 && res.getClassifiedById[0])
         setLoading(false)
       } else {
         setClassifiedDetails(classified)
-
         setLoading(false)
       }
     }
@@ -208,8 +228,8 @@ export const ClassifiedsDetails: FC<ClassifiedsTabProps<"ClassifiedsDetails">> =
             text={classified?.title}
             weight="medium"
             style={{
-              margin: spacing.medium,
-              textAlign:'justify'
+              marginHorizontal: spacing.medium,
+              textAlign: 'justify'
             }}
           /> */}
           <PublisherDetails publisher={classifiedDetails?.UserId || classifiedDetails?.userId} />

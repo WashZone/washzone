@@ -1,20 +1,14 @@
 import { observer } from "mobx-react-lite"
 import React, { FC, useEffect, useState } from "react"
-import { AppStackParamList, AppStackScreenProps } from "../../navigators"
-import { $contentCenter, $flex1, $flexRow, $justifyCenter } from "../styles"
-import { Screen, Text, Icon, EmptyState } from "../../components"
+import { AppStackScreenProps } from "../../navigators"
+import { $flex1 } from "../styles"
 import { Chat, MessageType } from "@flyerhq/react-native-chat-ui"
-import { PreviewData } from "@flyerhq/react-native-link-preview"
 // import DocumentPicker from 'react-native-document-picker'
 import FileViewer from "react-native-file-viewer"
-import { launchImageLibrary } from "react-native-image-picker"
-import { v4 as uuidv4 } from "uuid"
-import { NavigationProp, useNavigation } from "@react-navigation/native"
-import { Pressable, TextStyle, TouchableOpacity, View, ViewStyle } from "react-native"
+import { PanGestureHandler } from "react-native-gesture-handler"
+import { Animated, Dimensions, TextStyle, View } from "react-native"
 import { colors, spacing } from "../../theme"
 import { MediaPicker } from "../../utils/device/MediaPicker"
-import { MessageOptionsModal } from "./partials/MessageOptionsModal"
-import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { CustomChatMessage, P2PHeader } from "./partials"
 import { useStores } from "../../models"
 import { useHooks } from "../hooks"
@@ -23,6 +17,8 @@ import ShimmerPlaceholder from "react-native-shimmer-placeholder"
 import FastImage from "react-native-fast-image"
 import LinearGradient from "react-native-linear-gradient"
 import Lottie from "lottie-react-native"
+import { Text } from "../../components"
+import moment from "moment"
 
 const getColorFromType = (type: any) => {
   switch (type) {
@@ -66,7 +62,7 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
     if (message.type === "file") {
       try {
         await FileViewer.open(message.uri, { showOpenWithDialog: true })
-      } catch {}
+      } catch { }
     }
   }
 
@@ -112,37 +108,47 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
     setLoadingMore(false)
   }
 
+
   const renderBubble = (payload: {
     child: React.ReactNode
     message: MessageType.Any
     nextMessageInGroup: boolean
   }) => {
-    const { child, message } = payload
+
+    const { child, message, nextMessageInGroup } = payload
+    console.log("nextMessageInGroup", nextMessageInGroup)
+
     const isAuthorMe = message?.author?.id === userStore._id
     const isImage = message?.type === "image"
     const isLog =
       message?.type === "custom" &&
       [messageMetadataType.classifiedOffer].includes(message?.metaData?.metaDataType)
     return (
-      <View
-        style={[
-          {
+      <>
+        <View
+          style={{
             backgroundColor: isLog
               ? getColorFromType(message?.metaData?.metaDataType)
               : isAuthorMe
-              ? colors.palette.messageAuthor
-              : colors.palette.messageReceiver,
+                ? colors.palette.messageAuthor
+                : colors.palette.messageReceiver,
             padding: isImage ? 0 : spacing.tiny,
             paddingHorizontal: isImage ? 0 : spacing.extraSmall,
             borderRadius: isLog ? 8 : 10,
             alignItems: isAuthorMe ? "flex-end" : "flex-start",
             borderBottomRightRadius: isAuthorMe ? 0 : 10,
             borderBottomLeftRadius: isAuthorMe ? 10 : 0,
-          },
-        ]}
-      >
-        {child}
-      </View>
+            marginBottom:8
+          }}
+        >
+          {child}
+        </View>
+        {!nextMessageInGroup && <Text text={moment(message?.createdAt).format('hh:mm A')
+        } weight="medium" color={colors.palette.neutral500} style={[{
+          position: 'absolute',
+          bottom: -12, fontSize: 11,
+        }, isAuthorMe && { right: 0 }]} numberOfLines={1}/>}
+      </>
     )
   }
 
@@ -175,6 +181,7 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
     <View style={$flex1}>
       <P2PHeader data={receiver} roomId={roomId} />
       <Chat
+        showUserNames
         renderImageMessage={renderImageMessage}
         isAttachmentUploading={isAttachmentUploading}
         sendButtonVisibilityMode="editing"
@@ -233,6 +240,7 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
         renderBubble={renderBubble}
         enableAnimation
         isLastPage={isLastPage}
+        showUserAvatars
       />
       {/* <MessageOptionsModal
         message={selectedMessage}

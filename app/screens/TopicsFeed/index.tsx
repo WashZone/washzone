@@ -43,6 +43,7 @@ const Actions = observer(function ActionButtons({ item }: { item: any }) {
       likeviews: item?.likeviews,
     })
   }, [item])
+
   return (
     <View style={$actionsContainer}>
       <View style={$actionContainer}>

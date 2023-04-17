@@ -14,6 +14,7 @@ import { AppStackParamList } from "../../navigators"
 import ShimmerPlaceholder from "react-native-shimmer-placeholder"
 import LinearGradient from "react-native-linear-gradient"
 import { BROKEN_IMAGE } from "../../utils"
+import { $contentCenter } from "../styles"
 
 export const VideoBlock = ({
   videoDetails,
@@ -98,31 +99,54 @@ export const VideoRowList = ({ channelDetails }) => {
             navigation.navigate("ViewChannel", { publisher: channelDetails[0]?.userId })
           }
         >
-          <Text
+          {!channelDetails?.isEmpty && <Text
             text={
-              channelDetails?.length > 0 &&
-              (channelDetails[0]?.userId?._id === _id
-                ? "Your"
-                : channelDetails[0]?.userId?.first_name + `'s`) + ` Channel`
+              channelDetails?.isEmpty
+                ? "Your Channel"
+                : channelDetails[0]?.userId?._id === _id
+                  ? "Your Channel"
+                  : channelDetails[0]?.userId?.first_name + `'s` + ` Channel`
             }
             weight="bold"
             style={$titleText}
-          />
-          <Text text="View All" weight="medium" style={$textViewAll} />
+          />}
+          {channelDetails?.length > 1 && (
+            <Text text="View All" weight="medium" style={$textViewAll} />
+          )}
         </TouchableOpacity>
-        <Icon icon="caretRight" size={20} color={colors.palette.primary200} />
+        {channelDetails?.length > 1 && (
+          <Icon icon="caretRight" size={20} color={colors.palette.primary200} />
+        )}
       </View>
-      <FlatList
-        ListHeaderComponent={<View style={{ paddingLeft: spacing.medium }} />}
-        showsHorizontalScrollIndicator={false}
-        horizontal
-        data={channelDetails}
-        renderItem={({ item }) => <VideoBlock videoDetails={item} />}
-      />
+      {channelDetails?.length > 0 ? (
+        <FlatList
+          ListHeaderComponent={<View style={{ paddingLeft: spacing.medium }} />}
+          showsHorizontalScrollIndicator={false}
+          horizontal
+          data={channelDetails}
+          renderItem={({ item }) => <VideoBlock videoDetails={item} />}
+        />
+      ) : (
+        <View style={$contentCenter}>
+          <Pressable
+            style={$uploadContainerIsUserEmpty}
+            onPress={() => navigation.navigate("UploadVideo")}
+          >
+            <Icon icon="upload" size={28} />
+            <Text text="Post a Video" color={colors.palette.neutral100} size="lg" weight="bold" />
+          </Pressable>
+          <Text
+            text={`Why not create and share some amazing content with your audience?`}
+            style={{ marginTop: spacing.medium, marginHorizontal: spacing.medium, textAlign: 'center' }}
+            color={colors.palette.neutral600}
+            weight="medium"
+          />
+        </View>
+      )}
     </View>
   )
 }
-
+// https://www.youtube.com/watch?v=7gMtv_Ylc78
 export const VideosFeed: FC<VideosTabProps<"VideosFeed">> = observer(function VideosFeed(_props) {
   const { refreshVideos } = useHooks()
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
@@ -146,15 +170,15 @@ export const VideosFeed: FC<VideosTabProps<"VideosFeed">> = observer(function Vi
         <CustomFlatlist
           customRefresh={fetchVideos}
           showsVerticalScrollIndicator={false}
-          ListHeaderComponent={<View style={$listHeader} />}
+          ListHeaderComponent={!videos[0]?.isEmpty && <View style={$listHeader} />}
           data={videos}
           renderItem={({ item }) => <VideoRowList channelDetails={item} />}
         />
       </Screen>
-      <Pressable style={$uploadContainer} onPress={() => navigation.navigate("UploadVideo")}>
+      {!videos[0]?.isEmpty && <Pressable style={$uploadContainer} onPress={() => navigation.navigate("UploadVideo")}>
         <Icon icon="upload" size={20} />
         <Text text="Post a Video" style={$uploadText} weight="bold" />
-      </Pressable>
+      </Pressable>}
     </>
   )
 })
@@ -193,6 +217,17 @@ const $conditionContainer: ViewStyle = {
   flexDirection: "row",
   justifyContent: "space-between",
   flex: 1,
+}
+
+const $uploadContainerIsUserEmpty: ViewStyle = {
+  backgroundColor: colors.palette.primary300,
+  height: 50,
+  width: 200,
+  borderRadius: 10,
+  flexDirection: "row",
+  alignItems: "center",
+  padding: spacing.medium / 2,
+  justifyContent: "space-around",
 }
 
 const $uploadContainer: ViewStyle = {

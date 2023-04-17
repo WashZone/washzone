@@ -208,8 +208,7 @@ export function useHooks() {
       acttachmentType: "image",
       comment,
       topicId,
-    }
-    )
+    })
   }
 
   const postCommentOnHomePagePost = async (
@@ -462,11 +461,9 @@ export function useHooks() {
       console.log("uploaded Videos", res.getUserChannel)
       const resMyChannel = await getUserVideos(userStore._id)
       console.log("res.resMyChannel", resMyChannel)
-
-      if (resMyChannel?.length > 0) {
+      if (resMyChannel?.length === 0) setVideos([{ isEmpty: true }, ...res.getUserChannel])
+      else {
         setVideos([resMyChannel, ...res.getUserChannel])
-      } else {
-        setVideos(res.getUserChannel)
       }
     } catch (err) {
       console.log(err)
@@ -494,11 +491,14 @@ export function useHooks() {
   }
 
   const getUserVideos = async (userId: string) => {
-    const res = await queryGetUploadedVideoByUserIdPage({
-      userId,
-      callerId: userStore._id,
-      pageNumber: 1,
-    })
+    const res = await queryGetUploadedVideoByUserIdPage(
+      {
+        userId,
+        callerId: userStore._id,
+        pageNumber: 1,
+      },
+      { fetchPolicy: "no-cache" },
+    )
 
     return res.getUploadedVideoByUserIdPage.data
   }
@@ -656,17 +656,20 @@ export function useHooks() {
     thumbnailUrl,
     attachmentVideoUrl,
     vedioPlaylistId,
+    description,
   }: {
     videoHeading: string
     thumbnailUrl: string
     attachmentVideoUrl: string
     vedioPlaylistId?: string
+    description: string
   }) => {
     let body: any = {
       videoHeading,
       thumbnailUrl,
       attachmentVideoUrl,
       userId: userStore._id,
+      description,
     }
     if (vedioPlaylistId) {
       body = { ...body, vedioPlaylistId }
@@ -729,12 +732,14 @@ export function useHooks() {
 
   const rateUser = async (userId: string, rating: number) => {
     try {
-      await mutateCreateUserRating({
+      const res = await mutateCreateUserRating({
         userId,
-        ratinguserId: userStore._id,
+        ratingByUserId: userStore._id,
         ratingStar: rating,
       })
-      return true
+      const newRating = 5
+      console.log("RATING USER :", res.createUserRating?.averageRating)
+      return { success: true, avg: res.createUserRating?.averageRating }
     } catch (err) {
       return false
     }
@@ -742,6 +747,7 @@ export function useHooks() {
 
   const getRatingOnUser = async (userId: string) => {
     const res = await queryGetratingOnUserId({ userId }, { fetchPolicy: "no-cache" })
+    console.log("res.getratingOnUserId?.data[0]", res.getratingOnUserId?.data[0])
     return res.getratingOnUserId?.data?.length > 0 ? res.getratingOnUserId?.data[0].ratingStar : 0
   }
 
