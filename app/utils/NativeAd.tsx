@@ -1,38 +1,49 @@
 /* eslint-disable react/display-name */
-import React, { forwardRef, useState, useEffect } from 'react';
+import React, { forwardRef, useState, useEffect, useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
 import AppLovinMAX from 'react-native-applovin-max/src/index';
 import { colors } from '../theme';
 import { NATIVE_AD_UNIT_ID } from './AppLovin';
 
-export const NativeAdView = forwardRef((props, ref) => {
+export const NativeAdView = () => {
     const [aspectRatio, setAspectRatio] = useState(1.0);
     const [mediaViewSize, setMediaViewSize] = useState({});
+    const [loadFailed, setLoadFailed] = useState(false)
 
+
+    const nativeAdViewRef = useRef<any>()
+
+    // useEffect(() => {
+    //     if (nativeAdViewRef?.current) {
+    //         nativeAdViewRef.current?.loadAd()
+    //     }
+    // }, [nativeAdViewRef.current])
     // adjust the size of MediaView when `aspectRatio` changes
     useEffect(() => {
         if (aspectRatio > 1) {
-            // landscape 
-            // eslint-disable-next-line object-shorthand
+  
             setMediaViewSize({ aspectRatio: aspectRatio, width: '80%', height: undefined });
         } else {
-            // portrait or square
+    
             setMediaViewSize({ aspectRatio, width: undefined, height: 180 });
         }
     }, [aspectRatio]);
 
+    if (loadFailed) return null
+
     return (
         <AppLovinMAX.NativeAdView
+            ref={nativeAdViewRef}
             adUnitId={NATIVE_AD_UNIT_ID}
             placement='myplacement'
             customData='mycustomdata'
-            ref={ref}
             style={styles.nativead}
             onAdLoaded={(adInfo) => {
                 setAspectRatio(adInfo.nativeAd.mediaContentAspectRatio);
                 console.log('AppLovinMAX.NativeAdView: Native ad loaded from ' + adInfo.networkName);
             }}
             onAdLoadFailed={(errorInfo) => {
+                setLoadFailed(true)
                 console.log('AppLovinMAX.NativeAdView: Native ad failed to load with error code ' + errorInfo.code + ' and message: ' + errorInfo.message);
             }}
             onAdClicked={() => {
@@ -57,7 +68,7 @@ export const NativeAdView = forwardRef((props, ref) => {
             </View>
         </AppLovinMAX.NativeAdView>
     );
-});
+};
 
 const styles = StyleSheet.create({
     advertiser: {

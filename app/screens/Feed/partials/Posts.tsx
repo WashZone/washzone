@@ -130,14 +130,6 @@ export const PostComponent = ({ post, navigateOnPress, index }: PostComponentPro
     content: post?.Discription,
   }
 
-
-  const nativeAdViewRef = useRef<any>()
-
-  useEffect(() => {
-    if (nativeAdViewRef?.current) {
-      nativeAdViewRef.current?.loadAd()
-    }
-  }, [nativeAdViewRef.current])
   return (
     <>
       <Pressable onPress={onContainerPress} style={$postContainer}>
@@ -187,7 +179,7 @@ export const PostComponent = ({ post, navigateOnPress, index }: PostComponentPro
       </Pressable>
       {index % 5 === 0 && (
         <>
-          <NativeAdView ref={nativeAdViewRef} />
+          <NativeAdView  />
           {/* <AppLovinMAX.AdView
           adUnitId={MREC_AD_UNIT_ID}
           adFormat={AppLovinMAX.AdFormat.BANNER}

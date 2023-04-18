@@ -737,8 +737,8 @@ export function useHooks() {
         ratingByUserId: userStore._id,
         ratingStar: rating,
       })
-      const newRating = 5
-      console.log("RATING USER :", res.createUserRating?.averageRating)
+      const updatedRes =  getRatingOnUser(userId)
+      console.log("RATING USER :", res)
       return { success: true, avg: res.createUserRating?.averageRating }
     } catch (err) {
       return false

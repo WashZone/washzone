@@ -56,7 +56,7 @@ export const SignupScreen: FC<SignupProps> = observer(function LoginScreen(_prop
       try {
         setLoading(true)
         const res = await mutateCreateUser({
-          type: "User",
+          type: "email",
           isSocialLogin: false,
           lastName: name.split(" ")[1],
           firstName: name.split(" ")[0],
@@ -81,7 +81,7 @@ export const SignupScreen: FC<SignupProps> = observer(function LoginScreen(_prop
         setAuthToken(token.toString())
         setLoading(false)
       } catch (err) {
-        console.log("ERROEW",err)
+        console.log("SIGN UP ERROR",err)
         Toast.show({
           type: "error",
           text1: err?.response?.errors?.length > 0 && err?.response?.errors[0].message,

@@ -21,7 +21,7 @@ export const CommentComponent = ({ comment }: { comment: any }) => {
             uri: comment?.users?.picture,
           }}
         />
-        <View style={{ justifyContent: "space-around", height: 46 }}>
+        <View style={{ justifyContent: "space-around" }}>
           <View style={$nameView}>
             <Text text={formatName(comment?.users?.name)} style={$publisherName} weight="medium" />
             <Text text={fromNow(comment?.createdAt)} style={$fromNow} />
@@ -71,7 +71,7 @@ const $commentText: TextStyle = {
 
 const $publisherName: TextStyle = {
   fontSize: 16,
-  lineHeight: 16,
+  lineHeight: 24,
   marginRight: 10,
 }
 

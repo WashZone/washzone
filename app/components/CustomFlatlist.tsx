@@ -43,7 +43,6 @@ export function CustomFlatlist(props: CustomListProps) {
   const $animatedLoaderParentContainer = useAnimatedStyle(() => {
     return {
       top: 0,
-
       position: "absolute",
       height: refreshing ? 60 : loaderProgress.value * 60,
       width: "100%",

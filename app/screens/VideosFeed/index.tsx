@@ -110,11 +110,11 @@ export const VideoRowList = ({ channelDetails }) => {
             weight="bold"
             style={$titleText}
           />}
-          {channelDetails?.length > 1 && (
+          {channelDetails?.length > 0 && (
             <Text text="View All" weight="medium" style={$textViewAll} />
           )}
         </TouchableOpacity>
-        {channelDetails?.length > 1 && (
+        {channelDetails?.length > 0&& (
           <Icon icon="caretRight" size={20} color={colors.palette.primary200} />
         )}
       </View>
@@ -136,7 +136,7 @@ export const VideoRowList = ({ channelDetails }) => {
             <Text text="Post a Video" color={colors.palette.neutral100} size="lg" weight="bold" />
           </Pressable>
           <Text
-            text={`Why not create and share some amazing content with your audience?`}
+            text={`You have not posted a video.\nShare videos with the WashZone community.`}
             style={{ marginTop: spacing.medium, marginHorizontal: spacing.medium, textAlign: 'center' }}
             color={colors.palette.neutral600}
             weight="medium"

@@ -69,7 +69,7 @@ export const DrawerOptions = observer(function DrawerOptions({
       icon: "support",
       label: "DrawerNavigator.support",
       onPress() {
-        Linking.openURL("mailto:contact@washzone.com?subject=Support")
+        Linking.openURL("mailto:support@washzoneapp.com?subject=Support")
       },
     },
     {
@@ -150,10 +150,7 @@ const UnreadNotificationCountBadge = observer(() => {
   const {
     notificationStore: { getUnreadCount },
   } = useStores()
-  // const [count, setCount] = useState(0)
-  // useEffect(() => {
-  //   setCount(getUnreadCount())
-  // }, [allChatRooms])
+
   return (
     parseInt(getUnreadCount()) > 0 && (
       <View style={$unreadBadge}>

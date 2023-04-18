@@ -222,7 +222,7 @@ export const ClassifiedsDetails: FC<ClassifiedsTabProps<"ClassifiedsDetails">> =
           <FastImage
             source={{ uri: classifiedDetails?.attachmentUrl }}
             style={$posterImage}
-            resizeMode="contain"
+          // resizeMode="contain"
           />
           {/* <Text
             text={classified?.title}

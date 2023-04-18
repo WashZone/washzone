@@ -1,10 +1,8 @@
 import React, { FC, useEffect, useState } from "react"
 import { FlatList, TextInput, TextStyle, View, ViewStyle } from "react-native"
-import { Icon, Screen } from "../../components"
+import { CommentInput, Icon, Screen } from "../../components"
 import { colors, spacing } from "../../theme"
 import { HomeTabProps } from "../../tabs/Home"
-// import { PostComponent } from "../Feed/partials"
-import { MediaPicker } from "../../utils/device/MediaPicker"
 import { useHooks } from "../hooks"
 import { CommentComponent } from "./Comments"
 import { useStores } from "../../models"
@@ -15,16 +13,12 @@ import Loading from "../../components/Loading"
 
 export const TopicInfo: FC<HomeTabProps<"TopicInfo">> = function PostInfo(props) {
   const { topic } = props.route.params
-  const [commentText, setCommentText] = useState<string>("")
   const { postComment, getCommentsOnPost } = useHooks()
   const [comments, setComments] = useState<Array<any>>([])
-  const [isCommenting, setIsCommenting] = useState<boolean>(false)
-  const [selectedMedia, setSelectedMedia] = useState<any>()
   const [topicDetails, setTopicDetails] = useState<any>(topic)
   const [loading, setLoading] = useState<boolean>(typeof topic === "string")
   const {
     userStore: { _id },
-
     api: { mutateGetTopicById },
   } = useStores()
 
@@ -52,19 +46,9 @@ export const TopicInfo: FC<HomeTabProps<"TopicInfo">> = function PostInfo(props)
     setComments(data || [])
   }
 
-  const onComment = async () => {
-    if (commentText?.length === 0) return
-    setIsCommenting(true)
+  const onComment = async (commentText, selectedMedia) => {
     await postComment(commentText, selectedMedia, topicDetails?._id)
     await syncComments(topicDetails?._id)
-    setSelectedMedia(undefined)
-    setCommentText("")
-    setIsCommenting(false)
-  }
-
-  const onAddImage = async () => {
-    const res = await MediaPicker()
-    setSelectedMedia(res)
   }
 
   if (loading) {
@@ -80,43 +64,7 @@ export const TopicInfo: FC<HomeTabProps<"TopicInfo">> = function PostInfo(props)
         ListHeaderComponent={<TopicComponentFullView topic={topicDetails} />}
       />
 
-      {selectedMedia && (
-        <View style={{ position: "absolute", bottom: 54 }}>
-          <FastImage
-            source={{ uri: selectedMedia?.uri }}
-            style={{ height: 100, width: 100, borderRadius: 10 }}
-          />
-          <Icon
-            icon="x"
-            size={20}
-            onPress={() => setSelectedMedia(undefined)}
-            containerStyle={$iconXContainer}
-            disabled={isCommenting}
-          />
-        </View>
-      )}
-      <View style={$postCommentContainer}>
-        <Icon icon="addImage" disabled={isCommenting} size={28} onPress={onAddImage} />
-        <TextInput
-          value={commentText}
-          onChangeText={setCommentText}
-          placeholder="Write a comment!"
-          placeholderTextColor={colors.palette.overlay50}
-          style={$commentInput}
-        />
-        <View style={$rightIconContainer}>
-          {isCommenting ? (
-            <ActivityIndicator animating />
-          ) : (
-            <Icon
-              icon="send"
-              size={28}
-              onPress={onComment}
-              color={commentText.length > 1 ? colors.palette.primary100 : colors.palette.neutral400}
-            />
-          )}
-        </View>
-      </View>
+      <CommentInput createComment={onComment} />
     </Screen>
   )
 }

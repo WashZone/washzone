@@ -48,6 +48,7 @@ export const LoginView = observer(() => {
       })
       setAuthToken(String(Date.now()))
     } catch (error) {
+      console.log("LOGIN ERROR" , error)
       Toast.show({ ...toastMessages.incorrectCredentials })
     }
   }

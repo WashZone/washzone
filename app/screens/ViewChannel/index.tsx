@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from "react"
-import { View, TextStyle, ViewStyle, Pressable, FlatList, Dimensions } from "react-native"
+import { View, TextStyle, ViewStyle, Pressable, FlatList, Dimensions, NativeSyntheticEvent, NativeScrollEvent } from "react-native"
 import { Button, Icon, Screen, Text } from "../../components"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { VideosTabParamList, VideosTabProps } from "../../tabs"
@@ -12,6 +12,7 @@ import { useHooks } from "../hooks"
 import { VideoBlockFullWidth } from "../Playlist"
 import ShimmerPlaceholder from "react-native-shimmer-placeholder"
 import LinearGradient from "react-native-linear-gradient"
+import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanimated"
 
 export const ViewChannel: FC<VideosTabProps<"ViewChannel">> = observer(function ViewChannel(props) {
   const { publisher } = props.route.params
@@ -19,6 +20,7 @@ export const ViewChannel: FC<VideosTabProps<"ViewChannel">> = observer(function 
 
   const [data, setData] = useState<any>([{}, {}, {}])
   const [loading, setLoading] = useState(true)
+  const topOffset = useSharedValue(0)
 
   const { getUserVideos } = useHooks()
 
@@ -34,24 +36,42 @@ export const ViewChannel: FC<VideosTabProps<"ViewChannel">> = observer(function 
     syncPlaylistData()
   }, [])
 
+  const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    topOffset.value = - event.nativeEvent.contentOffset.y
+  }
+
+  const $animatedBg = useAnimatedStyle(() => {
+    return {
+      position: 'absolute',
+      height: topOffset.value + 120,
+      backgroundColor: colors.palette.primary400,
+
+    }
+  })
+
   return (
-    <Screen preset="fixed" contentContainerStyle={$flex1}>
-      <FlatList
-        style={$flex1}
-        ListHeaderComponent={<HeaderComponent publisher={publisher} />}
-        data={data}
-        renderItem={({ item, index }) =>
-          loading ? (
-            <ShimmerPlaceholder
-              LinearGradient={LinearGradient}
-              shimmerStyle={$shimmer}
-            />
-          ) : (
-            <VideoBlockFullWidth index={index} key={index} videoDetails={item} />
-          )
-        }
-      />
-    </Screen>
+    <>
+      <Screen preset="fixed" contentContainerStyle={$flex1}>
+        <Animated.View style={[{ width: Dimensions.get('screen').width }, $animatedBg]} />
+
+        <FlatList
+          onScroll={onScroll}
+          style={$flex1}
+          ListHeaderComponent={<HeaderComponent publisher={publisher} />}
+          data={data}
+          renderItem={({ item, index }) =>
+            loading ? (
+              <ShimmerPlaceholder
+                LinearGradient={LinearGradient}
+                shimmerStyle={$shimmer}
+              />
+            ) : (
+              <VideoBlockFullWidth index={index} key={index} videoDetails={item} />
+            )
+          }
+        />
+      </Screen>
+    </>
   )
 })
 
@@ -66,12 +86,12 @@ const HeaderComponent = ({ publisher }: { publisher: any }) => {
 
 export default ViewChannel
 
-const $shimmer:ViewStyle={
-    marginHorizontal: spacing.medium,
-    marginTop: spacing.medium,
-    height: 100,
-    width: Dimensions.get("window").width,
-  }
+const $shimmer: ViewStyle = {
+  marginHorizontal: spacing.medium,
+  marginTop: spacing.medium,
+  height: 100,
+  width: Dimensions.get("window").width,
+}
 
 const $avatar: ImageStyle = {
   height: 60,
