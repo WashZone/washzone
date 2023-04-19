@@ -184,7 +184,7 @@ const en = {
   },
   addAVideo: {
     iAgree: "I agree to the",
-    tnc:'Terms of Service.'
+    tnc: 'Terms of Service.'
   },
   toastMessages: {
     videoSavedSuccessfully: {

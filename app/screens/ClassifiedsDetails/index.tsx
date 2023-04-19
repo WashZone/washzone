@@ -8,9 +8,8 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
-  Touchable,
 } from "react-native"
-import { Text, IconTypes, Icon, StarRating } from "../../components"
+import { Text, IconTypes, Icon } from "../../components"
 import { ClassifiedsTabProps, HomeTabParamList } from "../../tabs"
 import { colors, spacing } from "../../theme"
 import { observer } from "mobx-react-lite"
@@ -26,6 +25,7 @@ import { SendOfferModal } from "./SendOfferModal"
 import Loading from "../../components/Loading"
 import { Rating } from "react-native-ratings"
 import Toast from "react-native-toast-message"
+import ImageView from "react-native-image-viewing"
 
 interface ActionProps {
   icon: IconTypes
@@ -34,7 +34,7 @@ interface ActionProps {
   tintColor?: string
 }
 
-const PublisherDetails = ({ publisher }: { publisher: any }) => {
+const PublisherDetails = ({ publisher, price }: { publisher: any; price: string }) => {
   const [rateUserModalVisible, setRateUserModalVisible] = useState(false)
   const [avgRating, setAvgRating] = useState(publisher?.averageRating)
   const { rateUser } = useHooks()
@@ -48,23 +48,22 @@ const PublisherDetails = ({ publisher }: { publisher: any }) => {
       Toast.show({ type: "success", text1: `Rated ${rating} starred.` })
       setAvgRating(res.avg)
     }
-
   }
 
   return (
     <>
-      <View
-
-        style={$publisherContainer}
-      >
-        <View style={$flexHori}>
-          <TouchableOpacity onPress={() => navigation.navigate("Profile", { user: publisher })}><FastImage style={$publisherPicture} source={{ uri: publisher?.picture }} />
+      <View style={$publisherContainer}>
+        <View style={[$flexHori, $flex1]}>
+          <TouchableOpacity onPress={() => navigation.navigate("Profile", { user: publisher })}>
+            <FastImage style={$publisherPicture} source={{ uri: publisher?.picture }} />
           </TouchableOpacity>
-          <View style={{ justifyContent: 'space-around', marginVertical: spacing.tiny, alignItems: 'flex-start' }}>
+          <View
+            style={$publisherChildContainer}
+          >
             <Text text={publisher?.name} />
             <TouchableOpacity onPress={() => setRateUserModalVisible(true)}>
               <Rating
-                type='custom'
+                type="custom"
                 imageSize={20}
                 tintColor={colors.palette.neutral100}
                 ratingColor={colors.palette.primary100}
@@ -72,11 +71,18 @@ const PublisherDetails = ({ publisher }: { publisher: any }) => {
                 ratingBackgroundColor={colors.palette.neutral400}
                 // style={{ backgroundColor: colors.palette.primary100 }}
                 startingValue={avgRating}
-                readonly />
+                readonly
+              />
             </TouchableOpacity>
           </View>
-        </View>
 
+          <Text
+            text={"$ " + price}
+            weight="medium"
+            size="md"
+            style={{ marginTop: spacing.extraSmall }}
+          />
+        </View>
       </View>
 
       <RateUserModal
@@ -192,6 +198,7 @@ export const ClassifiedsDetails: FC<ClassifiedsTabProps<"ClassifiedsDetails">> =
     const navigation = useNavigation()
     const [classifiedDetails, setClassifiedDetails] = useState<any>(classified)
     const [loading, setLoading] = useState<boolean>(typeof classified === "string")
+    const [isImageViewVisible, setImageViewVisible] = useState<boolean>(false)
     const {
       api: { mutateGetClassifiedById },
     } = useStores()
@@ -219,26 +226,31 @@ export const ClassifiedsDetails: FC<ClassifiedsTabProps<"ClassifiedsDetails">> =
     return (
       <View style={[$flex1, { backgroundColor: colors.palette.neutral100 }]}>
         <ScrollView style={$flex1}>
-          <FastImage
-            source={{ uri: classifiedDetails?.attachmentUrl }}
-            style={$posterImage}
-          // resizeMode="contain"
+          <TouchableOpacity onPress={() => setImageViewVisible(true)}>
+            <FastImage
+              source={{ uri: classifiedDetails?.attachmentUrl }}
+              style={$posterImage}
+            // resizeMode="contain"
+            />
+          </TouchableOpacity>
+          <PublisherDetails
+            price={classifiedDetails?.prize}
+            publisher={classifiedDetails?.UserId || classifiedDetails?.userId}
           />
-          {/* <Text
-            text={classified?.title}
-            weight="medium"
-            style={{
-              marginHorizontal: spacing.medium,
-              textAlign: 'justify'
-            }}
-          /> */}
-          <PublisherDetails publisher={classifiedDetails?.UserId || classifiedDetails?.userId} />
           <MoreDetails classified={classifiedDetails} />
         </ScrollView>
         <Pressable style={$backContainer} onPress={() => navigation.goBack()}>
           <Icon icon="back" color={colors.palette.primary100} />
         </Pressable>
         <BottomActions classified={classifiedDetails} />
+        <ImageView
+          images={[{ uri: classifiedDetails?.attachmentUrl }]}
+          imageIndex={0}
+          visible={isImageViewVisible}
+          swipeToCloseEnabled
+          animationType='fade'
+          onRequestClose={() => setImageViewVisible(false)}
+        />
       </View>
     )
   },
@@ -303,6 +315,13 @@ const $publisherPicture: ImageStyle = {
   width: 60,
   borderRadius: 30,
   marginRight: spacing.medium,
+}
+
+const $publisherChildContainer: ViewStyle = {
+  justifyContent: "space-around",
+  marginVertical: spacing.tiny,
+  alignItems: "flex-start",
+  flex: 1,
 }
 
 // const $reviewsButtonContainer: ViewStyle = {

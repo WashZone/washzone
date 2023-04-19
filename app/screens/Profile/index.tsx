@@ -5,7 +5,6 @@ import {
   ViewStyle,
   View,
   useWindowDimensions,
-  Pressable,
 } from "react-native"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { CollapsibleHeaderTabView } from "react-native-tab-view-collapsible-header"
@@ -28,9 +27,6 @@ import { useHooks } from "../hooks"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { AppStackParamList } from "../../navigators"
 import { useStores } from "../../models"
-
-const mockDescription =
-  "Nulla cupidatat deserunt amet quis aliquip nostrud do adipisicing. Adipisicing excepteur elit laborum Lorem adipisicing do duis."
 
 export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ route }) {
   const { user, header } = route.params

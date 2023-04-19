@@ -38,6 +38,7 @@ export function useHooks() {
     },
     api: {
       mutateAddNotificationToken,
+      queryGetAllPlaylistVideo,
       queryGetAllTopicByPageNumberInteraction,
       mutateCommentOnTopic,
       queryGetCommentsByTopicId,
@@ -452,19 +453,29 @@ export function useHooks() {
     return res.getClassifiedById?.data[0]
   }
 
+  // const refreshVideos = async () => {
+  //   try {
+  //     const res = await queryGetUserChannel(
+  //       { pageNumber: 1, userId: userStore._id },
+  //       { fetchPolicy: "no-cache" },
+  //     )
+  //     console.log("uploaded Videos", res.getUserChannel)
+  //     const resMyChannel = await getUserVideos(userStore._id)
+  //     console.log("res.resMyChannel", resMyChannel)
+  //     if (resMyChannel?.length === 0) setVideos([{ isEmpty: true }, ...res.getUserChannel])
+  //     else {
+  //       setVideos([resMyChannel, ...res.getUserChannel])
+  //     }
+  //   } catch (err) {
+  //     console.log(err)
+  //   }
+  // }
+
   const refreshVideos = async () => {
     try {
-      const res = await queryGetUserChannel(
-        { pageNumber: 1, userId: userStore._id },
-        { fetchPolicy: "no-cache" },
-      )
-      console.log("uploaded Videos", res.getUserChannel)
-      const resMyChannel = await getUserVideos(userStore._id)
-      console.log("res.resMyChannel", resMyChannel)
-      if (resMyChannel?.length === 0) setVideos([{ isEmpty: true }, ...res.getUserChannel])
-      else {
-        setVideos([resMyChannel, ...res.getUserChannel])
-      }
+      const res = await getVideosCategorically()
+      setVideos(res)
+
     } catch (err) {
       console.log(err)
     }
@@ -737,7 +748,7 @@ export function useHooks() {
         ratingByUserId: userStore._id,
         ratingStar: rating,
       })
-      const updatedRes =  getRatingOnUser(userId)
+      const updatedRes = getRatingOnUser(userId)
       console.log("RATING USER :", res)
       return { success: true, avg: res.createUserRating?.averageRating }
     } catch (err) {
@@ -1146,8 +1157,15 @@ export function useHooks() {
     }
   }
 
+  const getVideosCategorically = async () => {
+    const res = await queryGetAllPlaylistVideo()
+    console.log(res)
+    return res.getAllPlaylistVideo
+  }
+
   return {
     fetchNotifications,
+    getVideosCategorically,
     getRoomById,
     sendSilentAlert,
     getMoreChatMessages,

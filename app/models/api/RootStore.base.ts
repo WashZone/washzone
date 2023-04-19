@@ -616,8 +616,8 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     mutateUpdateLegalInfo(variables: { legalitiesdata: InputInfo }, optimisticUpdate?: () => void) {
       return self.mutate<{ updateLegalInfo: any }>(`mutation updateLegalInfo($legalitiesdata: InputInfo!) { updateLegalInfo(Legalitiesdata: $legalitiesdata) }`, variables, optimisticUpdate)
     },
-    mutateCreateUserTopic(variables: { title?: (string | null), attachmentUrl?: (string | null), attachmentType?: (string | null), topicContent: string, commentId?: (string | null), userId: string }, resultSelector: string | ((qb: TopicDetailModelSelector) => TopicDetailModelSelector) = topicDetailModelPrimitives.toString(), optimisticUpdate?: () => void) {
-      return self.mutate<{ createUserTopic: TopicDetailModelType}>(`mutation createUserTopic($title: String, $attachmentUrl: String, $attachmentType: String, $topicContent: String!, $commentId: String, $userId: String!) { createUserTopic(title: $title, attachmentUrl: $attachmentUrl, attachmentType: $attachmentType, topicContent: $topicContent, commentId: $commentId, userId: $userId) {
+    mutateCreateUserTopic(variables: { title: string, attachmentUrl?: (string | null), attachmentType?: (string | null), topicContent: string, commentId?: (string | null), userId: string }, resultSelector: string | ((qb: TopicDetailModelSelector) => TopicDetailModelSelector) = topicDetailModelPrimitives.toString(), optimisticUpdate?: () => void) {
+      return self.mutate<{ createUserTopic: TopicDetailModelType}>(`mutation createUserTopic($title: String!, $attachmentUrl: String, $attachmentType: String, $topicContent: String!, $commentId: String, $userId: String!) { createUserTopic(title: $title, attachmentUrl: $attachmentUrl, attachmentType: $attachmentType, topicContent: $topicContent, commentId: $commentId, userId: $userId) {
         ${typeof resultSelector === "function" ? resultSelector(new TopicDetailModelSelector()).toString() : resultSelector}
       } }`, variables, optimisticUpdate)
     },
@@ -692,8 +692,8 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
         ${typeof resultSelector === "function" ? resultSelector(new VideoUploadModelSelector()).toString() : resultSelector}
       } }`, variables, optimisticUpdate)
     },
-    mutateCreateClassifiedDetail(variables: { condition: string, title?: (string | null), prize?: (string | null), attachmentUrl?: (string | null), attachmentType?: (string | null), classifiedDetail?: (string | null), reviewDetailId?: (string | null), userId: string }, resultSelector: string | ((qb: ClassifiedFeedModelSelector) => ClassifiedFeedModelSelector) = classifiedFeedModelPrimitives.toString(), optimisticUpdate?: () => void) {
-      return self.mutate<{ createClassifiedDetail: ClassifiedFeedModelType}>(`mutation createClassifiedDetail($condition: String!, $title: String, $prize: String, $attachmentUrl: String, $attachmentType: String, $classifiedDetail: String, $reviewDetailId: String, $userId: String!) { createClassifiedDetail(condition: $condition, title: $title, prize: $prize, attachmentUrl: $attachmentUrl, attachmentType: $attachmentType, classifiedDetail: $classifiedDetail, reviewDetailId: $reviewDetailId, userId: $userId) {
+    mutateCreateClassifiedDetail(variables: { condition: string, title: string, prize?: (string | null), attachmentUrl: string, attachmentType?: (string | null), classifiedDetail: string, reviewDetailId?: (string | null), userId: string }, resultSelector: string | ((qb: ClassifiedFeedModelSelector) => ClassifiedFeedModelSelector) = classifiedFeedModelPrimitives.toString(), optimisticUpdate?: () => void) {
+      return self.mutate<{ createClassifiedDetail: ClassifiedFeedModelType}>(`mutation createClassifiedDetail($condition: String!, $title: String!, $prize: String, $attachmentUrl: String!, $attachmentType: String, $classifiedDetail: String!, $reviewDetailId: String, $userId: String!) { createClassifiedDetail(condition: $condition, title: $title, prize: $prize, attachmentUrl: $attachmentUrl, attachmentType: $attachmentType, classifiedDetail: $classifiedDetail, reviewDetailId: $reviewDetailId, userId: $userId) {
         ${typeof resultSelector === "function" ? resultSelector(new ClassifiedFeedModelSelector()).toString() : resultSelector}
       } }`, variables, optimisticUpdate)
     },
@@ -725,8 +725,8 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     mutateDeleteClassfied(variables: { classifiedFeedId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ deleteClassfied: boolean }>(`mutation deleteClassfied($classifiedFeedId: String!) { deleteClassfied(ClassifiedFeedId: $classifiedFeedId) }`, variables, optimisticUpdate)
     },
-    mutateCreateUserHomePages(variables: { discription?: (string | null), attachmentUrl?: (string | null), attachmentType?: (string | null), commentId?: (string | null), userId: string }, resultSelector: string | ((qb: HomePageDetailModelSelector) => HomePageDetailModelSelector) = homePageDetailModelPrimitives.toString(), optimisticUpdate?: () => void) {
-      return self.mutate<{ createUserHomePages: HomePageDetailModelType}>(`mutation createUserHomePages($discription: String, $attachmentUrl: String, $attachmentType: String, $commentId: String, $userId: String!) { createUserHomePages(Discription: $discription, attachmentUrl: $attachmentUrl, attachmentType: $attachmentType, commentId: $commentId, userId: $userId) {
+    mutateCreateUserHomePages(variables: { discription: string, attachmentUrl?: (string | null), attachmentType?: (string | null), commentId?: (string | null), userId: string }, resultSelector: string | ((qb: HomePageDetailModelSelector) => HomePageDetailModelSelector) = homePageDetailModelPrimitives.toString(), optimisticUpdate?: () => void) {
+      return self.mutate<{ createUserHomePages: HomePageDetailModelType}>(`mutation createUserHomePages($discription: String!, $attachmentUrl: String, $attachmentType: String, $commentId: String, $userId: String!) { createUserHomePages(Discription: $discription, attachmentUrl: $attachmentUrl, attachmentType: $attachmentType, commentId: $commentId, userId: $userId) {
         ${typeof resultSelector === "function" ? resultSelector(new HomePageDetailModelSelector()).toString() : resultSelector}
       } }`, variables, optimisticUpdate)
     },
@@ -769,8 +769,8 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     mutateLikeDislikeVideo(variables: { status: string, videoId: string, userId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ likeDislikeVideo: any }>(`mutation likeDislikeVideo($status: String!, $videoId: String!, $userId: String!) { likeDislikeVideo(status: $status, videoId: $videoId, userId: $userId) }`, variables, optimisticUpdate)
     },
-    mutateUploadVideoPlaylist(variables: { playListName: string, videoUpload: InputVideoUploadPlaylist[], userId: string }, resultSelector: string | ((qb: VideoPlaylistModelSelector) => VideoPlaylistModelSelector) = videoPlaylistModelPrimitives.toString(), optimisticUpdate?: () => void) {
-      return self.mutate<{ uploadVideoPlaylist: VideoPlaylistModelType}>(`mutation uploadVideoPlaylist($playListName: String!, $videoUpload: [InputVideoUploadPlaylist!]!, $userId: String!) { uploadVideoPlaylist(playListName: $playListName, VideoUpload: $videoUpload, userId: $userId) {
+    mutateUploadVideoPlaylist(variables: { playListbanner?: (string | null), playListthumbnail?: (string | null), playListName: string, videoUpload: InputVideoUploadPlaylist[], userId: string }, resultSelector: string | ((qb: VideoPlaylistModelSelector) => VideoPlaylistModelSelector) = videoPlaylistModelPrimitives.toString(), optimisticUpdate?: () => void) {
+      return self.mutate<{ uploadVideoPlaylist: VideoPlaylistModelType}>(`mutation uploadVideoPlaylist($playListbanner: String, $playListthumbnail: String, $playListName: String!, $videoUpload: [InputVideoUploadPlaylist!]!, $userId: String!) { uploadVideoPlaylist(playListbanner: $playListbanner, playListthumbnail: $playListthumbnail, playListName: $playListName, VideoUpload: $videoUpload, userId: $userId) {
         ${typeof resultSelector === "function" ? resultSelector(new VideoPlaylistModelSelector()).toString() : resultSelector}
       } }`, variables, optimisticUpdate)
     },

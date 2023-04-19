@@ -52,7 +52,7 @@ export const ClassifiedComponent = observer(({
       </ShimmerPlaceholder>
       <Text
         style={$postContent}
-        text={"$" + classified.prize + "  •  " + classified.title}
+        text={"$" + classified?.prize + "  •  " + classified?.title}
         numberOfLines={1}
         weight="semiBold"
       />

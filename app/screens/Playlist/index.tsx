@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useState } from "react"
-import { View, TextStyle, ViewStyle, Pressable, FlatList } from "react-native"
-import { Button, Icon, Screen, Text } from "../../components"
+import { View, TextStyle, ViewStyle, Pressable, FlatList, NativeSyntheticEvent, NativeScrollEvent, Dimensions } from "react-native"
+import { Screen, Text } from "../../components"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { VideosTabParamList, VideosTabProps } from "../../tabs"
 import { colors, spacing } from "../../theme"
@@ -12,9 +12,10 @@ import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { $flex1 } from "../styles"
 import { useHooks } from "../hooks"
 import Loading from "../../components/Loading"
+import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanimated"
 
 export const VideoBlockFullWidth = ({ videoDetails, index }) => {
-  const navigation = useNavigation<NavigationProp<VideosTabParamList>>()
+   
 
   return (
     <Pressable
@@ -90,6 +91,7 @@ export const Playlist: FC<VideosTabProps<"Playlist">> = observer(function Playli
   const [playlistData, setPlaylistData] = useState<any>()
   const [loading, setLoading] = useState(true)
   const { getPlaylist } = useHooks()
+  const topOffset = useSharedValue(0)
 
   const syncPlaylistData = async () => {
     const res = await getPlaylist(playlistId)
@@ -101,14 +103,28 @@ export const Playlist: FC<VideosTabProps<"Playlist">> = observer(function Playli
     syncPlaylistData()
   }, [])
 
+  const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    topOffset.value = - event.nativeEvent.contentOffset.y
+  }
+
+  const $animatedBg = useAnimatedStyle(() => {
+    return {
+      position: 'absolute',
+      height: topOffset.value + 120,
+      backgroundColor: colors.palette.primary400,
+
+    }
+  })
+
   if (loading) return <Loading />
 
   return (
     <Screen preset="fixed" contentContainerStyle={$flex1}>
-      <HeaderComponent playlistData={playlistData} />
+      <Animated.View style={[{ width: Dimensions.get('screen').width }, $animatedBg]} />
       <FlatList
+        onScroll={onScroll}
         style={$flex1}
-        // ListHeaderComponent={<PlaylistDescription />}
+        ListHeaderComponent={<HeaderComponent playlistData={playlistData} />}
         data={playlistData?.VideoDetail}
         renderItem={({ item, index }) => (
           <VideoBlockFullWidth key={index} index={index} videoDetails={item} />

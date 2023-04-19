@@ -26,6 +26,8 @@ export const VideoPlaylistModelBase = ModelBase
     userId: types.union(types.undefined, types.null, types.late((): any => UserModel)),
     VideoUpload: types.union(types.undefined, types.null, types.array(types.late((): any => VideoUploadPlaylistModel))),
     playListName: types.union(types.undefined, types.null, types.string),
+    playListthumbnail: types.union(types.undefined, types.null, types.string),
+    playListbanner: types.union(types.undefined, types.null, types.string),
   })
   .views(self => ({
     get store() {
@@ -38,6 +40,8 @@ export class VideoPlaylistModelSelector extends QueryBuilder {
   get createdAt() { return this.__attr(`createdAt`) }
   get updatedAt() { return this.__attr(`updatedAt`) }
   get playListName() { return this.__attr(`playListName`) }
+  get playListthumbnail() { return this.__attr(`playListthumbnail`) }
+  get playListbanner() { return this.__attr(`playListbanner`) }
   userId(builder: string | UserModelSelector | ((selector: UserModelSelector) => UserModelSelector) | undefined) { return this.__child(`userId`, UserModelSelector, builder) }
   VideoUpload(builder: string | VideoUploadPlaylistModelSelector | ((selector: VideoUploadPlaylistModelSelector) => VideoUploadPlaylistModelSelector) | undefined) { return this.__child(`VideoUpload`, VideoUploadPlaylistModelSelector, builder) }
 }
@@ -45,4 +49,4 @@ export function selectFromVideoPlaylist() {
   return new VideoPlaylistModelSelector()
 }
 
-export const videoPlaylistModelPrimitives = selectFromVideoPlaylist()._id.createdAt.updatedAt.playListName
+export const videoPlaylistModelPrimitives = selectFromVideoPlaylist()._id.createdAt.updatedAt.playListName.playListthumbnail.playListbanner

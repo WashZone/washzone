@@ -14,7 +14,6 @@ import { AppStackParamList } from "../../navigators"
 import ShimmerPlaceholder from "react-native-shimmer-placeholder"
 import LinearGradient from "react-native-linear-gradient"
 import { BROKEN_IMAGE } from "../../utils"
-import { $contentCenter } from "../styles"
 
 export const VideoBlock = ({
   videoDetails,
@@ -28,11 +27,12 @@ export const VideoBlock = ({
 
   const handleOnPress = () => {
     if (!disabled) {
-      if (videoDetails?.vedioPlaylistId && videoDetails?.vedioPlaylistId !== "") {
-        navigation.navigate("Playlist", { playlistId: videoDetails?.vedioPlaylistId })
-      } else {
-        navigation.navigate("VideoDetails", { data: videoDetails })
-      }
+      navigation.navigate("VideoDetails", { data: videoDetails })
+      // if (videoDetails?.vedioPlaylistId && videoDetails?.vedioPlaylistId !== "") {
+      //   navigation.navigate("Playlist", { playlistId: videoDetails?._id })
+      // } else {
+      //   navigation.navigate("VideoDetails", { data: videoDetails })
+      // }
     }
   }
 
@@ -62,12 +62,12 @@ export const VideoBlock = ({
             style={$videoTitle}
             weight="bold"
           />
-          <Text
-            text={videoDetails.UserId?.name}
+          {/* <Text
+            text={'videoDetails.UserId?.name'}
             numberOfLines={1}
             style={$publisherName}
             weight="medium"
-          />
+          /> */}
           <Text
             text={
               (videoDetails?.view || 0) +
@@ -90,43 +90,37 @@ export const VideoRowList = ({ channelDetails }) => {
   const {
     userStore: { _id },
   } = useStores()
+  if (channelDetails?.VideoDetail?.length === 0) return null
   return (
     <View style={$videoRowContainer}>
       <View style={$containerCondition}>
         <TouchableOpacity
           style={$conditionContainer}
           onPress={() =>
-            navigation.navigate("ViewChannel", { publisher: channelDetails[0]?.userId })
+            navigation.navigate("Playlist", { playlistId:channelDetails?._id  })
           }
         >
-          {!channelDetails?.isEmpty && <Text
-            text={
-              channelDetails?.isEmpty
-                ? "Your Channel"
-                : channelDetails[0]?.userId?._id === _id
-                  ? "Your Channel"
-                  : channelDetails[0]?.userId?.first_name + `'s` + ` Channel`
-            }
+          <Text
+            text={channelDetails?.playListName}
             weight="bold"
             style={$titleText}
-          />}
+          />
           {channelDetails?.length > 0 && (
             <Text text="View All" weight="medium" style={$textViewAll} />
           )}
         </TouchableOpacity>
-        {channelDetails?.length > 0&& (
+        {channelDetails?.length > 0 && (
           <Icon icon="caretRight" size={20} color={colors.palette.primary200} />
         )}
       </View>
-      {channelDetails?.length > 0 ? (
-        <FlatList
-          ListHeaderComponent={<View style={{ paddingLeft: spacing.medium }} />}
-          showsHorizontalScrollIndicator={false}
-          horizontal
-          data={channelDetails}
-          renderItem={({ item }) => <VideoBlock videoDetails={item} />}
-        />
-      ) : (
+      <FlatList
+        ListHeaderComponent={<View style={{ paddingLeft: spacing.medium }} />}
+        showsHorizontalScrollIndicator={false}
+        horizontal
+        data={channelDetails?.VideoDetail}
+        renderItem={({ item }) => <VideoBlock videoDetails={item} />}
+      />
+      {/* ) : (
         <View style={$contentCenter}>
           <Pressable
             style={$uploadContainerIsUserEmpty}
@@ -142,7 +136,7 @@ export const VideoRowList = ({ channelDetails }) => {
             weight="medium"
           />
         </View>
-      )}
+      )} */}
     </View>
   )
 }
@@ -170,7 +164,7 @@ export const VideosFeed: FC<VideosTabProps<"VideosFeed">> = observer(function Vi
         <CustomFlatlist
           customRefresh={fetchVideos}
           showsVerticalScrollIndicator={false}
-          ListHeaderComponent={!videos[0]?.isEmpty && <View style={$listHeader} />}
+          // ListHeaderComponent={!videos[0]?.isEmpty && <View style={$listHeader} />}
           data={videos}
           renderItem={({ item }) => <VideoRowList channelDetails={item} />}
         />
