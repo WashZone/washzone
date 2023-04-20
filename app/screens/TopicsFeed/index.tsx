@@ -176,7 +176,7 @@ export const TopicComponentFullView = ({ topic }) => {
   const [loaded, setLoaded] = useState(false)
   const windowWidth = Dimensions.get("window").width
 
-  const [attachmentDimensions, setAttachmentDimensions] = useState({ dth: windowWidth, height: windowWidth * 9 / 16 })
+  const [attachmentDimensions, setAttachmentDimensions] = useState({ width: windowWidth, height: windowWidth * 9 / 16 })
   const navigation = useNavigation<NavigationProp<TopicsTabParamList>>()
   const topicDetails = {
     picture: topic?.userId?.picture,
@@ -197,9 +197,8 @@ export const TopicComponentFullView = ({ topic }) => {
 
   return (
     <>
-      <Pressable
+      <View
         style={[$postContainer, $postParentContainer]}
-        onPress={() => navigation.navigate("TopicInfo", { topic })}
       >
         <View style={$flex1}>
           <View style={$publisherInfoContainer}>
@@ -252,8 +251,8 @@ export const TopicComponentFullView = ({ topic }) => {
           </View>
         )}
         <Actions item={topic} />
-      </Pressable>
-      <NativeAdView ref={nativeAdViewRef} />
+      </View>
+      <NativeAdView />
     </>
   )
 }

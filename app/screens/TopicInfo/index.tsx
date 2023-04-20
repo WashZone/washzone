@@ -6,9 +6,9 @@ import { HomeTabProps } from "../../tabs/Home"
 import { useHooks } from "../hooks"
 import { CommentComponent } from "./Comments"
 import { useStores } from "../../models"
-import { ActivityIndicator } from "react-native-paper"
+
 import { TopicComponentFullView } from "../TopicsFeed"
-import FastImage from "react-native-fast-image"
+
 import Loading from "../../components/Loading"
 
 export const TopicInfo: FC<HomeTabProps<"TopicInfo">> = function PostInfo(props) {

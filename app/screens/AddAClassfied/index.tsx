@@ -125,6 +125,7 @@ export const AddAClassified: FC<AppStackScreenProps<"AddAClassified">> = functio
       setButtonLoading(true)
       await createClassified({
         attachmentUrl: selectedMedia.uri,
+        type: selectedMedia.type,
         title,
         prize: price,
         classifiedDetail: description,

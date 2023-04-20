@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from "react"
-import { View, TextStyle, ViewStyle, Pressable, FlatList, NativeSyntheticEvent, NativeScrollEvent, Dimensions } from "react-native"
+import { View, TextStyle, ViewStyle, Pressable, FlatList, NativeSyntheticEvent, NativeScrollEvent, Dimensions, ImageBackground } from "react-native"
 import { Screen, Text } from "../../components"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { VideosTabParamList, VideosTabProps } from "../../tabs"
@@ -14,12 +14,12 @@ import { useHooks } from "../hooks"
 import Loading from "../../components/Loading"
 import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanimated"
 
-export const VideoBlockFullWidth = ({ videoDetails, index }) => {
-   
+export const VideoBlockFullWidth = ({ videoDetails }) => {
 
+  const navigation = useNavigation<NavigationProp<VideosTabParamList>>()
   return (
     <Pressable
-      onPress={() => navigation.navigate("VideoDetails", { data: videoDetails?._id.toString() })}
+      onPress={() => navigation.navigate("VideoDetails", { data: videoDetails?._id })}
       style={$backWhite}
     >
       <View style={$videoBlockContainer}>
@@ -54,35 +54,19 @@ export const VideoBlockFullWidth = ({ videoDetails, index }) => {
   )
 }
 
-const PlaylistDescription = () => {
-  return (
-    <View style={$playlistDescriptionContainer}>
-      {/* <Button
-        style={$followButton}
-        LeftAccessory={() => <Icon icon="add_vector" size={20} color={colors.palette.neutral100} />}
-        text="Follow"
-        textStyle={$followText}
-      /> */}
-    </View>
-  )
-}
+
 
 const HeaderComponent = ({ playlistData }: { playlistData: any }) => {
   return (
-    <View style={$screenHeaderContainer}>
+    <ImageBackground source={{ uri: playlistData?.playListbanner }} blurRadius={10} resizeMode='cover' style={$screenHeaderContainer}>
+      <FastImage style={$avatar} source={{ uri: playlistData?.playListthumbnail }} />
       <Text
         text={playlistData?.playListName?.toUpperCase()}
         preset="heading"
         style={$heading}
         weight="bold"
       />
-      <FastImage style={$avatar} source={{ uri: playlistData?.userId?.picture }} />
-      <Text
-        text={formatName(playlistData?.userId?.name)}
-        style={$publisherName}
-        weight="semiBold"
-      />
-    </View>
+    </ImageBackground>
   )
 }
 
@@ -95,6 +79,7 @@ export const Playlist: FC<VideosTabProps<"Playlist">> = observer(function Playli
 
   const syncPlaylistData = async () => {
     const res = await getPlaylist(playlistId)
+    console.log("PLAYLISYT DATA", res)
     setPlaylistData(res)
     setLoading(false)
   }
@@ -120,14 +105,16 @@ export const Playlist: FC<VideosTabProps<"Playlist">> = observer(function Playli
 
   return (
     <Screen preset="fixed" contentContainerStyle={$flex1}>
-      <Animated.View style={[{ width: Dimensions.get('screen').width }, $animatedBg]} />
+      <Animated.View style={[{ width: Dimensions.get('screen').width }, $animatedBg]} >
+
+      </Animated.View>
       <FlatList
         onScroll={onScroll}
         style={$flex1}
         ListHeaderComponent={<HeaderComponent playlistData={playlistData} />}
         data={playlistData?.VideoDetail}
         renderItem={({ item, index }) => (
-          <VideoBlockFullWidth key={index} index={index} videoDetails={item} />
+          <VideoBlockFullWidth key={index} videoDetails={item} />
         )}
       />
     </Screen>
@@ -138,30 +125,8 @@ export default Playlist
 
 const $backWhite: ViewStyle = { backgroundColor: colors.palette.neutral100 }
 
-const $followButton: ViewStyle = {
-  width: 120,
-  height: 40,
-  backgroundColor: colors.palette.primary300,
-  borderRadius: 20,
-  marginLeft: spacing.medium,
-  justifyContent: "space-around",
-  paddingHorizontal: spacing.large,
-  borderWidth: 0,
-}
 
-const $descriptionText: TextStyle = {
-  flex: 1,
-  textAlign: "justify",
-  fontSize: 14,
-  lineHeight: 20,
-}
 
-const $playlistDescriptionContainer: ViewStyle = {
-  flexDirection: "row",
-  padding: spacing.medium,
-  alignItems: "center",
-  ...$backWhite,
-}
 
 const $avatar: ImageStyle = {
   height: 60,
@@ -174,7 +139,7 @@ const $avatar: ImageStyle = {
 const $heading: TextStyle = {
   color: colors.palette.neutral100,
   alignSelf: "center",
-  marginTop: 30,
+  marginTop: 10,
   fontSize: 32,
   letterSpacing: -0.5,
 }
@@ -182,6 +147,7 @@ const $heading: TextStyle = {
 const $screenHeaderContainer: ViewStyle = {
   height: 200,
   backgroundColor: colors.palette.primary400,
+  justifyContent: 'center'
 }
 
 const $videoDetailsContent: ViewStyle = {
@@ -199,12 +165,6 @@ const $seperator: ViewStyle = {
   marginHorizontal: spacing.medium,
   marginTop: spacing.medium,
   height: 1,
-}
-
-const $followText: TextStyle = {
-  fontSize: 13,
-  color: colors.palette.neutral100,
-  lineHeight: 20,
 }
 
 const videoPosterWidth = 150

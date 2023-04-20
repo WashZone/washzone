@@ -14,7 +14,7 @@ import { VideoBlockFullWidth } from "../Playlist"
 import ImageView from "react-native-image-viewing"
 
 const GalleryItem = ({ uri, onPress }) => {
-  console.log("URI:AutoImage", uri)
+
   return (
     <TouchableOpacity onPress={onPress}>
       <AutoImage

@@ -24,10 +24,10 @@ export const VideoBlock = ({
 }) => {
   const [loaded, setLoaded] = useState(false)
   const navigation = useNavigation<NavigationProp<VideosTabParamList>>()
-
+console.log("videoDetailsvideoDetails", videoDetails)
   const handleOnPress = () => {
     if (!disabled) {
-      navigation.navigate("VideoDetails", { data: videoDetails })
+      navigation.navigate("VideoDetails", { data: videoDetails?._id })
       // if (videoDetails?.vedioPlaylistId && videoDetails?.vedioPlaylistId !== "") {
       //   navigation.navigate("Playlist", { playlistId: videoDetails?._id })
       // } else {
@@ -105,11 +105,11 @@ export const VideoRowList = ({ channelDetails }) => {
             weight="bold"
             style={$titleText}
           />
-          {channelDetails?.length > 0 && (
+          {channelDetails?.VideoDetail?.length > 0 && (
             <Text text="View All" weight="medium" style={$textViewAll} />
           )}
         </TouchableOpacity>
-        {channelDetails?.length > 0 && (
+        {channelDetails?.VideoDetail?.length > 0 && (
           <Icon icon="caretRight" size={20} color={colors.palette.primary200} />
         )}
       </View>
@@ -169,10 +169,10 @@ export const VideosFeed: FC<VideosTabProps<"VideosFeed">> = observer(function Vi
           renderItem={({ item }) => <VideoRowList channelDetails={item} />}
         />
       </Screen>
-      {!videos[0]?.isEmpty && <Pressable style={$uploadContainer} onPress={() => navigation.navigate("UploadVideo")}>
+      {/* {!videos[0]?.isEmpty && <Pressable style={$uploadContainer} onPress={() => navigation.navigate("UploadVideo")}>
         <Icon icon="upload" size={20} />
         <Text text="Post a Video" style={$uploadText} weight="bold" />
-      </Pressable>}
+      </Pressable>} */}
     </>
   )
 })

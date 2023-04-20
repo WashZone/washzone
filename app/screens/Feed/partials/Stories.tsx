@@ -68,6 +68,7 @@ export const Stories = observer(() => {
       setTimeout(() => {
         navigationTopic.navigate("TopicInfo", {
           topic: linkUrl?.split("/")[linkUrl?.split("/")?.length - 1],
+
         })
       }, 200)
     }

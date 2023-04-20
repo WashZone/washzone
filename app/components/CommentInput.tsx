@@ -120,7 +120,7 @@ const $rightIconContainer: ViewStyle = {
 }
 
 const $inputWrapper: ViewStyle = {
-    width: Dimensions.get("window").width - 100,
+    width: Dimensions.get("window").width - 105,
     paddingTop: spacing.tiny,
     backgroundColor: colors.background,
     marginHorizontal: 10,
@@ -130,12 +130,14 @@ const $inputWrapper: ViewStyle = {
 
 const $commentInput: TextStyle = {
     flex: 1,
-
     backgroundColor: colors.background,
     borderRadius: 24,
     paddingHorizontal: 10,
-    textAlignVertical: "center",
+    // textAlignVertical: "center",
     paddingVertical: spacing.extraSmall,
+    // back:'red',
+    textAlignVertical:'top',
+     color:colors.palette.neutral800
 }
 
 const $postCommentContainer: ViewStyle = {

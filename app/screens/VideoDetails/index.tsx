@@ -196,7 +196,7 @@ export const VideoDetails: FC<VideosTabProps<"VideoDetails">> = observer(functio
     userStore: { _id },
     api: { mutateGetVideoByVideoId },
   } = useStores()
-  console.log(data)
+  console.log("VIDEO VIDEO", data)
 
   const handleDataType = async () => {
     if (typeof data === "string") {

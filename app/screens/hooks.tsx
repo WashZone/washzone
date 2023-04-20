@@ -79,6 +79,7 @@ export function useHooks() {
       mutateGetUserById,
       mutateGetroomBymembers,
       mutateCreateChatRoom,
+      queryCheckUserRating,
       mutateCreateUserHomePages,
       mutateLikeDislikehome,
       queryGetAllHomePagesByPageNumber,
@@ -689,12 +690,13 @@ export function useHooks() {
     setTimeout(async () => await loadStories(), 1000)
   }
 
-  const createClassified = async ({ attachmentUrl, title, prize, classifiedDetail, condition }) => {
-    const imageUrl = await uploadToS3({ uri: attachmentUrl, name: title, type: "image" })
+  const createClassified = async ({ attachmentUrl, type, title, prize, classifiedDetail, condition }) => {
+
+    const imageUrl = await uploadToS3({ uri: attachmentUrl, name: title, type })
 
     await mutateCreateClassifiedDetail({
       attachmentUrl: imageUrl,
-      attachmentType: "image",
+      attachmentType: type,
       title,
       prize,
       classifiedDetail,
@@ -748,8 +750,11 @@ export function useHooks() {
         ratingByUserId: userStore._id,
         ratingStar: rating,
       })
-      const updatedRes = getRatingOnUser(userId)
-      console.log("RATING USER :", res)
+      const updatedRes = await queryCheckUserRating({
+        ratingByUserId: userStore._id,
+        userId,
+      },{fetchPolicy:'no-cache'})
+      console.log("RATING USER :", updatedRes?.averageRating)
       return { success: true, avg: res.createUserRating?.averageRating }
     } catch (err) {
       return false
@@ -1063,7 +1068,7 @@ export function useHooks() {
   }
 
   const uploadToS3 = async ({ uri, name, type }) => {
-    const file = {
+    let file = {
       // `uri` can also be a file system path (i.e. file://)
       uri,
       name,
@@ -1079,6 +1084,7 @@ export function useHooks() {
       successActionStatus: 201,
     }
     console.log("FILE", file)
+    file = { ...file, name: file.name + Date.now().toString() }
     try {
       console.log("UPLOADING")
       const response = await RNS3.put(file, options).progress((e) => console.log("PRGORESS", e))

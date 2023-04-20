@@ -45,7 +45,7 @@ export const CreatePost = observer(function CreatePost() {
     } finally {
       setIsPosting(false)
       progress.value = withTiming(0, { duration: 400 })
-      setSelectedImage({ height: 1, windth: 1 })
+      setSelectedImage({ height: 1, width: 1 })
       inputRef.current.clear()
       inputRef.current.blur()
     }
