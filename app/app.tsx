@@ -16,19 +16,18 @@ import React, { useEffect } from "react"
 import { initialWindowMetrics, SafeAreaProvider } from "react-native-safe-area-context"
 import * as Linking from "expo-linking"
 import { useInitialRootStore, useStores } from "./models"
-import { AppNavigator, AppStackParamList, navigationRef, useNavigationPersistence } from "./navigators"
+import { AppNavigator, useNavigationPersistence } from "./navigators"
 import { ErrorBoundary } from "./screens/ErrorScreen/ErrorBoundary"
 import * as storage from "./utils/storage"
 import { customFontsToLoad } from "./theme"
 import { setupReactotron } from "./services/reactotron"
 import Config from "./config"
 import { Platform } from "react-native"
-import AppLovinMAX from "react-native-applovin-max/src/index"
-import { CallTypes, useHooks } from "./screens/hooks"
+import AppLovinMAX from "react-native-applovin-max"
+import { useHooks } from "./screens/hooks"
 import Toast from "react-native-toast-message"
 import { notificationHandler } from "./utils"
 import RNCallKeep from "react-native-callkeep"
-
 
 const options = {
   ios: {
@@ -77,7 +76,6 @@ interface AppProps {
 notificationHandler()
 
 function App(props: AppProps) {
-
   const { hideSplashScreen } = props
   const { onBoot } = useHooks()
   const SDK_KEY =
@@ -86,7 +84,6 @@ function App(props: AppProps) {
   const [AppLovinSDKRegistered, setAppLovinSDKRegistered] = React.useState(false)
 
   useEffect(() => {
-
     // backToForeground()
     // RNCallKeep.setAvailable(true)
 
@@ -95,66 +92,59 @@ function App(props: AppProps) {
     // }
 
     if (AppLovinSDKRegistered) return
-    AppLovinMAX.setTestDeviceAdvertisingIds([])
-
+    AppLovinMAX.setTestDeviceAdvertisingIds(['3B8CDE19-018E-4E25-B93C-18628594CCDD'])
+    AppLovinMAX. setVerboseLogging(true)
     // navigationRef.navigate('TestNotification')
     // MAX Consent Flow for iOS 14.5+
 
     if (Platform.OS === "ios" && parseFloat(Platform.Version) >= 14.5) {
       // Enable the iOS consent flow programmatically - NSUserTrackingUsageDescription must be added to the Info.plist
-      // AppLovinMAX.setConsentFlowEnabled(true)
-      // AppLovinMAX.setPrivacyPolicyUrl("https://www.freeprivacypolicy.com/blog/privacy-policy-url/") // mandatory
+      AppLovinMAX.setConsentFlowEnabled(true)
+
+      AppLovinMAX.setPrivacyPolicyUrl("https://www.washzoneapp.com/privacy-policy") // mandatory
+      AppLovinMAX.setHasUserConsent(true)
     }
+    AppLovinMAX.setTestDeviceAdvertisingIds(["3B8CDE19-018E-4E25-B93C-18628594CCDD"])
 
-    AppLovinMAX.initialize(SDK_KEY, (configuration) => {
-      console.log("CONFIGURATION", configuration)
-      setAppLovinSDKRegistered(true)
-      // AppLovinMAX.showMediationDebugger();
-      if (Platform.OS === "android") {
-        if (configuration.consentDialogState === AppLovinMAX.ConsentDialogState.APPLIES) {
-          AppLovinMAX.showConsentDialog()
-        }
-      }
-      // MREC Ad Listeners
-      AppLovinMAX.addEventListener("OnMRecAdLoadedEvent", (adInfo) => {
-        console.log("MREC ad loaded from " + JSON.stringify(adInfo))
-      })
-      AppLovinMAX.addEventListener("OnMRecAdLoadFailedEvent", (errorInfo) => {
-        console.log(
-          "MREC ad failed to load with error code " +
-          errorInfo.code +
-          " and message: " +
-          errorInfo.message,
-        )
-      })
-      AppLovinMAX.addEventListener("OnMRecAdClickedEvent", (adInfo) => {
-        console.log("MREC ad clicked ", adInfo)
-      })
-      AppLovinMAX.addEventListener("OnMRecAdExpandedEvent", (adInfo) => {
-        console.log("MREC ad expanded ", adInfo)
-      })
-      AppLovinMAX.addEventListener("OnMRecAdCollapsedEvent", (adInfo) => {
-        console.log("MREC ad collapsed ", adInfo)
-      })
-      AppLovinMAX.addEventListener("OnMRecAdRevenuePaid", (adInfo) => {
-        console.log("MREC ad revenue paid: " + adInfo)
-      })
-    })
+    AppLovinMAX.setIsAgeRestrictedUser(false)
+    AppLovinMAX.setDoNotSell(false)
 
-    // Native Ad Listeners
-    AppLovinMAX.addEventListener("OnNativeAdLoadedEvent", (adInfo) => {
-      console.log("Native ad loaded from: " + adInfo.networkName)
-    })
-    AppLovinMAX.addEventListener("OnNativeAdLoadFailedEvent", (errorInfo) => {
-      console.log(JSON.stringify(errorInfo))
-      console.log("Native ad failed to load with error code " + JSON.stringify(errorInfo))
-    })
-    AppLovinMAX.addEventListener("OnNativeAdClickedEvent", (adInfo) => {
-      console.log("Native ad clicked ", adInfo)
-    })
-    AppLovinMAX.addEventListener("OnNativeAdRevenuePaid", (adInfo) => {
-      console.log("Native ad revenue paid: " + adInfo.revenue)
-    })
+    AppLovinMAX.initialize(
+      "U0OTon6ehwaUryCOnQkOPUyWxZJn8XLdTl5KVBzC5ThxUuJGI2fhWbDS9XEI4ZxcI0xpCu0IRhEwZTBtarZ5Rn",
+    )
+      .then((configuration) => {
+        // SDK is initialized, start loading ads
+
+        console.log("CONFIGURATION", configuration)
+        setAppLovinSDKRegistered(true)
+        // AppLovinMAX.showMediationDebugger()
+        // if (Platform.OS === "android") {
+        //   if (configuration.consentDialogState === AppLovinMAX.ConsentDialogState.APPLIES) {
+        //     AppLovinMAX.showConsentDialog()
+        //   }
+        // }
+        // // Native Ad Listeners
+        // AppLovinMAX.addEventListener("OnNativeAdLoadedEvent", (adInfo) => {
+        //   console.log("Native ad loaded from: " + adInfo.networkName)
+        // })
+        // AppLovinMAX.addEventListener("OnNativeAdLoadFailedEvent", (errorInfo) => {
+        //   console.log(JSON.stringify(errorInfo))
+        //   console.log(
+        //     "Native ad failed to load with error code App.tsx " + JSON.stringify(errorInfo),
+        //   )
+        // })
+        // AppLovinMAX.addEventListener("OnNativeAdClickedEvent", (adInfo) => {
+        //   console.log("Native ad clicked ", adInfo)
+        // })
+        // AppLovinMAX.addEventListener("OnNativeAdRevenuePaid", (adInfo) => {
+        //   console.log("Native ad revenue paid: " + adInfo.revenue)
+        // })
+      })
+      .catch((error) => {
+        console.log("Failed to initialize SDK ", error)
+        // Failed to initialize SDK
+      })
+
     setTimeout(hideSplashScreen, 2000)
   }, [])
 

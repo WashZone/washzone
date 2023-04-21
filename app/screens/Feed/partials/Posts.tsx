@@ -52,6 +52,7 @@ const Actions = observer(function ActionButtons({ item }: { item: any }) {
       likeviews: item?.likeviews,
     })
   }, [item])
+
   return (
     <View style={$actionsContainer}>
       <View style={$actionContainer}>
@@ -180,11 +181,6 @@ export const PostComponent = ({ post, navigateOnPress, index }: PostComponentPro
       {index % 5 === 0 && (
         <>
           <NativeAdView  />
-          {/* <AppLovinMAX.AdView
-          adUnitId={MREC_AD_UNIT_ID}
-          adFormat={AppLovinMAX.AdFormat.BANNER}
-          // style={$mrecStyle}
-        ></AppLovinMAX.AdView> */}
         </>
       )}
     </>

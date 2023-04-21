@@ -252,7 +252,9 @@ export const TopicComponentFullView = ({ topic }) => {
         )}
         <Actions item={topic} />
       </View>
-      <NativeAdView />
+      <NativeAdView/>
+
+      {/* <NativeAdView /> */}
     </>
   )
 }

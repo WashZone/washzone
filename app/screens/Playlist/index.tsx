@@ -58,7 +58,7 @@ export const VideoBlockFullWidth = ({ videoDetails }) => {
 
 const HeaderComponent = ({ playlistData }: { playlistData: any }) => {
   return (
-    <ImageBackground source={{ uri: playlistData?.playListbanner }} blurRadius={10} resizeMode='cover' style={$screenHeaderContainer}>
+    <ImageBackground source={{ uri: playlistData?.playListbanner||playlistData?.playListthumbnail }} blurRadius={20}  resizeMode='cover' style={$screenHeaderContainer}>
       <FastImage style={$avatar} source={{ uri: playlistData?.playListthumbnail }} />
       <Text
         text={playlistData?.playListName?.toUpperCase()}
@@ -142,12 +142,14 @@ const $heading: TextStyle = {
   marginTop: 10,
   fontSize: 32,
   letterSpacing: -0.5,
+  shadowColor:colors.palette.neutral900,
+   shadowOffset:{height :-2, width:-2}, elevation:10, shadowRadius:10, shadowOpacity:1,
 }
 
 const $screenHeaderContainer: ViewStyle = {
   height: 200,
   backgroundColor: colors.palette.primary400,
-  justifyContent: 'center'
+  justifyContent: 'center',
 }
 
 const $videoDetailsContent: ViewStyle = {
