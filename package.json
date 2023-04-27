@@ -40,6 +40,7 @@
     "@expo-google-fonts/space-grotesk": "^0.2.2",
     "@expo/webpack-config": "^0.17.0",
     "@flyerhq/react-native-chat-ui": "^1.4.3",
+    "@invertase/react-native-apple-authentication": "^2.2.2",
     "@react-native-async-storage/async-storage": "^1.17.3",
     "@react-native-community/push-notification-ios": "^1.10.1",
     "@react-native-firebase/app": "17.3.1",

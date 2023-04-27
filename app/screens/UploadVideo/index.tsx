@@ -182,7 +182,7 @@ export const UploadVideo: FC<AppStackScreenProps<"UploadVideo">> = function Uplo
         <TouchableOpacity onPress={() => setTNCAccepted(!TNCAccepted)} style={$flexRow}>
           <Toggle onPress={() => setTNCAccepted(!TNCAccepted)} value={TNCAccepted} />
           <Text style={$tnc} tx="addAVideo.iAgree" weight="medium" />
-          <TouchableOpacity onPress={() => navigation.navigate("Legal")} style={{ marginLeft: -4 }}>
+          <TouchableOpacity onPress={() => navigation.navigate("Legal")} style={{ marginLeft: -spacing.tiny }}>
             <Text
               color={colors.palette.primary100}
               style={$tnc}

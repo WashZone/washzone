@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "801053055110-pur33ibdq8bn9dmb60ntg29ro106kmkr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.washzone",
+            "certificate_hash": "a4dbec78a08c9c74bc2dc314373799d02aafdc12"
+          }
+        },
+        {
           "client_id": "801053055110-qjigsd0o5uk4bntecq68p5b5216h923c.apps.googleusercontent.com",
           "client_type": 3
         }

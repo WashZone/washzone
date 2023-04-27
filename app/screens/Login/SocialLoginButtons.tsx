@@ -1,5 +1,5 @@
 import React from "react"
-import { Platform, Pressable, TextStyle, View, ViewStyle } from "react-native"
+import {  Platform, Pressable, TextStyle, View, ViewStyle } from "react-native"
 import { Icon, Text } from "../../components"
 import { colors, spacing } from "../../theme"
 import {
@@ -12,6 +12,8 @@ import { GoogleSignin } from "@react-native-google-signin/google-signin"
 import { useStores } from "../../models"
 import Toast from "react-native-toast-message"
 import { toastMessages } from "../../utils/toastMessages"
+import { appleAuth } from "@invertase/react-native-apple-authentication"
+import { defaultImages } from "../../utils"
 
 interface OptionType {
   icon: "fb" | "google" | "email" | "apple"
@@ -30,7 +32,7 @@ export function SocialLogin() {
       webClientId:
         Platform.OS === "ios"
           ? "801053055110-7i8u483irj11gaovpcu7srko4hv73ga8.apps.googleusercontent.com"
-          : "13619163176-1na00l0e80pvlbs9u1ggvfih13c0t06k.apps.googleusercontent.com",
+          : "801053055110-qjigsd0o5uk4bntecq68p5b5216h923c.apps.googleusercontent.com",
       iosClientId: "801053055110-7i8u483irj11gaovpcu7srko4hv73ga8.apps.googleusercontent.com",
     })
     GoogleSignin.hasPlayServices()
@@ -38,6 +40,7 @@ export function SocialLogin() {
         if (hasPlayService) {
           GoogleSignin.signIn()
             .then(async (userInfo) => {
+              console.log('GOOGLE userInfo : ', JSON.stringify(userInfo))
               const resGetUserBySocialId = await queryGetUserBysocialId(
                 {
                   socialId: userInfo.user.id,
@@ -45,8 +48,11 @@ export function SocialLogin() {
                 { fetchPolicy: "network-only" },
               )
               const userFound = resGetUserBySocialId.getUserBysocialId.length > 0
+              console.log('USER FOUND : ', JSON.stringify(userFound))
               try {
                 let resCreateUser: { createUser: any }
+                console.log("GOOGLE USER INFO! ", userInfo)
+                console.log("GOOGLE USER INFO! ", JSON.stringify(userInfo))
                 if (!userFound) {
                   resCreateUser = await mutateCreateUser({
                     type: "google",
@@ -60,26 +66,30 @@ export function SocialLogin() {
                     socialId: userInfo.user.id,
                   })
                 }
-                console.log('TEST USER GOT', resGetUserBySocialId.getUserBysocialId[0])
-                const user  = userFound ? resGetUserBySocialId.getUserBysocialId[0] : resCreateUser.createUser
+                console.log("TEST USER GOT", resGetUserBySocialId.getUserBysocialId[0])
+                const user = userFound
+                  ? resGetUserBySocialId.getUserBysocialId[0]
+                  : resCreateUser.createUser
                 setUser({
                   _id: user?._id,
                   name: user?.name,
                   email: user?.email,
                   first_name: user?.first_name,
                   socialId: user?.socialId,
-                  description :user?.description,
+                  description: user?.description,
                   last_name: user?.last_name || "",
                   picture: user?.picture,
                   isSocialLogin: true,
                   type: "google",
                 })
-                setAuthToken(userInfo.idToken)
+                setAuthToken(user?._id)
               } catch (err) {
-                Toast.show(toastMessages.emailAlreadyExists)
+                console.log('API ERR : ', JSON.stringify(err))
+                Toast.show(toastMessages.somethingWentWrong)
               }
             })
             .catch((e) => {
+              console.log("Module ERR : ", JSON.stringify(e))
               console.log(e)
             })
         }
@@ -99,8 +109,7 @@ export function SocialLogin() {
       "/me",
       { accessToken: token, parameters: PROFILE_REQUEST_PARAMS },
       async (error, user) => {
-        if (error) {
-        } else {
+        if (!error) {
           const userInfo: any = user
           const resGetUserBySocialId = await queryGetUserBysocialId(
             { socialId: userInfo?.id },
@@ -156,14 +165,83 @@ export function SocialLogin() {
           })
         }
       },
-      (error) => {},
+      (error) => { },
     )
   }
+  const signInWithApple = async () => {
+    // performs login request
+    const appleAuthRequestResponse = await appleAuth.performRequest({
+      requestedOperation: appleAuth.Operation.LOGIN,
+      // Note: it appears putting FULL_NAME first is important, see issue #293
+      requestedScopes: [appleAuth.Scope.FULL_NAME, appleAuth.Scope.EMAIL],
+    })
 
-  const options: OptionType[] = [
-    { icon: "fb", key: "facebook", onPress: loginWithFacebook },
-    { icon: "google", key: "google", onPress: siginGoogle },
-  ]
+    // get current authentication state for user
+    // /!\ This method must be tested on a real device. On the iOS simulator it always throws an error.
+    const credentialState = await appleAuth.getCredentialStateForUser(appleAuthRequestResponse.user)
+
+    // use credentialState response to ensure the user is authenticated
+    if (credentialState === appleAuth.State.AUTHORIZED) {
+      // user is authenticated
+      console.log("appleAuthRequestResponse", appleAuthRequestResponse)
+
+      const resGetUserBySocialId = await queryGetUserBysocialId(
+        {
+          socialId: appleAuthRequestResponse.user,
+        },
+        { fetchPolicy: "network-only" },
+      )
+      const userFound = resGetUserBySocialId.getUserBysocialId.length > 0
+      // eyJraWQiOiJmaDZCczhDIiwiYWxnIjoiUlMyNTYifQ.eyJpc3MiOiJodHRwczovL2FwcGxlaWQuYXBwbGUuY29tIiwiYXVkIjoiY29tLndhc2h6b25lLndhc2h0ZXN0MDEiLCJleHAiOjE2ODI2NzQzMTgsImlhdCI6MTY4MjU4NzkxOCwic3ViIjoiMDAxNTU1LjUwMWY3YjI4NmZkNzQ0MzY5MTdjMjg1YWY4YmU3MmUxLjA5MTkiLCJub25jZSI6IjEwNDkyOTc0ZDA4N2U4ODYwMGY4NmJjMmJmNDQyYzVhYTU1YTdkOWJjYWFlNWUyMTU3YTU3OTIzYjkxN2QwOGMiLCJjX2hhc2giOiJOWHc1Rl9Sb3VZY0IybmVRUkU4dllRIiwiZW1haWwiOiJkaXhpdDk3MjNheXVzaEBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6InRydWUiLCJhdXRoX3RpbWUiOjE2ODI1ODc5MTgsIm5vbmNlX3N1cHBvcnRlZCI6dHJ1ZSwicmVhbF91c2VyX3N0YXR1cyI6Mn0.d4pbxnAY3qUxL6gtXVULJ1jACZaDL0g3kNEEAQoIqLmaS81C6VGY8UsmA4UIYpZIssb8Sj9pSanhEkgYpYyN_ey5F0xhmA-YnBEG5-tnnKnrspy-dAnhLqCaWjGNBfJQ77pYP07EV5whm1RJJyuHPaBnlYZ1DUq9WIDMH_x7Qu7eBOq8s7zdBqZptpi0V5XWgV5CpRHR097sZvGW1MLiuL3zYEMIyTUSqo1-P4tgxwWBV7RHuYkSQT1wAz5bN2tKwsMNJmJnc77-D_ttpj8r279Y28lFc0tbiTb8svxDV0L7UXesP_C38MdaBs7zGSLrn7igrn1e1ySBKtzLnAb8tQ
+      try {
+        let resCreateUser: { createUser: any }
+        if (!userFound) {
+          resCreateUser = await mutateCreateUser({
+            type: "apple",
+            isSocialLogin: true,
+            lastName: appleAuthRequestResponse.fullName.familyName,
+            firstName: appleAuthRequestResponse.fullName.givenName,
+            password: "",
+            email: appleAuthRequestResponse?.email,
+            name: appleAuthRequestResponse.fullName.givenName + ' ' + appleAuthRequestResponse.fullName.familyName,
+            picture: defaultImages.profile,
+            socialId: appleAuthRequestResponse.user,
+          })
+        }
+        console.log("TEST USER GOT", resGetUserBySocialId.getUserBysocialId[0])
+        const user = userFound
+          ? resGetUserBySocialId.getUserBysocialId[0]
+          : resCreateUser.createUser
+        setUser({
+          _id: user?._id,
+          name: user?.name,
+          email: user?.email,
+          first_name: user?.first_name,
+          socialId: user?.socialId,
+          description: user?.description,
+          last_name: user?.last_name || "",
+          picture: user?.picture,
+          isSocialLogin: true,
+          type: "google",
+        })
+        setAuthToken(user?._id)
+      } catch (err) {
+        Toast.show(toastMessages.emailAlreadyExists)
+      }
+    }
+  }
+
+  const options: OptionType[] = Platform.select({
+    ios: [
+      { icon: "fb", key: "facebook", onPress: loginWithFacebook },
+      { icon: "apple", key: "apple", onPress: signInWithApple },
+      { icon: "google", key: "google", onPress: siginGoogle },
+    ],
+    android: [
+      { icon: "fb", key: "facebook", onPress: loginWithFacebook },
+      { icon: "google", key: "google", onPress: siginGoogle },
+    ],
+  })
 
   return (
     <View>
