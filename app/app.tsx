@@ -93,20 +93,17 @@ function App(props: AppProps) {
 
     if (AppLovinSDKRegistered) return
     AppLovinMAX.setTestDeviceAdvertisingIds(['3B8CDE19-018E-4E25-B93C-18628594CCDD'])
-    AppLovinMAX. setVerboseLogging(true)
+    AppLovinMAX.setVerboseLogging(true)
     // navigationRef.navigate('TestNotification')
     // MAX Consent Flow for iOS 14.5+
 
     if (Platform.OS === "ios" && parseFloat(Platform.Version) >= 14.5) {
       // Enable the iOS consent flow programmatically - NSUserTrackingUsageDescription must be added to the Info.plist
       AppLovinMAX.setConsentFlowEnabled(true)
-
       AppLovinMAX.setPrivacyPolicyUrl("https://www.washzoneapp.com/privacy-policy") // mandatory
-      AppLovinMAX.setHasUserConsent(true)
     }
-    AppLovinMAX.setTestDeviceAdvertisingIds(["3B8CDE19-018E-4E25-B93C-18628594CCDD"])
 
-    AppLovinMAX.setIsAgeRestrictedUser(false)
+    AppLovinMAX.setIsAgeRestrictedUser(true)
     AppLovinMAX.setDoNotSell(false)
 
     AppLovinMAX.initialize(
@@ -114,31 +111,8 @@ function App(props: AppProps) {
     )
       .then((configuration) => {
         // SDK is initialized, start loading ads
-
         console.log("CONFIGURATION", configuration)
         setAppLovinSDKRegistered(true)
-        // AppLovinMAX.showMediationDebugger()
-        // if (Platform.OS === "android") {
-        //   if (configuration.consentDialogState === AppLovinMAX.ConsentDialogState.APPLIES) {
-        //     AppLovinMAX.showConsentDialog()
-        //   }
-        // }
-        // // Native Ad Listeners
-        // AppLovinMAX.addEventListener("OnNativeAdLoadedEvent", (adInfo) => {
-        //   console.log("Native ad loaded from: " + adInfo.networkName)
-        // })
-        // AppLovinMAX.addEventListener("OnNativeAdLoadFailedEvent", (errorInfo) => {
-        //   console.log(JSON.stringify(errorInfo))
-        //   console.log(
-        //     "Native ad failed to load with error code App.tsx " + JSON.stringify(errorInfo),
-        //   )
-        // })
-        // AppLovinMAX.addEventListener("OnNativeAdClickedEvent", (adInfo) => {
-        //   console.log("Native ad clicked ", adInfo)
-        // })
-        // AppLovinMAX.addEventListener("OnNativeAdRevenuePaid", (adInfo) => {
-        //   console.log("Native ad revenue paid: " + adInfo.revenue)
-        // })
       })
       .catch((error) => {
         console.log("Failed to initialize SDK ", error)
