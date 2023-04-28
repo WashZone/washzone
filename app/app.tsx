@@ -84,17 +84,8 @@ function App(props: AppProps) {
   const [AppLovinSDKRegistered, setAppLovinSDKRegistered] = React.useState(false)
 
   useEffect(() => {
-    // backToForeground()
-    // RNCallKeep.setAvailable(true)
-
-    // if (Platform.OS === "android") {
-    //   OverlayPermissionModule.requestOverlayPermission();
-    // }
-
     if (AppLovinSDKRegistered) return
-    AppLovinMAX.setTestDeviceAdvertisingIds(['3B8CDE19-018E-4E25-B93C-18628594CCDD'])
-    AppLovinMAX.setVerboseLogging(true)
-    // navigationRef.navigate('TestNotification')
+
     // MAX Consent Flow for iOS 14.5+
 
     if (Platform.OS === "ios" && parseFloat(Platform.Version) >= 14.5) {
@@ -106,9 +97,7 @@ function App(props: AppProps) {
     AppLovinMAX.setIsAgeRestrictedUser(true)
     AppLovinMAX.setDoNotSell(false)
 
-    AppLovinMAX.initialize(
-      "U0OTon6ehwaUryCOnQkOPUyWxZJn8XLdTl5KVBzC5ThxUuJGI2fhWbDS9XEI4ZxcI0xpCu0IRhEwZTBtarZ5Rn",
-    )
+    AppLovinMAX.initialize(SDK_KEY)
       .then((configuration) => {
         // SDK is initialized, start loading ads
         console.log("CONFIGURATION", configuration)
@@ -119,7 +108,7 @@ function App(props: AppProps) {
         // Failed to initialize SDK
       })
 
-    setTimeout(hideSplashScreen, 2000)
+    setTimeout(hideSplashScreen, 2300)
   }, [])
 
   const prefix = Linking.createURL("/")
