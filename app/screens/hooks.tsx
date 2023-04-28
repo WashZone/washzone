@@ -754,7 +754,7 @@ export function useHooks() {
         ratingByUserId: userStore._id,
         userId,
       },{fetchPolicy:'no-cache'})
-      console.log("RATING USER :", updatedRes?.averageRating)
+      console.log("RATING USER :", updatedRes?.checkUserRating)
       return { success: true, avg: res.createUserRating?.averageRating }
     } catch (err) {
       return false

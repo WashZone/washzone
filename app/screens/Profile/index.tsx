@@ -1,11 +1,5 @@
 import React, { FC, useState } from "react"
-import {
-  Dimensions,
-  TextStyle,
-  ViewStyle,
-  View,
-  useWindowDimensions,
-} from "react-native"
+import { Dimensions, TextStyle, ViewStyle, View, useWindowDimensions } from "react-native"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { CollapsibleHeaderTabView } from "react-native-tab-view-collapsible-header"
 import { NavigationState, SceneRendererProps, TabBar } from "react-native-tab-view"
@@ -32,7 +26,7 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
   const { user, header } = route.params
   const [galleryItemsTopics, setGalleryItemsTopics] = useState([])
   const [galleryItemsClassifieds, setGalleryItemsClassifieds] = useState([])
-  const [galleryItemsVideos, setGalleryItemsVideos] = useState([])
+  // const [galleryItemsVideos, setGalleryItemsVideos] = useState([])
   const [galleryItemsHomePosts, setGalleryItemsHomePosts] = useState([])
   const { getOrCreateRoom } = useHooks()
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
@@ -47,7 +41,7 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
     { key: "posts", title: "Posts" },
     { key: "topic", title: "Topics" },
     { key: "classified", title: "Classifieds" },
-    { key: "video", title: "Videos" },
+    // { key: "video", title: "Videos" },
     { key: "gallery", title: "Gallery" },
   ])
 
@@ -59,15 +53,15 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
         return <TopicsTabScreen userId={user?._id} addToGallery={setGalleryItemsTopics} />
       case "classified":
         return <ClassifiedsTabScreen userId={user?._id} addToGallery={setGalleryItemsClassifieds} />
-      case "video":
-        return <VideosTabScreen userId={user?._id} addToGallery={setGalleryItemsVideos} />
+      // case "video":
+      //   return <VideosTabScreen userId={user?._id} addToGallery={setGalleryItemsVideos} />
       case "gallery":
         return (
           <GalleryTabView
             galleryItems={[
               ...galleryItemsTopics,
               ...galleryItemsClassifieds,
-              ...galleryItemsVideos,
+              // ...galleryItemsVideos,
               ...galleryItemsHomePosts,
             ]}
           />
@@ -103,8 +97,8 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
     <Screen contentContainerStyle={$flex1}>
       {header && (
         <Header
-          title={'Profile'}
-          titleStyle={{color:colors.palette.neutral100}}
+          title={"Profile"}
+          titleStyle={{ color: colors.palette.neutral100 }}
           leftIcon="caretLeft"
           backgroundColor={colors.palette.primary100}
           onLeftPress={() => navigation.goBack()}

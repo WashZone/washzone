@@ -6,6 +6,7 @@ import {
   RefreshControl,
   Share,
   TextStyle,
+  TouchableOpacity,
   View,
   ViewStyle,
 } from "react-native"
@@ -135,14 +136,14 @@ export const PostComponent = ({ post, navigateOnPress, index }: PostComponentPro
     <>
       <Pressable onPress={onContainerPress} style={$postContainer}>
         <View style={$publisherInfoContainer}>
-          <Pressable onPress={() => navigation.navigate("Profile", { user: post?.userId })}>
+          <TouchableOpacity onPress={() => navigation.navigate("Profile", { user: post?.userId })}>
             <FastImage
               source={{
                 uri: postDetails.picture || defaultImages.profile,
               }}
               style={$picture}
             />
-          </Pressable>
+          </TouchableOpacity>
           <View style={$textContainer}>
             <Text
               text={formatName(postDetails?.first_name + " " + postDetails?.last_name)}

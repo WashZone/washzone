@@ -1,24 +1,30 @@
 import React, { FC, useEffect, useState } from "react"
-import { Dimensions, TextStyle, View, ViewStyle } from "react-native"
+import { Dimensions, TextStyle, TouchableOpacity, View, ViewStyle } from "react-native"
 import { Header, Screen, Text } from "../../components"
 import { colors, spacing } from "../../theme"
 
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { observer } from "mobx-react-lite"
-import { TopicsTabProps, TopicsTabParamList } from "../../tabs"
+import { TopicsTabProps, TopicsTabParamList, HomeTabParamList } from "../../tabs"
 import { formatName } from "../../utils/formatName"
 import { fromNow } from "../../utils/agoFromNow"
 import { useStores } from "../../models"
 
 const TopicInfoComponent = ({ topic }: { topic: any }) => {
+  const navigationHome = useNavigation<NavigationProp<HomeTabParamList>>()
   const publisher = topic?.UserId
 
   return (
     <>
       <View style={$publisherContainer}>
         <View style={$flexHori}>
-          <FastImage style={$image} source={{ uri: publisher?.picture }} />
+          <TouchableOpacity
+            onPress={() => navigationHome.navigate("Profile", { user: topic?.UserId })}
+          >
+            <FastImage style={$image} source={{ uri: publisher?.picture }} />
+          </TouchableOpacity>
+
           <Text text={formatName(publisher?.name)} style={$nameText} weight="medium" />
         </View>
         <Text text={fromNow(topic?.createdAt)} style={$fromText} />

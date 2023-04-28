@@ -26,6 +26,7 @@ import Loading from "../../components/Loading"
 import { Rating } from "react-native-ratings"
 import Toast from "react-native-toast-message"
 import ImageView from "react-native-image-viewing"
+import { formatName } from "../../utils/formatName"
 
 interface ActionProps {
   icon: IconTypes
@@ -60,7 +61,7 @@ const PublisherDetails = ({ publisher, price }: { publisher: any; price: string 
           <View
             style={$publisherChildContainer}
           >
-            <Text text={publisher?.name} />
+            <Text text={formatName(publisher?.name)} />
             <TouchableOpacity onPress={() => setRateUserModalVisible(true)}>
               <Rating
                 type="custom"

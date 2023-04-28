@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { Dimensions, TextStyle, View, ViewStyle } from "react-native"
+import { Dimensions, TextStyle, TouchableOpacity, View, ViewStyle } from "react-native"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { colors, spacing } from "../../theme"
 import { Text } from "../../components"
@@ -7,20 +7,30 @@ import { fromNow } from "../../utils/agoFromNow"
 import { formatName } from "../../utils/formatName"
 import ShimmerPlaceholder from "react-native-shimmer-placeholder"
 import LinearGradient from "react-native-linear-gradient"
+import { NavigationProp, useNavigation } from "@react-navigation/native"
+import { HomeTabParamList } from "../../tabs"
 const windowWidth = Dimensions.get("window").width
 
 export const CommentComponent = ({ comment }: { comment: any }) => {
   const [loaded, setLoaded] = useState(false)
-  const [attachmentDimensions, setAttachmentDimensions] = useState({ height: Dimensions.get("window").width * 0.6, width: Dimensions.get("window").width })
+  const navigationHome = useNavigation<NavigationProp<HomeTabParamList>>()
+  const [attachmentDimensions, setAttachmentDimensions] = useState({
+    height: Dimensions.get("window").width * 0.6,
+    width: Dimensions.get("window").width,
+  })
   return (
     <>
       <View style={$commentContainer}>
-        <FastImage
-          style={$profileImage}
-          source={{
-            uri: comment?.users?.picture,
-          }}
-        />
+        <TouchableOpacity
+          onPress={() => navigationHome.navigate("Profile", { user: comment?.users?._id })}
+        >
+          <FastImage
+            style={$profileImage}
+            source={{
+              uri: comment?.users?.picture,
+            }}
+          />
+        </TouchableOpacity>
         <View style={{ justifyContent: "space-around" }}>
           <View style={$nameView}>
             <Text text={formatName(comment?.users?.name)} style={$publisherName} weight="medium" />

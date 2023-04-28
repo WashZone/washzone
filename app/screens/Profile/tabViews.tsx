@@ -70,7 +70,9 @@ export const GalleryTabView = ({ galleryItems }: { galleryItems: Array<any> }) =
   if (loading) return <Loading />
 
   return (
-    <HScrollView showsVerticalScrollIndicator={false} index={4} style={$screenContainer}>
+    <HScrollView showsVerticalScrollIndicator={false}       
+    index={3}
+    style={$screenContainer}>
       <View style={$flexRow}>
         <View style={{ flex: 1 / 2 }}>
           {imageData.left.map((e, index) => (

@@ -1,14 +1,8 @@
 import React, { FC, useEffect, useRef, useState } from "react"
-import {
-  View,
-  Pressable,
-  TextStyle,
-  ViewStyle,
-  Dimensions,
-} from "react-native"
+import { View, Pressable, TextStyle, ViewStyle, Dimensions, TouchableOpacity } from "react-native"
 import { CustomFlatlist, Icon, Screen, Text } from "../../components"
 import FastImage, { ImageStyle } from "react-native-fast-image"
-import { TopicsTabParamList, TopicsTabProps } from "../../tabs"
+import { HomeTabParamList, TopicsTabParamList, TopicsTabProps } from "../../tabs"
 import { colors, spacing } from "../../theme"
 import { fromNow } from "../../utils/agoFromNow"
 import { formatName } from "../../utils/formatName"
@@ -176,8 +170,12 @@ export const TopicComponentFullView = ({ topic }) => {
   const [loaded, setLoaded] = useState(false)
   const windowWidth = Dimensions.get("window").width
 
-  const [attachmentDimensions, setAttachmentDimensions] = useState({ width: windowWidth, height: windowWidth * 9 / 16 })
+  const [attachmentDimensions, setAttachmentDimensions] = useState({
+    width: windowWidth,
+    height: (windowWidth * 9) / 16,
+  })
   const navigation = useNavigation<NavigationProp<TopicsTabParamList>>()
+  const navigationHome = useNavigation<NavigationProp<HomeTabParamList>>()
   const topicDetails = {
     picture: topic?.userId?.picture,
     first_name: topic?.userId?.first_name,
@@ -186,6 +184,7 @@ export const TopicComponentFullView = ({ topic }) => {
     createdAt: topic?.createdAt,
     content: topic?.topicContent,
     title: topic?.title,
+    userID :topic?.userId?._id
   }
   const nativeAdViewRef = useRef<any>()
 
@@ -197,17 +196,21 @@ export const TopicComponentFullView = ({ topic }) => {
 
   return (
     <>
-      <View
-        style={[$postContainer, $postParentContainer]}
-      >
+      <View style={[$postContainer, $postParentContainer]}>
         <View style={$flex1}>
           <View style={$publisherInfoContainer}>
-            <FastImage
-              source={{
-                uri: topicDetails?.picture || defaultImages.profile,
-              }}
-              style={$picture}
-            />
+            <TouchableOpacity
+              onPress={() =>
+                navigationHome.navigate("Profile", { user: topicDetails?.userID })
+              }
+            >
+              <FastImage
+                source={{
+                  uri: topicDetails?.picture || defaultImages.profile,
+                }}
+                style={$picture}
+              />
+            </TouchableOpacity>
             <View style={[$textContainer, $flexRow, { alignItems: "center" }]}>
               <Text
                 text={formatName(topicDetails.first_name + " " + topicDetails.last_name)}
@@ -229,12 +232,11 @@ export const TopicComponentFullView = ({ topic }) => {
           <View style={[$contentCenter, { marginTop: spacing.tiny }]}>
             <ShimmerPlaceholder
               visible={loaded}
-              shimmerStyle={{ width: windowWidth, height: windowWidth * 9 / 16 }}
+              shimmerStyle={{ width: windowWidth, height: (windowWidth * 9) / 16 }}
               LinearGradient={LinearGradient}
             >
               <FastImage
                 resizeMode={FastImage.resizeMode.stretch}
-
                 style={attachmentDimensions}
                 source={{
                   uri: topic?.attachmentUrl,
@@ -252,7 +254,7 @@ export const TopicComponentFullView = ({ topic }) => {
         )}
         <Actions item={topic} />
       </View>
-      <NativeAdView/>
+      <NativeAdView />
 
       {/* <NativeAdView /> */}
     </>

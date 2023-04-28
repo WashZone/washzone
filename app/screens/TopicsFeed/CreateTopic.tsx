@@ -20,7 +20,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated"
 import { useHooks } from "../hooks"
-import Toast from 'react-native-toast-message'
+import Toast from "react-native-toast-message"
 import { toastMessages } from "../../utils/toastMessages"
 
 export function CreateTopic() {
@@ -39,13 +39,13 @@ export function CreateTopic() {
   const onPost = async () => {
     setIsPosting(true)
     setIsPosting(false)
-    if (topicTitle.replace(/\s/g, '')?.length === 0) {
-      Toast.show(toastMessages.inputTitle);
+    if (topicTitle.replace(/\s/g, "")?.length === 0) {
+      Toast.show(toastMessages.inputTitle)
       setIsPosting(false)
       return
     }
-    if (topicDescription.replace(/\s/g, '')?.length === 0) {
-      Toast.show(toastMessages.inputDescription);
+    if (topicDescription.replace(/\s/g, "")?.length === 0) {
+      Toast.show(toastMessages.inputDescription)
       setIsPosting(false)
       return
     }
@@ -55,17 +55,17 @@ export function CreateTopic() {
         attachment: selectedImage,
         title: topicTitle,
       })
-      refreshTopics()
-      loadStories()
+      await refreshTopics()
+      await loadStories()
     } catch (error) {
     } finally {
-      setIsPosting(false)
-      progress.value = withTiming(0, { duration: 400 })
-      setSelectedImage({ height: 1, windth: 1 })
       inputRef.current.clear()
       inputTitleRef.current.clear()
       inputTitleRef.current.blur()
       inputRef.current.blur()
+      setIsPosting(false)
+      progress.value = withTiming(0, { duration: 400 })
+      setSelectedImage({ height: 1, windth: 1 })
     }
   }
 
@@ -91,7 +91,7 @@ export function CreateTopic() {
           progress.value = withTiming(1, { duration: 300 })
         }, 100)
       }
-    } catch (e) { }
+    } catch (e) {}
   }
 
   const onDeletePress = () => {
