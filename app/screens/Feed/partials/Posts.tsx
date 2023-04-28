@@ -35,6 +35,7 @@ export interface PostComponentProps {
   post: any
   navigateOnPress?: boolean
   index: number
+  numberOfLines?: number
 }
 const Actions = observer(function ActionButtons({ item }: { item: any }) {
   const [loading, setLoading] = useState<boolean>(false)
@@ -109,7 +110,7 @@ const Actions = observer(function ActionButtons({ item }: { item: any }) {
   )
 })
 
-export const PostComponent = ({ post, navigateOnPress, index }: PostComponentProps) => {
+export const PostComponent = ({ post, navigateOnPress, index, numberOfLines }: PostComponentProps) => {
   const [loaded, setLoaded] = useState(false)
   const windowWidth = Dimensions.get("window").width
 
@@ -153,7 +154,7 @@ export const PostComponent = ({ post, navigateOnPress, index }: PostComponentPro
           </View>
         </View>
 
-        <Text style={$postContent} text={postDetails.content} size="xs" />
+        <Text style={$postContent} numberOfLines={numberOfLines} text={postDetails.content} size="xs" />
         {postDetails?.attachmentUrl && <ShimmerPlaceHolder
           visible={loaded}
           shimmerStyle={{
@@ -181,7 +182,7 @@ export const PostComponent = ({ post, navigateOnPress, index }: PostComponentPro
       </Pressable>
       {index % 5 === 0 && (
         <>
-          <NativeAdView  />
+          <NativeAdView />
         </>
       )}
     </>
@@ -212,7 +213,7 @@ export const Posts = observer(() => {
         onEndReached={loadMoreHomeFeed}
         data={homeFeed}
         renderItem={({ item, index }) => (
-          <PostComponent key={item?._id} post={item} navigateOnPress={true} index={index} />
+          <PostComponent numberOfLines={7} key={item?._id} post={item} navigateOnPress={true} index={index} />
         )}
       />
     </View>

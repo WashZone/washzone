@@ -160,7 +160,7 @@ const $descriptionText: TextStyle = {
   width: Dimensions.get("screen").width - 100,
   fontSize: 14,
   lineHeight: 17,
-  textAlign: "justify",
+  textAlign: "center",
   alignSelf: "center",
 }
 

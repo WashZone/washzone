@@ -38,7 +38,6 @@ export function CreateTopic() {
 
   const onPost = async () => {
     setIsPosting(true)
-    setIsPosting(false)
     if (topicTitle.replace(/\s/g, "")?.length === 0) {
       Toast.show(toastMessages.inputTitle)
       setIsPosting(false)
@@ -55,8 +54,8 @@ export function CreateTopic() {
         attachment: selectedImage,
         title: topicTitle,
       })
-      await refreshTopics()
-      await loadStories()
+      refreshTopics()
+      loadStories()
     } catch (error) {
     } finally {
       inputRef.current.clear()
