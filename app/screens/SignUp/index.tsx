@@ -9,7 +9,15 @@ import {
   View,
   ViewStyle,
 } from "react-native"
-import { Button, Icon, Screen, Text, TextField, TextFieldAccessoryProps } from "../../components"
+import {
+  Button,
+  Icon,
+  Screen,
+  Text,
+  TextField,
+  TextFieldAccessoryProps,
+  Toggle,
+} from "../../components"
 import { useStores } from "../../models"
 import { AppStackScreenProps } from "../../navigators"
 import { colors, spacing } from "../../theme"
@@ -21,8 +29,11 @@ import {
   validatePassword,
 } from "../../utils/validate"
 import Toast from "react-native-toast-message"
+import { $contentCenter, $flexRow } from "../styles"
+import * as Linking from 'expo-linking'
+import { toastMessages } from "../../utils/toastMessages"
 
-interface SignupProps extends AppStackScreenProps<"Signup"> {}
+interface SignupProps extends AppStackScreenProps<"Signup"> { }
 
 export const SignupScreen: FC<SignupProps> = observer(function LoginScreen(_props) {
   const passwordInput = useRef<TextInput>()
@@ -35,6 +46,7 @@ export const SignupScreen: FC<SignupProps> = observer(function LoginScreen(_prop
   const [confirmPassword, setConfirmPassword] = useState("")
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [tncAccepted, setTncAccepted] = useState(false)
   const [attemptsCount, setAttemptsCount] = useState(0)
 
   const {
@@ -46,12 +58,14 @@ export const SignupScreen: FC<SignupProps> = observer(function LoginScreen(_prop
   async function login() {
     setIsSubmitted(true)
     setAttemptsCount(attemptsCount + 1)
+    if (!tncAccepted) Toast.show(toastMessages.acceptTNC)
 
     if (
       validateName(name) === "" &&
       validateEmail(email) === "" &&
       validateConfirmPassword(password, confirmPassword) === "" &&
-      validatePassword(password) === ""
+      validatePassword(password) === "" &&
+      tncAccepted
     ) {
       try {
         setLoading(true)
@@ -81,7 +95,7 @@ export const SignupScreen: FC<SignupProps> = observer(function LoginScreen(_prop
         setAuthToken(token.toString())
         setLoading(false)
       } catch (err) {
-        console.log("SIGN UP ERROR",err)
+        console.log("SIGN UP ERROR", err)
         Toast.show({
           type: "error",
           text1: err?.response?.errors?.length > 0 && err?.response?.errors[0].message,
@@ -184,6 +198,35 @@ export const SignupScreen: FC<SignupProps> = observer(function LoginScreen(_prop
         onSubmitEditing={login}
         style={$inputText}
       />
+
+      <View style={[$flexRow, $contentCenter, { marginBottom: spacing.homeScreen }]}>
+        <Toggle
+          containerStyle={{ marginRight: spacing.tiny }}
+          inputInnerStyle={$checkBoxIn}
+          inputOuterStyle={$checkBoxOut}
+          onPress={() => setTncAccepted(!tncAccepted)}
+          value={tncAccepted}
+        />
+
+        <Text color={colors.palette.neutral100} size="xxs" tx="loginScreen.tncIntro" />
+        <Text
+          color={colors.palette.glow100}
+          weight="semiBold"
+          onPress={() => Linking.openURL('http://18.219.176.209:3000/Eula')}
+          style={{}}
+          tx="loginScreen.tncLink1"
+          size="xxs"
+        />
+        <Text color={colors.palette.neutral100} tx="loginScreen.and" size="xxs" />
+        <Text
+          color={colors.palette.glow100}
+          weight="semiBold"
+          onPress={() => _props.navigation.navigate("Legal")}
+          size="xxs"
+          tx="loginScreen.tncLink2"
+        />
+        <Text color={colors.palette.neutral100} weight="semiBold" size="xxs" text="." />
+      </View>
       <Button
         RightAccessory={() => (
           <ActivityIndicator
@@ -206,6 +249,18 @@ export const SignupScreen: FC<SignupProps> = observer(function LoginScreen(_prop
     </Screen>
   )
 })
+
+const $checkBoxIn: ViewStyle = { height: 12, width: 12, alignSelf: "center" }
+
+const $checkBoxOut: ViewStyle = {
+  backgroundColor: colors.palette.primary100,
+  height: 24,
+  alignItems: "center",
+  justifyContent: "center",
+  width: 24,
+  borderRadius: 10,
+  borderColor: colors.palette.neutral100,
+}
 
 const $loadingIndicator: ViewStyle = { position: "absolute", right: spacing.medium }
 

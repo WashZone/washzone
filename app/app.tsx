@@ -87,7 +87,6 @@ function App(props: AppProps) {
     if (AppLovinSDKRegistered) return
 
     // MAX Consent Flow for iOS 14.5+
-
     if (Platform.OS === "ios" && parseFloat(Platform.Version) >= 14.5) {
       // Enable the iOS consent flow programmatically - NSUserTrackingUsageDescription must be added to the Info.plist
       AppLovinMAX.setConsentFlowEnabled(true)

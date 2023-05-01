@@ -52,7 +52,6 @@ export function SocialLogin() {
               try {
                 let resCreateUser: { createUser: any }
                 console.log("GOOGLE USER INFO! ", userInfo)
-                console.log("GOOGLE USER INFO! ", JSON.stringify(userInfo))
                 if (!userFound) {
                   resCreateUser = await mutateCreateUser({
                     type: "google",

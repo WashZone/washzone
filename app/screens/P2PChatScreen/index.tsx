@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite"
 import React, { FC, useEffect, useState } from "react"
 import { AppStackScreenProps } from "../../navigators"
-import { $flex1 } from "../styles"
+import { $flex1, $flexRow } from "../styles"
 import { Chat, MessageType } from "@flyerhq/react-native-chat-ui"
 // import DocumentPicker from 'react-native-document-picker'
 import FileViewer from "react-native-file-viewer"
@@ -17,7 +17,7 @@ import ShimmerPlaceholder from "react-native-shimmer-placeholder"
 import FastImage from "react-native-fast-image"
 import LinearGradient from "react-native-linear-gradient"
 import Lottie from "lottie-react-native"
-import { Text } from "../../components"
+import { CommentInput, Text, Screen } from "../../components"
 import moment from "moment"
 
 const getColorFromType = (type: any) => {
@@ -87,7 +87,13 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
     }
   }
 
-  const handleSendPress = async (text: MessageType.PartialText) => {
+  const handleSendPress = async (text: string, selectedMedia: any) => {
+    setSending(true)
+    !syncing && !loadingMore && (await sendTextMessage(roomId, text, receiver._id))
+    setSending(false)
+  }
+
+  const handleSendPressFlyer = async (text: MessageType.Text) => {
     setSending(true)
     !syncing && !loadingMore && (await sendTextMessage(roomId, text.text, receiver._id))
     setSending(false)
@@ -108,13 +114,11 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
     setLoadingMore(false)
   }
 
-
   const renderBubble = (payload: {
     child: React.ReactNode
     message: MessageType.Any
     nextMessageInGroup: boolean
   }) => {
-
     const { child, message, nextMessageInGroup } = payload
     console.log("nextMessageInGroup", nextMessageInGroup)
 
@@ -138,16 +142,27 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
             alignItems: isAuthorMe ? "flex-end" : "flex-start",
             borderBottomRightRadius: isAuthorMe ? 0 : 10,
             borderBottomLeftRadius: isAuthorMe ? 10 : 0,
-            marginBottom:8
+            marginBottom: 8,
           }}
         >
           {child}
         </View>
-        {!nextMessageInGroup && <Text text={moment(message?.createdAt).format('hh:mm A')
-        } weight="medium" color={colors.palette.neutral500} style={[{
-          position: 'absolute',
-          bottom: -12, fontSize: 11,
-        }, isAuthorMe && { right: 0 }]} numberOfLines={1}/>}
+        {!nextMessageInGroup && (
+          <Text
+            text={moment(message?.createdAt).format("hh:mm A")}
+            weight="medium"
+            color={colors.palette.neutral500}
+            style={[
+              {
+                position: "absolute",
+                bottom: -12,
+                fontSize: 11,
+              },
+              isAuthorMe && { right: 0 },
+            ]}
+            numberOfLines={1}
+          />
+        )}
       </>
     )
   }
@@ -178,7 +193,7 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
   }
 
   return (
-    <View style={$flex1}>
+    <Screen contentContainerStyle={$flex1}>
       <P2PHeader data={receiver} roomId={roomId} />
       <Chat
         showUserNames
@@ -235,12 +250,19 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
         onAttachmentPress={onAttachmentPress}
         onMessagePress={handleMessagePress}
         // onMessageLongPress={handleOnMessageLongPress}
-        onSendPress={handleSendPress}
+        onSendPress={handleSendPressFlyer}
         user={user}
         renderBubble={renderBubble}
         enableAnimation
         isLastPage={isLastPage}
         showUserAvatars
+        customBottomComponent={() => (
+          <CommentInput
+            bottomSafe
+            createComment={handleSendPress}
+            placeholder='Message ...'
+          />
+        )}
       />
       {/* <MessageOptionsModal
         message={selectedMessage}
@@ -248,7 +270,7 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
         setVisible={setOptionsModalVisible}
         metadata={selectedMessage?.metadata}
       /> */}
-    </View>
+    </Screen>
   )
 })
 

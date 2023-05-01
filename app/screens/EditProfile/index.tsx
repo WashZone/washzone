@@ -20,7 +20,7 @@ export const EditProfile: FC<AppStackScreenProps<"EditProfile">> = function Edit
   const [firstName, setFirstName] = useState(userStore.first_name)
   const [lastName, setLastName] = useState(userStore.last_name)
   const [bio, setBio] = useState(userStore?.description || "")
-  const [picture, setPicture] = useState({uri : userStore.picture})
+  const [picture, setPicture] = useState({ uri: userStore.picture })
   const [buttonLoading, setButtonLoading] = useState<boolean>(false)
   const [justOverflowed, setJustOverflowed] = useState<boolean>(false)
 
@@ -57,7 +57,12 @@ export const EditProfile: FC<AppStackScreenProps<"EditProfile">> = function Edit
   const onSubmit = async () => {
     if (isActive) {
       setButtonLoading(true)
-      await updateProfile(firstName, lastName, picture, bio)
+      await updateProfile(
+        firstName,
+        lastName,
+        bio,
+        picture?.uri === userStore.picture ? picture?.uri : picture,
+      )
       navigation.goBack()
       setButtonLoading(false)
     }

@@ -96,7 +96,7 @@ const SavedItem = ({ item, index, handleOnPress, refreshSavedClassifieds }) => {
             numberOfLines={1}
             style={{ width: Dimensions.get("window").width - 200 }}
           />
-          <Text text={videoDetails?.description} weight="medium" size="xs" numberOfLines={1} />
+          <Text text={videoDetails?.description} weight="medium" size="xs" numberOfLines={1} ellipsizeMode='tail' />
           <Text text={videoDetails?.users?.name} style={$byText} />
           <BottomActions data={item} type="video" refreshSavedClassifieds={refreshSavedClassifieds} />
         </View>
@@ -249,4 +249,5 @@ const $textContainer: ViewStyle = {
   paddingHorizontal: spacing.medium,
   height: 120,
   alignSelf: "center",
+  flex: 1
 }

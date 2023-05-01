@@ -51,7 +51,6 @@ export function useHooks() {
       mutateUpdateDeletesavedclassified,
       queryGetAllStory,
       mutateSaveLikedVideo,
-      queryGetUserChannel,
       queryGetTopicByUsersId,
       mutateGetClassifiedByUserId,
       queryGetUploadedVideoByUserIdPage,
@@ -305,15 +304,18 @@ export function useHooks() {
   const updateProfile = async (
     firstName: string,
     lastName: string,
-    attachment: any,
     bio: string,
+    attachment?: any,
   ) => {
     try {
-      const imageUrl = await uploadToS3({
-        uri: attachment?.uri,
-        type: attachment?.type,
-        name: attachment?.fileName,
-      })
+      const imageUrl =
+        typeof attachment === "string"
+          ? attachment
+          : await uploadToS3({
+            uri: attachment?.uri,
+            type: attachment?.type,
+            name: attachment?.fileName,
+          })
       const res = await mutateUpdateUser({
         user: {
           first_name: firstName,
@@ -476,7 +478,6 @@ export function useHooks() {
     try {
       const res = await getVideosCategorically()
       setVideos(res)
-
     } catch (err) {
       console.log(err)
     }
@@ -690,8 +691,14 @@ export function useHooks() {
     setTimeout(async () => await loadStories(), 1000)
   }
 
-  const createClassified = async ({ attachmentUrl, type, title, prize, classifiedDetail, condition }) => {
-
+  const createClassified = async ({
+    attachmentUrl,
+    type,
+    title,
+    prize,
+    classifiedDetail,
+    condition,
+  }) => {
     const imageUrl = await uploadToS3({ uri: attachmentUrl, name: title, type })
 
     await mutateCreateClassifiedDetail({
@@ -750,21 +757,18 @@ export function useHooks() {
         ratingByUserId: userStore._id,
         ratingStar: rating,
       })
-      const updatedRes = await queryCheckUserRating({
-        ratingByUserId: userStore._id,
-        userId,
-      },{fetchPolicy:'no-cache'})
-      console.log("RATING USER :", updatedRes?.checkUserRating)
-      return { success: true, avg: res.createUserRating?.averageRating }
+      const updatedRes = await queryGetratingOnUserId({ userId }, { fetchPolicy: "no-cache" })
+      const avg = updatedRes?.getratingOnUserId?.data?.length > 0 ? updatedRes?.getratingOnUserId?.data[0]?.averageRating : 0
+      return { success: true, avg }
     } catch (err) {
       return false
     }
   }
 
   const getRatingOnUser = async (userId: string) => {
-    const res = await queryGetratingOnUserId({ userId }, { fetchPolicy: "no-cache" })
-    console.log("res.getratingOnUserId?.data[0]", res.getratingOnUserId?.data[0])
-    return res.getratingOnUserId?.data?.length > 0 ? res.getratingOnUserId?.data[0].ratingStar : 0
+    const res = await queryCheckUserRating({ userId, ratingByUserId: userStore._id }, { fetchPolicy: "no-cache" })
+    console.log("res.res.checkUserRating", res.checkUserRating)
+    return res.checkUserRating?.ratingStar
   }
 
   const onBoot = async () => {

@@ -8,27 +8,13 @@ export const Capture = async () => {
       path: "images",
     },
   }
+  let image: any
   await ImagePicker.launchCamera(options, (res) => {
-    console.log("Response = ", res)
-    if (res.errorMessage) return undefined
-    if (res.didCancel) {
-      console.log("User cancelled image picker")
-    } else if (res.error) {
-      console.log("ImagePicker Error: ", res.error)
-    } else if (res.customButton) {
-      console.log("User tapped custom button: ", res.customButton)
-      alert(res.customButton)
-    } else {
-      // const source = { uri: res.uri };
-      console.log("response", JSON.stringify(res))
-      // this.setState({
-      //   filePath: res,
-      //   fileData: res.data,
-      //   fileUri: res.uri
-      // })
-      return res
-    }
+    console.log("CATURED IMAGE", res?.assets?.[0])
+    image = res?.assets?.[0]
   })
+  return image
+
 }
 
 export const MediaPicker = async () => {

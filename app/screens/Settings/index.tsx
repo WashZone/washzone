@@ -2,12 +2,14 @@ import React, { FC, useEffect, useState } from "react"
 import { TextStyle, View, ViewStyle } from "react-native"
 import { Header, ListItem, Screen, Toggle } from "../../components"
 import { colors, spacing } from "../../theme"
+import * as Linking from "expo-linking"
 
 import { AppStackParamList, AppStackScreenProps } from "../../navigators"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { useStores } from "../../models"
 import { observer } from "mobx-react-lite"
 import { useHooks } from "../hooks"
+import { showAlertYesNo } from "../../utils/helpers"
 
 export const Settings: FC<AppStackScreenProps<"Settings">> = observer(function Settings() {
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
@@ -62,6 +64,19 @@ export const Settings: FC<AppStackScreenProps<"Settings">> = observer(function S
             rightIcon="caretRight"
           />
         )}
+        <ListItem
+          onPress={() =>
+            showAlertYesNo({
+              message: "Close Account ?\n",
+              description: "Are you sure you want to close your account?  \n\n This action is irreversible and all your data will be permanently deleted. \n\n You will be redirected to a web-page to verify your identity.",
+              onYesPress: () => Linking.openURL("http://18.219.176.209:3000/delete-account"),
+            })
+          }
+          style={$listItemStyle}
+          leftIcon="deleteUser"
+          text="Close Account"
+          rightIcon="caretRight"
+        />
       </View>
     </Screen>
   )

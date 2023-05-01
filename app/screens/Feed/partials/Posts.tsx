@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import {
   Dimensions,
   FlatList,
@@ -26,7 +26,6 @@ import ShimmerPlaceHolder from "react-native-shimmer-placeholder"
 import { getIconForInteraction } from "../../../utils/helpers"
 
 import NativeAdView from "../../../utils/NativeAd"
-
 
 import { defaultImages } from "../../../utils"
 import LinearGradient from "react-native-linear-gradient"
@@ -110,11 +109,22 @@ const Actions = observer(function ActionButtons({ item }: { item: any }) {
   )
 })
 
-export const PostComponent = ({ post, navigateOnPress, index, numberOfLines }: PostComponentProps) => {
+export const PostComponent = ({
+  post,
+  navigateOnPress,
+  index,
+  numberOfLines,
+}: PostComponentProps) => {
   const [loaded, setLoaded] = useState(false)
+  const [showMore, setShowMore] = useState(undefined)
+  const [tempNumberOfLines, setTempNumberOfLines] = useState(undefined)
+
   const windowWidth = Dimensions.get("window").width
 
-  const [attachmentDimensions, setAttachmentDimensions] = useState({ height: windowWidth, width: windowWidth })
+  const [attachmentDimensions, setAttachmentDimensions] = useState({
+    height: windowWidth,
+    width: windowWidth,
+  })
   const navigation = useNavigation<NavigationProp<HomeTabParamList>>()
   const onContainerPress = () => {
     if (navigateOnPress !== undefined && navigateOnPress) {
@@ -132,6 +142,17 @@ export const PostComponent = ({ post, navigateOnPress, index, numberOfLines }: P
     createdAt: post?.createdAt,
     content: post?.Discription,
   }
+  useEffect(() => {
+    showMore && setTempNumberOfLines(numberOfLines)
+  }, [showMore])
+
+  const onTextLayout = useCallback((e) => {
+    if (showMore === undefined && tempNumberOfLines === undefined) {
+      numberOfLines &&
+        e.nativeEvent.lines.length > numberOfLines &&
+        setShowMore(e.nativeEvent.lines.length > numberOfLines)
+    }
+  }, [])
 
   return (
     <>
@@ -154,30 +175,51 @@ export const PostComponent = ({ post, navigateOnPress, index, numberOfLines }: P
           </View>
         </View>
 
-        <Text style={$postContent} numberOfLines={numberOfLines} text={postDetails.content} size="xs" />
-        {postDetails?.attachmentUrl && <ShimmerPlaceHolder
-          visible={loaded}
-          shimmerStyle={{
-            height: windowWidth,
-            width: windowWidth,
-          }}
-          LinearGradient={LinearGradient}
-        >
-          <FastImage
-            style={attachmentDimensions}
-            source={{ uri: postDetails?.attachmentUrl }}
-            onLoadStart={() => console.log("LOADINGGGG STARTED")}
-            resizeMode={FastImage.resizeMode.stretch}
-            onLoad={(res) => {
-              console.log("ONLOAD POST ATTACHMENT", res.nativeEvent)
-              setAttachmentDimensions({
-                height: (windowWidth * res.nativeEvent.height) / res.nativeEvent.width,
-                width: windowWidth,
-              })
-            }}
-            onLoadEnd={() => { setLoaded(true) }}
+        <Text
+          style={$postContent}
+          numberOfLines={tempNumberOfLines}
+          onTextLayout={onTextLayout}
+          text={postDetails.content}
+          size="xs"
+        />
+        {showMore && tempNumberOfLines && (
+          <Text
+            size="xxs"
+            weight="bold"
+            style={{ marginLeft: spacing.homeScreen }}
+            color={colors.palette.primary100}
+            text={"Read More"}
+            onPress={() => setTempNumberOfLines(undefined)}
           />
-        </ShimmerPlaceHolder>}
+        )}
+        {postDetails?.attachmentUrl && (
+          <ShimmerPlaceHolder
+            visible={loaded}
+            shimmerStyle={{
+              marginTop:spacing.extraSmall,
+              height: windowWidth,
+              width: windowWidth,
+            }}
+            LinearGradient={LinearGradient}
+          >
+            <FastImage
+              style={[attachmentDimensions, { marginTop: spacing.extraSmall }]}
+              source={{ uri: postDetails?.attachmentUrl }}
+              onLoadStart={() => console.log("LOADINGGGG STARTED")}
+              resizeMode={FastImage.resizeMode.stretch}
+              onLoad={(res) => {
+                console.log("ONLOAD POST ATTACHMENT", res.nativeEvent)
+                setAttachmentDimensions({
+                  height: (windowWidth * res.nativeEvent.height) / res.nativeEvent.width,
+                  width: windowWidth,
+                })
+              }}
+              onLoadEnd={() => {
+                setLoaded(true)
+              }}
+            />
+          </ShimmerPlaceHolder>
+        )}
         <Actions item={post} />
       </Pressable>
       {index % 5 === 0 && (
@@ -202,7 +244,6 @@ export const Posts = observer(() => {
   const onRefresh = async () => {
     await refreshHomeFeed()
     await loadStories()
-
   }
 
   return (
@@ -213,7 +254,13 @@ export const Posts = observer(() => {
         onEndReached={loadMoreHomeFeed}
         data={homeFeed}
         renderItem={({ item, index }) => (
-          <PostComponent numberOfLines={7} key={item?._id} post={item} navigateOnPress={true} index={index} />
+          <PostComponent
+            numberOfLines={7}
+            key={item?._id}
+            post={item}
+            navigateOnPress={true}
+            index={index}
+          />
         )}
       />
     </View>
@@ -223,17 +270,12 @@ export const Posts = observer(() => {
 const $postContent: TextStyle = {
   // fontSize: 13,
   marginHorizontal: spacing.homeScreen,
-  marginBottom: spacing.homeScreen,
   lineHeight: 20,
 }
 
 const $agoStamp: TextStyle = {
   fontSize: 12,
   color: colors.palette.neutral500,
-}
-const $bottomCurve: ImageStyle = {
-  borderBottomLeftRadius: 10,
-  borderBottomRightRadius: 10,
 }
 
 const $postContainer: ViewStyle = {

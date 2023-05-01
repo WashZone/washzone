@@ -57,7 +57,7 @@ export type AppStackParamList = {
   Legal: undefined
   Support: undefined
   AllChats: undefined
-  UserProfile:{user:any, header?:boolean},
+  UserProfile: { user: any, header?: boolean },
   P2PChat: { receiver: any; roomId: string | undefined }
   AudioCall: {
     receiver: any
@@ -134,12 +134,12 @@ const AppStack = observer(function AppStack() {
             <Stack.Screen
               name="UploadVideo"
               component={UploadVideo}
-              // options={{ presentation: 'modal' }}
+            // options={{ presentation: 'modal' }}
             />
             <Stack.Screen
               name="AddAClassified"
               component={AddAClassified}
-              // options={{ presentation: "containedModal" }}
+            // options={{ presentation: "containedModal" }}
             />
           </>
         ) : (
@@ -148,6 +148,8 @@ const AppStack = observer(function AppStack() {
             <Stack.Screen name="Signup" component={SignupScreen} />
             <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
             <Stack.Screen name="VerifyOTP" component={VerifyOTP} />
+            <Stack.Screen name="Legal" component={Legal} />
+
           </>
         )}
       </Stack.Navigator>
@@ -156,7 +158,7 @@ const AppStack = observer(function AppStack() {
   )
 })
 
-interface NavigationProps extends Partial<React.ComponentProps<typeof NavigationContainer>> {}
+interface NavigationProps extends Partial<React.ComponentProps<typeof NavigationContainer>> { }
 
 export const AppNavigator = observer(function AppNavigator(props: NavigationProps) {
   const colorScheme = useColorScheme()

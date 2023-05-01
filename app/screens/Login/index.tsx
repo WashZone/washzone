@@ -1,7 +1,7 @@
 import { useIsFocused } from "@react-navigation/native"
 import { observer } from "mobx-react-lite"
 import React, { FC, useEffect, useMemo, useState } from "react"
-import { Image, Keyboard, TextStyle, View, ViewStyle } from "react-native"
+import { Image, Keyboard, Linking, TextStyle, View, ViewStyle } from "react-native"
 import Animated, {
   interpolate,
   SharedValue,
@@ -15,7 +15,7 @@ import { colors, spacing } from "../../theme"
 import LoginView from "./Login"
 import { SocialLogin } from "./SocialLoginButtons"
 
-interface LoginScreenProps extends AppStackScreenProps<"Login"> {}
+interface LoginScreenProps extends AppStackScreenProps<"Login"> { }
 
 interface LogoProps {
   animVal: SharedValue<number>
@@ -156,9 +156,9 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
           <SocialLogin />
           <View style={$footerContainer}>
             <Text tx="loginScreen.tncIntro" style={$textLight} />
-            <Text tx="loginScreen.tncLink1" style={$textHyperLink} />
+            <Text tx="loginScreen.tncLink1" onPress={() => Linking.openURL('http://18.219.176.209:3000/Eula')} style={$textHyperLink} />
             <Text tx="loginScreen.and" style={$textLight} />
-            <Text tx="loginScreen.tncLink2" style={$textHyperLink} />
+            <Text onPress={() => navigation.navigate('Legal')} tx="loginScreen.tncLink2" style={$textHyperLink} />
           </View>
         </Animated.View>
       </View>
