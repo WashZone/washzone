@@ -55,6 +55,13 @@ export const Settings: FC<AppStackScreenProps<"Settings">> = observer(function S
           text="Notifications"
           RightComponent={<Toggle variant="switch" value={status} />}
         />
+        <ListItem
+          onPress={() => navigation.navigate("BlockedUsers")}
+          style={$listItemStyle}
+          leftIcon="blockUser"
+          text="Blocked Users"
+          rightIcon="caretRight"
+        />
         {!isSocialLogin && (
           <ListItem
             onPress={() => navigation.navigate("ResetPassword")}
@@ -68,8 +75,9 @@ export const Settings: FC<AppStackScreenProps<"Settings">> = observer(function S
           onPress={() =>
             showAlertYesNo({
               message: "Close Account ?\n",
-              description: "Are you sure you want to close your account?  \n\n This action is irreversible and all your data will be permanently deleted. \n\n You will be redirected to a web-page to verify your identity.",
-              onYesPress: () => Linking.openURL("http://18.219.176.209:3000/delete-account"),
+              description:
+                "Are you sure you want to close your account?  \n\n This action is irreversible and all your data will be permanently deleted. \n\n You will be redirected to a web-page to verify your identity.",
+              onYesPress: () => Linking.openURL("http://admin.washzoneapp.com/delete-account"),
             })
           }
           style={$listItemStyle}

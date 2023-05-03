@@ -6,7 +6,7 @@ import { Chat, MessageType } from "@flyerhq/react-native-chat-ui"
 // import DocumentPicker from 'react-native-document-picker'
 import FileViewer from "react-native-file-viewer"
 import { PanGestureHandler } from "react-native-gesture-handler"
-import { Animated, Dimensions, TextStyle, View } from "react-native"
+import { Animated, Dimensions, TextStyle, View, ViewStyle } from "react-native"
 import { colors, spacing } from "../../theme"
 import { MediaPicker } from "../../utils/device/MediaPicker"
 import { CustomChatMessage, P2PHeader } from "./partials"
@@ -19,6 +19,9 @@ import LinearGradient from "react-native-linear-gradient"
 import Lottie from "lottie-react-native"
 import { CommentInput, Text, Screen } from "../../components"
 import moment from "moment"
+import { CommentsDetailModelSelector } from "../../models/api"
+import { useSafeAreaInsetsStyle } from "../../utils/useSafeAreaInsetsStyle"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 const getColorFromType = (type: any) => {
   switch (type) {
@@ -40,8 +43,9 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
   const { receiver, roomId } = props.route.params
   const {
     userStore,
-    allChats: { getRoomMessages, setLastReadId },
+    allChats: { getRoomMessages, setLastReadId, getRoomDetails },
   } = useStores()
+  console.log("GETROOMDETALIS< ", getRoomDetails(roomId))
   const { syncChatMessages, sendTextMessage, getMoreChatMessages, sendAttachment } = useHooks()
   // const [optionsModalVisible, setOptionsModalVisible] = useState(false)
   const [isLastPage, setIsLastPage] = useState(false)
@@ -89,7 +93,11 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
 
   const handleSendPress = async (text: string, selectedMedia: any) => {
     setSending(true)
-    !syncing && !loadingMore && (await sendTextMessage(roomId, text, receiver._id))
+    if (!syncing && !loadingMore) {
+      selectedMedia &&
+        (await sendAttachment({ roomId, attachment: selectedMedia, receiverId: receiver._id }))
+      text && (await sendTextMessage(roomId, text, receiver._id))
+    }
     setSending(false)
   }
 
@@ -157,6 +165,8 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
                 position: "absolute",
                 bottom: -12,
                 fontSize: 11,
+                minWidth: 55,
+                textAlign: isAuthorMe ? "right" : "left",
               },
               isAuthorMe && { right: 0 },
             ]}
@@ -256,13 +266,24 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
         enableAnimation
         isLastPage={isLastPage}
         showUserAvatars
-        customBottomComponent={() => (
-          <CommentInput
-            bottomSafe
-            createComment={handleSendPress}
-            placeholder='Message ...'
-          />
-        )}
+        customBottomComponent={() =>
+          getRoomDetails(roomId)?.blocked ? (
+            <View style={[$blockedContainer, { marginBottom: useSafeAreaInsets().bottom }]}>
+              <Text
+                style={$blockedText}
+                weight="semiBold"
+                color={colors.palette.neutral600}
+                text={
+                  userStore?.isBlocked(receiver?._id)
+                    ? "You blocked " + receiver?.first_name + '.'
+                    : "You have been blocked by " + receiver?.first_name + '.'
+                }
+              />
+            </View>
+          ) : (
+            <CommentInput bottomSafe createComment={handleSendPress} placeholder="Message ..." />
+          )
+        }
       />
       {/* <MessageOptionsModal
         message={selectedMessage}
@@ -273,5 +294,12 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
     </Screen>
   )
 })
-
+const $blockedContainer: ViewStyle = {
+  height: 30,
+  paddingHorizontal: spacing.extraSmall,
+  alignItems: "center",
+  justifyContent: "center",
+}
 const testTextStyle: TextStyle = {}
+
+const $blockedText: TextStyle = {}

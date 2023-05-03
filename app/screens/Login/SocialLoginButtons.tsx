@@ -1,5 +1,5 @@
 import React from "react"
-import {  Platform, Pressable, TextStyle, View, ViewStyle } from "react-native"
+import { Platform, Pressable, TextStyle, View, ViewStyle } from "react-native"
 import { Icon, Text } from "../../components"
 import { colors, spacing } from "../../theme"
 import {
@@ -80,6 +80,7 @@ export function SocialLogin() {
                   picture: user?.picture,
                   isSocialLogin: true,
                   type: "google",
+                  blockedUser: user?.blockedUser || [],
                 })
                 setAuthToken(user?._id)
               } catch (err) {
@@ -142,6 +143,7 @@ export function SocialLogin() {
               picture: userInfo?.picture.data?.url,
               isSocialLogin: true,
               type: "facebook",
+              blockedUser: user?.blockedUser || [],
             })
             setAuthToken(token)
           } catch (err) {
@@ -222,6 +224,7 @@ export function SocialLogin() {
           picture: user?.picture,
           isSocialLogin: true,
           type: "google",
+          blockedUser: user?.blockedUser || [],
         })
         setAuthToken(user?._id)
       } catch (err) {

@@ -5,6 +5,8 @@
 import { types } from "mobx-state-tree"
 import { QueryBuilder } from "mst-gql"
 import { ModelBase } from "./ModelBase"
+import { BloackedUserListModel, BloackedUserListModelType } from "./BloackedUserListModel"
+import { BloackedUserListModelSelector } from "./BloackedUserListModel.base"
 import { ClassifiedFeedModel, ClassifiedFeedModelType } from "./ClassifiedFeedModel"
 import { ClassifiedFeedModelSelector } from "./ClassifiedFeedModel.base"
 import { TopicDetailModel, TopicDetailModelType } from "./TopicDetailModel"
@@ -47,6 +49,7 @@ export const UserModelBase = ModelBase
     averageRating: types.union(types.undefined, types.null, types.number),
     notificationToken: types.union(types.undefined, types.null, types.string),
     notificationStatus: types.union(types.undefined, types.null, types.boolean),
+    blockedUser: types.union(types.undefined, types.null, types.array(types.late((): any => BloackedUserListModel))),
   })
   .views(self => ({
     get store() {
@@ -78,6 +81,7 @@ export class UserModelSelector extends QueryBuilder {
   topicId(builder: string | TopicDetailModelSelector | ((selector: TopicDetailModelSelector) => TopicDetailModelSelector) | undefined) { return this.__child(`topicId`, TopicDetailModelSelector, builder) }
   classifiedId(builder: string | ClassifiedFeedModelSelector | ((selector: ClassifiedFeedModelSelector) => ClassifiedFeedModelSelector) | undefined) { return this.__child(`classifiedId`, ClassifiedFeedModelSelector, builder) }
   videoId(builder: string | VideoUploadModelSelector | ((selector: VideoUploadModelSelector) => VideoUploadModelSelector) | undefined) { return this.__child(`videoId`, VideoUploadModelSelector, builder) }
+  blockedUser(builder: string | BloackedUserListModelSelector | ((selector: BloackedUserListModelSelector) => BloackedUserListModelSelector) | undefined) { return this.__child(`blockedUser`, BloackedUserListModelSelector, builder) }
 }
 export function selectFromUser() {
   return new UserModelSelector()

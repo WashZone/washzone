@@ -24,7 +24,7 @@ export const VideoBlock = ({
 }) => {
   const [loaded, setLoaded] = useState(false)
   const navigation = useNavigation<NavigationProp<VideosTabParamList>>()
-console.log("videoDetailsvideoDetails", videoDetails)
+  console.log("videoDetailsvideoDetails", videoDetails)
   const handleOnPress = () => {
     if (!disabled) {
       navigation.navigate("VideoDetails", { data: videoDetails?._id })
@@ -46,8 +46,9 @@ console.log("videoDetailsvideoDetails", videoDetails)
         <FastImage
           defaultSource={BROKEN_IMAGE}
           source={{
-            uri: `https://img.youtube.com/vi/${videoDetails?.attachmentVideoUrl?.split("=")[1]
-              }/0.jpg`,
+            uri: `https://img.youtube.com/vi/${
+              videoDetails?.attachmentVideoUrl?.split("=")[1]
+            }/0.jpg`,
           }}
           style={$videoPoster}
           resizeMode="cover"
@@ -96,15 +97,9 @@ export const VideoRowList = ({ channelDetails }) => {
       <View style={$containerCondition}>
         <TouchableOpacity
           style={$conditionContainer}
-          onPress={() =>
-            navigation.navigate("Playlist", { playlistId:channelDetails?._id  })
-          }
+          onPress={() => navigation.navigate("Playlist", { playlistId: channelDetails?._id })}
         >
-          <Text
-            text={channelDetails?.playListName}
-            weight="bold"
-            style={$titleText}
-          />
+          <Text text={channelDetails?.playListName} weight="bold" style={$titleText} />
           {channelDetails?.VideoDetail?.length > 0 && (
             <Text text="View All" weight="medium" style={$textViewAll} />
           )}

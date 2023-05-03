@@ -33,7 +33,8 @@ import {
   Role,
   AudioCall,
   VideoCall,
-  Profile
+  Profile,
+  BlockedUsers
 } from "../screens"
 import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
 import { DrawerNavigator } from "./Drawer/DrawerNavigator"
@@ -75,6 +76,7 @@ export type AppStackParamList = {
     answer?: any
     cancelled?: boolean
   }
+  BlockedUsers:undefined
   TestNotification: undefined
 }
 
@@ -115,6 +117,7 @@ const AppStack = observer(function AppStack() {
             <Stack.Screen name="P2PChat" component={P2PChat} />
             <Stack.Screen name="Support" component={Support} />
             <Stack.Screen name="UserProfile" component={Profile} />
+            <Stack.Screen name="BlockedUsers" component={BlockedUsers} />
             <Stack.Screen
               name="AudioCall"
               component={AudioCall}

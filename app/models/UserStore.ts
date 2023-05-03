@@ -13,6 +13,7 @@ export const UserStoreModel = types
     picture: types.optional(types.string, ""),
     isSocialLogin: types.optional(types.boolean, false),
     type: null || "facebook" || "google",
+    blockedUser: types.maybe(types.frozen([])),
   })
   .actions((store) => ({
     setName(firstName?: string, lastName?: string) {
@@ -35,6 +36,7 @@ export const UserStoreModel = types
       store.socialId = ""
       store.isSocialLogin = false
       store.type = null
+      // store.blockedUser = []
     },
     setUser(user: any) {
       store.email = user?.email
@@ -46,9 +48,26 @@ export const UserStoreModel = types
       store.socialId = user?.socialId
       store.isSocialLogin = user?.isSocialLogin
       store.type = user?.type
-      store._id=user?._id
+      store._id = user?._id
+      store.blockedUser = user?.blockedUser
+    },
+    removeFromBlocked(id: string) {
+      const filtered = store.blockedUser.filter((i) => i !== id)
+      store.blockedUser = [...filtered]
+    },
+
+    addToBlocked(id: string) {
+      if (store.blockedUser?.includes(id)) return
+      store.blockedUser = [...store.blockedUser, id]
     },
   }))
+  .views((store) => ({
+    isBlocked(id: string) {
+      return store.blockedUser?.includes(id)
+    },
+  })
 
-export interface UserStore extends Instance<typeof UserStoreModel> {}
-export interface UsertoreSnapshot extends SnapshotOut<typeof UserStoreModel> {}
+
+  )
+export interface UserStore extends Instance<typeof UserStoreModel> { }
+export interface UsertoreSnapshot extends SnapshotOut<typeof UserStoreModel> { }

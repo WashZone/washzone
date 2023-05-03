@@ -89,6 +89,7 @@ export const SignupScreen: FC<SignupProps> = observer(function LoginScreen(_prop
           type: "",
           isSocialLogin: false,
           _id: res.createUser._id,
+          blockedUser : [],
         })
         setIsSubmitted(false)
         const token = new Date()
@@ -212,7 +213,7 @@ export const SignupScreen: FC<SignupProps> = observer(function LoginScreen(_prop
         <Text
           color={colors.palette.glow100}
           weight="semiBold"
-          onPress={() => Linking.openURL('http://18.219.176.209:3000/Eula')}
+          onPress={() => Linking.openURL('http://admin.washzoneapp.com/Eula')}
           style={{}}
           tx="loginScreen.tncLink1"
           size="xxs"

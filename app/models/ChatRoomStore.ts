@@ -12,6 +12,7 @@ export const ChatRoomStoreModel = types
   })
   .actions(withSetPropAction)
   .actions((self) => ({
+   
     getChatRooms() {
       const res = self.allChatRooms.filter(i => !this.getLatestMessageForRoom(i?._id).isEmpty)
       return res
@@ -151,6 +152,10 @@ export const ChatRoomStoreModel = types
   .views((store) => ({
     get getAllChatRooms() {
       return store.allChatRooms
+    },
+    getRoomDetails(id:string) {
+      const res = store.allChatRooms.filter(i => i?._id===id)
+      return res?.[0]
     },
   }))
 

@@ -34,7 +34,7 @@ export const LoginView = observer(() => {
         email: authEmail,
         password: authPassword,
       })
-      console.log("res:mutateSignin",res )
+      console.log("res:mutateSignin", res)
       setUser({
         name: res.signin.name,
         email: res.signin.email,
@@ -45,10 +45,11 @@ export const LoginView = observer(() => {
         type: "",
         isSocialLogin: false,
         _id: res.signin._id,
+        blockedUser: res.signin.blockedUser
       })
       setAuthToken(String(Date.now()))
     } catch (error) {
-      console.log("LOGIN ERROR" , error)
+      console.log("LOGIN ERROR", error)
       Toast.show({ ...toastMessages.incorrectCredentials })
     }
   }

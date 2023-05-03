@@ -27,6 +27,8 @@ import { Rating } from "react-native-ratings"
 import Toast from "react-native-toast-message"
 import ImageView from "react-native-image-viewing"
 import { formatName } from "../../utils/formatName"
+import * as Haptics from "expo-haptics"
+import { showAlertYesNo } from "../../utils/helpers"
 
 interface ActionProps {
   icon: IconTypes
@@ -39,10 +41,12 @@ const PublisherDetails = ({ publisher, price }: { publisher: any; price: string 
   const [rateUserModalVisible, setRateUserModalVisible] = useState(false)
   const [avgRating, setAvgRating] = useState(publisher?.averageRating)
   const { rateUser } = useHooks()
+
   const navigation = useNavigation<NavigationProp<HomeTabParamList>>()
   console.log("PUBLISHER RATING", publisher)
 
   const onRateUser = async (rating: number) => {
+    console.log("RATING USER")
     const res = await rateUser(publisher?._id, rating)
     if (res) {
       setRateUserModalVisible(false)
@@ -58,9 +62,7 @@ const PublisherDetails = ({ publisher, price }: { publisher: any; price: string 
           <TouchableOpacity onPress={() => navigation.navigate("Profile", { user: publisher })}>
             <FastImage style={$publisherPicture} source={{ uri: publisher?.picture }} />
           </TouchableOpacity>
-          <View
-            style={$publisherChildContainer}
-          >
+          <View style={$publisherChildContainer}>
             <Text text={formatName(publisher?.name)} />
             <TouchableOpacity onPress={() => setRateUserModalVisible(true)}>
               <Rating
@@ -96,10 +98,19 @@ const PublisherDetails = ({ publisher, price }: { publisher: any; price: string 
   )
 }
 
-const MoreDetails = ({ classified }: { classified: any }) => {
+const MoreDetails = ({
+  classified,
+  flagClassfied,
+}: {
+  classified: any
+  flagClassfied: () => void
+}) => {
   return (
     <View style={$moreDetialsContainer}>
-      <Text text="Details" weight="semiBold" preset="h2" />
+      <View style={$flexRowBetween}>
+        <Text text="Details" weight="semiBold" preset="h2" />
+        <Icon icon="flag" onPress={flagClassfied} size={20}/>
+      </View>
       <View style={$containerCondition}>
         <View style={$conditionContainer}>
           <Text text="Condition" weight="medium" />
@@ -107,7 +118,6 @@ const MoreDetails = ({ classified }: { classified: any }) => {
         </View>
         <Icon icon="caretRight" size={22} />
       </View>
-
       <Text text={classified?.classifiedDetail} style={$descriptionText} />
     </View>
   )
@@ -201,9 +211,11 @@ export const ClassifiedsDetails: FC<ClassifiedsTabProps<"ClassifiedsDetails">> =
     const [loading, setLoading] = useState<boolean>(typeof classified === "string")
     const [isImageViewVisible, setImageViewVisible] = useState<boolean>(false)
     const {
-      api: { mutateGetClassifiedById },
+      api: { mutateFlagsOnFeed, mutateGetClassifiedById },
+      userStore: { _id },
     } = useStores()
 
+    const publisher = classifiedDetails?.UserId || classifiedDetails?.userId
     const handleStringTypeClassified = async () => {
       setLoading(true)
       if (typeof classified === "string") {
@@ -220,6 +232,29 @@ export const ClassifiedsDetails: FC<ClassifiedsTabProps<"ClassifiedsDetails">> =
       handleStringTypeClassified()
     }, [classified])
 
+    const flagClassfied = () => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
+      showAlertYesNo({
+        message: "Flag " + publisher?.first_name + "'s classified ?",
+        description:
+          "Our team will review the flagged content promptly and take appropriate action based on our community guidelines and policies.",
+        onYesPress: async () => {
+          try {
+            await mutateFlagsOnFeed({
+              flagsById: _id,
+              type: "classified",
+              classifiedId: classifiedDetails?._id,
+            })
+            Alert.alert("Success!", "We will review the flagged content within 24 hours.")
+          } catch (err) {
+            Alert.alert(err?.response?.errors?.[0]?.message)
+          }
+        },
+      })
+
+      console.log("FLAGGING CALSSIFIED : ", classifiedDetails?._id)
+    }
+
     if (loading) {
       return <Loading />
     }
@@ -231,14 +266,14 @@ export const ClassifiedsDetails: FC<ClassifiedsTabProps<"ClassifiedsDetails">> =
             <FastImage
               source={{ uri: classifiedDetails?.attachmentUrl }}
               style={$posterImage}
-            // resizeMode="contain"
+              // resizeMode="contain"
             />
           </TouchableOpacity>
           <PublisherDetails
             price={classifiedDetails?.prize}
             publisher={classifiedDetails?.UserId || classifiedDetails?.userId}
           />
-          <MoreDetails classified={classifiedDetails} />
+          <MoreDetails classified={classifiedDetails} flagClassfied={flagClassfied} />
         </ScrollView>
         <Pressable style={$backContainer} onPress={() => navigation.goBack()}>
           <Icon icon="back" color={colors.palette.primary100} />
@@ -249,13 +284,18 @@ export const ClassifiedsDetails: FC<ClassifiedsTabProps<"ClassifiedsDetails">> =
           imageIndex={0}
           visible={isImageViewVisible}
           swipeToCloseEnabled
-          animationType='fade'
+          animationType="fade"
           onRequestClose={() => setImageViewVisible(false)}
         />
       </View>
     )
   },
 )
+
+const $flexRowBetween: ViewStyle = {
+  flexDirection: "row",
+  justifyContent: "space-between",
+}
 
 const $flex1 = { flex: 1 }
 

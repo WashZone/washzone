@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react"
-import { View, ViewStyle } from "react-native"
+import { Keyboard, TextInput, View, ViewStyle } from "react-native"
 import { debounce } from "lodash"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 import { BottomModal, TextField } from "../../../components"
@@ -13,6 +13,7 @@ export const AddMessageModal = ({ isVisible, setVisible }) => {
   const [searchResults, setSearchResults] = useState([])
   const [searchKey, setSearchKey] = useState("")
   const [loading, setLoading] = useState(false)
+
   const handleSearch = useCallback(
     debounce(async (text: string) => {
       if (text.length > 0) {
@@ -36,6 +37,7 @@ export const AddMessageModal = ({ isVisible, setVisible }) => {
     <BottomModal propagateSwipe isVisible={isVisible} setVisible={setVisible}>
       <View style={$contentContainer}>
         <TextField
+
           value={searchKey}
           onChangeText={onChangeText}
           style={{ color: colors.palette.neutral100 }}

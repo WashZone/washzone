@@ -22,7 +22,7 @@ import { useHooks } from "../hooks"
 import { getIconForInteraction } from "../../utils/helpers"
 import Loading from "../../components/Loading"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
-import { AppStackParamList } from "../../navigators"
+import * as Haptics from 'expo-haptics'
 
 const ActionButtons = observer(function TopicsFeed({ data }: { data: any }) {
   const {
@@ -82,9 +82,10 @@ const ActionButtons = observer(function TopicsFeed({ data }: { data: any }) {
         label: "Share",
         icon: "forward",
         onPress: () =>
-          Share.share({
+       {    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
+        Share.share({
             message: `washzone://shared-video/${data?._id}`,
-          }),
+          })}
       },
       {
         label: isVideoSaved(data?._id) ? "Saved" : "Save",
@@ -217,6 +218,8 @@ export const VideoDetails: FC<VideosTabProps<"VideoDetails">> = observer(functio
   }, [data])
 
   const shareVideo = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
+
     Share.share({
       message: `washzone://shared-video/${videoDetails?._id}`,
     })

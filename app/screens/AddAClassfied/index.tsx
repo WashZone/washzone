@@ -128,7 +128,7 @@ export const AddAClassified: FC<AppStackScreenProps<"AddAClassified">> = functio
         type: selectedMedia.type,
         title,
         prize: price,
-        classifiedDetail: description,
+        classifiedDetail: description.trim(),
         condition: value,
       })
       await refreshClassifieds()

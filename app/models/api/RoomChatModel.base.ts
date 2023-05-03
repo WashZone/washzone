@@ -32,6 +32,9 @@ export const RoomChatModelBase = ModelBase
     adminId: types.union(types.undefined, types.null, types.late((): any => UserModel)),
     latestMessage: types.union(types.undefined, types.null, types.late((): any => UsersChatModel)),
     chatId: types.union(types.undefined, types.null, types.late((): any => UsersChatModel)),
+    blocked: types.union(types.undefined, types.null, types.boolean),
+    roomWith: types.union(types.undefined, types.null, types.string),
+    blockedBy: types.union(types.undefined, types.null, types.string),
   })
   .views(self => ({
     get store() {
@@ -46,6 +49,9 @@ export class RoomChatModelSelector extends QueryBuilder {
   get roomType() { return this.__attr(`roomType`) }
   get offer() { return this.__attr(`offer`) }
   get answer() { return this.__attr(`answer`) }
+  get blocked() { return this.__attr(`blocked`) }
+  get roomWith() { return this.__attr(`roomWith`) }
+  get blockedBy() { return this.__attr(`blockedBy`) }
   membersId(builder: string | UsersModelSelector | ((selector: UsersModelSelector) => UsersModelSelector) | undefined) { return this.__child(`membersId`, UsersModelSelector, builder) }
   adminId(builder: string | UserModelSelector | ((selector: UserModelSelector) => UserModelSelector) | undefined) { return this.__child(`adminId`, UserModelSelector, builder) }
   latestMessage(builder: string | UsersChatModelSelector | ((selector: UsersChatModelSelector) => UsersChatModelSelector) | undefined) { return this.__child(`latestMessage`, UsersChatModelSelector, builder) }
@@ -55,4 +61,4 @@ export function selectFromRoomChat() {
   return new RoomChatModelSelector()
 }
 
-export const roomChatModelPrimitives = selectFromRoomChat()._id.createdAt.updatedAt.roomType.offer.answer
+export const roomChatModelPrimitives = selectFromRoomChat()._id.createdAt.updatedAt.roomType.offer.answer.blocked.roomWith.blockedBy

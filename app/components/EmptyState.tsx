@@ -142,6 +142,12 @@ const EmptyStatePresets = {
     content: translate("emptyStateComponent.searchResults.content"),
     button: translate("emptyStateComponent.searchResults.button"),
   },
+  blocked : {
+    imageSource: sadFace,
+    heading: translate("emptyStateComponent.blocked.heading"),
+    content: translate("emptyStateComponent.blocked.content"),
+    button: translate("emptyStateComponent.blocked.button"),
+  }
 } as const
 
 /**

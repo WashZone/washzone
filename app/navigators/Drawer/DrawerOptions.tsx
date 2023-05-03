@@ -18,6 +18,7 @@ import { AppStackParamList } from "../AppNavigator"
 import { observer } from "mobx-react-lite"
 import { showAlertYesNo } from "../../utils/helpers"
 import { $contentCenter } from "../../screens/styles"
+import { HomeTabParamList } from "../../tabs"
 
 interface DrawerOptionType {
   icon: IconTypes
@@ -42,6 +43,7 @@ export const DrawerOptions = observer(function DrawerOptions({
   const [notifications, setNotifications] = useState(false)
 
   const navigaton = useNavigation<NavigationProp<AppStackParamList>>()
+  const navigatonHome = useNavigation<NavigationProp<HomeTabParamList>>()
 
   const drawerOptions: DrawerOptionType[] = [
     {
@@ -120,7 +122,7 @@ export const DrawerOptions = observer(function DrawerOptions({
 
   return (
     <View style={$container}>
-      <View style={$userProfileContainer}>
+      <TouchableOpacity onPress={() => {closeDrawer(); navigatonHome.navigate('Profile', { user: userStore })}} style={$userProfileContainer}>
         <Image
           source={{
             uri: userStore.picture,
@@ -129,7 +131,7 @@ export const DrawerOptions = observer(function DrawerOptions({
           resizeMode="cover"
         />
         <Text text={userStore.name} style={$userName} weight="bold" numberOfLines={1} />
-      </View>
+      </TouchableOpacity>
       <View style={$notificationContainer}>
         <ActionComponent key={drawerOptions[0].icon} action={drawerOptions[0]} />
         <Toggle

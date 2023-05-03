@@ -27,14 +27,14 @@ export const P2PUserComponent = observer(function p2PUserComponent({
   const receiver = data?.membersId.filter((i: any) => i._id !== myId)[0]
 
   const handlePress = () => {
-    navigation.navigate("P2PChat", { receiver, roomId: data?._id })
+    data?._id && navigation.navigate("P2PChat", { receiver, roomId: data?._id })
   }
   const latestMessage = getLatestMessageForRoom(data?._id)
   const [isRead, setIsRead] = useState(false)
 
   useEffect(() => {
     console.log('rooms', rooms)
-    console.log("IS READ:",rooms[data?._id], ' === ',latestMessage?.id )
+    console.log("IS READ:", rooms[data?._id], ' === ', latestMessage?.id)
     if (rooms[data?._id] === latestMessage?.id) setIsRead(true)
     else {
       setIsRead(false)
@@ -82,7 +82,7 @@ const $topContentContainer: ViewStyle = {
   justifyContent: "space-between",
 }
 
-const $alignCenter :ViewStyle ={ alignItems: "center" }
+const $alignCenter: ViewStyle = { alignItems: "center" }
 
 const $contentContainer: ViewStyle = {
   height: 66,

@@ -33,8 +33,7 @@ const en = {
     },
     allChats: {
       heading: "You haven’t chatted with anyone yet!",
-      content:
-        "",
+      content: "",
       button: "Start a Chat",
     },
     saved: {
@@ -52,6 +51,12 @@ const en = {
       content: "",
       button: "Back",
     },
+    blocked: {
+      heading: "No Blocked Users Found!",
+      content: "",
+      button: "Back",
+    },
+    
   },
 
   errors: {
@@ -184,7 +189,7 @@ const en = {
   },
   addAVideo: {
     iAgree: "I agree to the",
-    tnc: 'Terms of Service.'
+    tnc: "Terms of Service.",
   },
   toastMessages: {
     videoSavedSuccessfully: {
@@ -242,6 +247,15 @@ const en = {
     },
     createdSuccessfully: {
       text1: "Successfully Created!",
+    },
+    successfullyReported: {
+      text1: "Reported Successfully !",
+    },
+    succesfullyBlocked: {
+      text1: "Blocked Successfully !",
+    },
+    succesfullyFlagged: {
+      text1: "Flagged Successfully !",
     },
   },
 }

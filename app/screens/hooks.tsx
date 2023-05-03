@@ -8,6 +8,7 @@ import messaging from "@react-native-firebase/messaging"
 import { RNS3 } from "react-native-upload-aws-s3"
 import { Alert } from "react-native"
 import { getInputInteraction, likeDislikeCountUpdater } from "../utils/helpers"
+import * as Haptics from 'expo-haptics';
 
 export function useHooks() {
   const {
@@ -48,6 +49,7 @@ export function useHooks() {
       mutateSaveLikedClassifiedFeed,
       queryGetAllSavedByUserId,
       mutateGetClassifiedById,
+
       mutateUpdateDeletesavedclassified,
       queryGetAllStory,
       mutateSaveLikedVideo,
@@ -91,9 +93,21 @@ export function useHooks() {
       queryGetCommentsByHomePageId,
       mutateCommentOnHomepage,
       queryGetHomePagesByUsersId,
+      mutateBlockUserId,
+      mutateUnblockUserId
     },
     userStore,
   } = useStores()
+
+  const syncUser = async () => {
+    const res = await getUserById(userStore?._id)
+    console.log("NEW BLOCKED USERS", res?.blockedUser)
+    userStore?.setUser({
+      ...userStore,
+      picture: res?.picture,
+      blockedUser: res?.blockedUser,
+    })
+  }
 
   const resetPassword = async ({ email, otp, password }) => {
     console.log("password", password, email, otp)
@@ -406,6 +420,8 @@ export function useHooks() {
   }
 
   const interactWithSaveOnVideo = async (videoId: string) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
+
     const currentStatus = getSavedInteractionOnVideo(videoId)
     console.log("SAVE VIDEO", videoId, "Current Status : ", currentStatus)
     try {
@@ -557,6 +573,8 @@ export function useHooks() {
     button: "like" | "dislike"
     previousData: { interaction: Interaction; dislikeviews: number; likeviews: number }
   }) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
+
     const inputInteraction = getInputInteraction(button, previousData?.interaction)
     const newCount = likeDislikeCountUpdater(
       previousData.interaction,
@@ -584,6 +602,8 @@ export function useHooks() {
     button: "like" | "dislike"
     previousData: { interaction: Interaction; dislikeviews: number; likeviews: number }
   }) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
+
     const inputInteraction = getInputInteraction(button, previousData?.interaction)
     const newCount = likeDislikeCountUpdater(
       previousData.interaction,
@@ -611,6 +631,8 @@ export function useHooks() {
     button: "like" | "dislike"
     previousData: { interaction: Interaction; dislikeviews: number; likeviews: number }
   }) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
+
     const inputInteraction = getInputInteraction(button, previousData?.interaction)
     const newCount = likeDislikeCountUpdater(
       previousData.interaction,
@@ -752,23 +774,35 @@ export function useHooks() {
 
   const rateUser = async (userId: string, rating: number) => {
     try {
-      const res = await mutateCreateUserRating({
-        userId,
-        ratingByUserId: userStore._id,
-        ratingStar: rating,
-      })
+      try {
+        await mutateCreateUserRating({
+          userId,
+          ratingByUserId: userStore._id,
+          ratingStar: rating,
+        })
+      } catch (err) {
+        console.log("mutateCreateUserRating :ERRRRRR", err)
+
+      }
       const updatedRes = await queryGetratingOnUserId({ userId }, { fetchPolicy: "no-cache" })
       const avg = updatedRes?.getratingOnUserId?.data?.length > 0 ? updatedRes?.getratingOnUserId?.data[0]?.averageRating : 0
       return { success: true, avg }
     } catch (err) {
+      console.log("ERRRRRR", err)
       return false
     }
   }
 
   const getRatingOnUser = async (userId: string) => {
-    const res = await queryCheckUserRating({ userId, ratingByUserId: userStore._id }, { fetchPolicy: "no-cache" })
-    console.log("res.res.checkUserRating", res.checkUserRating)
-    return res.checkUserRating?.ratingStar
+    console.log('userId : ', userId, userStore._id)
+    try {
+      const res = await queryCheckUserRating({ userId, ratingByUserId: userStore._id }, { fetchPolicy: "no-cache" })
+      console.log("res.res.checkUserRating", res.checkUserRating)
+      return res.checkUserRating?.ratingStar
+    } catch (err) {
+      return 0
+    }
+
   }
 
   const onBoot = async () => {
@@ -782,7 +816,8 @@ export function useHooks() {
     syncAllChats().then(() => syncUnreadCount())
     fetchNotifications()
     await syncSavedInteractionsHook()
-    await syncInteractedVideosAndTopics()
+    // await syncInteractedVideosAndTopics()
+    syncUser()
     refreshTopics()
     refreshClassifieds()
     refreshVideos()
@@ -1173,7 +1208,32 @@ export function useHooks() {
     return res.getAllPlaylistVideo
   }
 
+  const blockUser = async (id: string) => {
+    await mutateBlockUserId(
+      {
+        blockUserById: id,
+        userId: userStore?._id
+      }
+    )
+    syncAllChats()
+
+    userStore.addToBlocked(id)
+  }
+
+  const unblockUser = async (id: string) => {
+    await mutateUnblockUserId(
+      {
+        blockUserById: id,
+        userId: userStore?._id
+      }
+    )
+    syncAllChats()
+    userStore.removeFromBlocked(id)
+  }
+
   return {
+    blockUser,
+    unblockUser,
     fetchNotifications,
     getVideosCategorically,
     getRoomById,

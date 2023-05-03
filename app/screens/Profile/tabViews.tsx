@@ -177,7 +177,7 @@ export const TopicsTabScreen = ({
       bounces={false}
       data={userTopics}
       showsVerticalScrollIndicator={false}
-      renderItem={({ item, index }) => <TopicComponent topic={item} />}
+      renderItem={({ item, index }) => <TopicComponent topic={item} index={index}/>}
     />
   )
 }
@@ -270,7 +270,7 @@ export const VideosTabScreen = ({
       ListHeaderComponent={<View style={{ height: spacing.homeScreen }} />}
       renderItem={({ item, index }) => (
         <View style={$videoBlockContainer}>
-          <VideoBlockFullWidth videoDetails={item} index={index} />
+          <VideoBlockFullWidth videoDetails={item} />
         </View>
       )}
     />

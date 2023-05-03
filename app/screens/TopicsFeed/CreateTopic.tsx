@@ -7,6 +7,7 @@ import {
   ViewStyle,
   Pressable,
   ActivityIndicator,
+  TouchableOpacity,
 } from "react-native"
 import { $fontWeightStyles, Icon, iconRegistry, Text, TextField } from "../../components"
 import { colors, spacing } from "../../theme"
@@ -22,10 +23,12 @@ import Animated, {
 import { useHooks } from "../hooks"
 import Toast from "react-native-toast-message"
 import { toastMessages } from "../../utils/toastMessages"
-
-export function CreateTopic() {
+import { observer } from "mobx-react-lite"
+import { NavigationProp, useNavigation } from "@react-navigation/native"
+import { HomeTabParamList } from "../../tabs"
+export const CreateTopic = observer(function CreateTopic() {
   const {
-    userStore: { picture, _id },
+    userStore
   } = useStores()
   const [topicDescription, setTopicDescription] = useState<string>("")
   const [topicTitle, setTopicTitle] = useState<string>("")
@@ -35,6 +38,7 @@ export function CreateTopic() {
   const inputTitleRef = useRef<TextInput>()
   const [selectedImage, setSelectedImage] = useState<any>({ height: 1, width: 1 })
   const { createTopic, loadStories, refreshTopics } = useHooks()
+  const navigation = useNavigation<NavigationProp<HomeTabParamList>>()
 
   const onPost = async () => {
     setIsPosting(true)
@@ -50,9 +54,9 @@ export function CreateTopic() {
     }
     try {
       await createTopic({
-        content: topicDescription,
+        content: topicDescription.trim(),
         attachment: selectedImage,
-        title: topicTitle,
+        title: topicTitle.trim(),
       })
       refreshTopics()
       loadStories()
@@ -90,7 +94,7 @@ export function CreateTopic() {
           progress.value = withTiming(1, { duration: 300 })
         }, 100)
       }
-    } catch (e) {}
+    } catch (e) { }
   }
 
   const onDeletePress = () => {
@@ -168,7 +172,9 @@ export function CreateTopic() {
       }}
     >
       <View style={$container}>
-        <FastImage source={{ uri: picture }} style={$picture} resizeMode="cover" />
+        <TouchableOpacity onPress={() => navigation.navigate('Profile', { user: userStore })}>
+          <FastImage source={{ uri: userStore?.picture }} style={$picture} resizeMode="cover" />
+        </TouchableOpacity>
         <View style={$contentContainer}>
           <TextField
             value={topicTitle}
@@ -233,7 +239,7 @@ export function CreateTopic() {
       </Animated.View>
     </View>
   )
-}
+})
 
 const $loadingIndicator: ViewStyle = {
   transform: [{ scaleX: 0.75 }, { scaleY: 0.75 }],

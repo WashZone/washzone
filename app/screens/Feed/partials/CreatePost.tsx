@@ -7,6 +7,7 @@ import {
   ViewStyle,
   Pressable,
   ActivityIndicator,
+  TouchableOpacity,
 } from "react-native"
 import { Icon, iconRegistry, Text, TextField } from "../../../components"
 import { colors, spacing } from "../../../theme"
@@ -21,17 +22,18 @@ import Animated, {
 } from "react-native-reanimated"
 import { useHooks } from "../../hooks"
 import { observer } from "mobx-react-lite"
+import { NavigationProp, useNavigation } from "@react-navigation/native"
+import { HomeTabParamList } from "../../../tabs"
 
 export const CreatePost = observer(function CreatePost() {
   const { createPost } = useHooks()
-  const {
-    userStore: { picture },
-  } = useStores()
+  const { userStore } = useStores()
   const [postContent, setPostContent] = useState<string>("")
   const [isPosting, setIsPosting] = useState<boolean>(false)
   const progress = useSharedValue(0)
   const inputRef = useRef<TextInput>()
   const [selectedImage, setSelectedImage] = useState<any>({ height: 1, width: 1 })
+  const navigation = useNavigation<NavigationProp<HomeTabParamList>>()
 
   const onPost = async () => {
     setIsPosting(true)
@@ -146,7 +148,9 @@ export const CreatePost = observer(function CreatePost() {
   return (
     <View>
       <View style={$container}>
-        <FastImage source={{ uri: picture }} style={$picture} resizeMode="cover" />
+        <TouchableOpacity onPress={() => navigation.navigate("Profile", { user: userStore })}>
+          <FastImage source={{ uri: userStore?.picture }} style={$picture} resizeMode="cover" />
+        </TouchableOpacity>
         <View style={$contentContainer}>
           <TextField
             value={postContent}

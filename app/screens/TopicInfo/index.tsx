@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useState } from "react"
-import { FlatList, TextInput, TextStyle, View, ViewStyle } from "react-native"
-import { CommentInput, Icon, Screen } from "../../components"
+import { FlatList, TextStyle, ViewStyle } from "react-native"
+import { CommentInput, Screen } from "../../components"
 import { colors, spacing } from "../../theme"
 import { HomeTabProps } from "../../tabs/Home"
 import { useHooks } from "../hooks"

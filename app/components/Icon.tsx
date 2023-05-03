@@ -162,6 +162,11 @@ export const iconRegistry = {
   speaker: require("../../assets/icons/speaker.png"),
   addImage: require("../../assets/icons/add-image.png"),
   shareCursive: require("../../assets/icons/share-cursive.png"),
+  reportUser: require("../../assets/icons/report-user.png"),
+  flag: require("../../assets/icons/flag.png"),
+  block: require("../../assets/icons/block.png"),
+  blockUser: require("../../assets/icons/block-user.png"),
+
 }
 
 const $imageStyle: ImageStyle = {

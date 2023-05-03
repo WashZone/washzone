@@ -58,6 +58,7 @@
     "expo-constants": "~13.2.3",
     "expo-device": "^5.2.1",
     "expo-font": "~10.2.0",
+    "expo-haptics": "^12.2.1",
     "expo-linking": "^3.2.3",
     "expo-localization": "13.1.0",
     "expo-modules-core": "~1.0.3",

@@ -1,9 +1,23 @@
 import en from "../i18n/en"
 
 export const toastMessages = {
+
+  succesfullyFlagged:{
+    type: "success",
+    ...en.toastMessages.succesfullyFlagged,
+  },
   videoSavedSuccessfully: {
     type: "success",
     ...en.toastMessages.videoSavedSuccessfully,
+  },
+  successfullyReported:{
+    type: "success",
+    ...en.toastMessages.successfullyReported,
+
+  },
+  succesfullyBlocked:{
+    type: "success",
+    ...en.toastMessages.succesfullyBlocked,
   },
   classifiedUnsavedSuccessfully: {
     type: "success",

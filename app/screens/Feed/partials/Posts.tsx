@@ -1,9 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from "react"
 import {
+  Alert,
   Dimensions,
-  FlatList,
   Pressable,
-  RefreshControl,
   Share,
   TextStyle,
   TouchableOpacity,
@@ -21,14 +20,16 @@ import { observer } from "mobx-react-lite"
 import { useHooks } from "../../hooks"
 import { useStores } from "../../../models"
 import { Stories } from "./Stories"
-import { $flex1 } from "../../styles"
+import { $flex1, $flexRow } from "../../styles"
 import ShimmerPlaceHolder from "react-native-shimmer-placeholder"
-import { getIconForInteraction } from "../../../utils/helpers"
+import { getIconForInteraction, showAlertYesNo } from "../../../utils/helpers"
+import * as Haptics from 'expo-haptics';
 
 import NativeAdView from "../../../utils/NativeAd"
 
 import { defaultImages } from "../../../utils"
 import LinearGradient from "react-native-linear-gradient"
+import { toastMessages } from "../../../utils/toastMessages"
 
 export interface PostComponentProps {
   post: any
@@ -44,6 +45,32 @@ const Actions = observer(function ActionButtons({ item }: { item: any }) {
     dislikeviews: item?.dislikeviews,
     likeviews: item?.likeviews,
   })
+  const { api: { mutateFlagsOnFeed }, userStore: { _id } } = useStores()
+
+  const flagPost = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
+    showAlertYesNo({
+      message: "Flag " + item?.userId?.first_name + "'s post ?",
+      description:
+        "Our team will review the flagged content promptly and take appropriate action based on our community guidelines and policies.",
+      onYesPress: async () => {
+        try {
+          await mutateFlagsOnFeed({
+            flagsById: _id,
+            type: 'post',
+            postId: item?._id
+          })
+          Alert.alert('Success!', 'We will review the flagged content within 24 hours.')
+        }
+        catch (err) {
+          Alert.alert(err?.response?.errors?.[0]?.message)
+        }
+
+      }
+    })
+
+    console.log("FLAGGING POST : ", item?._id)
+  }
 
   useEffect(() => {
     console.log("CHANGING DYANMIC DATA")
@@ -56,55 +83,63 @@ const Actions = observer(function ActionButtons({ item }: { item: any }) {
 
   return (
     <View style={$actionsContainer}>
-      <View style={$actionContainer}>
-        <Icon
-          icon={getIconForInteraction(dynamicData.interaction, "liked")}
-          size={20}
-          style={{ marginRight: spacing.extraSmall }}
-          onPress={async () => {
-            if (!loading) {
-              setLoading(true)
-              const res = await interactWithHomePost({
-                postId: item?._id,
-                button: "like",
-                previousData: dynamicData,
-              })
-              setDynamicData(res)
-              setLoading(false)
+      <View style={$flexRow}>
+        <View style={$actionContainer}>
+          <Icon
+            icon={getIconForInteraction(dynamicData.interaction, "liked")}
+            size={20}
+            style={{ marginRight: spacing.extraSmall }}
+            onPress={async () => {
+              if (!loading) {
+                setLoading(true)
+                const res = await interactWithHomePost({
+                  postId: item?._id,
+                  button: "like",
+                  previousData: dynamicData,
+                })
+                setDynamicData(res)
+                setLoading(false)
+              }
+            }}
+          />
+          <Text>{dynamicData?.likeviews}</Text>
+        </View>
+        <View style={$actionContainer}>
+          <Icon
+            icon={getIconForInteraction(dynamicData.interaction, "disliked")}
+            size={20}
+            style={{ marginRight: spacing.extraSmall }}
+            onPress={async () => {
+
+              if (!loading) {
+                setLoading(true)
+                const res = await interactWithHomePost({
+                  postId: item?._id,
+                  button: "dislike",
+                  previousData: dynamicData,
+                })
+                setDynamicData(res)
+                setLoading(false)
+              }
+            }}
+          />
+          <Text>{dynamicData?.dislikeviews}</Text>
+        </View>
+        <View style={$actionContainer}>
+          <Icon
+            icon="shareCursive"
+            size={20}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
+
+              Share.share({ message: "", title: "", url: `washzone://shared-post/${item?._id}` })
             }
-          }}
-        />
-        <Text>{dynamicData?.likeviews}</Text>
-      </View>
-      <View style={$actionContainer}>
-        <Icon
-          icon={getIconForInteraction(dynamicData.interaction, "disliked")}
-          size={20}
-          style={{ marginRight: spacing.extraSmall }}
-          onPress={async () => {
-            if (!loading) {
-              setLoading(true)
-              const res = await interactWithHomePost({
-                postId: item?._id,
-                button: "dislike",
-                previousData: dynamicData,
-              })
-              setDynamicData(res)
-              setLoading(false)
             }
-          }}
-        />
-        <Text>{dynamicData?.dislikeviews}</Text>
+          />
+        </View>
       </View>
-      <View style={$actionContainer}>
-        <Icon
-          icon="shareCursive"
-          size={20}
-          onPress={() =>
-            Share.share({ message: "", title: "", url: `washzone://shared-post/${item?._id}` })
-          }
-        />
-      </View>
+
+      <Icon icon="flag" size={20} onPress={flagPost} />
     </View>
   )
 })
@@ -196,7 +231,7 @@ export const PostComponent = ({
           <ShimmerPlaceHolder
             visible={loaded}
             shimmerStyle={{
-              marginTop:spacing.extraSmall,
+              marginTop: spacing.extraSmall,
               height: windowWidth,
               width: windowWidth,
             }}
@@ -318,4 +353,5 @@ const $actionsContainer: ViewStyle = {
   flexDirection: "row",
   padding: spacing.medium,
   zIndex: 999,
+  justifyContent: 'space-between',
 }

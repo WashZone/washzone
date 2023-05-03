@@ -80,11 +80,11 @@ export const UploadVideo: FC<AppStackScreenProps<"UploadVideo">> = function Uplo
       }
       setButtonLoading(true)
       await uploadVideo({
-        videoHeading: title,
+        videoHeading: title.trim(),
         thumbnailUrl: `https://img.youtube.com/vi/${ytVideoId}/default.jpg`,
         attachmentVideoUrl: parsedYtUrl,
         vedioPlaylistId: value,
-        description
+        description  : description.trim()
       })
       await refreshVideos()
       navigation.goBack()

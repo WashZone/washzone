@@ -29,7 +29,7 @@ export const SendOfferModal = ({ isVisible, setVisible, receiver, classified }) 
       Keyboard.dismiss()
       setVisible(false)
       setLoading(false)
-      navigation.navigate("P2PChat", { receiver, roomId })
+      roomId && navigation.navigate("P2PChat", { receiver, roomId })
       setAmount("")
     }, 3000)
   }

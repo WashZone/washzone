@@ -24,7 +24,7 @@ export const ResultComponent = ({
     const roomId = await getOrCreateRoom(data?._id)
     Keyboard.dismiss()
     setVisible(false)
-    navigation.navigate("P2PChat", { receiver: data, roomId })
+    roomId && navigation.navigate("P2PChat", { receiver: data, roomId })
   }
 
   return (

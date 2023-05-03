@@ -36,9 +36,9 @@ export const CommentInput = ({ createComment, bottomSafe, placeholder }: Comment
   const safeAreInsets = useSafeAreaInsets()
 
   const onComment = async () => {
-    if (commentText?.length === 0) return
+    if (commentText?.length === 0 && selectedMedia === undefined) return
     setIsCommenting(true)
-    await createComment(commentText, selectedMedia)
+    await createComment(commentText.trim(), selectedMedia)
     setCommentText("")
     setSelectedMedia(undefined)
     setIsCommenting(false)
@@ -65,12 +65,7 @@ export const CommentInput = ({ createComment, bottomSafe, placeholder }: Comment
 
   const $animatedMediaContainer = useAnimatedStyle(() => {
     return {
-      bottom: interpolate(focus.value, [0, 1], [
-          
-        bottomSafe ? 54 +safeAreInsets.bottom: 54 , 
-        100 
-    
-    ]),
+      bottom: interpolate(focus.value, [0, 1], [bottomSafe ? 54 + safeAreInsets.bottom : 54, 100]),
       position: "absolute",
     }
   })
@@ -131,7 +126,8 @@ export const CommentInput = ({ createComment, bottomSafe, placeholder }: Comment
               icon="send"
               size={28}
               onPress={onComment}
-              color={commentText.length > 1 ? colors.palette.primary100 : colors.palette.neutral400}
+              disabled={commentText.length < 2 || selectedMedia}
+              color={(commentText.length > 1 ||selectedMedia) ? colors.palette.primary100 : colors.palette.neutral400}
             />
           )}
         </TouchableOpacity>

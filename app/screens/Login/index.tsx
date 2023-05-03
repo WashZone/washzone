@@ -156,7 +156,7 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
           <SocialLogin />
           <View style={$footerContainer}>
             <Text tx="loginScreen.tncIntro" style={$textLight} />
-            <Text tx="loginScreen.tncLink1" onPress={() => Linking.openURL('http://18.219.176.209:3000/Eula')} style={$textHyperLink} />
+            <Text tx="loginScreen.tncLink1" onPress={() => Linking.openURL('http://admin.washzoneapp.com/Eula')} style={$textHyperLink} />
             <Text tx="loginScreen.and" style={$textLight} />
             <Text onPress={() => navigation.navigate('Legal')} tx="loginScreen.tncLink2" style={$textHyperLink} />
           </View>
