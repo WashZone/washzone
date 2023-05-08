@@ -9,7 +9,8 @@ import { AppStackParamList } from "../../../navigators"
 import { colors, spacing } from "../../../theme"
 import { formatName } from "../../../utils/formatName"
 import { useHooks } from "../../hooks"
-import { $flex1, $flexRow } from "../../styles"
+import Toast from 'react-native-toast-message'
+import { toastMessages } from "../../../utils/toastMessages"
 
 export const ResultComponent = ({
   data,
@@ -24,6 +25,7 @@ export const ResultComponent = ({
     const roomId = await getOrCreateRoom(data?._id)
     Keyboard.dismiss()
     setVisible(false)
+    if(!roomId) Toast.show(toastMessages.mightbeblocked)
     roomId && navigation.navigate("P2PChat", { receiver: data, roomId })
   }
 

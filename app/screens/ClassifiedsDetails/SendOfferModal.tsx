@@ -6,6 +6,8 @@ import { $fontWeightStyles, BottomModal, Button, Text, TextField } from "../../c
 import { AppStackParamList } from "../../navigators"
 import { colors, spacing } from "../../theme"
 import { useHooks } from "../hooks"
+import { toastMessages } from "../../utils/toastMessages"
+import Toast from 'react-native-toast-message'
 
 export const SendOfferModal = ({ isVisible, setVisible, receiver, classified }) => {
   const [amount, setAmount] = useState("")
@@ -24,11 +26,13 @@ export const SendOfferModal = ({ isVisible, setVisible, receiver, classified }) 
       description: classified?.classifiedDetail,
       image: classified?.attachmentUrl,
     })
-  
+
     setTimeout(() => {
       Keyboard.dismiss()
       setVisible(false)
       setLoading(false)
+      if (!roomId) Toast.show(toastMessages.mightbeblocked)
+
       roomId && navigation.navigate("P2PChat", { receiver, roomId })
       setAmount("")
     }, 3000)

@@ -321,6 +321,7 @@ mutateBlockUserId="mutateBlockUserId",
 mutateUnblockUserId="mutateUnblockUserId",
 mutateCreateChatRoom="mutateCreateChatRoom",
 mutateUpdateBlockStatus="mutateUpdateBlockStatus",
+mutateUpdateUnBlockStatus="mutateUpdateUnBlockStatus",
 mutateCreateUserMessage="mutateCreateUserMessage",
 mutateCreateUserCall="mutateCreateUserCall",
 mutateSendCallNotification="mutateSendCallNotification",
@@ -844,6 +845,11 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     },
     mutateUpdateBlockStatus(variables: { roomWith: string, userId: string }, resultSelector: string | ((qb: RoomChatModelSelector) => RoomChatModelSelector) = roomChatModelPrimitives.toString(), optimisticUpdate?: () => void) {
       return self.mutate<{ updateBlockStatus: RoomChatModelType}>(`mutation updateBlockStatus($roomWith: String!, $userId: String!) { updateBlockStatus(roomWith: $roomWith, userId: $userId) {
+        ${typeof resultSelector === "function" ? resultSelector(new RoomChatModelSelector()).toString() : resultSelector}
+      } }`, variables, optimisticUpdate)
+    },
+    mutateUpdateUnBlockStatus(variables: { roomWith: string, userId: string }, resultSelector: string | ((qb: RoomChatModelSelector) => RoomChatModelSelector) = roomChatModelPrimitives.toString(), optimisticUpdate?: () => void) {
+      return self.mutate<{ updateUnBlockStatus: RoomChatModelType}>(`mutation updateUnBlockStatus($roomWith: String!, $userId: String!) { updateUnBlockStatus(roomWith: $roomWith, userId: $userId) {
         ${typeof resultSelector === "function" ? resultSelector(new RoomChatModelSelector()).toString() : resultSelector}
       } }`, variables, optimisticUpdate)
     },

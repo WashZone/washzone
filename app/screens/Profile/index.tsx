@@ -163,6 +163,7 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
 
   const onMessage = async () => {
     const roomId = await getOrCreateRoom(user?._id)
+    if (!roomId) Toast.show(toastMessages.mightbeblocked)
     roomId && navigation.navigate("P2PChat", { receiver: user, roomId })
   }
 
@@ -173,7 +174,7 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
         reportedById: _id,
         userId: user?._id,
       })
-      Toast.show(toastMessages.successfullyReported)
+      Alert.alert(user?.first_name+' has been reported!',`Thank you for reporting the user. Please be assured that all reports are taken seriously and appropriate action will be taken if necessary. We will review the user within 24hours.`)
     } catch (err) {
       Toast.show(toastMessages.somethingWentWrong)
     }

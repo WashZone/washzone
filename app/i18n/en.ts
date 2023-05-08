@@ -56,7 +56,6 @@ const en = {
       content: "",
       button: "Back",
     },
-    
   },
 
   errors: {
@@ -192,6 +191,10 @@ const en = {
     tnc: "Terms of Service.",
   },
   toastMessages: {
+    mightbeblocked: {
+      text1: "Oops! Might be Blocked.",
+      text2: "User might be blocked or might have blocked you.",
+    },
     videoSavedSuccessfully: {
       text1: "Video Successfully Saved!",
       text2: "Head over to Saved to view your saved items.",

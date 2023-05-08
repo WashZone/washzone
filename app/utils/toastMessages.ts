@@ -1,7 +1,10 @@
 import en from "../i18n/en"
 
 export const toastMessages = {
-
+  mightbeblocked:{
+    type: "error",
+    ...en.toastMessages.mightbeblocked,
+  },
   succesfullyFlagged:{
     type: "success",
     ...en.toastMessages.succesfullyFlagged,

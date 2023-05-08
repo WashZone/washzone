@@ -17,7 +17,7 @@ import { withSetPropAction } from "./helpers/withSetPropAction"
 import { CallStoreModel } from "./CallStore"
 import { NotificationStoreModel } from "./NotificationStore"
 
-const baseURL = "http://18.219.176.209:3002"
+const baseURL = "https://api.washzoneapp.com"
 
 export const env = {
   gqlHttpClient: createHttpClient(`${baseURL}/graphql`),

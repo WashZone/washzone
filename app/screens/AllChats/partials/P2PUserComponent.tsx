@@ -9,6 +9,8 @@ import { AppStackParamList } from "../../../navigators"
 import { colors, spacing } from "../../../theme"
 import { fromNow } from "../../../utils/agoFromNow"
 import { formatName } from "../../../utils/formatName"
+import { toastMessages } from "../../../utils/toastMessages"
+import Toast from "react-native-toast-message"
 
 export const P2PUserComponent = observer(function p2PUserComponent({
   data,
@@ -27,6 +29,7 @@ export const P2PUserComponent = observer(function p2PUserComponent({
   const receiver = data?.membersId.filter((i: any) => i._id !== myId)[0]
 
   const handlePress = () => {
+    if (!data?._id) Toast.show(toastMessages.mightbeblocked)
     data?._id && navigation.navigate("P2PChat", { receiver, roomId: data?._id })
   }
   const latestMessage = getLatestMessageForRoom(data?._id)

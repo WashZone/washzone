@@ -235,7 +235,7 @@ export function SocialLogin() {
 
   const options: OptionType[] = Platform.select({
     ios: [
-      { icon: "fb", key: "facebook", onPress: loginWithFacebook },
+      // { icon: "fb", key: "facebook", onPress: loginWithFacebook },
       { icon: "apple", key: "apple", onPress: signInWithApple },
       { icon: "google", key: "google", onPress: siginGoogle },
     ],
