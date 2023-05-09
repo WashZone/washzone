@@ -34,7 +34,7 @@ import { IncomingCallHook } from "../../utils/incomingCall"
 
 const STUN_SERVER = "stun:stun.l.google.com:19302"
 const TURN_SERVER = "turn:18.219.176.209:3478?transport=tcp"
-const sessionConstraints = {
+let sessionConstraints = {
   mandatory: {
     OfferToReceiveAudio: true,
     OfferToReceiveVideo: true,
@@ -42,7 +42,7 @@ const sessionConstraints = {
   },
 }
 
-export const VideoCall: FC<AppStackScreenProps<"VideoCall">> = observer(
+export const VideoCallAndroid: FC<AppStackScreenProps<"VideoCallAndroid">> = observer(
   function CallScreen(props) {
     const { receiver, offer, answer, role, roomId, cancelled } = props.route.params
     const { endAllCall } = IncomingCallHook()
@@ -492,7 +492,7 @@ export const VideoCall: FC<AppStackScreenProps<"VideoCall">> = observer(
   },
 )
 
-export default VideoCall
+export default VideoCallAndroid
 
 const styles = StyleSheet.create({
   root: {

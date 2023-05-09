@@ -24,4 +24,4 @@ export const $contentCenter: ViewStyle = {
   alignItems: "center",
 }
 
-export const $scaleFull :ViewStyle={ height: Dimensions.get('window').height, width: Dimensions.get('window').width}
+export const $scaleFull :ViewStyle={ height: Dimensions.get('screen').height, width: Dimensions.get('screen').width}

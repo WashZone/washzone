@@ -1165,7 +1165,7 @@ export function useHooks() {
     // we have to send a setter alert and then a actualy display alert
     // as we send the alert twice we need a way to identify each, we will do that via a type key in receiver
     // (Why Receiver? cuz rn, i am using Stringified JSON in receiver field and that being so, i can add remove feilds as per i see fit)
-    await mutateSendCallNotification({
+    const res = await mutateSendCallNotification({
       data: {
         roomId,
         type,
@@ -1173,6 +1173,7 @@ export function useHooks() {
       },
       notificationToken: token,
     })
+    console.log("mutateSendCallNotification",  res)
   }
 
   const getRoomById = async (roomId: string) => {

@@ -8,9 +8,7 @@ import { $fontWeightStyles, Icon, Text } from "../../../components"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { formatName } from "../../../utils/formatName"
-import { he } from "date-fns/locale"
 import { Role } from "../../CallScreen/audioCall"
-import { useStores } from "../../../models"
 
 export const P2PHeader = ({ data, roomId }) => {
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
@@ -60,7 +58,7 @@ export const P2PHeader = ({ data, roomId }) => {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-              navigation.navigate("VideoCall", {
+              navigation.navigate("VideoCallAndroid", {
                 receiver: data,
                 role: Role.initiator,
                 roomId,

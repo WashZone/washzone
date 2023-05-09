@@ -33,7 +33,13 @@ import { IncomingCallHook } from "../../utils/incomingCall"
 
 const STUN_SERVER = "stun:stun.l.google.com:19302"
 const TURN_SERVER = "turn:18.219.176.209:3478?transport=tcp"
-
+const sessionConstraints = {
+  mandatory: {
+    OfferToReceiveAudio: true,
+    OfferToReceiveVideo: true,
+    VoiceActivityDetection: true,
+  },
+}
 export const AudioCall: FC<AppStackScreenProps<"AudioCall">> = observer(function CallScreen(props) {
   const { receiver, offer, answer, role, roomId, cancelled } = props.route.params
   const { endAllCall } = IncomingCallHook()
@@ -46,6 +52,7 @@ export const AudioCall: FC<AppStackScreenProps<"AudioCall">> = observer(function
   const [remoteStream, setRemoteStream] = useState<any>({ toURL: () => null })
   const safeArea = useSafeAreaInsets()
   console.log("OFFER FROM ", receiver, offer)
+  console.log("MODE MODE ", receiver?.name)
 
   useEffect(() => {
     if (offer) {
@@ -67,6 +74,7 @@ export const AudioCall: FC<AppStackScreenProps<"AudioCall">> = observer(function
     if (role === Role.receiver) {
       setStatus(CallStatus.ringing)
     }
+
     const handleInit = async () => {
       setTimeout(
         () =>
@@ -83,6 +91,7 @@ export const AudioCall: FC<AppStackScreenProps<"AudioCall">> = observer(function
         1000,
       )
     }
+
     registerPeerEvents()
     initLocalVideo()
 
@@ -104,6 +113,7 @@ export const AudioCall: FC<AppStackScreenProps<"AudioCall">> = observer(function
     InCallManager.start()
     // InCallManager.setKeepScreenOn(true)
     InCallManager.setSpeakerphoneOn(speaker)
+    InCallManager.setKeepScreenOn(true)
     return () => {
       InCallManager.stop()
     }
@@ -121,7 +131,7 @@ export const AudioCall: FC<AppStackScreenProps<"AudioCall">> = observer(function
     setStatus(CallStatus.cancelled)
   }
 
-  // Defioning RTCConnection
+  // Defining RTCConnection
   const yourConn = useRef(
     new RTCPeerConnection({
       iceServers: [
@@ -143,9 +153,71 @@ export const AudioCall: FC<AppStackScreenProps<"AudioCall">> = observer(function
   }, [cancelled])
 
   const registerPeerEvents = () => {
+    yourConn.current.addEventListener("connectionstatechange", (event) => {
+      switch (yourConn.current.connectionState) {
+        case "closed":
+          // You can handle the call being disconnected here.
+
+          break
+      }
+    })
+
+    yourConn.current.addEventListener("icecandidate", (event) => {
+      // When you find a null candidate then there are no more candidates.
+      // Gathering of candidates has finished.
+      if (!event.candidate) {
+        return
+      }
+
+      // Send the event.candidate onto the person you're calling.
+      // Keeping to Trickle ICE Standards, you should send the candidates immediately.
+    })
+
+    yourConn.current.addEventListener("icecandidateerror", (event) => {
+      // You can ignore some candidate errors.
+      // Connections can still be made even when errors occur.
+    })
+
+    yourConn.current.addEventListener("iceconnectionstatechange", (event) => {
+      switch (yourConn.current.iceConnectionState) {
+        case "connected":
+        case "completed":
+          // You can handle the call being connected here.
+          // Like setting the video streams to visible.
+
+          break
+      }
+    })
+
+    yourConn.current.addEventListener("negotiationneeded", (event) => {
+      // You can start the offer stages here.
+      // Be careful as this event can be called multiple times.
+    })
+
+    yourConn.current.addEventListener("signalingstatechange", (event) => {
+      switch (yourConn.current.signalingState) {
+        case "closed":
+          // You can handle the call being disconnected here.
+
+          break
+      }
+    })
+
+    yourConn.current.addEventListener("track", (event) => {
+      // Grab the remote track from the connected participant.
+      // console.log("track:track",event )
+      // const  remoteMediaStream = remoteStream || new MediaStream();
+      // remoteMediaStream.addTrack( event?.stream, remoteMediaStream );
+      setRemoteStream(event?.streams[0])
+    })
+
+    // // Add our stream to the peer connection.
+    // localMediaStream.getTracks().forEach(
+    //   track => peerConnection.addTrack( track, localMediaStream );
+    // );
     yourConn.current.onaddstream = (event) => {
       console.log("On Add Remote Stream")
-      setRemoteStream(event.stream)
+      // setRemoteStream(event.stream)
     }
     yourConn.current.onicecandidate = (event) => {
       if (event.candidate) {
@@ -154,21 +226,54 @@ export const AudioCall: FC<AppStackScreenProps<"AudioCall">> = observer(function
     }
   }
 
-  const initLocalVideo = () => {
-    mediaDevices
-      .getUserMedia({
-        audio: true,
-        video: false,
-      })
-      .then((stream) => {
-        setLocalStream(stream)
-        yourConn.current.addStream(stream)
-      })
-      .catch((error) => {
-        Alert.alert(JSON.stringify(error))
-        handleLeave()
-        navigationRef.goBack()
-      })
+  const initLocalVideo = async () => {
+    const mediaConstraints = {
+      audio: true,
+      video: {
+        frameRate: 50,
+        facingMode: "user",
+      },
+    }
+
+    // let localMediaStream;
+    // let remoteMediaStream;
+    // let isVoiceOnly = false;
+
+    try {
+      const mediaStream = await mediaDevices.getUserMedia(mediaConstraints)
+
+      // if ( isVoiceOnly ) {
+      const videoTrack = mediaStream.getVideoTracks()[0]
+      videoTrack.enabled = false
+      // };
+
+      setLocalStream(mediaStream)
+      mediaStream.getTracks().forEach((track) => yourConn.current.addTrack(track, mediaStream))
+    } catch (err) {
+      // Handle Error
+    }
+
+    // mediaDevices
+    //   .getUserMedia({
+    //     audio: true,
+    //     video: {
+    //       mandatory: {
+    //         minWidth: 500, // Provide your own width, height and frame rate here
+    //         minHeight: 300,
+    //         minFrameRate: 45,
+    //       },
+    //       facingMode: "user",
+    //     },
+    //   })
+    //   .then((stream) => {
+    //     setLocalStream(stream)
+    //     yourConn.current.addStream(stream)
+    //   })
+    //   .catch((error) => {
+    //     Alert.alert(JSON.stringify(error))
+    //     handleLeave()
+    //     navigationRef.goBack()
+    //   })
   }
 
   const onCall = () => {
@@ -184,7 +289,7 @@ export const AudioCall: FC<AppStackScreenProps<"AudioCall">> = observer(function
     connectedUser.current = otherUser
     console.log("Calling to", otherUser)
     // create an offer
-    yourConn.current.createOffer().then((offer) => {
+    yourConn.current.createOffer(sessionConstraints).then((offer) => {
       yourConn.current.setLocalDescription(offer).then(() => {
         console.log("Sending Ofer")
         console.log("OFFER", JSON.stringify(offer))
@@ -219,24 +324,19 @@ export const AudioCall: FC<AppStackScreenProps<"AudioCall">> = observer(function
     setCallActive(true)
     console.log("Accepting CALL", name, offer)
     yourConn.current
-      .setRemoteDescription(offer)
-      .then(function () {
+      .setRemoteDescription(new RTCSessionDescription(offer))
+      .then(async function () {
         connectedUser.current = name
-        return yourConn.current.createAnswer()
+        const ans = await yourConn.current.createAnswer()
+        return ans
       })
       .then(function (answer) {
         console.log("ANSWER", JSON.stringify(answer))
         yourConn.current.setLocalDescription(answer)
         setStatus(CallStatus.connected)
-        sendSilentAlert(
-          receiver?.notificationToken,
-          CallTypes.answer,
-          roomId,
-          {
-            answer: JSON.stringify(answer),
-          },
-          false,
-        )
+        sendSilentAlert(receiver?.notificationToken, CallTypes.answer, roomId, {
+          answer: JSON.stringify(answer),
+        })
       })
   }
 
@@ -454,7 +554,6 @@ const $localVideo: ViewStyle = {
 }
 
 const $localVideoContainer: ViewStyle = {
-  height: Dimensions.get("window").height,
-  width: Dimensions.get("window").width,
-  backgroundColor: "green",
+  height: Dimensions.get("screen").height,
+  width: Dimensions.get("screen").width,
 }

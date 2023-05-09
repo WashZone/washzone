@@ -27,6 +27,7 @@ export * from "./P2PChatScreen"
 export * from './PostInfo'
 export * from "./CallScreen/audioCall"
 export * from "./CallScreen/videoCall"
+export * from "./CallScreen/videoCallAndroid"
 export * from './VerifyOTP'
 export * from './ViewChannel'
 export * from './BlockedUsers'

@@ -34,7 +34,8 @@ import {
   AudioCall,
   VideoCall,
   Profile,
-  BlockedUsers
+  BlockedUsers,
+  VideoCallAndroid
 } from "../screens"
 import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
 import { DrawerNavigator } from "./Drawer/DrawerNavigator"
@@ -61,6 +62,14 @@ export type AppStackParamList = {
   UserProfile: { user: any, header?: boolean },
   P2PChat: { receiver: any; roomId: string | undefined }
   AudioCall: {
+    receiver: any
+    role: Role
+    roomId: string
+    offer?: any
+    answer?: any
+    cancelled?: boolean
+  }
+  VideoCallAndroid:{
     receiver: any
     role: Role
     roomId: string
@@ -126,6 +135,11 @@ const AppStack = observer(function AppStack() {
             <Stack.Screen
               name="VideoCall"
               component={VideoCall}
+              options={{ presentation: "containedModal" }}
+            />
+              <Stack.Screen
+              name="VideoCallAndroid"
+              component={VideoCallAndroid}
               options={{ presentation: "containedModal" }}
             />
             <Stack.Screen
