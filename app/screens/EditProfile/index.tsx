@@ -1,5 +1,12 @@
 import React, { FC, useState } from "react"
-import { ActivityIndicator, TextStyle, View, ViewStyle } from "react-native"
+import {
+  ActivityIndicator,
+  ImageBackground,
+  TextStyle,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from "react-native"
 import { Header, Screen, Text, TextField, Button } from "../../components"
 import { colors, spacing } from "../../theme"
 
@@ -21,6 +28,7 @@ export const EditProfile: FC<AppStackScreenProps<"EditProfile">> = function Edit
   const [lastName, setLastName] = useState(userStore.last_name)
   const [bio, setBio] = useState(userStore?.description || "")
   const [picture, setPicture] = useState({ uri: userStore.picture })
+  const [banner, setBanner] = useState({ uri: userStore?.banner })
   const [buttonLoading, setButtonLoading] = useState<boolean>(false)
   const [justOverflowed, setJustOverflowed] = useState<boolean>(false)
 
@@ -30,6 +38,13 @@ export const EditProfile: FC<AppStackScreenProps<"EditProfile">> = function Edit
     const res = await MediaPicker()
     if (res) {
       setPicture(res)
+    }
+  }
+
+  const onEditBanner = async () => {
+    const res = await MediaPicker()
+    if (res) {
+      setBanner(res)
     }
   }
 
@@ -77,69 +92,81 @@ export const EditProfile: FC<AppStackScreenProps<"EditProfile">> = function Edit
         onLeftPress={() => navigation.goBack()}
         leftIconColor={colors.palette.neutral600}
       />
-      <Screen contentContainerStyle={[$container, $content]}>
+      <Screen contentContainerStyle={$container}>
         <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
           {/* <View style={}> */}
-          <FastImage source={{ uri: picture?.uri }} style={$picture} />
+          <TouchableOpacity onPress={onEditBanner}>
+            <ImageBackground
+              style={{ backgroundColor: colors.palette.primary400, marginBottom: spacing.medium }}
+              source={{ uri: banner?.uri }}
+            >
+              <TouchableOpacity onPress={onEditPP} style={$pictureWrapper}>
+                <FastImage source={{ uri: picture?.uri }} style={$picture} />
+              </TouchableOpacity>
+            </ImageBackground>
+          </TouchableOpacity>
+          <View style={$content}>
+            <TextField
+              value={firstName}
+              onChangeText={onChangeFirstName}
+              containerStyle={$textField}
+              autoCorrect={false}
+              placeholder="First Name"
+              style={$inputText}
+              inputWrapperStyle={$inputWrapperStyle}
+              placeholderTextColor={colors.palette.overlay50}
+              maxLength={20}
+            />
 
-          <Text text="Edit Profile Picture" style={$editPP} onPress={onEditPP} />
-          <TextField
-            value={firstName}
-            onChangeText={onChangeFirstName}
-            containerStyle={$textField}
-            autoCorrect={false}
-            placeholder="First Name"
-            style={$inputText}
-            inputWrapperStyle={$inputWrapperStyle}
-            placeholderTextColor={colors.palette.overlay50}
-            maxLength={20}
-          />
+            <TextField
+              value={lastName}
+              onChangeText={onChangeLastName}
+              containerStyle={$textField}
+              autoCorrect={false}
+              placeholder="Last Name"
+              style={$inputText}
+              inputWrapperStyle={$inputWrapperStyle}
+              placeholderTextColor={colors.palette.overlay50}
+              maxLength={20}
+            />
 
-          <TextField
-            value={lastName}
-            onChangeText={onChangeLastName}
-            containerStyle={$textField}
-            autoCorrect={false}
-            placeholder="Last Name"
-            style={$inputText}
-            inputWrapperStyle={$inputWrapperStyle}
-            placeholderTextColor={colors.palette.overlay50}
-            maxLength={20}
-          />
-
-          <TextField
-            value={bio}
-            onChangeText={onChangeBio}
-            containerStyle={$textField}
-            autoCorrect={false}
-            placeholder="Bio"
-            style={[$inputText, $bioHeight, justOverflowed && { color: colors.palette.angry500 }]}
-            inputWrapperStyle={[
-              $inputWrapperStyle,
-              { borderColor: justOverflowed ? colors.palette.angry500 : colors.palette.primary100 },
-            ]}
-            placeholderTextColor={colors.palette.overlay50}
-            multiline
-          />
-
-          <Button
-            onPress={onSubmit}
-            disabled={!isActive || buttonLoading}
-            style={[
-              $submitButton,
-              { backgroundColor: isActive ? colors.palette.primary100 : colors.palette.neutral400 },
-            ]}
-            text={"Save"}
-            textStyle={$textButton}
-            RightAccessory={() => (
-              <ActivityIndicator
-                animating={buttonLoading}
-                size={20}
-                style={$indicator}
-                color={colors.palette.neutral100}
-              />
-            )}
-          />
+            <TextField
+              value={bio}
+              onChangeText={onChangeBio}
+              containerStyle={$textField}
+              autoCorrect={false}
+              placeholder="Bio"
+              style={[$inputText, $bioHeight, justOverflowed && { color: colors.palette.angry500 }]}
+              inputWrapperStyle={[
+                $inputWrapperStyle,
+                {
+                  borderColor: justOverflowed ? colors.palette.angry500 : colors.palette.primary100,
+                },
+              ]}
+              placeholderTextColor={colors.palette.overlay50}
+              multiline
+            />
+            <Button
+              onPress={onSubmit}
+              disabled={!isActive || buttonLoading}
+              style={[
+                $submitButton,
+                {
+                  backgroundColor: isActive ? colors.palette.primary100 : colors.palette.neutral400,
+                },
+              ]}
+              text={"Save"}
+              textStyle={$textButton}
+              RightAccessory={() => (
+                <ActivityIndicator
+                  animating={buttonLoading}
+                  size={20}
+                  style={$indicator}
+                  color={colors.palette.neutral100}
+                />
+              )}
+            />
+          </View>
         </KeyboardAwareScrollView>
       </Screen>
     </>
@@ -175,9 +202,10 @@ const $picture: ImageStyle = {
   height: 100,
   width: 100,
   borderRadius: 50,
-  alignSelf: "center",
-  marginTop: 40,
+
 }
+
+const $pictureWrapper: ViewStyle = { alignSelf: 'center', borderRadius: 50, backgroundColor: 'red', marginVertical: 30, }
 
 const $titleStyle: TextStyle = {
   color: colors.palette.primary100,

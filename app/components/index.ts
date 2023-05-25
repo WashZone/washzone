@@ -14,4 +14,5 @@ export * from "./Loading"
 export * from "./CustomFlatlist"
 export * from "./StarRating"
 export * from "./CommentInput"
+export * from "./PinchableImage"
 

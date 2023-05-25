@@ -9,7 +9,7 @@ import {
   View,
   ViewStyle,
 } from "react-native"
-import { CustomFlatlist, Icon, Text } from "../../../components"
+import { CustomFlatlist, Icon, Text,PinchableImage } from "../../../components"
 import { colors, spacing } from "../../../theme"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { formatName } from "../../../utils/formatName"
@@ -23,13 +23,39 @@ import { Stories } from "./Stories"
 import { $flex1, $flexRow } from "../../styles"
 import ShimmerPlaceHolder from "react-native-shimmer-placeholder"
 import { getIconForInteraction, showAlertYesNo } from "../../../utils/helpers"
-import * as Haptics from 'expo-haptics';
+import * as Haptics from "expo-haptics"
+import Video from "react-native-video"
+import Carousel from "react-native-snap-carousel"
 
 import NativeAdView from "../../../utils/NativeAd"
 
 import { defaultImages } from "../../../utils"
 import LinearGradient from "react-native-linear-gradient"
-import { toastMessages } from "../../../utils/toastMessages"
+
+const testAttachments = [
+  {
+    id: 1,
+    mediaType: "image",
+    imgUrl:
+      "https://images.unsplash.com/photo-1473177027534-53d906e9abcf?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1049&q=80",
+  },
+  {
+    id: 2,
+    mediaType: "video",
+    imgUrl: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+  },
+  {
+    id: 3,
+    mediaType: "image",
+    imgUrl:
+      "https://images.unsplash.com/photo-1473177027534-53d906e9abcf?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1049&q=80",
+  },
+  {
+    id: 4,
+    mediaType: "video",
+    imgUrl: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+  },
+]
 
 export interface PostComponentProps {
   post: any
@@ -45,7 +71,10 @@ const Actions = observer(function ActionButtons({ item }: { item: any }) {
     dislikeviews: item?.dislikeviews,
     likeviews: item?.likeviews,
   })
-  const { api: { mutateFlagsOnFeed }, userStore: { _id } } = useStores()
+  const {
+    api: { mutateFlagsOnFeed },
+    userStore: { _id },
+  } = useStores()
 
   const flagPost = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
@@ -57,16 +86,14 @@ const Actions = observer(function ActionButtons({ item }: { item: any }) {
         try {
           await mutateFlagsOnFeed({
             flagsById: _id,
-            type: 'post',
-            postId: item?._id
+            type: "post",
+            postId: item?._id,
           })
-          Alert.alert('Success!', 'We will review the flagged content within 24 hours.')
-        }
-        catch (err) {
+          Alert.alert("Success!", "We will review the flagged content within 24 hours.")
+        } catch (err) {
           Alert.alert(err?.response?.errors?.[0]?.message)
         }
-
-      }
+      },
     })
 
     console.log("FLAGGING POST : ", item?._id)
@@ -110,7 +137,6 @@ const Actions = observer(function ActionButtons({ item }: { item: any }) {
             size={20}
             style={{ marginRight: spacing.extraSmall }}
             onPress={async () => {
-
               if (!loading) {
                 setLoading(true)
                 const res = await interactWithHomePost({
@@ -133,8 +159,7 @@ const Actions = observer(function ActionButtons({ item }: { item: any }) {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
 
               Share.share({ message: "", title: "", url: `washzone://shared-post/${item?._id}` })
-            }
-            }
+            }}
           />
         </View>
       </View>
@@ -150,6 +175,8 @@ export const PostComponent = ({
   index,
   numberOfLines,
 }: PostComponentProps) => {
+  const SCREEN_WIDTH = Dimensions.get("screen").width
+
   const [loaded, setLoaded] = useState(false)
   const [showMore, setShowMore] = useState(undefined)
   const [tempNumberOfLines, setTempNumberOfLines] = useState(undefined)
@@ -189,9 +216,36 @@ export const PostComponent = ({
     }
   }, [])
 
+  const renderItem = ({ item, index }) => {
+
+    if (item.mediaType === "image") {
+      return (
+        <View key={index}>
+          <PinchableImage uri={item.imgUrl}/>
+          {/* <FastImage source={{ uri: item.imgUrl }} resizeMode={"cover"} style={{ width: SCREEN_WIDTH, height: 240 }} /> */}
+        </View>
+      )
+    } else {
+      return (
+        <View key={index}>
+          <Video
+            source={{ uri: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4' }}  // Can be a URL or a local file.
+            resizeMode={'contain'}
+            paused={true}
+            onError={(e) => console.log("VIDEO LOAD ERR",e)}
+            controls={true}
+            onBuffer={(b) => console.log(b)}
+            removeClippedSubviews
+            style={{ height: 240, width: SCREEN_WIDTH }}
+          />
+        </View>
+      )
+    }
+  }
+
   return (
     <>
-      <Pressable onPress={onContainerPress} style={$postContainer}>
+      <View  style={$postContainer}>
         <View style={$publisherInfoContainer}>
           <TouchableOpacity onPress={() => navigation.navigate("Profile", { user: post?.userId })}>
             <FastImage
@@ -227,7 +281,7 @@ export const PostComponent = ({
             onPress={() => setTempNumberOfLines(undefined)}
           />
         )}
-        {postDetails?.attachmentUrl && (
+        {/* {postDetails?.attachmentUrl && (
           <ShimmerPlaceHolder
             visible={loaded}
             shimmerStyle={{
@@ -254,9 +308,22 @@ export const PostComponent = ({
               }}
             />
           </ShimmerPlaceHolder>
-        )}
+        )} */}
+        <Carousel
+          //  ref={(c) => { this._carousel = c; }}
+          data={testAttachments}
+          firstItem={0}
+          // autoplay={true}
+          layout={"default"}
+          // loop={true}
+          renderItem={renderItem}
+          //  onSnapToItem={(ind) => this.setState({ activeSlide: ind })}
+          //  loopClonesPerSide={bannersDataLength}
+          sliderWidth={SCREEN_WIDTH}
+          itemWidth={SCREEN_WIDTH}
+        />
         <Actions item={post} />
-      </Pressable>
+      </View>
       {index % 5 === 0 && (
         <>
           <NativeAdView />
@@ -288,6 +355,7 @@ export const Posts = observer(() => {
         customRefresh={onRefresh}
         onEndReached={loadMoreHomeFeed}
         data={homeFeed}
+        removeClippedSubviews
         renderItem={({ item, index }) => (
           <PostComponent
             numberOfLines={7}
@@ -353,5 +421,5 @@ const $actionsContainer: ViewStyle = {
   flexDirection: "row",
   padding: spacing.medium,
   zIndex: 999,
-  justifyContent: 'space-between',
+  justifyContent: "space-between",
 }

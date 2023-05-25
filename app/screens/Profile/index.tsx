@@ -1,5 +1,13 @@
 import React, { FC, useState } from "react"
-import { Dimensions, TextStyle, ViewStyle, View, useWindowDimensions, Alert } from "react-native"
+import {
+  Dimensions,
+  TextStyle,
+  ViewStyle,
+  View,
+  useWindowDimensions,
+  Alert,
+  ImageBackground,
+} from "react-native"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { CollapsibleHeaderTabView } from "react-native-tab-view-collapsible-header"
 import { NavigationState, SceneRendererProps, TabBar } from "react-native-tab-view"
@@ -174,7 +182,10 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
         reportedById: _id,
         userId: user?._id,
       })
-      Alert.alert(user?.first_name+' has been reported!',`Thank you for reporting the user. Please be assured that all reports are taken seriously and appropriate action will be taken if necessary. We will review the user within 24hours.`)
+      Alert.alert(
+        user?.first_name + " has been reported!",
+        `Thank you for reporting the user. Please be assured that all reports are taken seriously and appropriate action will be taken if necessary. We will review the user within 24hours.`,
+      )
     } catch (err) {
       Toast.show(toastMessages.somethingWentWrong)
     }
@@ -195,7 +206,14 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
       )}
       <CollapsibleHeaderTabView
         renderScrollHeader={() => (
-          <View style={$topContainer}>
+          <ImageBackground
+            source={{
+              uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRjFPcJqziZXYjlWPPAUxepuQbt4lDJEJqvRbGn9UoSfA&s",
+            }}
+            blurRadius={2}
+            imageStyle={{ resizeMode: 'cover' }}
+            style={$topContainer}
+          >
             <FastImage style={$profileImage} source={{ uri: user?.picture }} />
             <Text text={formatName(user?.name)} style={$publisherName} weight="semiBold" />
             {user?.description && (
@@ -211,7 +229,7 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
               <Button preset="reversed" style={$messageButton} text="Message" onPress={onMessage} />
             )}
             <BlockAndReport user={user} setReportModalVisible={setReportModalVisible} />
-          </View>
+          </ImageBackground>
         )}
         enableSnap
         navigationState={{ index, routes }}
