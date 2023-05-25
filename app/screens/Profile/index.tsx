@@ -211,7 +211,7 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
               uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRjFPcJqziZXYjlWPPAUxepuQbt4lDJEJqvRbGn9UoSfA&s",
             }}
             blurRadius={2}
-            imageStyle={{ resizeMode: 'cover' }}
+            // imageStyle={{ resizeMode: 'cover' }}
             style={$topContainer}
           >
             <FastImage style={$profileImage} source={{ uri: user?.picture }} />
