@@ -93,7 +93,7 @@ function App(props: AppProps) {
       AppLovinMAX.setPrivacyPolicyUrl("https://www.washzoneapp.com/privacy-policy") // mandatory
     }
 
-    AppLovinMAX.setIsAgeRestrictedUser(true)
+    AppLovinMAX.setIsAgeRestrictedUser(false)
     AppLovinMAX.setDoNotSell(false)
 
     AppLovinMAX.initialize(SDK_KEY)

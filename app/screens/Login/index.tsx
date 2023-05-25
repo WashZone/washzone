@@ -1,7 +1,7 @@
 import { useIsFocused } from "@react-navigation/native"
 import { observer } from "mobx-react-lite"
 import React, { FC, useEffect, useMemo, useState } from "react"
-import { Image, Keyboard, Linking, TextStyle, View, ViewStyle } from "react-native"
+import { Dimensions, Image, Keyboard, KeyboardAvoidingView, Linking, TextStyle, View, ViewStyle } from "react-native"
 import Animated, {
   interpolate,
   SharedValue,
@@ -15,18 +15,26 @@ import { colors, spacing } from "../../theme"
 import LoginView from "./Login"
 import { SocialLogin } from "./SocialLoginButtons"
 
-interface LoginScreenProps extends AppStackScreenProps<"Login"> { }
+interface LoginScreenProps extends AppStackScreenProps<"Login"> {}
 
 interface LogoProps {
   animVal: SharedValue<number>
 }
-
+const dimesions = Dimensions.get("screen")
 const Logo = ({ animVal }: LogoProps) => {
   const AnimatedImage = Animated.createAnimatedComponent(Image)
 
   const animatedLogo = useAnimatedStyle(() => {
-    const height = interpolate(animVal.value, [0, 1], [212, 120])
-    const width = interpolate(animVal.value, [0, 1], [212, 120])
+    const height = interpolate(
+      animVal.value,
+      [0, 1, 2],
+      [dimesions.height - 550, dimesions.height - 650, 0],
+    )
+    const width = interpolate(
+      animVal.value,
+      [0, 1, 2],
+      [dimesions.height - 550, dimesions.height - 650, 0],
+    )
 
     return {
       height,
@@ -64,6 +72,12 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
 
   function login() {
     animVal.value = withTiming(1, {
+      duration: 300,
+    })
+  }
+
+  function handleKeyboard(focus: boolean) {
+    animVal.value = withTiming(focus ? 2 : 1, {
       duration: 300,
     })
   }
@@ -114,7 +128,7 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
   return (
     <Screen
       androidKeyboardBehavior="height"
-      keyboardOffset={-265}
+      keyboardOffset={-200}
       preset="fixed"
       contentContainerStyle={$screenContentContainer}
     >
@@ -132,7 +146,7 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
             <View style={$buttonContainer}>
               <Button
                 testID="get-started-button"
-                text='Sign Up'
+                text="Sign Up"
                 style={$tapButton}
                 preset="reversed"
                 textColor={colors.palette.neutral100}
@@ -140,8 +154,7 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
               />
               <Button
                 testID="get-started-button"
-                text='LogIn'
-
+                text="LogIn"
                 style={$tapButton}
                 preset="reversed"
                 onPress={login}
@@ -149,16 +162,24 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
             </View>
           </Animated.View>
           <Animated.View style={animatedViewBottom}>
-            <LoginView />
+            <LoginView handleKeyboard={handleKeyboard} />
           </Animated.View>
         </Animated.View>
         <Animated.View style={animatedSocialLoginView}>
           <SocialLogin />
           <View style={$footerContainer}>
             <Text tx="loginScreen.tncIntro" style={$textLight} />
-            <Text tx="loginScreen.tncLink1" onPress={() => Linking.openURL('http://admin.washzoneapp.com/Eula')} style={$textHyperLink} />
+            <Text
+              tx="loginScreen.tncLink1"
+              onPress={() => Linking.openURL("http://admin.washzoneapp.com/Eula")}
+              style={$textHyperLink}
+            />
             <Text tx="loginScreen.and" style={$textLight} />
-            <Text onPress={() => navigation.navigate('Legal')} tx="loginScreen.tncLink2" style={$textHyperLink} />
+            <Text
+              onPress={() => navigation.navigate("Legal")}
+              tx="loginScreen.tncLink2"
+              style={$textHyperLink}
+            />
           </View>
         </Animated.View>
       </View>

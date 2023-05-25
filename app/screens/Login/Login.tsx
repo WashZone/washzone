@@ -10,7 +10,7 @@ import { $flex1 } from "../styles"
 import Toast from "react-native-toast-message"
 import { toastMessages } from "../../utils/toastMessages"
 
-export const LoginView = observer(() => {
+export const LoginView = observer(({ handleKeyboard } :{handleKeyboard : (b:boolean) => void}) => {
   const authPasswordInput = useRef<TextInput>()
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
   const [isAuthPasswordHidden, setIsAuthPasswordHidden] = useState(true)
@@ -45,7 +45,7 @@ export const LoginView = observer(() => {
         type: "",
         isSocialLogin: false,
         _id: res.signin._id,
-        blockedUser: res.signin.blockedUser
+        blockedUser: res.signin.blockedUser,
       })
       setAuthToken(String(Date.now()))
     } catch (error) {
@@ -80,6 +80,8 @@ export const LoginView = observer(() => {
       <Text tx="loginScreen.loginDescription" preset="subheading" style={$enterDetails} />
 
       <TextField
+        onFocus={() => handleKeyboard(true)}
+        onBlur={() => handleKeyboard(false)}
         value={authEmail}
         onChangeText={setAuthEmail}
         containerStyle={$textField}
@@ -93,6 +95,8 @@ export const LoginView = observer(() => {
       />
 
       <TextField
+        onFocus={() => handleKeyboard(true)}
+        onBlur={() => handleKeyboard(false)}
         ref={authPasswordInput}
         value={authPassword}
         onChangeText={setAuthPassword}
@@ -117,7 +121,7 @@ export const LoginView = observer(() => {
 
       <Button
         testID="login-button"
-        text='Log In'
+        text="Log In"
         style={$tapButton}
         preset="reversed"
         onPress={login}
@@ -125,7 +129,7 @@ export const LoginView = observer(() => {
       />
       <Pressable onPress={() => navigation.navigate("Signup")} style={$footer}>
         <Text tx="loginScreen.noAccont" size="sm" weight="light" style={$hint} />
-        <Text tx='loginScreen.signUp' size="sm" weight="bold" style={$footerText} />
+        <Text tx="loginScreen.signUp" size="sm" weight="bold" style={$footerText} />
       </Pressable>
     </Screen>
   )

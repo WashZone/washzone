@@ -1,19 +1,54 @@
+
+// eslint-disable-next-line react-native/split-platform-components
+import { PermissionsAndroid, Platform } from "react-native";
 import { ImageLibraryOptions } from "react-native-image-picker"
 const ImagePicker = require("react-native-image-picker")
 
 export const Capture = async () => {
+  console.log('CAPTURING')
   const options = {
     storageOptions: {
       skipBackup: true,
       path: "images",
     },
   }
-  let image: any
-  await ImagePicker.launchCamera(options, (res) => {
-    console.log("CATURED IMAGE", res?.assets?.[0])
-    image = res?.assets?.[0]
-  })
-  return image
+if(Platform.OS ==='android') {
+
+  const granted = await PermissionsAndroid.request(
+    PermissionsAndroid.PERMISSIONS.CAMERA,
+    {
+      title: "App Camera Permission",
+      message:"App needs access to your camera ",
+      buttonNeutral: "Ask Me Later",
+      buttonNegative: "Cancel",
+      buttonPositive: "OK"
+    }
+  );
+  if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+    console.log("Camera permission given");
+    let image: any
+    await ImagePicker.launchCamera(options, (res) => {
+      console.log("CATURED IMAGE", res?.assets?.[0])
+      image = res?.assets?.[0]
+    })
+    return image
+  } else {
+    console.log("Camera permission denied");
+    return undefined
+  }
+ 
+}
+ else{
+  console.log("Camera permission given");
+    let image: any
+    await ImagePicker.launchCamera(options, (res) => {
+      console.log("CATURED IMAGE", res?.assets?.[0])
+      image = res?.assets?.[0]
+    })
+    return image
+ }
+  
+ 
 
 }
 

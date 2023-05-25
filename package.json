@@ -113,7 +113,7 @@
     "react-native-upload-aws-s3": "^0.8.1",
     "react-native-uuid": "^2.0.1",
     "react-native-video": "^5.2.1",
-    "react-native-webrtc": "111.0.0",
+    "react-native-webrtc": "^111.0.0",
     "react-native-webview": "11.26.0",
     "react-native-youtube": "2.0.2",
     "react-native-youtube-iframe": "^2.2.2",

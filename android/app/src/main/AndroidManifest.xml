@@ -6,7 +6,8 @@ package="com.washzone" >
 <uses-feature android:name="android.hardware.camera.autofocus" />
 <uses-feature android:name="android.hardware.audio.output" />
 <uses-feature android:name="android.hardware.microphone" />
-
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 <uses-permission android:name="android.permission.CAMERA" />
 <uses-permission android:name="android.permission.RECORD_AUDIO" />
 <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -14,10 +15,8 @@ package="com.washzone" >
 <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 <uses-permission android:name="android.permission.INTERNET" />
 <uses-permission android:name="com.google.android.gms.permission.AD_ID"/>
-
-  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-      <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+<uses-permission android:name="android.permission.VIBRATE" />
+<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
   <queries>
     <intent>
       <action android:name="android.intent.action.VIEW" />
@@ -86,7 +85,6 @@ package="com.washzone" >
     </activity>
     <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
    	<meta-data android:name="com.facebook.sdk.ClientToken" android:value="@string/facebook_client_token"/>
-
      <activity android:name="com.facebook.FacebookActivity"
         android:configChanges=
                 "keyboard|keyboardHidden|screenLayout|screenSize|orientation"

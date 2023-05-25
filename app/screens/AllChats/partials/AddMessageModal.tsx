@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from "react"
-import { Keyboard, TextInput, View, ViewStyle } from "react-native"
+import { Keyboard, KeyboardAvoidingView, Platform, TextInput, View, ViewStyle } from "react-native"
 import { debounce } from "lodash"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
-import { BottomModal, TextField } from "../../../components"
+import { BottomModal, TextField,Screen } from "../../../components"
 import { colors, spacing } from "../../../theme"
 import { useHooks } from "../../hooks"
 import { ActivityIndicator } from "react-native-paper"
@@ -34,10 +34,9 @@ export const AddMessageModal = ({ isVisible, setVisible }) => {
   }
 
   return (
-    <BottomModal propagateSwipe isVisible={isVisible} setVisible={setVisible}>
-      <View style={$contentContainer}>
+    <BottomModal propagateSwipe avoidKeyboard={true} isVisible={isVisible} setVisible={setVisible}>
+      <View style={$contentContainer} >
         <TextField
-
           value={searchKey}
           onChangeText={onChangeText}
           style={{ color: colors.palette.neutral100 }}
@@ -67,7 +66,7 @@ const $scrollContainer: ViewStyle = {
 }
 
 const $contentContainer: ViewStyle = {
-  height: 600,
+  height: Platform.OS==='android'? 300 : 600,
   width: "100%",
   paddingHorizontal: spacing.medium,
   paddingTop: spacing.large,

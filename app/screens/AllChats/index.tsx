@@ -53,7 +53,7 @@ export const AllChats: FC<AppStackScreenProps<"AllChats">> = observer(function A
 
   return (
     <>
-      <Screen preset="fixed" contentContainerStyle={$flex1}>
+      <View style={$flex1}>
         <Header
           titleStyle={{ color: colors.palette.neutral100 }}
           backgroundColor={colors.palette.primary100}
@@ -85,7 +85,7 @@ export const AllChats: FC<AppStackScreenProps<"AllChats">> = observer(function A
             ListFooterComponent={<View style={{ padding: spacing.medium }} />}
           />
         )}
-      </Screen>
+      </View>
       <AddMessageModal isVisible={addModalVisible} setVisible={setAddModalVisible} />
       <OptionsModal
         isVisible={optionsVisible}
