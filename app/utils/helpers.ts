@@ -1,4 +1,5 @@
 import { Alert } from "react-native"
+import { userTagRegEx } from "../components"
 import { Interaction } from "./enums"
 
 export const getIconForInteraction = (i: Interaction, buttonType: "liked" | "disliked") => {
@@ -94,3 +95,24 @@ export const showAlertYesNo = ({
       cancelable: true,
     },
   )
+
+
+export const getTaggedIds = (content: string) => {
+  const regex = /@\[([^[\]]+)\]\(([^)]+)\)/g;
+  const matchedSubstrings = [];
+  let match;
+
+  while ((match = regex.exec(content)) !== null) {
+    matchedSubstrings.push(match[0]);
+  }
+
+
+  const ids = matchedSubstrings.map(i => {
+    const match = i.match(userTagRegEx);
+    console.log("MATCH: ", match)
+    return match[2]
+  })
+  console.log(" TAGGED IDS ", ids)
+  return ids
+
+}

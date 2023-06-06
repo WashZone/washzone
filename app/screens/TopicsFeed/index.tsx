@@ -28,6 +28,7 @@ import LinearGradient from "react-native-linear-gradient"
 import ShimmerPlaceholder from "react-native-shimmer-placeholder"
 import NativeAdView from "../../utils/NativeAd"
 import * as Haptics from 'expo-haptics'
+import { Host } from "react-native-portalize"
 
 const Actions = observer(function ActionButtons({ item }: { item: any }) {
   const [loading, setLoading] = useState<boolean>(false)
@@ -120,14 +121,15 @@ const Actions = observer(function ActionButtons({ item }: { item: any }) {
           <Icon
             icon="shareCursive"
             size={20}
-            onPress={() =>
-          {    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
-            Share.open({ message: "", title: "", url: `washzone://shared-topic/${item?._id}` })
-           } }
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
+              Share.open({ message: "", title: "", url: `washzone://shared-topic/${item?._id}` })
+            }}
           />
         </View>
       </View>
       <Icon icon="flag" size={20} onPress={flagTopic} />
+
     </View>
   )
 })
@@ -315,15 +317,17 @@ export const TopicsFeed: FC<TopicsTabProps<"TopicsFeed">> = observer(function To
 
   return (
     <Screen contentContainerStyle={$container} keyboardOffset={-180}>
-      <CustomFlatlist
-        customRefresh={onRefresh}
-        ListHeaderComponent={<CreateTopic />}
-        stickyHeaderIndices={[0]}
-        style={$container}
-        onEndReached={loadMoreTopics}
-        data={topics}
-        renderItem={({ item, index }) => <TopicComponent topic={item} index={index} />}
-      />
+      <Host>
+        <CustomFlatlist
+          customRefresh={onRefresh}
+          ListHeaderComponent={<CreateTopic />}
+          stickyHeaderIndices={[0]}
+          style={$container}
+          onEndReached={loadMoreTopics}
+          data={topics}
+          renderItem={({ item, index }) => <TopicComponent topic={item} index={index} />}
+        />
+      </Host>
     </Screen>
   )
 })

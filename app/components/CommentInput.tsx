@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react"
+import React, { useState, useEffect, useRef, FC } from "react"
 import {
   View,
   TextInput,
@@ -19,6 +19,10 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
+import { ChooseMediaModal, } from "."
+import { TagInput } from "./TagInput"
+import { Host } from "react-native-portalize"
+// import { getTaggedIds } from "../utils/helpers"
 
 interface CommentInputProps {
   createComment: (text: string, selectedMedia: any) => Promise<void>
@@ -31,6 +35,7 @@ export const CommentInput = ({ createComment, bottomSafe, placeholder }: Comment
   const [selectedMedia, setSelectedMedia] = useState(undefined)
   const [isCommenting, setIsCommenting] = useState(false)
   const [isFocused, setIsFocused] = useState(false)
+  const [showChooseMediaModal, setShowChooseMediaModal] = useState(false)
   const focus = useSharedValue(0)
   const inputRef = useRef<TextInput>()
   const safeAreInsets = useSafeAreaInsets()
@@ -44,7 +49,7 @@ export const CommentInput = ({ createComment, bottomSafe, placeholder }: Comment
     setIsCommenting(false)
     inputRef.current.blur()
   }
-
+  console.log("commentText : ", commentText)
   const onAddImage = async () => {
     const res = await MediaPicker()
     res && setSelectedMedia(res)
@@ -97,16 +102,15 @@ export const CommentInput = ({ createComment, bottomSafe, placeholder }: Comment
       )}
       <Animated.View style={[$postCommentContainer, $animatedContainer]}>
         <Icon
-          icon="camera"
+          icon="attachment"
           containerStyle={{ marginRight: spacing.extraSmall }}
           disabled={isCommenting}
-          size={28}
-          onPress={onCapture}
+          size={24}
+          onPress={() => setShowChooseMediaModal(true)}
         />
 
-        <Icon icon="addImage" disabled={isCommenting} size={28} onPress={onAddImage} />
         <View style={$inputWrapper}>
-          <TextInput
+          {/* <TextInput
             ref={inputRef}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
@@ -116,6 +120,18 @@ export const CommentInput = ({ createComment, bottomSafe, placeholder }: Comment
             placeholderTextColor={colors.palette.overlay50}
             style={$commentInput}
             multiline
+          /> */}
+          <TagInput
+            value={commentText}
+            onChange={setCommentText}
+            inputRef={inputRef}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
+            placeholder={placeholder || "Write a comment!"}
+            placeholderTextColor={colors.palette.overlay50}
+            containerStyle={$commentInput}
+            multiline
+            suggestionsContainerStyle={{ bottom: 90 }}
           />
         </View>
         <TouchableOpacity onPress={!isCommenting && onComment} style={$rightIconContainer}>
@@ -127,11 +143,21 @@ export const CommentInput = ({ createComment, bottomSafe, placeholder }: Comment
               size={28}
               onPress={onComment}
               disabled={commentText.length < 2 || selectedMedia}
-              color={(commentText.length > 1 ||selectedMedia) ? colors.palette.primary100 : colors.palette.neutral400}
+              color={
+                commentText.length > 1 || selectedMedia
+                  ? colors.palette.primary100
+                  : colors.palette.neutral400
+              }
             />
           )}
         </TouchableOpacity>
       </Animated.View>
+      <ChooseMediaModal
+        onTakePhoto={onCapture}
+        onChooseFromLibrary={onAddImage}
+        isVisible={showChooseMediaModal}
+        setVisible={setShowChooseMediaModal}
+      />
     </>
   )
 }
@@ -153,8 +179,7 @@ const $rightIconContainer: ViewStyle = {
 }
 
 const $inputWrapper: ViewStyle = {
-  width: Dimensions.get("window").width - 140,
-  paddingTop: spacing.tiny,
+  width: Dimensions.get("window").width - 115,
   backgroundColor: colors.background,
   marginHorizontal: 10,
   borderRadius: 8,
@@ -163,7 +188,7 @@ const $inputWrapper: ViewStyle = {
 const $commentInput: TextStyle = {
   flex: 1,
   backgroundColor: colors.background,
-  borderRadius: 24,
+  borderRadius: 10,
   paddingHorizontal: 10,
   // textAlignVertical: "center",
   paddingVertical: spacing.extraSmall,

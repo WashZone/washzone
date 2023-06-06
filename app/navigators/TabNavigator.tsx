@@ -3,7 +3,7 @@ import { CompositeScreenProps, NavigationProp, useNavigation } from "@react-navi
 import React, { useEffect } from "react"
 import { ImageStyle, TextStyle, ViewStyle } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
-import { Icon } from "../components"
+import { AddPostModal, EmptyState, Icon } from "../components"
 import { translate } from "../i18n"
 import {
   Home,
@@ -23,6 +23,7 @@ export type TabParamList = {
   Topics: undefined
   Classifieds: undefined
   Videos: undefined
+  Add: undefined
 }
 
 export type TabScreenProps<T extends keyof TabParamList> = CompositeScreenProps<
@@ -42,12 +43,12 @@ export function TabNavigator() {
   const url = Linking.useURL()
 
   const handleStoryURL = (linkUrl: string) => {
-    if(!url) return
+    if (!url) return
     if (/shared-classified/.test(linkUrl)) {
       // navigation.navigate("Classifieds")
       setTimeout(
-        () =>
-         { navigationClassified.navigate("ClassifiedsDetails", {
+        () => {
+          navigationClassified.navigate("ClassifiedsDetails", {
             classified: linkUrl?.split("/")[linkUrl?.split("/").length - 1],
           });
           Linking.openURL('')
@@ -63,20 +64,20 @@ export function TabNavigator() {
         })
         Linking.openURL('')
       }, 200)
-      
+
     }
     if (/shared-video/.test(linkUrl)) {
       setTimeout(
-        () =>
-         { 
+        () => {
           // navigation.navigate("Videos")
           navigationVideo.navigate("VideoDetails", {
             data: linkUrl?.split("/")[linkUrl?.split("/").length - 1],
           })
-          Linking.openURL('')},
+          Linking.openURL('')
+        },
         200,
       )
-     
+
     }
   }
 
@@ -127,7 +128,13 @@ export function TabNavigator() {
           ),
         }}
       />
-
+      <Tab.Screen
+        name="Add"
+        component={() => <></>}
+        options={{
+          tabBarButton :  () => (<AddPostModal />),
+        }}
+      />
       <Tab.Screen
         name="Classifieds"
         component={Classifieds}

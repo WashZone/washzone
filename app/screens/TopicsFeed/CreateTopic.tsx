@@ -57,6 +57,7 @@ export const CreateTopic = observer(function CreateTopic() {
         content: topicDescription.trim(),
         attachment: selectedImage,
         title: topicTitle.trim(),
+        tagTopicUser:[]
       })
       refreshTopics()
       loadStories()

@@ -67,7 +67,11 @@ export interface ButtonProps extends PressableProps {
    */
   children?: React.ReactNode
 
-  textColor ?:ColorValue
+  /**
+   * Text Color.
+   */
+  textColor?: ColorValue
+
 }
 
 /**
@@ -98,7 +102,6 @@ export function Button(props: ButtonProps) {
       $viewPresets[preset],
       $viewStyleOverride,
       !!pressed && [$pressedViewPresets[preset], $pressedViewStyleOverride],
-
     ]
   }
   function $textStyle({ pressed }) {
@@ -106,7 +109,7 @@ export function Button(props: ButtonProps) {
       $textPresets[preset],
       $textStyleOverride,
       !!pressed && [$pressedTextPresets[preset], $pressedTextStyleOverride],
-      textColor && {color:textColor}
+      textColor && { color: textColor }
 
     ]
   }
@@ -179,7 +182,10 @@ const $textPresets: Record<Presets, StyleProp<TextStyle>> = {
 }
 
 const $pressedViewPresets: Record<Presets, StyleProp<ViewStyle>> = {
-  default: { backgroundColor: colors.palette.neutral200 },
+  default: {
+opacity :  0.8
+  },
+  
   filled: { backgroundColor: colors.palette.neutral400 },
   reversed: { backgroundColor: colors.palette.neutral700 },
 }

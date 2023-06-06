@@ -28,6 +28,7 @@ import { useHooks } from "./screens/hooks"
 import Toast from "react-native-toast-message"
 import { notificationHandler } from "./utils"
 import RNCallKeep from "react-native-callkeep"
+import { Host } from 'react-native-portalize';
 
 const options = {
   ios: {
@@ -134,13 +135,14 @@ function App(props: AppProps) {
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
       <ErrorBoundary catchErrors={Config.catchErrors}>
-        <AppNavigator
-          linking={linking}
-          initialState={initialNavigationState}
-          onStateChange={onNavigationStateChange}
-        />
+          <AppNavigator
+            linking={linking}
+            initialState={initialNavigationState}
+            onStateChange={onNavigationStateChange}
+          />
         <Toast />
       </ErrorBoundary>
+
     </SafeAreaProvider>
   )
 }

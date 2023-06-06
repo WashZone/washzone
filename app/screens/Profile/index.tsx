@@ -1,12 +1,13 @@
-import React, { FC, useState } from "react"
+import React, { FC, Ref, useEffect, useRef, useState } from "react"
 import {
   Dimensions,
   TextStyle,
   ViewStyle,
-  View,
+  TouchableOpacity,
   useWindowDimensions,
   Alert,
   ImageBackground,
+  Animated,
 } from "react-native"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { CollapsibleHeaderTabView } from "react-native-tab-view-collapsible-header"
@@ -23,7 +24,7 @@ import {
   HomePostsTabScreen,
   TopicsTabScreen,
 } from "./tabViews"
-import { $flex1 } from "../styles"
+import { $contentCenter, $flex1 } from "../styles"
 import { useHooks } from "../hooks"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { AppStackParamList } from "../../navigators"
@@ -32,6 +33,24 @@ import ReportUserModal from "./reportUserModal"
 import Toast from "react-native-toast-message"
 import { toastMessages } from "../../utils/toastMessages"
 import { showAlertYesNo } from "../../utils/helpers"
+import { interpolateColor, useAnimatedStyle, useSharedValue } from "react-native-reanimated"
+import Loading from "../../components/Loading"
+
+const getIndexFromKey = (key: string) => {
+  switch (key) {
+    case "posts":
+      return 0
+    case "topic":
+      return 1
+    case "classified":
+      return 2
+    case "gallery":
+      return 3
+    default: {
+      return 0
+    }
+  }
+}
 
 const BlockAndReport = observer(function BlockAndReport({
   setReportModalVisible,
@@ -102,47 +121,141 @@ const BlockAndReport = observer(function BlockAndReport({
   )
 })
 
+const renderTabBar = (
+  props: SceneRendererProps & {
+    navigationState: NavigationState<any>
+  },
+  position: React.MutableRefObject<Animated.Value>,
+  setIndex: (n: number) => void,
+  index: number,
+) => {
+  position.current = props.position
+  const color = position.current.interpolate({
+    inputRange: [0.5, 1],
+    outputRange: [colors.palette.neutral100, colors.palette.primary100],
+  })
+
+  return (
+    <TabBar
+      style={$tab}
+      labelStyle={$label}
+      activeColor={colors.palette.neutral100}
+      indicatorStyle={$indicator}
+      scrollEnabled
+      renderTabBarItem={(props) => {
+        return (
+          <TouchableOpacity
+            onPress={() => {
+              switch (props.key) {
+                case "posts": {
+                  setIndex(0)
+                  break
+                }
+                case "topic": {
+                  setIndex(1)
+                  break
+                }
+                case "classified": {
+                  setIndex(2)
+                  break
+                }
+                case "gallery": {
+                  setIndex(3)
+                  break
+                }
+              }
+            }}
+          >
+            <Animated.View
+              style={[
+                $tabBarItem,
+                {
+                  backgroundColor:
+                    getIndexFromKey(props.key) === index
+                      ? colors.palette.neutral100
+                      : colors.palette.primary100,
+                  borderTopRightRadius: spacing.tiny,
+                  borderTopLeftRadius: spacing.tiny,
+                },
+              ]}
+            >
+              <Animated.Text
+                style={{
+                  color:
+                    getIndexFromKey(props.key) === index
+                      ? colors.palette.primary100
+                      : colors.palette.neutral250,
+                  fontWeight: getIndexFromKey(props.key) === index ? "700" : "500",
+                  fontSize: spacing.medium,
+                }}
+              >
+                {props?.key.toUpperCase()}
+              </Animated.Text>
+            </Animated.View>
+          </TouchableOpacity>
+        )
+      }}
+      {...props}
+    />
+  )
+}
+
 export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ route }) {
   const { user, header } = route.params
+  console.log('user :: ', user)
   const [galleryItemsTopics, setGalleryItemsTopics] = useState([])
   const [galleryItemsClassifieds, setGalleryItemsClassifieds] = useState([])
   const [isReportModalVisible, setReportModalVisible] = useState(false)
   const [galleryItemsHomePosts, setGalleryItemsHomePosts] = useState([])
-  const { getOrCreateRoom } = useHooks()
+  const { getOrCreateRoom, getUserById } = useHooks()
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
   const layout = useWindowDimensions()
   const {
     userStore: { _id },
     api: { mutateReportOnUser },
   } = useStores()
+  const [loading, setLoading] = useState(Object.keys(user)?.length === 1)
   const isUser = user?._id === _id
-
+  const position = useRef(new Animated.Value(0))
   const [index, setIndex] = React.useState(0)
   const [routes] = React.useState([
     { key: "posts", title: "Posts" },
     { key: "topic", title: "Discussions" },
     { key: "classified", title: "Classifieds" },
-    // { key: "video", title: "Videos" },
     { key: "gallery", title: "Gallery" },
   ])
+
+  const syncUser = async () => {
+    const res = await getUserById(user?._id)
+    navigation.setParams({ user: res })
+    setLoading(false)
+  }
+
+  useEffect(() => {
+    Object.keys(user)?.length === 1 && syncUser()
+  }, [])
 
   const renderScene = ({ route }) => {
     switch (route.key) {
       case "posts":
-        return <HomePostsTabScreen userId={user?._id} addToGallery={setGalleryItemsHomePosts} />
+        return (
+          <HomePostsTabScreen userId={user?._id} addToGallery={setGalleryItemsHomePosts} />
+        )
       case "topic":
         return <TopicsTabScreen userId={user?._id} addToGallery={setGalleryItemsTopics} />
       case "classified":
-        return <ClassifiedsTabScreen userId={user?._id} addToGallery={setGalleryItemsClassifieds} />
-      // case "video":
-      //   return <VideosTabScreen userId={user?._id} addToGallery={setGalleryItemsVideos} />
+        return (
+          <ClassifiedsTabScreen
+            userId={user?._id}
+            addToGallery={setGalleryItemsClassifieds}
+          />
+        )
       case "gallery":
         return (
           <GalleryTabView
             galleryItems={[
               ...galleryItemsTopics,
               ...galleryItemsClassifieds,
-              // ...galleryItemsVideos,
               ...galleryItemsHomePosts,
             ]}
           />
@@ -150,23 +263,6 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
       default:
         return null
     }
-  }
-
-  const renderTabBar = (
-    props: SceneRendererProps & {
-      navigationState: NavigationState<any>
-    },
-  ) => {
-    return (
-      <TabBar
-        style={$tab}
-        labelStyle={$label}
-        activeColor={colors.palette.neutral100}
-        indicatorStyle={$indicator}
-        scrollEnabled
-        {...props}
-      />
-    )
   }
 
   const onMessage = async () => {
@@ -192,6 +288,8 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
     setReportModalVisible(false)
   }
 
+  if (loading) return <Loading />
+
   return (
     <Screen contentContainerStyle={$flex1}>
       {header && (
@@ -210,8 +308,7 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
             source={{
               uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRjFPcJqziZXYjlWPPAUxepuQbt4lDJEJqvRbGn9UoSfA&s",
             }}
-            blurRadius={2}
-            // imageStyle={{ resizeMode: 'cover' }}
+            blurRadius={1}
             style={$topContainer}
           >
             <FastImage style={$profileImage} source={{ uri: user?.picture }} />
@@ -234,7 +331,7 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
         enableSnap
         navigationState={{ index, routes }}
         renderScene={renderScene}
-        renderTabBar={renderTabBar}
+        renderTabBar={(props) => renderTabBar(props, position, setIndex, index)}
         onIndexChange={setIndex}
         style={$flex1}
         initialLayout={{ width: layout.width }}
@@ -248,6 +345,13 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
     </Screen>
   )
 })
+
+const $tabBarItem: ViewStyle = {
+  height: 50,
+  width: 171.2, // Default Tab Width as per docs
+  backgroundColor: "pink",
+  ...$contentCenter,
+}
 
 const $blockIcon: ViewStyle = {
   position: "absolute",
@@ -273,6 +377,7 @@ const $label: TextStyle = {
 }
 const $indicator: ViewStyle = {
   backgroundColor: colors.palette.neutral100,
+  height: 0,
 }
 
 const $topContainer: ViewStyle = {

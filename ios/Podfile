@@ -33,6 +33,7 @@ target 'WashZone' do
     # to disable hermes on iOS, change `true` to `flags[:hermes_enabled]` and then install pods
     :hermes_enabled => false,
     :fabric_enabled => flags[:fabric_enabled],
+
     # :flipper_configuration => FlipperConfiguration.enabled(["Debug"], { 'Flipper' => '0.157.0' }),
     # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/.."
@@ -45,8 +46,21 @@ target 'WashZone' do
 
   post_install do |installer|
     react_native_post_install(installer)
+    installer.pods_project.targets.each do |target|
+          target.build_configurations.each do |config|
+            config.build_settings['APPLICATION_EXTENSION_API_ONLY'] = 'NO'
+          end
+        end
     # __apply_Xcode_12_5_M1_post_install_workaround(installer)
     File.delete("./.xcode.env.local") if File.exist?("./.xcode.env.local")
   end
   
+  target 'share' do
+   use_react_native!
+
+    pod 'RNShareMenu', :path => '../node_modules/react-native-share-menu'
+   # Manually link packages here to keep your extension bundle size minimal
+  end
+
 end
+

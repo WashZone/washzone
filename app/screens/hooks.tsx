@@ -8,7 +8,7 @@ import messaging from "@react-native-firebase/messaging"
 import { RNS3 } from "react-native-upload-aws-s3"
 import { Alert } from "react-native"
 import { getInputInteraction, likeDislikeCountUpdater } from "../utils/helpers"
-import * as Haptics from 'expo-haptics';
+import * as Haptics from "expo-haptics"
 
 export function useHooks() {
   const {
@@ -49,7 +49,6 @@ export function useHooks() {
       mutateSaveLikedClassifiedFeed,
       queryGetAllSavedByUserId,
       mutateGetClassifiedById,
-
       mutateUpdateDeletesavedclassified,
       queryGetAllStory,
       mutateSaveLikedVideo,
@@ -94,7 +93,8 @@ export function useHooks() {
       mutateCommentOnHomepage,
       queryGetHomePagesByUsersId,
       mutateBlockUserId,
-      mutateUnblockUserId
+      mutateUnblockUserId,
+
     },
     userStore,
   } = useStores()
@@ -172,7 +172,6 @@ export function useHooks() {
   const refreshClassifieds = async () => {
     try {
       const res = await queryGetAllClassifiedFeed({ pageNumber: 0 }, { fetchPolicy: "no-cache" })
-
       setClassifieds(res.getAllClassifiedFeed?.data)
     } catch (err) {
       console.log(err)
@@ -208,7 +207,7 @@ export function useHooks() {
     }
   }
 
-  const postComment = async (comment: string, selectedMedia: any, topicId: string) => {
+  const postComment = async (comment: string, selectedMedia: any, topicId: string, topictagComment: { topicTagCommentId: string }[]) => {
     let imageUrl = ""
     if (selectedMedia) {
       imageUrl = await uploadToS3({
@@ -223,6 +222,7 @@ export function useHooks() {
       acttachmentType: "image",
       comment,
       topicId,
+      topictagComment,
     })
   }
 
@@ -230,6 +230,7 @@ export function useHooks() {
     comment: string,
     selectedMedia: any,
     homePageId: string,
+    taginHomeComment: { taghomecommentId: string }[]
   ) => {
     let imageUrl = ""
     if (selectedMedia) {
@@ -245,6 +246,7 @@ export function useHooks() {
       acttachmentType: "image",
       comment,
       homePageId,
+      taginHomeComment,
     })
     console.log("postCommentOnHomePagePost", res)
   }
@@ -261,7 +263,7 @@ export function useHooks() {
     return res.getCommentsByHomePageId.length === 1 && res.getCommentsByHomePageId[0]?.comments
   }
 
-  const createTopic = async ({ content, attachment, title }) => {
+  const createTopic = async ({ content, attachment, title, tagTopicUser }) => {
     if (title.length === 0 || content?.length === 0) return
     const imageUrl = attachment
       ? await uploadToS3({
@@ -271,9 +273,9 @@ export function useHooks() {
       })
       : undefined
 
-    console.log("IMAGE URL", imageUrl)
     try {
       const res = await mutateCreateUserTopic({
+        tagTopicUser,
         attachmentUrl: imageUrl,
         attachmentType: attachment?.type || "",
         topicContent: content,
@@ -289,26 +291,33 @@ export function useHooks() {
   // loadStories()
   // setTimeout(loadStories, 1000)
 
-  const createPost = async ({ content, attachment }) => {
-    if (content?.length === 0) return
-    const imageUrl = attachment
-      ? await uploadToS3({
-        uri: attachment?.uri,
-        type: attachment?.type,
-        name: attachment?.fileName,
-      })
-      : undefined
+  const createPost = async ({ content, attachments, setUploadProgress, tagUser }: { content: string; attachments: any[], tagUser: string[], setUploadProgress: (s: string) => void, }) => {
+    if (content?.length === 0 && attachments?.length === 0) return
+    setUploadProgress(`0/${attachments?.length}`)
+    const imageUrls = []
+    if (attachments?.length > 0) {
+      for (let i = 0; i < attachments.length; i++) {
+        const url = await uploadToS3({
+          uri: attachments[i]?.uri,
+          type: attachments[i]?.type,
+          name: attachments[i]?.fileName,
+        })
+        imageUrls.push(url)
+        setUploadProgress(`${i + 1}/${attachments?.length}`)
+      }
 
-    console.log("IMAGE URL", imageUrl)
-    console.log("createPost:imageUrl", imageUrl)
+    }
+
     try {
       await mutateCreateUserHomePages({
-        attachmentUrl: imageUrl,
-        attachmentType: attachment?.type || "",
+        tagUser: tagUser?.map(i => { return { tagId: i } }),
+        attachmentUrl: imageUrls,
+        attachmentType: "image",
         userId: userStore._id,
         discription: content,
       })
     } catch (err) {
+      console.log('mutateCreateUserHomePagesERrr', err)
       Alert.alert("Something Went Wrong!")
     }
     refreshHomeFeed()
@@ -782,10 +791,12 @@ export function useHooks() {
         })
       } catch (err) {
         console.log("mutateCreateUserRating :ERRRRRR", err)
-
       }
       const updatedRes = await queryGetratingOnUserId({ userId }, { fetchPolicy: "no-cache" })
-      const avg = updatedRes?.getratingOnUserId?.data?.length > 0 ? updatedRes?.getratingOnUserId?.data[0]?.averageRating : 0
+      const avg =
+        updatedRes?.getratingOnUserId?.data?.length > 0
+          ? updatedRes?.getratingOnUserId?.data[0]?.averageRating
+          : 0
       return { success: true, avg }
     } catch (err) {
       console.log("ERRRRRR", err)
@@ -794,15 +805,17 @@ export function useHooks() {
   }
 
   const getRatingOnUser = async (userId: string) => {
-    console.log('userId : ', userId, userStore._id)
+    console.log("userId : ", userId, userStore._id)
     try {
-      const res = await queryCheckUserRating({ userId, ratingByUserId: userStore._id }, { fetchPolicy: "no-cache" })
+      const res = await queryCheckUserRating(
+        { userId, ratingByUserId: userStore._id },
+        { fetchPolicy: "no-cache" },
+      )
       console.log("res.res.checkUserRating", res.checkUserRating)
       return res.checkUserRating?.ratingStar
     } catch (err) {
       return 0
     }
-
   }
 
   const onBoot = async () => {
@@ -823,6 +836,14 @@ export function useHooks() {
     refreshVideos()
     loadStories()
     await updateNotificationToken()
+  }
+
+  const searchUsers = async (searchKey: string) => {
+    const resUsers = await queryGetSearchedUser(
+      { searchKey, pageNumber: 1 },
+      { fetchPolicy: "no-cache" },
+    )
+    return resUsers.getSearchedUser?.data || []
   }
 
   const searchKeyword = async (searchKey: string) => {
@@ -1027,6 +1048,7 @@ export function useHooks() {
 
   const getUserById = async (userId: string) => {
     try {
+      console.log("getUserById : ", userId)
       const res = await mutateGetUserById({ userId })
       console.log("CONNECTED USER FOR ", userStore.name, res.getUserById)
       return res.getUserById
@@ -1173,7 +1195,7 @@ export function useHooks() {
       },
       notificationToken: token,
     })
-    console.log("mutateSendCallNotification",  res)
+    console.log("mutateSendCallNotification", res)
   }
 
   const getRoomById = async (roomId: string) => {
@@ -1210,24 +1232,20 @@ export function useHooks() {
   }
 
   const blockUser = async (id: string) => {
-    await mutateBlockUserId(
-      {
-        blockUserById: id,
-        userId: userStore?._id
-      }
-    )
+    await mutateBlockUserId({
+      blockUserById: id,
+      userId: userStore?._id,
+    })
     syncAllChats()
 
     userStore.addToBlocked(id)
   }
 
   const unblockUser = async (id: string) => {
-    await mutateUnblockUserId(
-      {
-        blockUserById: id,
-        userId: userStore?._id
-      }
-    )
+    await mutateUnblockUserId({
+      blockUserById: id,
+      userId: userStore?._id,
+    })
     syncAllChats()
     userStore.removeFromBlocked(id)
   }
@@ -1298,6 +1316,7 @@ export function useHooks() {
     getCommentsOnHomePagePost,
     interactWithHomePost,
     getUsersHomePosts,
+    searchUsers
   }
 }
 

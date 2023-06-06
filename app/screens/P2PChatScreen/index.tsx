@@ -22,6 +22,7 @@ import moment from "moment"
 import { CommentsDetailModelSelector } from "../../models/api"
 import { useSafeAreaInsetsStyle } from "../../utils/useSafeAreaInsetsStyle"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
+import { Host } from "react-native-portalize"
 
 const getColorFromType = (type: any) => {
   switch (type) {
@@ -203,6 +204,8 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
   }
 
   return (
+    <Host>
+
     <Screen contentContainerStyle={$flex1}>
       <P2PHeader data={receiver} roomId={roomId} />
       <Chat
@@ -292,6 +295,8 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
         metadata={selectedMessage?.metadata}
       /> */}
     </Screen>
+    </Host>
+
   )
 })
 const $blockedContainer: ViewStyle = {

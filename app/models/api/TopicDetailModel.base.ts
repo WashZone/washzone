@@ -9,6 +9,8 @@ import { CommentsDetailModel, CommentsDetailModelType } from "./CommentsDetailMo
 import { CommentsDetailModelSelector } from "./CommentsDetailModel.base"
 import { LikeTopicsModel, LikeTopicsModelType } from "./LikeTopicsModel"
 import { LikeTopicsModelSelector } from "./LikeTopicsModel.base"
+import { TopicTaguserModel, TopicTaguserModelType } from "./TopicTaguserModel"
+import { TopicTaguserModelSelector } from "./TopicTaguserModel.base"
 import { UserModel, UserModelType } from "./UserModel"
 import { UserModelSelector } from "./UserModel.base"
 import { RootStoreType } from "./index"
@@ -35,6 +37,7 @@ export const TopicDetailModelBase = ModelBase
     status: types.union(types.undefined, types.null, types.string),
     likeviews: types.union(types.undefined, types.null, types.integer),
     dislikeviews: types.union(types.undefined, types.null, types.integer),
+    tagTopicUser: types.union(types.undefined, types.null, types.array(types.late((): any => TopicTaguserModel))),
   })
   .views(self => ({
     get store() {
@@ -56,6 +59,7 @@ export class TopicDetailModelSelector extends QueryBuilder {
   userId(builder: string | UserModelSelector | ((selector: UserModelSelector) => UserModelSelector) | undefined) { return this.__child(`userId`, UserModelSelector, builder) }
   commentId(builder: string | CommentsDetailModelSelector | ((selector: CommentsDetailModelSelector) => CommentsDetailModelSelector) | undefined) { return this.__child(`commentId`, CommentsDetailModelSelector, builder) }
   topiclikeId(builder: string | LikeTopicsModelSelector | ((selector: LikeTopicsModelSelector) => LikeTopicsModelSelector) | undefined) { return this.__child(`topiclikeId`, LikeTopicsModelSelector, builder) }
+  tagTopicUser(builder: string | TopicTaguserModelSelector | ((selector: TopicTaguserModelSelector) => TopicTaguserModelSelector) | undefined) { return this.__child(`tagTopicUser`, TopicTaguserModelSelector, builder) }
 }
 export function selectFromTopicDetail() {
   return new TopicDetailModelSelector()

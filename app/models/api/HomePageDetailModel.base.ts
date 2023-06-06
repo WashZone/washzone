@@ -9,6 +9,8 @@ import { HomecommentsModel, HomecommentsModelType } from "./HomecommentsModel"
 import { HomecommentsModelSelector } from "./HomecommentsModel.base"
 import { UserModel, UserModelType } from "./UserModel"
 import { UserModelSelector } from "./UserModel.base"
+import { UserTagListModel, UserTagListModelType } from "./UserTagListModel"
+import { UserTagListModelSelector } from "./UserTagListModel.base"
 import { RootStoreType } from "./index"
 
 
@@ -25,9 +27,10 @@ export const HomePageDetailModelBase = ModelBase
     updatedAt: types.union(types.undefined, types.frozen()),
     userId: types.union(types.undefined, types.late((): any => UserModel)),
     commentId: types.union(types.undefined, types.late((): any => HomecommentsModel)),
+    tagUser: types.union(types.undefined, types.null, types.array(types.late((): any => UserTagListModel))),
     Discription: types.union(types.undefined, types.null, types.string),
     attachmentType: types.union(types.undefined, types.null, types.string),
-    attachmentUrl: types.union(types.undefined, types.null, types.string),
+    attachmentUrl: types.union(types.undefined, types.null, types.array(types.string)),
     status: types.union(types.undefined, types.null, types.string),
     likeviews: types.union(types.undefined, types.null, types.integer),
     dislikeviews: types.union(types.undefined, types.null, types.integer),
@@ -50,6 +53,7 @@ export class HomePageDetailModelSelector extends QueryBuilder {
   get dislikeviews() { return this.__attr(`dislikeviews`) }
   userId(builder: string | UserModelSelector | ((selector: UserModelSelector) => UserModelSelector) | undefined) { return this.__child(`userId`, UserModelSelector, builder) }
   commentId(builder: string | HomecommentsModelSelector | ((selector: HomecommentsModelSelector) => HomecommentsModelSelector) | undefined) { return this.__child(`commentId`, HomecommentsModelSelector, builder) }
+  tagUser(builder: string | UserTagListModelSelector | ((selector: UserTagListModelSelector) => UserTagListModelSelector) | undefined) { return this.__child(`tagUser`, UserTagListModelSelector, builder) }
 }
 export function selectFromHomePageDetail() {
   return new HomePageDetailModelSelector()

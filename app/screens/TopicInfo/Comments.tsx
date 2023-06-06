@@ -2,7 +2,7 @@ import React, { useState } from "react"
 import { Dimensions, TextStyle, TouchableOpacity, View, ViewStyle } from "react-native"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { colors, spacing } from "../../theme"
-import { Text } from "../../components"
+import { ParsedTextComp, Text } from "../../components"
 import { fromNow } from "../../utils/agoFromNow"
 import { formatName } from "../../utils/formatName"
 import ShimmerPlaceholder from "react-native-shimmer-placeholder"
@@ -36,7 +36,7 @@ export const CommentComponent = ({ comment }: { comment: any }) => {
             <Text text={formatName(comment?.users?.name)} style={$publisherName} weight="medium" />
             <Text text={fromNow(comment?.createdAt)} style={$fromNow} />
           </View>
-          <Text text={comment?.comment} style={$commentText} />
+          <ParsedTextComp text={comment?.comment} style={$commentText} />
         </View>
       </View>
       {comment?.acttachmentUrl && (

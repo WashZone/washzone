@@ -36,6 +36,7 @@ export const UserModelBase = ModelBase
     first_name: types.union(types.undefined, types.null, types.string),
     last_name: types.union(types.undefined, types.null, types.string),
     name: types.union(types.undefined, types.null, types.string),
+    username: types.union(types.undefined, types.null, types.string),
     email: types.union(types.undefined, types.null, types.string),
     socialId: types.union(types.undefined, types.null, types.string),
     password: types.union(types.undefined, types.null, types.string),
@@ -47,8 +48,13 @@ export const UserModelBase = ModelBase
     role: types.union(types.undefined, types.null, types.string),
     description: types.union(types.undefined, types.null, types.string),
     averageRating: types.union(types.undefined, types.null, types.number),
+    reportCount: types.union(types.undefined, types.null, types.number),
+    follower: types.union(types.undefined, types.null, types.number),
+    following: types.union(types.undefined, types.null, types.number),
+    postCount: types.union(types.undefined, types.null, types.number),
     notificationToken: types.union(types.undefined, types.null, types.string),
     notificationStatus: types.union(types.undefined, types.null, types.boolean),
+    blueTick: types.union(types.undefined, types.null, types.boolean),
     blockedUser: types.union(types.undefined, types.null, types.array(types.late((): any => BloackedUserListModel))),
   })
   .views(self => ({
@@ -64,6 +70,7 @@ export class UserModelSelector extends QueryBuilder {
   get first_name() { return this.__attr(`first_name`) }
   get last_name() { return this.__attr(`last_name`) }
   get name() { return this.__attr(`name`) }
+  get username() { return this.__attr(`username`) }
   get email() { return this.__attr(`email`) }
   get socialId() { return this.__attr(`socialId`) }
   get password() { return this.__attr(`password`) }
@@ -75,8 +82,13 @@ export class UserModelSelector extends QueryBuilder {
   get role() { return this.__attr(`role`) }
   get description() { return this.__attr(`description`) }
   get averageRating() { return this.__attr(`averageRating`) }
+  get reportCount() { return this.__attr(`reportCount`) }
+  get follower() { return this.__attr(`follower`) }
+  get following() { return this.__attr(`following`) }
+  get postCount() { return this.__attr(`postCount`) }
   get notificationToken() { return this.__attr(`notificationToken`) }
   get notificationStatus() { return this.__attr(`notificationStatus`) }
+  get blueTick() { return this.__attr(`blueTick`) }
   ratingId(builder: string | UserRatingModelSelector | ((selector: UserRatingModelSelector) => UserRatingModelSelector) | undefined) { return this.__child(`ratingId`, UserRatingModelSelector, builder) }
   topicId(builder: string | TopicDetailModelSelector | ((selector: TopicDetailModelSelector) => TopicDetailModelSelector) | undefined) { return this.__child(`topicId`, TopicDetailModelSelector, builder) }
   classifiedId(builder: string | ClassifiedFeedModelSelector | ((selector: ClassifiedFeedModelSelector) => ClassifiedFeedModelSelector) | undefined) { return this.__child(`classifiedId`, ClassifiedFeedModelSelector, builder) }
@@ -87,4 +99,4 @@ export function selectFromUser() {
   return new UserModelSelector()
 }
 
-export const userModelPrimitives = selectFromUser()._id.createdAt.updatedAt.first_name.last_name.name.email.socialId.password.picture.isSocialLogin.type.token.status.role.description.averageRating.notificationToken.notificationStatus
+export const userModelPrimitives = selectFromUser()._id.createdAt.updatedAt.first_name.last_name.name.username.email.socialId.password.picture.isSocialLogin.type.token.status.role.description.averageRating.reportCount.follower.following.postCount.notificationToken.notificationStatus.blueTick

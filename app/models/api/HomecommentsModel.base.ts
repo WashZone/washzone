@@ -5,6 +5,8 @@
 import { types } from "mobx-state-tree"
 import { QueryBuilder } from "mst-gql"
 import { ModelBase } from "./ModelBase"
+import { HomeCommentTagListModel, HomeCommentTagListModelType } from "./HomeCommentTagListModel"
+import { HomeCommentTagListModelSelector } from "./HomeCommentTagListModel.base"
 import { HomePageDetailModel, HomePageDetailModelType } from "./HomePageDetailModel"
 import { HomePageDetailModelSelector } from "./HomePageDetailModel.base"
 import { UserModel, UserModelType } from "./UserModel"
@@ -28,6 +30,7 @@ export const HomecommentsModelBase = ModelBase
     comment: types.union(types.undefined, types.null, types.string),
     acttachmentUrl: types.union(types.undefined, types.null, types.string),
     acttachmentType: types.union(types.undefined, types.null, types.string),
+    taginHomeComment: types.union(types.undefined, types.null, types.array(types.late((): any => HomeCommentTagListModel))),
   })
   .views(self => ({
     get store() {
@@ -44,6 +47,7 @@ export class HomecommentsModelSelector extends QueryBuilder {
   get acttachmentType() { return this.__attr(`acttachmentType`) }
   userId(builder: string | UserModelSelector | ((selector: UserModelSelector) => UserModelSelector) | undefined) { return this.__child(`userId`, UserModelSelector, builder) }
   HomePageId(builder: string | HomePageDetailModelSelector | ((selector: HomePageDetailModelSelector) => HomePageDetailModelSelector) | undefined) { return this.__child(`HomePageId`, HomePageDetailModelSelector, builder) }
+  taginHomeComment(builder: string | HomeCommentTagListModelSelector | ((selector: HomeCommentTagListModelSelector) => HomeCommentTagListModelSelector) | undefined) { return this.__child(`taginHomeComment`, HomeCommentTagListModelSelector, builder) }
 }
 export function selectFromHomecomments() {
   return new HomecommentsModelSelector()

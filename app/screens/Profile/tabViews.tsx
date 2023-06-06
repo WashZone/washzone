@@ -70,9 +70,9 @@ export const GalleryTabView = ({ galleryItems }: { galleryItems: Array<any> }) =
   if (loading) return <Loading />
 
   return (
-    <HScrollView showsVerticalScrollIndicator={false}       
-    index={3}
-    style={$screenContainer}>
+    <HScrollView showsVerticalScrollIndicator={false}
+      index={3}
+      style={$screenContainer}>
       <View style={$flexRow}>
         <View style={{ flex: 1 / 2 }}>
           {imageData.left.map((e, index) => (
@@ -111,9 +111,12 @@ export const HomePostsTabScreen = ({
   const fetchUserPosts = async () => {
     const res = await getUsersHomePosts(userId)
     setUserPosts(res)
-    const galleryImages = res.map((i, index) => {
-      if (i.attachmentUrl) return { uri: i?.attachmentUrl || "", id: "post" + index }
-      return { uri: "" }
+    const galleryImages = []
+    res.forEach((i, index) => {
+      i?.attachmentUrl?.forEach((j: any, jIndex: string) => {
+        console.log("JJJJ : ", j)
+        galleryImages.push({ uri: j, id: "topic" + index + "-" + jIndex })
+      })
     })
     console.log("GalleryImages", galleryImages)
     const filteredImages = galleryImages.filter((i) => i?.uri)
@@ -177,7 +180,7 @@ export const TopicsTabScreen = ({
       bounces={false}
       data={userTopics}
       showsVerticalScrollIndicator={false}
-      renderItem={({ item, index }) => <TopicComponent topic={item} index={index}/>}
+      renderItem={({ item, index }) => <TopicComponent topic={item} index={index} />}
     />
   )
 }
@@ -190,7 +193,7 @@ export const ClassifiedsTabScreen = ({
   addToGallery: (toAdd: Array<any>) => void
 }) => {
   const [loading, setLoading] = useState(true)
-
+  console.log("USER ID : :: :", userId)
   const [userClassifieds, setUserClassifieds] = React.useState([])
   const { getUserClassifieds } = useHooks()
 
@@ -291,7 +294,7 @@ const $classifiedBlockContainer: ViewStyle = {
 
 const $screenContainer: ViewStyle = {
   flex: 1,
-  backgroundColor: colors.palette.primaryOverlay15,
+  backgroundColor: colors.palette.neutral100,
 }
 
 const $marginAutoImage: ImageStyle = { margin: 10 }

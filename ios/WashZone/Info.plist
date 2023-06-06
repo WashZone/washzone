@@ -47,6 +47,8 @@
 			</array>
 		</dict>
 		<dict>
+      <key>CFBundleTypeRole</key>
+              <string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>washzone</string>
@@ -59,6 +61,31 @@
 	<string>656188942713213</string>
 	<key>FacebookDisplayName</key>
 	<string>WashZone</string>
+  <key>HostAppBundleIdentifier</key>
+  <string>com.washzone.washv01</string>
+  <key>HostAppURLScheme</key>
+  <string>washzone</string>
+  <!-- This url scheme CONTAINS :// at the end - E.G. "mycustomscheme://"-->
+  <key>NSExtension</key>
+  <dict>
+      <key>NSExtensionAttributes</key>
+      <dict>
+          <key>NSExtensionActivationRule</key>
+          <dict>
+              <!-- For a full list of available options, visit https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/AppExtensionKeys.html#//apple_ref/doc/uid/TP40014212-SW10 -->
+              <key>NSExtensionActivationSupportsImageWithMaxCount</key>
+              <integer>1</integer>
+              <key>NSExtensionActivationSupportsText</key>
+              <true/>
+              <key>NSExtensionActivationSupportsWebURLWithMaxCount</key>
+              <integer>1</integer>
+          </dict>
+      </dict>
+      <key>NSExtensionMainStoryboard</key>
+      <string>MainInterface</string>
+      <key>NSExtensionPointIdentifier</key>
+      <string>com.apple.share-services</string>
+  </dict>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>fbapi</string>

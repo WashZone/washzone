@@ -5,6 +5,8 @@
 import { types } from "mobx-state-tree"
 import { QueryBuilder } from "mst-gql"
 import { ModelBase } from "./ModelBase"
+import { TopicCommentTagModel, TopicCommentTagModelType } from "./TopicCommentTagModel"
+import { TopicCommentTagModelSelector } from "./TopicCommentTagModel.base"
 import { TopicDetailModel, TopicDetailModelType } from "./TopicDetailModel"
 import { TopicDetailModelSelector } from "./TopicDetailModel.base"
 import { UserModel, UserModelType } from "./UserModel"
@@ -28,6 +30,7 @@ export const CommentsDetailModelBase = ModelBase
     comment: types.union(types.undefined, types.null, types.string),
     acttachmentUrl: types.union(types.undefined, types.null, types.string),
     acttachmentType: types.union(types.undefined, types.null, types.string),
+    topictagComment: types.union(types.undefined, types.null, types.array(types.late((): any => TopicCommentTagModel))),
   })
   .views(self => ({
     get store() {
@@ -44,6 +47,7 @@ export class CommentsDetailModelSelector extends QueryBuilder {
   get acttachmentType() { return this.__attr(`acttachmentType`) }
   userId(builder: string | UserModelSelector | ((selector: UserModelSelector) => UserModelSelector) | undefined) { return this.__child(`userId`, UserModelSelector, builder) }
   TopicId(builder: string | TopicDetailModelSelector | ((selector: TopicDetailModelSelector) => TopicDetailModelSelector) | undefined) { return this.__child(`TopicId`, TopicDetailModelSelector, builder) }
+  topictagComment(builder: string | TopicCommentTagModelSelector | ((selector: TopicCommentTagModelSelector) => TopicCommentTagModelSelector) | undefined) { return this.__child(`topictagComment`, TopicCommentTagModelSelector, builder) }
 }
 export function selectFromCommentsDetail() {
   return new CommentsDetailModelSelector()

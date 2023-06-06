@@ -1,61 +1,51 @@
-
 // eslint-disable-next-line react-native/split-platform-components
-import { PermissionsAndroid, Platform } from "react-native";
+import { PermissionsAndroid, Platform } from "react-native"
 import { ImageLibraryOptions } from "react-native-image-picker"
 const ImagePicker = require("react-native-image-picker")
 
 export const Capture = async () => {
-  console.log('CAPTURING')
+  console.log("CAPTURING")
   const options = {
     storageOptions: {
       skipBackup: true,
       path: "images",
     },
   }
-if(Platform.OS ==='android') {
-
-  const granted = await PermissionsAndroid.request(
-    PermissionsAndroid.PERMISSIONS.CAMERA,
-    {
+  if (Platform.OS === "android") {
+    const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.CAMERA, {
       title: "App Camera Permission",
-      message:"App needs access to your camera ",
+      message: "App needs access to your camera ",
       buttonNeutral: "Ask Me Later",
       buttonNegative: "Cancel",
-      buttonPositive: "OK"
+      buttonPositive: "OK",
+    })
+    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+      console.log("Camera permission given")
+      let image: any
+      await ImagePicker.launchCamera(options, (res) => {
+        console.log("CATURED IMAGE", res?.assets?.[0])
+        image = res?.assets?.[0]
+      })
+      return image
+    } else {
+      console.log("Camera permission denied")
+      return undefined
     }
-  );
-  if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-    console.log("Camera permission given");
-    let image: any
-    await ImagePicker.launchCamera(options, (res) => {
-      console.log("CATURED IMAGE", res?.assets?.[0])
-      image = res?.assets?.[0]
-    })
-    return image
   } else {
-    console.log("Camera permission denied");
-    return undefined
-  }
- 
-}
- else{
-  console.log("Camera permission given");
+    console.log("Camera permission given")
     let image: any
     await ImagePicker.launchCamera(options, (res) => {
       console.log("CATURED IMAGE", res?.assets?.[0])
       image = res?.assets?.[0]
     })
     return image
- }
-  
- 
-
+  }
 }
 
-export const MediaPicker = async () => {
+export const MediaPicker = async (props?: { selectionLimit?: number }) => {
   const options: ImageLibraryOptions = {
     mediaType: "photo",
-    selectionLimit: 1,
+    selectionLimit: props?.selectionLimit || 1,
     maxWidth: 1920,
     maxHeight: 1080,
     quality: 1,
@@ -73,7 +63,7 @@ export const MediaPicker = async () => {
         console.log("ImagePicker Error: ", response?.errorMessage)
       } else if (response?.assets) {
         console.log("response", JSON.stringify(response?.assets?.[0]))
-        image = response?.assets?.[0]
+        image = props?.selectionLimit ? response?.assets : response?.assets?.[0]
       }
     },
   )

@@ -10,6 +10,7 @@ import { useStores } from "../../models"
 import { TopicComponentFullView } from "../TopicsFeed"
 
 import Loading from "../../components/Loading"
+import { Host } from "react-native-portalize"
 
 export const TopicInfo: FC<HomeTabProps<"TopicInfo">> = function PostInfo(props) {
   const { topic } = props.route.params
@@ -47,7 +48,7 @@ export const TopicInfo: FC<HomeTabProps<"TopicInfo">> = function PostInfo(props)
   }
 
   const onComment = async (commentText, selectedMedia) => {
-    await postComment(commentText, selectedMedia, topicDetails?._id)
+    await postComment(commentText, selectedMedia, topicDetails?._id,[])
     await syncComments(topicDetails?._id)
   }
 
@@ -57,14 +58,15 @@ export const TopicInfo: FC<HomeTabProps<"TopicInfo">> = function PostInfo(props)
 
   return (
     <Screen preset="fixed" keyboardOffset={-180} contentContainerStyle={$container}>
+      <Host>
       <FlatList
         data={comments}
         renderItem={({ item }) => <CommentComponent comment={item} key={item?._id} />}
         style={$contentContainer}
         ListHeaderComponent={<TopicComponentFullView topic={topicDetails} />}
       />
-
       <CommentInput createComment={onComment} />
+      </Host>
     </Screen>
   )
 }

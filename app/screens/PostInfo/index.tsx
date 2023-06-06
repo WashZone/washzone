@@ -4,14 +4,17 @@ import { CommentInput, Icon, Screen } from "../../components"
 import { colors, spacing } from "../../theme"
 import { HomeTabProps } from "../../tabs/Home"
 import { PostComponent } from "../Feed/partials"
-import { MediaPicker } from "../../utils/device/MediaPicker"
 import { useHooks } from "../hooks"
 import { useStores } from "../../models"
 import { CommentComponent } from "../TopicInfo/Comments"
 import Loading from "../../components/Loading"
+import ImageView from "react-native-image-viewing"
+import { ImageViewConfigType } from ".."
+import { Host } from "react-native-portalize"
 
 export const PostInfo: FC<HomeTabProps<"PostInfo">> = function PostInfo(props) {
   const { post } = props.route.params
+  const [imageViewConfig, setImageViewConfig] = useState<ImageViewConfigType>({ images: [], currentIndex: 0, show: false })
 
   const [comments, setComments] = useState<Array<any>>([])
 
@@ -47,7 +50,7 @@ export const PostInfo: FC<HomeTabProps<"PostInfo">> = function PostInfo(props) {
   }
 
   const onComment = async (commentText, selectedMedia) => {
-    await postCommentOnHomePagePost(commentText, selectedMedia, postDetails?._id)
+    await postCommentOnHomePagePost(commentText, selectedMedia, postDetails?._id, [])
     await syncComments(postDetails?._id)
   }
 
@@ -56,68 +59,26 @@ export const PostInfo: FC<HomeTabProps<"PostInfo">> = function PostInfo(props) {
   }
   return (
     <Screen preset="fixed" keyboardOffset={-180} contentContainerStyle={$container}>
-      <FlatList
-        data={comments}
-        renderItem={({ item }) => <CommentComponent comment={item} key={item?._id} />}
-        style={$contentContainer}
-        ListHeaderComponent={<PostComponent post={postDetails} index={0} />}
-      />
+      <Host>
+        <FlatList
+          data={comments}
+          renderItem={({ item }) => <CommentComponent comment={item} key={item?._id} />}
+          style={$contentContainer}
+          ListHeaderComponent={<PostComponent setImageViewConfig={setImageViewConfig} post={postDetails} index={0} />}
+        />
 
-      <CommentInput createComment={onComment} />
+        <CommentInput createComment={onComment} />
+        <ImageView
+          images={imageViewConfig.images}
+          imageIndex={imageViewConfig.currentIndex}
+          visible={imageViewConfig.show}
+          onRequestClose={() => setImageViewConfig({ ...imageViewConfig, show: false })}
+        />
+      </Host>
     </Screen>
   )
 }
 
-const $iconXContainer: ViewStyle = {
-  height: 24,
-  width: 24,
-  justifyContent: "center",
-  alignItems: "center",
-  borderRadius: 8,
-  backgroundColor: colors.background,
-  position: "absolute",
-  top: -5,
-  left: 85,
-}
-
-const $rightIconContainer: ViewStyle = {
-  width: 28,
-}
-
-const $commentInput: TextStyle = {
-  flex: 1,
-  height: 48,
-  backgroundColor: colors.background,
-  marginHorizontal: 10,
-  borderRadius: 24,
-  paddingHorizontal: 10,
-}
-
-const $postCommentContainer: ViewStyle = {
-  height: 54,
-  flexDirection: "row",
-  paddingHorizontal: spacing.medium,
-  backgroundColor: colors.palette.neutral100,
-  alignItems: "center",
-}
-
-const $loadingScreen: ViewStyle = {
-  flex: 1,
-  alignItems: "center",
-  justifyContent: "center",
-}
-// const $rightIconContainer: ViewStyle = {
-//   width: 28,
-// }
-
-// const $commentInput: TextStyle = {
-//   flex: 1,
-//   height: 48,
-//   backgroundColor: colors.background,
-//   marginHorizontal: 10,
-//   borderRadius: 24,
-//   paddingHorizontal: 10,
-// }
 
 const $container: ViewStyle = {
   flex: 1,
@@ -127,10 +88,3 @@ const $contentContainer: ViewStyle = {
   flex: 1,
 }
 
-// const $postCommentContainer: ViewStyle = {
-//   height: 54,
-//   flexDirection: "row",
-//   paddingHorizontal: spacing.medium,
-//   backgroundColor: colors.palette.neutral100,
-//   alignItems: "center",
-// }

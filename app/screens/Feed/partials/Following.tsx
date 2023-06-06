@@ -118,80 +118,55 @@ const StoryComponent = ({ item, index, handleStoryUrl }: StoryComponentProps) =>
         style={$storyContainer}
         key={index}
         onPress={() => {
-          handleStoryUrl(item?.attachmentUrl)
+          handleStoryUrl(item?.activityDotUrl)
         }}
       >
         <FastImage
           onLoadEnd={() => setLoaded(true)}
           defaultSource={BROKEN_IMAGE}
-          source={{ uri: item?.thumbnailUrl }}
+          source={{ uri: item?.userId?.picture }}
           resizeMode="cover"
           style={$story}
         />
-        <View style={$pictureContainer}>
-          <FastImage source={{ uri: item?.userId?.picture }} style={$picture} />
+        <View style={$activityDot}>
         </View>
-        <LinearGradient colors={["transparent", colors.palette.primary500]} style={$nameContainer}>
-          <Text text={formatName(item?.userId?.name)} style={$name} numberOfLines={1} />
-        </LinearGradient>
+        <Text text={formatName(item?.userId?.name)} style={$name} numberOfLines={1} />
       </Pressable>
     </ShimmerPlaceholder>
   )
 }
 
-const storyContainerRadius = 10
+const $activityDot : ViewStyle ={
+  height:14, width: 14, borderRadius: 7 , backgroundColor:colors.palette.primary300 , position:'absolute' , bottom:25, right : 0
+}
 
 const $storyList: ViewStyle = { paddingHorizontal: spacing.homeScreen / 2 }
 
 const $story: ImageStyle = {
-  height: "100%",
-  width: "100%",
-  borderRadius: storyContainerRadius,
-  position: "absolute",
+  height: 80,
+  width: 80,
+  borderRadius: 40,
 }
 
 const $storyContainer: ViewStyle = {
-  height: 180,
-  backgroundColor: colors.palette.neutral300,
-  width: 100,
-  borderRadius: storyContainerRadius,
+  height: 100,
   margin: spacing.homeScreen / 2,
   justifyContent: "space-between",
 }
 
-const $pictureContainer: ViewStyle = {
-  height: 44,
-  width: 44,
-  borderRadius: 22,
-  backgroundColor: colors.palette.primary500,
-  margin: 5,
-  alignItems: "center",
-  justifyContent: "center",
-}
-
-const $picture: ImageStyle = {
-  height: 40,
-  width: 40,
-  borderRadius: 20,
-}
-
-const $nameContainer: ViewStyle = {
-  borderBottomEndRadius: storyContainerRadius,
-  borderBottomLeftRadius: storyContainerRadius,
-  paddingLeft: 12,
-}
 
 const $name: TextStyle = {
-  color: colors.palette.neutral100,
+  color: colors.palette.neutral700,
   fontSize: 14,
-  textShadowColor: colors.palette.neutral700,
+  textAlign:'center',
+  textShadowColor: colors.palette.primary400,
   textShadowRadius: 4,
   textShadowOffset: { height: -2, width: 0 },
 }
 
 const $container: ViewStyle = {
   width: "100%",
-  height: 210,
+  height: 120,
   backgroundColor: colors.palette.neutral100,
   flexDirection: "row",
   alignItems: "center",

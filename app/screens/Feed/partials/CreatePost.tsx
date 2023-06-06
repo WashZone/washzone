@@ -9,46 +9,55 @@ import {
   ActivityIndicator,
   TouchableOpacity,
 } from "react-native"
-import { Icon, iconRegistry, Text, TextField } from "../../../components"
+import { Icon, iconRegistry, Text, TextField, Button, TagInput, userTagRegEx } from "../../../components"
 import { colors, spacing } from "../../../theme"
 import { useStores } from "../../../models"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { MediaPicker } from "../../../utils/device/MediaPicker"
 import Animated, {
   interpolate,
+  SharedValue,
   useAnimatedStyle,
-  useSharedValue,
   withTiming,
 } from "react-native-reanimated"
 import { useHooks } from "../../hooks"
 import { observer } from "mobx-react-lite"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { HomeTabParamList } from "../../../tabs"
+import DraggableFlatList, { ScaleDecorator } from "react-native-draggable-flatlist"
+import { $flexRow } from "../../styles"
+import { getTaggedIds } from "../../../utils/helpers"
 
-export const CreatePost = observer(function CreatePost() {
+export const CreatePost = observer(function CreatePost({
+  progress,
+}: {
+  progress: SharedValue<number>
+}) {
   const { createPost } = useHooks()
   const { userStore } = useStores()
   const [postContent, setPostContent] = useState<string>("")
   const [isPosting, setIsPosting] = useState<boolean>(false)
-  const progress = useSharedValue(0)
+  const [uploadProgress, setUploadProgress] = useState<string>("0/0")
   const inputRef = useRef<TextInput>()
-  const [selectedImage, setSelectedImage] = useState<any>({ height: 1, width: 1 })
+  const [selectedImages, setSelectedImages] = useState<Array<any>>([])
   const navigation = useNavigation<NavigationProp<HomeTabParamList>>()
 
   const onPost = async () => {
     setIsPosting(true)
     try {
       await createPost({
-        attachment: selectedImage,
+        tagUser: getTaggedIds(postContent),
+        attachments: selectedImages,
         content: postContent,
+        setUploadProgress,
       })
     } catch (error) {
       console.log("Create Post", error)
     } finally {
       setIsPosting(false)
       progress.value = withTiming(0, { duration: 400 })
-      setSelectedImage({ height: 1, width: 1 })
-      inputRef.current.clear()
+      setSelectedImages([])
+      setPostContent('')
       inputRef.current.blur()
     }
   }
@@ -68,44 +77,63 @@ export const CreatePost = observer(function CreatePost() {
 
   const onGalleryPress = async () => {
     try {
-      const image = await MediaPicker()
-      if (image?.uri) {
-        setSelectedImage(image)
+      const images = await MediaPicker({ selectionLimit: 5 })
+      console.log(images)
+      if (images?.length > 0) {
+        setSelectedImages(images)
         setTimeout(() => {
           progress.value = withTiming(1, { duration: 300 })
         }, 100)
       }
-    } catch (e) {}
+    } catch (e) { }
   }
 
-  const onDeletePress = () => {
-    progress.value = withTiming(0.5, { duration: 200 })
-    setSelectedImage({ height: 1, width: 1 })
+  const onAddMoreImages = async () => {
+    try {
+      const images = await MediaPicker({ selectionLimit: 5 - selectedImages.length })
+      // console.log(images)
+      if (images?.length > 0) {
+        setSelectedImages([...selectedImages, ...images])
+        // setTimeout(() => {
+        //   progress.value = withTiming(1, { duration: 300 })
+        // }, 100)
+      }
+    } catch (e) { }
+  }
+
+  const onDeletePress = (item) => {
+    const temp = selectedImages.filter((i) => i !== item)
+    if (temp.length === 0) {
+      progress.value = withTiming(0.5, { duration: 200 })
+    }
+    setSelectedImages(temp)
   }
 
   const AnimatedImage = Animated.createAnimatedComponent(Image)
   const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
-  const previewImage: ImageStyle = {
-    height: selectedImage.uri ? 80 : 0,
-    width: selectedImage.uri ? 80 : 0,
-    alignItems: "center",
-    borderRadius: 10,
+  const previewImage = (item: any) => {
+    return {
+      height: item?.uri ? 80 : 0,
+      width: item?.uri ? 80 : 0,
+      borderRadius: 10,
+    }
   }
 
-  const animatedPreviewContainer = useAnimatedStyle(() => {
-    const height = interpolate(progress.value, [0.5, 1], [0, 80])
-    const opacity = interpolate(progress.value, [0.5, 1], [0, 1])
-    // const marginBottom = interpolate(progress.value, [0.5, 1], [0, 10])
+  const animatedPreviewContainer = (item) =>
+    useAnimatedStyle(() => {
+      const height = interpolate(progress.value, [0.5, 1], [0, 80])
+      const opacity = interpolate(progress.value, [0.5, 1], [0, 1])
+      // const marginBottom = interpolate(progress.value, [0.5, 1], [0, 10])
 
-    return {
-      height,
-      width: (80 * selectedImage?.width) / selectedImage?.height,
-      marginHorizontal: 20,
-      justifyContent: "center",
-      opacity,
-    }
-  })
+      return {
+        height,
+        width: (80 * item?.width) / item?.height,
+        marginHorizontal: 20,
+        justifyContent: "center",
+        opacity,
+      }
+    })
 
   const animatedPostButton = useAnimatedStyle(() => {
     const opacity = interpolate(progress.value, [0, 0.5], [0, 1])
@@ -146,34 +174,60 @@ export const CreatePost = observer(function CreatePost() {
   })
 
   return (
-    <View>
+    <View style={{ position: "absolute", top: 0, width: "100%" }}>
       <View style={$container}>
         <TouchableOpacity onPress={() => navigation.navigate("Profile", { user: userStore })}>
           <FastImage source={{ uri: userStore?.picture }} style={$picture} resizeMode="cover" />
         </TouchableOpacity>
         <View style={$contentContainer}>
-          <TextField
+          <TagInput
             value={postContent}
-            onChangeText={setPostContent}
-            ref={inputRef}
+            onChange={setPostContent}
+            inputRef={inputRef}
             onFocus={onFocus}
             containerStyle={$inputContainer}
-            inputWrapperStyle={$inputWrapper}
-            multiline
             style={$inputText}
-            placeholderTx="HomeSreen.createPostPlaceholder"
+            multiline
+            placeholder="What's on your mind?"
             placeholderTextColor={colors.palette.neutral700}
+            additionalPartTypes={{ isBottomMentionSuggestionsRender: true, trigger: "@" }}
+            suggestionsContainerStyle={{ top: 70 }}
+            portalized
           />
         </View>
+
       </View>
       <Animated.View style={animatedMediaContainer}>
-        <Animated.View style={animatedPreviewContainer}>
-          <FastImage source={{ uri: selectedImage?.uri }} style={previewImage} />
-        </Animated.View>
-        <Pressable style={$deleteIcon} onPress={onDeletePress}>
-          <Icon icon="delete" size={selectedImage.uri ? 24 : 0.0001} />
-        </Pressable>
-        <View style={$bottomActionContainer}>
+        <DraggableFlatList
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          data={selectedImages}
+          onDragEnd={({ data }) => setSelectedImages(data)}
+          ListFooterComponent={
+            selectedImages?.length < 5 &&
+            selectedImages?.length > 0 && (
+              <Button style={$addImagesButton} onPress={onAddMoreImages}>
+                <Icon icon="plus" size={28} color={colors.palette.neutral100} />
+              </Button>
+            )
+          }
+          renderItem={({ item, drag, isActive }) => (
+            <ScaleDecorator>
+              <Pressable onLongPress={drag} disabled={isActive}>
+                <Animated.View style={animatedPreviewContainer(item)}>
+                  <FastImage source={{ uri: item?.uri }} style={previewImage(item)} />
+                </Animated.View>
+                <Pressable style={$deleteIcon} onPress={() => onDeletePress(item)}>
+                  <Icon icon="delete" size={item.uri ? 24 : 0.0001} />
+                </Pressable>
+              </Pressable>
+            </ScaleDecorator>
+          )}
+          keyExtractor={function (item: any): string {
+            return item?.uri
+          }}
+        />
+        <View style={[$bottomActionContainer, { zIndex: -1 }]}>
           <View style={$actionButtonsContainer}>
             <Pressable onPress={onGalleryPress}>
               {useMemo(
@@ -186,11 +240,19 @@ export const CreatePost = observer(function CreatePost() {
           </View>
           <AnimatedPressable disabled={isPosting} onPress={onPost} style={animatedPostButton}>
             {isPosting ? (
-              <ActivityIndicator
-                color={colors.palette.neutral100}
-                style={$loadingIndicator}
-                animating
-              />
+              <View style={$flexRow}>
+                {selectedImages?.length > 0 && <Text
+                  text={uploadProgress}
+                  color={colors.palette.neutral100}
+                  weight="medium"
+                  size="xs"
+                />}
+                <ActivityIndicator
+                  color={colors.palette.neutral100}
+                  style={$loadingIndicator}
+                  animating
+                />
+              </View>
             ) : (
               <Text text="Post" style={$postTextStyle} weight="semiBold" />
             )}
@@ -201,8 +263,18 @@ export const CreatePost = observer(function CreatePost() {
   )
 })
 
+const $addImagesButton: ViewStyle = {
+  height: 80,
+  width: 80,
+  borderRadius: 10,
+  marginLeft: 40,
+  marginRight: 40,
+  backgroundColor: colors.palette.primary300,
+}
+
 const $loadingIndicator: ViewStyle = {
   transform: [{ scaleX: 0.75 }, { scaleY: 0.75 }],
+  marginLeft: spacing.extraSmall,
 }
 
 const $deleteIcon: ViewStyle = {
@@ -250,7 +322,8 @@ const $inputContainer: ViewStyle = {
   marginLeft: spacing.homeScreen / 2,
   flex: 1,
   borderWidth: 0,
-  padding: 0,
+  paddingHorizontal: spacing.extraSmall,
+  width: "100%",
 }
 
 const $inputWrapper: ViewStyle = {

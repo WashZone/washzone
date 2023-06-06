@@ -16,6 +16,7 @@ interface CustomModalProps {
   title?: string
   propagateSwipe?: boolean
   avoidKeyboard?: boolean
+  showIndicator?: boolean
   backgroundColor?: ColorValue
 }
 
@@ -26,7 +27,8 @@ export const BottomModal = ({
   children,
   title,
   avoidKeyboard,
-  backgroundColor
+  backgroundColor,
+  showIndicator = true
 }: CustomModalProps) => {
   const safeArea = useSafeAreaInsets()
   const closeModal = () => setVisible(false)
@@ -41,7 +43,7 @@ export const BottomModal = ({
       onBackdropPress={closeModal}
     >
       <View>
-        <Handle />
+        {showIndicator && <Handle />}
         <View style={[$content, { paddingBottom: safeArea.bottom }, backgroundColor && { backgroundColor }]}>
           <Text text={title} style={$title} weight="semiBold" />
           {children}
