@@ -16,6 +16,7 @@ import { ChatRoomStoreModel } from "./ChatRoomStore"
 import { withSetPropAction } from "./helpers/withSetPropAction"
 import { CallStoreModel } from "./CallStore"
 import { NotificationStoreModel } from "./NotificationStore"
+import { ShareStoreModel } from "./ShareStore"
 
 const baseURL = "https://api.washzoneapp.com"
 
@@ -41,6 +42,7 @@ export const RootStoreModel = types
     interaction: types.optional(InteractionStoreModel, {}),
     api: types.optional(APIRootStore, {}),
     searchStore: types.optional(SearchStoreModel, {}),
+    share: types.optional(ShareStoreModel, {}),
     notificationStore: types.optional(NotificationStoreModel, { lastReadDate: "" }),
     callStore: types.optional(CallStoreModel, {
       ongoingCall: false,

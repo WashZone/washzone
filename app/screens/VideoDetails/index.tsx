@@ -22,11 +22,13 @@ import { useHooks } from "../hooks"
 import { getIconForInteraction } from "../../utils/helpers"
 import Loading from "../../components/Loading"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
-import * as Haptics from 'expo-haptics'
+import * as Haptics from "expo-haptics"
+import { messageMetadataType } from "../../utils"
 
 const ActionButtons = observer(function TopicsFeed({ data }: { data: any }) {
   const {
     interaction: { isVideoSaved },
+    share:{share}
   } = useStores()
   const [loading, setLoading] = useState<boolean>(false)
 
@@ -81,11 +83,15 @@ const ActionButtons = observer(function TopicsFeed({ data }: { data: any }) {
       {
         label: "Share",
         icon: "forward",
-        onPress: () =>
-       {    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
-        Share.share({
-            message: `washzone://shared-video/${data?._id}`,
-          })}
+        onPress: () => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
+          share({
+            url: `washzone://shared-video/${data?._id}`,
+            title:'',
+            message:'',
+            type: messageMetadataType.sharedVideo
+          })
+        },
       },
       {
         label: isVideoSaved(data?._id) ? "Saved" : "Save",
@@ -155,10 +161,7 @@ const VideoDescription = ({ data }: { data: any }) => {
           weight="semiBold"
         />
       </TouchableOpacity>
-      <Text
-        text={data?.description}
-        style={$descriptionText}
-      />
+      <Text text={data?.description} style={$descriptionText} />
     </View>
   )
 }
@@ -196,6 +199,7 @@ export const VideoDetails: FC<VideosTabProps<"VideoDetails">> = observer(functio
   const {
     userStore: { _id },
     api: { mutateGetVideoByVideoId },
+    share: { share },
   } = useStores()
   console.log("VIDEO VIDEO", data)
 
@@ -220,8 +224,11 @@ export const VideoDetails: FC<VideosTabProps<"VideoDetails">> = observer(functio
   const shareVideo = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
 
-    Share.share({
-      message: `washzone://shared-video/${videoDetails?._id}`,
+    share({
+      url: `washzone://shared-video/${videoDetails?._id}`,
+      type: messageMetadataType.sharedVideo,
+      title: "",
+      message: "",
     })
   }
 

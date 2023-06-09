@@ -167,6 +167,7 @@ export const iconRegistry = {
   block: require("../../assets/icons/block.png"),
   blockUser: require("../../assets/icons/block-user.png"),
   attachment: require("../../assets/icons/attachment.png"),
+  verifiedTick: require("../../assets/icons/verified-tick.png"),
 
 }
 

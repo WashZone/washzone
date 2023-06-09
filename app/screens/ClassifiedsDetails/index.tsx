@@ -29,6 +29,7 @@ import ImageView from "react-native-image-viewing"
 import { formatName } from "../../utils/formatName"
 import * as Haptics from "expo-haptics"
 import { showAlertYesNo } from "../../utils/helpers"
+import { messageMetadataType } from "../../utils"
 
 interface ActionProps {
   icon: IconTypes
@@ -109,7 +110,7 @@ const MoreDetails = ({
     <View style={$moreDetialsContainer}>
       <View style={$flexRowBetween}>
         <Text text="Details" weight="semiBold" preset="h2" />
-        <Icon icon="flag" onPress={flagClassfied} size={20}/>
+        <Icon icon="flag" onPress={flagClassfied} size={20} />
       </View>
       <View style={$containerCondition}>
         <View style={$conditionContainer}>
@@ -127,6 +128,7 @@ const BottomActions = ({ classified }: { classified: any }) => {
   const { interactWithSaveOnClassified } = useHooks()
   const {
     interaction: { isClassifiedSaved },
+    share: { share },
   } = useStores()
   const [isSaving, setSaving] = useState(false)
   const [sendOfferModal, setSendOfferModal] = useState(false)
@@ -151,17 +153,12 @@ const BottomActions = ({ classified }: { classified: any }) => {
       icon: "share",
       title: "Share",
       onPress: () =>
-        Share.open({
+        share({
           message: "",
+          type: messageMetadataType.sharedClassified,
           title: classified?.classifiedDetail,
           url: `washzone:// /${classified._id}`,
-        })
-          .then((res) => {
-            console.log(res)
-          })
-          .catch((err) => {
-            err && console.log(err)
-          }),
+        }),
     },
     {
       icon: "offer",

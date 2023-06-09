@@ -23,11 +23,11 @@ import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { $flex1, $flexRow } from "../styles"
 import Share from "react-native-share"
 import { getIconForInteraction, showAlertYesNo } from "../../utils/helpers"
-import { defaultImages } from "../../utils"
+import { defaultImages, messageMetadataType } from "../../utils"
 import LinearGradient from "react-native-linear-gradient"
 import ShimmerPlaceholder from "react-native-shimmer-placeholder"
 import NativeAdView from "../../utils/NativeAd"
-import * as Haptics from 'expo-haptics'
+import * as Haptics from "expo-haptics"
 import { Host } from "react-native-portalize"
 
 const Actions = observer(function ActionButtons({ item }: { item: any }) {
@@ -41,6 +41,7 @@ const Actions = observer(function ActionButtons({ item }: { item: any }) {
   const {
     userStore: { _id },
     api: { mutateFlagsOnFeed },
+    share: { share },
   } = useStores()
 
   useEffect(() => {
@@ -65,7 +66,7 @@ const Actions = observer(function ActionButtons({ item }: { item: any }) {
             type: "post",
             postId: item?._id,
           })
-          Alert.alert('Success!', 'We will review the flagged content within 24 hours.')
+          Alert.alert("Success!", "We will review the flagged content within 24 hours.")
         } catch (err) {
           Alert.alert(err?.response?.errors?.[0]?.message)
         }
@@ -123,13 +124,17 @@ const Actions = observer(function ActionButtons({ item }: { item: any }) {
             size={20}
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
-              Share.open({ message: "", title: "", url: `washzone://shared-topic/${item?._id}` })
+              share({
+                message: "",
+                title: "",
+                url: `washzone://shared-topic/${item?._id}`,
+                type: messageMetadataType.sharedDiscussion,
+              })
             }}
           />
         </View>
       </View>
       <Icon icon="flag" size={20} onPress={flagTopic} />
-
     </View>
   )
 })

@@ -12,6 +12,7 @@ import { FlatList } from "react-native-gesture-handler"
 import { useStores } from "../../models"
 import { observer } from "mobx-react-lite"
 import { ClassifiedsTabParamList, VideosTabParamList } from "../../tabs"
+import { messageMetadataType } from "../../utils"
 
 interface ActionProps {
   icon: IconTypes
@@ -30,7 +31,9 @@ const BottomActions = ({
 }) => {
   console.log("DATADATA SAVED", JSON.stringify(data))
   const { interactWithSaveOnClassified, interactWithSaveOnVideo } = useHooks()
-
+  const {
+    share: { share },
+  } = useStores()
   const bottomOptions: Array<ActionProps> = [
     {
       icon: "save",
@@ -48,10 +51,14 @@ const BottomActions = ({
       icon: "share",
       title: "Share",
       onPress: () =>
-        Share.open({
-          message: `washzone://shared-${type}/${data?._id}`,
-          title: "",
-          url: "",
+        share({
+          message: "",
+          title: data?.title||'',
+          url: `washzone://shared-${type}/${data?._id}`,
+          type:
+            type === "classified"
+              ? messageMetadataType.sharedClassified
+              : messageMetadataType.sharedVideo,
         }),
     },
   ]
@@ -96,9 +103,19 @@ const SavedItem = ({ item, index, handleOnPress, refreshSavedClassifieds }) => {
             numberOfLines={1}
             style={{ width: Dimensions.get("window").width - 200 }}
           />
-          <Text text={videoDetails?.description} weight="medium" size="xs" numberOfLines={1} ellipsizeMode='tail' />
+          <Text
+            text={videoDetails?.description}
+            weight="medium"
+            size="xs"
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          />
           <Text text={videoDetails?.users?.name} style={$byText} />
-          <BottomActions data={item} type="video" refreshSavedClassifieds={refreshSavedClassifieds} />
+          <BottomActions
+            data={item}
+            type="video"
+            refreshSavedClassifieds={refreshSavedClassifieds}
+          />
         </View>
       </ListItem>
     )
@@ -249,5 +266,5 @@ const $textContainer: ViewStyle = {
   paddingHorizontal: spacing.medium,
   height: 120,
   alignSelf: "center",
-  flex: 1
+  flex: 1,
 }

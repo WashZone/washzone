@@ -16,7 +16,6 @@ export const toastMessages = {
   successfullyReported:{
     type: "success",
     ...en.toastMessages.successfullyReported,
-
   },
   succesfullyBlocked:{
     type: "success",

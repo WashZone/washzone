@@ -40,6 +40,7 @@ import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
 import { DrawerNavigator } from "./Drawer/DrawerNavigator"
 import { useHooks } from "../screens/hooks"
 import { BlockedUserModal } from "../components/BlockedUserModal"
+import  ShareModal  from "../components/ShareModal"
 
 export type AppStackParamList = {
   Login: undefined
@@ -188,6 +189,8 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
       {...props}
     >
       <AppStack />
+      <ShareModal />
+
     </NavigationContainer>
   )
 })

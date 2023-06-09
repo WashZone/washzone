@@ -10,4 +10,8 @@ export const messageMetadataType = {
   incomingCallAnswer: "incoming-call-answer",
   hangUpCall: "hangup-call",
   classifiedOffer: "classified-offer",
+  sharedPost: "shared-post",
+  sharedVideo: "shared-video",
+  sharedDiscussion: "shared-discussion",
+  sharedClassified: "shared-classified",
 }

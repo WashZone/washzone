@@ -94,7 +94,7 @@ export function useHooks() {
       queryGetHomePagesByUsersId,
       mutateBlockUserId,
       mutateUnblockUserId,
-
+      queryGetActivities,
     },
     userStore,
   } = useStores()
@@ -207,7 +207,12 @@ export function useHooks() {
     }
   }
 
-  const postComment = async (comment: string, selectedMedia: any, topicId: string, topictagComment: { topicTagCommentId: string }[]) => {
+  const postComment = async (
+    comment: string,
+    selectedMedia: any,
+    topicId: string,
+    topictagComment: { topicTagCommentId: string }[],
+  ) => {
     let imageUrl = ""
     if (selectedMedia) {
       imageUrl = await uploadToS3({
@@ -230,7 +235,7 @@ export function useHooks() {
     comment: string,
     selectedMedia: any,
     homePageId: string,
-    taginHomeComment: { taghomecommentId: string }[]
+    taginHomeComment: { taghomecommentId: string }[],
   ) => {
     let imageUrl = ""
     if (selectedMedia) {
@@ -267,10 +272,10 @@ export function useHooks() {
     if (title.length === 0 || content?.length === 0) return
     const imageUrl = attachment
       ? await uploadToS3({
-        uri: attachment?.uri,
-        type: attachment?.type,
-        name: attachment?.fileName,
-      })
+          uri: attachment?.uri,
+          type: attachment?.type,
+          name: attachment?.fileName,
+        })
       : undefined
 
     try {
@@ -291,7 +296,17 @@ export function useHooks() {
   // loadStories()
   // setTimeout(loadStories, 1000)
 
-  const createPost = async ({ content, attachments, setUploadProgress, tagUser }: { content: string; attachments: any[], tagUser: string[], setUploadProgress: (s: string) => void, }) => {
+  const createPost = async ({
+    content,
+    attachments,
+    setUploadProgress,
+    tagUser,
+  }: {
+    content: string
+    attachments: any[]
+    tagUser: string[]
+    setUploadProgress: (s: string) => void
+  }) => {
     if (content?.length === 0 && attachments?.length === 0) return
     setUploadProgress(`0/${attachments?.length}`)
     const imageUrls = []
@@ -305,19 +320,20 @@ export function useHooks() {
         imageUrls.push(url)
         setUploadProgress(`${i + 1}/${attachments?.length}`)
       }
-
     }
 
     try {
       await mutateCreateUserHomePages({
-        tagUser: tagUser?.map(i => { return { tagId: i } }),
+        tagUser: tagUser?.map((i) => {
+          return { tagId: i }
+        }),
         attachmentUrl: imageUrls,
         attachmentType: "image",
         userId: userStore._id,
         discription: content,
       })
     } catch (err) {
-      console.log('mutateCreateUserHomePagesERrr', err)
+      console.log("mutateCreateUserHomePagesERrr", err)
       Alert.alert("Something Went Wrong!")
     }
     refreshHomeFeed()
@@ -335,10 +351,10 @@ export function useHooks() {
         typeof attachment === "string"
           ? attachment
           : await uploadToS3({
-            uri: attachment?.uri,
-            type: attachment?.type,
-            name: attachment?.fileName,
-          })
+              uri: attachment?.uri,
+              type: attachment?.type,
+              name: attachment?.fileName,
+            })
       const res = await mutateUpdateUser({
         user: {
           first_name: firstName,
@@ -541,6 +557,18 @@ export function useHooks() {
     return res.getUploadedVideoByUserIdPage.data
   }
 
+  const getActivities = async () => {
+    console.log("CALLING GET ACTIVITIES : ")
+
+    try {
+      const res = await queryGetActivities({ userId: userStore?._id })
+      console.log("RES GET ACTIVITIES : ", res.getActivities)
+    } catch (err) {
+      console.log("ERROR GET ACTIVITIES : ", err)
+    }
+    // setStories(res.getActivities?.data || [])
+  }
+
   // const getVideoByVideoId = async (videoId: string) => {
   //   const res = await queryGetUploadedVideoByUserIdPage({
   //     userId,
@@ -598,7 +626,7 @@ export function useHooks() {
         status: inputInteraction,
       })
       updateVideoInteractionLocally(videoId, inputInteraction, newCount)
-    } catch (err) { }
+    } catch (err) {}
     return { interaction: inputInteraction, ...newCount }
   }
 
@@ -627,7 +655,7 @@ export function useHooks() {
         status: inputInteraction,
       })
       updateHomePostInteractionLocally(postId, inputInteraction, newCount)
-    } catch (err) { }
+    } catch (err) {}
     return { interaction: inputInteraction, ...newCount }
   }
 
@@ -656,7 +684,7 @@ export function useHooks() {
         status: inputInteraction,
       })
       updateTopicInteractionLocally(topicId, inputInteraction, newCount)
-    } catch (err) { }
+    } catch (err) {}
     return { interaction: inputInteraction, ...newCount }
   }
 
@@ -764,7 +792,7 @@ export function useHooks() {
         userId: userStore._id,
         deviceId,
       })
-    } catch (err) { }
+    } catch (err) {}
   }
 
   const isUserBlocked = async () => {
@@ -778,7 +806,7 @@ export function useHooks() {
       if (res.getBlockedUser?.status) {
         setAuthToken(undefined)
       }
-    } catch (err) { }
+    } catch (err) {}
   }
 
   const rateUser = async (userId: string, rating: number) => {
@@ -973,7 +1001,40 @@ export function useHooks() {
         },
       })
       console.log("CREATED USER MESSAGE", res.createUserMessage)
-    } catch (err) { }
+    } catch (err) {}
+  }
+
+  const shareToFriend = async (roomId: string, shareOptions: any, receiverId: string) => {
+    const text = () => {
+      switch (shareOptions?.type) {
+        case messageMetadataType.sharedClassified:
+          return "Shared a Classified"
+        case messageMetadataType.sharedPost:
+          return "Shared a Post"
+        case messageMetadataType.sharedVideo:
+          return "Shared a Video"
+        case messageMetadataType.sharedDiscussion:
+          return "Shared a Discussion"
+        default:
+          return ""
+      }
+    }
+    try {
+      const res = await mutateCreateUserMessage({
+        roomId,
+        authorId: userStore._id,
+        text: text(),
+        membersId: [{ userId1: userStore._id }, { userId1: receiverId }],
+        messageType: "custom",
+        metaData: {
+          metaDataType: shareOptions?.type,
+          amount: "",
+          currency: "",
+          data: JSON.stringify(shareOptions),
+        },
+      })
+      console.log("CREATED USER MESSAGE", res.createUserMessage)
+    } catch (err) {}
   }
 
   const sendCallOffer = async (
@@ -1003,7 +1064,7 @@ export function useHooks() {
         },
       })
       console.log("CREATED USER MESSAGE", res.createUserMessage)
-    } catch (err) { }
+    } catch (err) {}
   }
 
   const acceptCallOffer = async (roomId: string, receiverId: string, answer: string) => {
@@ -1023,7 +1084,7 @@ export function useHooks() {
         },
       })
       console.log("CREATED USER MESSAGE", res.createUserMessage)
-    } catch (err) { }
+    } catch (err) {}
   }
 
   const hangUpCall = async (roomId: string, receiverId: string) => {
@@ -1043,7 +1104,7 @@ export function useHooks() {
         },
       })
       console.log("CREATED USER MESSAGE", res.createUserMessage)
-    } catch (err) { }
+    } catch (err) {}
   }
 
   const getUserById = async (userId: string) => {
@@ -1075,7 +1136,7 @@ export function useHooks() {
         console.log("ROOM FOUND", res.getroomBymembers)
 
         return res.getroomBymembers?.data[0]?._id
-      } catch (err) { }
+      } catch (err) {}
     }
   }
 
@@ -1102,7 +1163,7 @@ export function useHooks() {
         },
       })
       console.log("CREATED USER MESSAGE", res.createUserMessage)
-    } catch (err) { }
+    } catch (err) {}
   }
 
   const deleteChatRoom = async (roomId: string) => {
@@ -1112,7 +1173,7 @@ export function useHooks() {
         roomId,
       })
       syncAllChats()
-    } catch (err) { }
+    } catch (err) {}
   }
 
   const updateNotificationToken = async () => {
@@ -1316,7 +1377,9 @@ export function useHooks() {
     getCommentsOnHomePagePost,
     interactWithHomePost,
     getUsersHomePosts,
-    searchUsers
+    searchUsers,
+    shareToFriend,
+    getActivities,
   }
 }
 

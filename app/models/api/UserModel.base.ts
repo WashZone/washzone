@@ -53,6 +53,7 @@ export const UserModelBase = ModelBase
     following: types.union(types.undefined, types.null, types.number),
     postCount: types.union(types.undefined, types.null, types.number),
     notificationToken: types.union(types.undefined, types.null, types.string),
+    banner: types.union(types.undefined, types.null, types.string),
     notificationStatus: types.union(types.undefined, types.null, types.boolean),
     blueTick: types.union(types.undefined, types.null, types.boolean),
     blockedUser: types.union(types.undefined, types.null, types.array(types.late((): any => BloackedUserListModel))),
@@ -87,6 +88,7 @@ export class UserModelSelector extends QueryBuilder {
   get following() { return this.__attr(`following`) }
   get postCount() { return this.__attr(`postCount`) }
   get notificationToken() { return this.__attr(`notificationToken`) }
+  get banner() { return this.__attr(`banner`) }
   get notificationStatus() { return this.__attr(`notificationStatus`) }
   get blueTick() { return this.__attr(`blueTick`) }
   ratingId(builder: string | UserRatingModelSelector | ((selector: UserRatingModelSelector) => UserRatingModelSelector) | undefined) { return this.__child(`ratingId`, UserRatingModelSelector, builder) }
@@ -99,4 +101,4 @@ export function selectFromUser() {
   return new UserModelSelector()
 }
 
-export const userModelPrimitives = selectFromUser()._id.createdAt.updatedAt.first_name.last_name.name.username.email.socialId.password.picture.isSocialLogin.type.token.status.role.description.averageRating.reportCount.follower.following.postCount.notificationToken.notificationStatus.blueTick
+export const userModelPrimitives = selectFromUser()._id.createdAt.updatedAt.first_name.last_name.name.username.email.socialId.password.picture.isSocialLogin.type.token.status.role.description.averageRating.reportCount.follower.following.postCount.notificationToken.banner.notificationStatus.blueTick

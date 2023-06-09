@@ -1,11 +1,18 @@
 import React, { useMemo } from "react"
-import { View, ViewStyle } from "react-native"
+import { Pressable, View, ViewStyle } from "react-native"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { Text } from "../../../components"
 import { useStores } from "../../../models"
 import { colors, spacing } from "../../../theme"
 import { messageMetadataType } from "../../../utils"
 import { $flexRow } from "../../styles"
+import { NavigationProp, useNavigation } from "@react-navigation/native"
+import {
+  ClassifiedsTabParamList,
+  HomeTabParamList,
+  TopicsTabParamList,
+  VideosTabParamList,
+} from "../../../tabs"
 
 export enum CustomMessageType {
   classifiedOffer = "classified-offer",
@@ -16,9 +23,13 @@ export const CustomChatMessage = ({ message }: { message: any }) => {
     userStore: { _id: myId },
   } = useStores()
   const data = useMemo(() => message?.metaData, [])
+  const navigationClassified = useNavigation<NavigationProp<ClassifiedsTabParamList>>()
+  const navigationTopic = useNavigation<NavigationProp<TopicsTabParamList>>()
+  const navigationHome = useNavigation<NavigationProp<HomeTabParamList>>()
+  const navigationVideo = useNavigation<NavigationProp<VideosTabParamList>>()
   switch (data?.metaDataType) {
     case messageMetadataType.classifiedOffer: {
-      const classfied = JSON.parse(data?.data || "{}")
+      const parsedData = JSON.parse(data?.data || "{}")
 
       return (
         <View style={$offerContainer}>
@@ -29,10 +40,10 @@ export const CustomChatMessage = ({ message }: { message: any }) => {
             weight="semiBold"
           />
           <View style={[$flexRow, { maxWidth: 300, marginTop: spacing.tiny }]}>
-            <FastImage style={$image} source={{ uri: classfied?.image }} />
+            <FastImage style={$image} source={{ uri: parsedData?.image }} />
             <View style={{ justifyContent: "flex-end" }}>
               <Text
-                text={classfied?.title}
+                text={parsedData?.title}
                 color={colors.palette.neutral100}
                 size="sm"
                 weight="bold"
@@ -41,7 +52,7 @@ export const CustomChatMessage = ({ message }: { message: any }) => {
                 ellipsizeMode="tail"
               />
               <Text
-                text={classfied?.description}
+                text={parsedData?.description}
                 color={colors.palette.neutral300}
                 weight="normal"
                 numberOfLines={1}
@@ -49,7 +60,7 @@ export const CustomChatMessage = ({ message }: { message: any }) => {
                 ellipsizeMode="tail"
               />
               <Text
-                text={"$ " + classfied?.amount}
+                text={"$ " + parsedData?.amount}
                 color={colors.palette.neutral100}
                 size="xl"
                 numberOfLines={1}
@@ -81,6 +92,80 @@ export const CustomChatMessage = ({ message }: { message: any }) => {
           <Text text="Hung Up A Call" size="xs" weight="medium" />
         </View>
       )
+    case messageMetadataType.sharedClassified: {
+      const parsedData = JSON.parse(data?.data || "{}")
+      const id = parsedData?.url.split("/")[parsedData?.url.split("/")?.length - 1]
+
+      return (
+        <Pressable onPress={() => navigationClassified.navigate('ClassifiedsDetails', { classified: id })}>
+          <Text
+            text="Shared a classified"
+            size="xs"
+            weight="medium"
+            color={colors.palette.neutral100}
+          />
+          <Text
+            text="Click to view"
+            size="xxxs"
+            weight="medium"
+            color={colors.palette.neutral300}
+          />
+        </Pressable>
+      )
+    }
+    case messageMetadataType.sharedDiscussion: {
+      const parsedData = JSON.parse(data?.data || "{}")
+      const id = parsedData?.url.split("/")[parsedData?.url.split("/")?.length - 1]
+
+      return (
+        <Pressable onPress={() => navigationTopic.navigate("TopicInfo", { topic: id })}>
+          <Text
+            text="Shared a discussion"
+            size="xs"
+            weight="medium"
+            color={colors.palette.neutral100}
+          />
+          <Text
+            text="Click to view"
+            size="xxxs"
+            weight="medium"
+            color={colors.palette.neutral300}
+          />
+        </Pressable>
+      )
+    }
+    case messageMetadataType.sharedPost: {
+      const parsedData = JSON.parse(data?.data || "{}")
+      const id = parsedData?.url.split("/")[parsedData?.url.split("/")?.length - 1]
+
+      return (
+        <Pressable onPress={() => navigationHome.navigate("PostInfo", { post: id })}>
+          <Text text="Shared a post" size="xs" weight="medium" color={colors.palette.neutral100} />
+          <Text
+            text="Click to view"
+            size="xxxs"
+            weight="medium"
+            color={colors.palette.neutral300}
+          />
+        </Pressable>
+      )
+    }
+    case messageMetadataType.sharedVideo: {
+      const parsedData = JSON.parse(data?.data || "{}")
+      const id = parsedData?.url.split("/")[parsedData?.url.split("/")?.length - 1]
+
+      return (
+        <Pressable onPress={() => navigationVideo.navigate("VideoDetails", { data: id })}>
+          <Text text="Shared a video" size="xs" weight="medium" color={colors.palette.neutral100} />
+          <Text
+            text="Click to view"
+            size="xxxs"
+            weight="medium"
+            color={colors.palette.neutral300}
+          />
+        </Pressable>
+      )
+    }
     default:
       return null
   }

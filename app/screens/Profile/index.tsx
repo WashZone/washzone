@@ -1,14 +1,15 @@
 import React, { FC, Ref, useEffect, useRef, useState } from "react"
 import {
-  Dimensions,
   TextStyle,
   ViewStyle,
   TouchableOpacity,
   useWindowDimensions,
   Alert,
-  ImageBackground,
   Animated,
+  View,
 } from "react-native"
+import { Menu, MenuItem, MenuDivider } from "react-native-material-menu"
+
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { CollapsibleHeaderTabView } from "react-native-tab-view-collapsible-header"
 import { NavigationState, SceneRendererProps, TabBar } from "react-native-tab-view"
@@ -24,7 +25,7 @@ import {
   HomePostsTabScreen,
   TopicsTabScreen,
 } from "./tabViews"
-import { $contentCenter, $flex1 } from "../styles"
+import { $contentCenter, $flex1, $flexRow, $justifyCenter } from "../styles"
 import { useHooks } from "../hooks"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { AppStackParamList } from "../../navigators"
@@ -52,74 +53,36 @@ const getIndexFromKey = (key: string) => {
   }
 }
 
-const BlockAndReport = observer(function BlockAndReport({
-  setReportModalVisible,
-  user,
-}: {
-  setReportModalVisible: (b: boolean) => void
-  user: any
-}) {
-  const {
-    userStore: { _id, isBlocked },
-  } = useStores()
-  const { blockUser: blockUserHook, unblockUser: unblockUserHook } = useHooks()
+// const BlockAndReport = observer(function BlockAndReport({
+//   setReportModalVisible,
+//   user,
+// }: {
+//   setReportModalVisible: (b: boolean) => void
+//   user: any
+// }) {
 
-  const blockUser = () => {
-    showAlertYesNo({
-      message: `Block ${user?.first_name} ?`,
-      description: `Once you block someone, they won't be able to send you message or make offers on your Classifieds.`,
-      onYesPress: async () => {
-        try {
-          await blockUserHook(user?._id)
-          Alert.alert(
-            "Success",
-            `${user?.first_name} is now blocked and won't be able to now interact.`,
-          )
-        } catch (err) {
-          console.log("ERRRR", err)
-          Toast.show({ text1: JSON.stringify(err?.response?.errors?.[0]?.message) })
-        }
-      },
-    })
-  }
-
-  const unblockUser = () => {
-    showAlertYesNo({
-      message: `Unblock ${user?.first_name} ?`,
-      description: `${user?.first_name} has been blocked by you. If you unblock them, they will now be able to send you messages or make offers on your Classifieds.`,
-      onYesPress: async () => {
-        try {
-          await unblockUserHook(user?._id)
-          Alert.alert("Success", "You can now connect back with " + user?.first_name)
-        } catch (err) {
-          Toast.show({ text1: JSON.stringify(err?.response?.errors?.[0]?.message) })
-        }
-      },
-    })
-  }
-
-  return (
-    <>
-      {user?._id !== _id && (
-        <>
-          <Icon
-            color={colors.palette.angry500}
-            onPress={() => setReportModalVisible(true)}
-            icon="reportUser"
-            containerStyle={$reportIcon}
-            size={22}
-          />
-          <Icon
-            onPress={isBlocked(user?._id) ? unblockUser : blockUser}
-            icon="block"
-            containerStyle={$blockIcon}
-            size={22}
-          />
-        </>
-      )}
-    </>
-  )
-})
+//   return (
+//     <>
+//       {user?._id !== _id && (
+//         <>
+//           <Icon
+//             color={colors.palette.angry500}
+//             onPress={() => setReportModalVisible(true)}
+//             icon="reportUser"
+//             containerStyle={$reportIcon}
+//             size={22}
+//           />
+//           <Icon
+//             onPress={isBlocked(user?._id) ? unblockUser : blockUser}
+//             icon="block"
+//             containerStyle={$blockIcon}
+//             size={22}
+//           />
+//         </>
+//       )}
+//     </>
+//   )
+// })
 
 const renderTabBar = (
   props: SceneRendererProps & {
@@ -200,19 +163,217 @@ const renderTabBar = (
   )
 }
 
+const Options = ({ onMessage, setReportModalVisible, user }) => {
+  const {
+    userStore: { _id, isBlocked },
+  } = useStores()
+
+  const { blockUser: blockUserHook, unblockUser: unblockUserHook } = useHooks()
+
+  const [visible, setVisible] = useState(false)
+
+  const hideMenu = () => setVisible(false)
+
+  const showMenu = () => setVisible(true)
+
+  const blockUser = () => {
+    showAlertYesNo({
+      message: `Block ${user?.first_name} ?`,
+      description: `Once you block someone, they won't be able to send you message or make offers on your Classifieds.`,
+      onYesPress: async () => {
+        try {
+          await blockUserHook(user?._id)
+          Alert.alert(
+            "Success",
+            `${user?.first_name} is now blocked and won't be able to now interact.`,
+          )
+        } catch (err) {
+          console.log("ERRRR", err)
+          Toast.show({ text1: JSON.stringify(err?.response?.errors?.[0]?.message) })
+        }
+      },
+    })
+  }
+
+  const unblockUser = () => {
+    showAlertYesNo({
+      message: `Unblock ${user?.first_name} ?`,
+      description: `${user?.first_name} has been blocked by you. If you unblock them, they will now be able to send you messages or make offers on your Classifieds.`,
+      onYesPress: async () => {
+        try {
+          await unblockUserHook(user?._id)
+          Alert.alert("Success", "You can now connect back with " + user?.first_name)
+        } catch (err) {
+          Toast.show({ text1: JSON.stringify(err?.response?.errors?.[0]?.message) })
+        }
+      },
+    })
+  }
+
+  return (
+    <Menu
+      visible={visible}
+      anchor={<Icon onPress={showMenu} icon="more" size={28} color={colors.palette.neutral100} />}
+      onRequestClose={hideMenu}
+    >
+      <MenuItem
+        onPress={() => {
+          onMessage()
+          hideMenu()
+        }}
+      >
+        <View style={[{ height: "100%", width: 100, alignItems: "center" }, $flexRow]}>
+          <Icon
+            containerStyle={{ marginHorizontal: spacing.extraSmall }}
+            color={colors.palette.neutral900}
+            icon="chatMessage"
+            size={22}
+          />
+          <Text text="Message" />
+        </View>
+      </MenuItem>
+      <MenuDivider />
+
+      <MenuItem
+        onPress={() => {
+          console.log("Setting Modal to true")
+          setReportModalVisible(true)
+          // hideMenu()
+        }}
+      >
+        <View style={[{ height: "100%", width: 100, alignItems: "center" }, $flexRow]}>
+          <Icon
+            containerStyle={{ marginHorizontal: spacing.extraSmall }}
+            color={colors.palette.angry500}
+            icon="reportUser"
+            size={22}
+          />
+          <Text text="Report" />
+        </View>
+      </MenuItem>
+      <MenuDivider />
+      <MenuItem
+        onPress={() => {
+          hideMenu()
+          isBlocked(user?._id) ? unblockUser() : blockUser()
+        }}
+      >
+        <View style={[{ height: "100%", width: 100, alignItems: "center" }, $flexRow]}>
+          <Icon icon="block" size={22} containerStyle={{ marginHorizontal: spacing.extraSmall }} />
+          <Text text={isBlocked(user?._id) ? "UnBlock" : "Block"} />
+        </View>
+      </MenuItem>
+    </Menu>
+  )
+}
+
+const ProfileHeader = ({ user, isUser, onMessage }) => {
+  const [isReportModalVisible, setReportModalVisible] = useState(false)
+  const {
+    userStore: { _id },
+    api: { mutateReportOnUser },
+  } = useStores()
+  const reportUser = async (reason: string) => {
+    try {
+      await mutateReportOnUser({
+        reason,
+        reportedById: _id,
+        userId: user?._id,
+      })
+      Alert.alert(
+        user?.first_name + " has been reported!",
+        `Thank you for reporting the user. Please be assured that all reports are taken seriously and appropriate action will be taken if necessary. We will review the user within 24hours.`,
+      )
+    } catch (err) {
+      Toast.show(toastMessages.somethingWentWrong)
+    }
+    setReportModalVisible(false)
+  }
+
+  return (
+    <View style={{ height: 240, backgroundColor: colors.palette.neutral100 }}>
+      <FastImage
+        source={{
+          uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRjFPcJqziZXYjlWPPAUxepuQbt4lDJEJqvRbGn9UoSfA&s",
+        }}
+        style={$topContainer}
+      />
+      <View style={$userDetailsContainer}>
+        <View style={$flexRow}>
+          <FastImage style={$profileImage} source={{ uri: user?.picture }} />
+
+          <View
+            style={[
+              $flexRow,
+              $flex1,
+              { justifyContent: "space-around", paddingHorizontal: spacing.medium },
+            ]}
+          >
+            <View style={{ alignItems: "center" }}>
+              <Text
+                text="Followers"
+                weight="semiBold"
+                size="xxs"
+                color={colors.palette.neutral400}
+              />
+              <Text text="100" size="lg" weight="semiBold" color={colors.palette.primary100} />
+            </View>
+            <View style={{ alignItems: "center" }}>
+              <Text
+                text="Following"
+                weight="semiBold"
+                size="xxs"
+                color={colors.palette.neutral400}
+              />
+              <Text text="100" size="lg" weight="semiBold" color={colors.palette.primary100} />
+            </View>
+          </View>
+        </View>
+        <View style={[$flexRow, { alignItems: "center", marginTop: spacing.tiny }]}>
+          <Text text={formatName(user?.name)} style={$publisherName} weight="semiBold" />
+          <Icon icon="verifiedTick" size={20} containerStyle={{ marginLeft: spacing.extraSmall }} />
+        </View>
+        {user?.description && (
+          <View>
+            <Text
+              color={colors.palette.neutral900}
+              numberOfLines={3}
+              weight="normal"
+              text={user?.description + "sadfasdfsdaf"}
+              style={$descriptionText}
+            />
+          </View>
+        )}
+      </View>
+      {!isUser && (
+        <View style={$verticalThreeDots}>
+          <Options
+            onMessage={onMessage}
+            setReportModalVisible={setReportModalVisible}
+            user={user}
+          />
+        </View>
+      )}
+      <ReportUserModal
+        isVisible={isReportModalVisible}
+        setVisible={setReportModalVisible}
+        onReport={reportUser}
+        userName={user?.first_name}
+      />
+    </View>
+  )
+}
+
 export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ route }) {
   const { user, header } = route.params
-  console.log('user :: ', user)
   const [galleryItemsTopics, setGalleryItemsTopics] = useState([])
   const [galleryItemsClassifieds, setGalleryItemsClassifieds] = useState([])
-  const [isReportModalVisible, setReportModalVisible] = useState(false)
   const [galleryItemsHomePosts, setGalleryItemsHomePosts] = useState([])
   const { getOrCreateRoom, getUserById } = useHooks()
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
   const layout = useWindowDimensions()
   const {
     userStore: { _id },
-    api: { mutateReportOnUser },
   } = useStores()
   const [loading, setLoading] = useState(Object.keys(user)?.length === 1)
   const isUser = user?._id === _id
@@ -238,18 +399,11 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
   const renderScene = ({ route }) => {
     switch (route.key) {
       case "posts":
-        return (
-          <HomePostsTabScreen userId={user?._id} addToGallery={setGalleryItemsHomePosts} />
-        )
+        return <HomePostsTabScreen userId={user?._id} addToGallery={setGalleryItemsHomePosts} />
       case "topic":
         return <TopicsTabScreen userId={user?._id} addToGallery={setGalleryItemsTopics} />
       case "classified":
-        return (
-          <ClassifiedsTabScreen
-            userId={user?._id}
-            addToGallery={setGalleryItemsClassifieds}
-          />
-        )
+        return <ClassifiedsTabScreen userId={user?._id} addToGallery={setGalleryItemsClassifieds} />
       case "gallery":
         return (
           <GalleryTabView
@@ -271,23 +425,6 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
     roomId && navigation.navigate("P2PChat", { receiver: user, roomId })
   }
 
-  const reportUser = async (reason: string) => {
-    try {
-      await mutateReportOnUser({
-        reason,
-        reportedById: _id,
-        userId: user?._id,
-      })
-      Alert.alert(
-        user?.first_name + " has been reported!",
-        `Thank you for reporting the user. Please be assured that all reports are taken seriously and appropriate action will be taken if necessary. We will review the user within 24hours.`,
-      )
-    } catch (err) {
-      Toast.show(toastMessages.somethingWentWrong)
-    }
-    setReportModalVisible(false)
-  }
-
   if (loading) return <Loading />
 
   return (
@@ -304,29 +441,7 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
       )}
       <CollapsibleHeaderTabView
         renderScrollHeader={() => (
-          <ImageBackground
-            source={{
-              uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRjFPcJqziZXYjlWPPAUxepuQbt4lDJEJqvRbGn9UoSfA&s",
-            }}
-            blurRadius={1}
-            style={$topContainer}
-          >
-            <FastImage style={$profileImage} source={{ uri: user?.picture }} />
-            <Text text={formatName(user?.name)} style={$publisherName} weight="semiBold" />
-            {user?.description && (
-              <Text
-                color={colors.palette.neutral900}
-                numberOfLines={3}
-                weight="normal"
-                text={user?.description}
-                style={$descriptionText}
-              />
-            )}
-            {!isUser && (
-              <Button preset="reversed" style={$messageButton} text="Message" onPress={onMessage} />
-            )}
-            <BlockAndReport user={user} setReportModalVisible={setReportModalVisible} />
-          </ImageBackground>
+          <ProfileHeader user={user} isUser={isUser} onMessage={onMessage} />
         )}
         enableSnap
         navigationState={{ index, routes }}
@@ -336,15 +451,26 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
         style={$flex1}
         initialLayout={{ width: layout.width }}
       />
-      <ReportUserModal
-        isVisible={isReportModalVisible}
-        setVisible={setReportModalVisible}
-        onReport={reportUser}
-        userName={user?.first_name}
-      />
     </Screen>
   )
 })
+
+const $verticalThreeDots: ViewStyle = {
+  position: "absolute",
+  top: 10,
+  right: 10,
+  transform: [{ rotate: "90deg" }],
+}
+
+const $userDetailsContainer: ViewStyle = {
+  marginHorizontal: spacing.medium,
+  backgroundColor: colors.palette.neutral100,
+  borderTopRightRadius: 10,
+  borderTopLeftRadius: 10,
+  top: -40,
+  height: 180,
+  padding: spacing.medium,
+}
 
 const $tabBarItem: ViewStyle = {
   height: 50,
@@ -375,23 +501,22 @@ const $label: TextStyle = {
   fontSize: 14,
   fontWeight: "700",
 }
+
 const $indicator: ViewStyle = {
   backgroundColor: colors.palette.neutral100,
   height: 0,
 }
 
-const $topContainer: ViewStyle = {
+const $topContainer: ImageStyle = {
   backgroundColor: colors.palette.neutral100,
   alignItems: "center",
   paddingBottom: spacing.medium,
+  height: 100,
 }
+
 const $descriptionText: TextStyle = {
-  marginTop: spacing.large,
-  width: Dimensions.get("screen").width - 100,
   fontSize: 14,
   lineHeight: 17,
-  textAlign: "center",
-  alignSelf: "center",
 }
 
 const $messageButton: ViewStyle = {
@@ -404,15 +529,12 @@ const $messageButton: ViewStyle = {
 
 const $publisherName: TextStyle = {
   fontSize: 16,
-  lineHeight: 16,
   textAlign: "center",
-  marginTop: spacing.small,
 }
 
 const $profileImage: ImageStyle = {
-  height: 50,
-  width: 50,
-  borderRadius: 25,
+  height: 60,
+  width: 60,
+  borderRadius: 30,
   alignSelf: "center",
-  marginTop: spacing.extraLarge,
 }

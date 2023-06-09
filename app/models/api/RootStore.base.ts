@@ -83,6 +83,8 @@ import { FriendlistModel, FriendlistModelType } from "./FriendlistModel"
 import { friendlistModelPrimitives, FriendlistModelSelector } from "./FriendlistModel.base"
 import { ReciverIdArrayModel, ReciverIdArrayModelType } from "./ReciverIdArrayModel"
 import { reciverIdArrayModelPrimitives, ReciverIdArrayModelSelector } from "./ReciverIdArrayModel.base"
+import { LastReadModel, LastReadModelType } from "./LastReadModel"
+import { lastReadModelPrimitives, LastReadModelSelector } from "./LastReadModel.base"
 
 
 
@@ -103,6 +105,7 @@ export type InputUser = {
   password?: (string | null)
   picture?: (string | null)
   description?: (string | null)
+  banner?: (string | null)
 }
 export type InputInfo = {
   LegalitiesData?: (string | null)
@@ -286,7 +289,8 @@ queryGetfollowerCount="queryGetfollowerCount",
 queryCheckFOllowByfollower="queryCheckFOllowByfollower",
 queryGetratingOnUserId="queryGetratingOnUserId",
 queryCheckUserRating="queryCheckUserRating",
-queryGetratingByratingId="queryGetratingByratingId"
+queryGetratingByratingId="queryGetratingByratingId",
+queryGetActivities="queryGetActivities"
 }
 export enum RootStoreBaseMutations {
 mutateCreateUser="mutateCreateUser",
@@ -398,7 +402,8 @@ mutateGetFriendById="mutateGetFriendById",
 mutateGetrequestByStatus="mutateGetrequestByStatus",
 mutateAcceptRequest="mutateAcceptRequest",
 mutateCheckIsUserAFriend="mutateCheckIsUserAFriend",
-mutateDeleteFriend="mutateDeleteFriend"
+mutateDeleteFriend="mutateDeleteFriend",
+mutateOpenActivity="mutateOpenActivity"
 }
 
 /**
@@ -406,7 +411,7 @@ mutateDeleteFriend="mutateDeleteFriend"
 */
 export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
   .named("RootStore")
-  .extend(configureStoreMixin([['UserRating', () => UserRatingModel], ['classifiedFeed', () => ClassifiedFeedModel], ['CommentsDetail', () => CommentsDetailModel], ['topicCommentTag', () => TopicCommentTagModel], ['likeTopics', () => LikeTopicsModel], ['TopicIdArray', () => TopicIdArrayModel], ['TopicDetail', () => TopicDetailModel], ['topicTaguser', () => TopicTaguserModel], ['likeVideos', () => LikeVideosModel], ['VideoLikeArray', () => VideoLikeArrayModel], ['VideoPlaylist', () => VideoPlaylistModel], ['VideoUploadPlaylist', () => VideoUploadPlaylistModel], ['VideoUpload', () => VideoUploadModel], ['User', () => UserModel], ['BloackedUserList', () => BloackedUserListModel], ['SigninUser', () => SigninUserModel], ['Legalities', () => LegalitiesModel], ['saveVideo', () => SaveVideoModel], ['storyViewerUser', () => StoryViewerUserModel], ['saveClassified', () => SaveClassifiedModel], ['blockUser', () => BlockUserModel], ['MetaData', () => MetaDataModel], ['Notification', () => NotificationModel], ['usersChat', () => UsersChatModel], ['roomChat', () => RoomChatModel], ['Users', () => UsersModel], ['CallMetaData', () => CallMetaDataModel], ['CallNotification', () => CallNotificationModel], ['Homecomments', () => HomecommentsModel], ['homeCommentTagList', () => HomeCommentTagListModel], ['HomePageDetail', () => HomePageDetailModel], ['UserTagList', () => UserTagListModel], ['likeHomePages', () => LikeHomePagesModel], ['HomePageIdArray', () => HomePageIdArrayModel], ['flags', () => FlagsModel], ['reportUser', () => ReportUserModel], ['followUser', () => FollowUserModel], ['friendlist', () => FriendlistModel], ['reciverIdArray', () => ReciverIdArrayModel]], [], "js"))
+  .extend(configureStoreMixin([['UserRating', () => UserRatingModel], ['classifiedFeed', () => ClassifiedFeedModel], ['CommentsDetail', () => CommentsDetailModel], ['topicCommentTag', () => TopicCommentTagModel], ['likeTopics', () => LikeTopicsModel], ['TopicIdArray', () => TopicIdArrayModel], ['TopicDetail', () => TopicDetailModel], ['topicTaguser', () => TopicTaguserModel], ['likeVideos', () => LikeVideosModel], ['VideoLikeArray', () => VideoLikeArrayModel], ['VideoPlaylist', () => VideoPlaylistModel], ['VideoUploadPlaylist', () => VideoUploadPlaylistModel], ['VideoUpload', () => VideoUploadModel], ['User', () => UserModel], ['BloackedUserList', () => BloackedUserListModel], ['SigninUser', () => SigninUserModel], ['Legalities', () => LegalitiesModel], ['saveVideo', () => SaveVideoModel], ['storyViewerUser', () => StoryViewerUserModel], ['saveClassified', () => SaveClassifiedModel], ['blockUser', () => BlockUserModel], ['MetaData', () => MetaDataModel], ['Notification', () => NotificationModel], ['usersChat', () => UsersChatModel], ['roomChat', () => RoomChatModel], ['Users', () => UsersModel], ['CallMetaData', () => CallMetaDataModel], ['CallNotification', () => CallNotificationModel], ['Homecomments', () => HomecommentsModel], ['homeCommentTagList', () => HomeCommentTagListModel], ['HomePageDetail', () => HomePageDetailModel], ['UserTagList', () => UserTagListModel], ['likeHomePages', () => LikeHomePagesModel], ['HomePageIdArray', () => HomePageIdArrayModel], ['flags', () => FlagsModel], ['reportUser', () => ReportUserModel], ['followUser', () => FollowUserModel], ['friendlist', () => FriendlistModel], ['reciverIdArray', () => ReciverIdArrayModel], ['lastRead', () => LastReadModel]], [], "js"))
   .props({
 
   })
@@ -672,8 +677,11 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     queryGetratingByratingId(variables: { ratingByUserId: string }, options: QueryOptions = {}) {
       return self.query<{ getratingByratingId: any }>(`query getratingByratingId($ratingByUserId: String!) { getratingByratingId(ratingByUserId: $ratingByUserId) }`, variables, options)
     },
-    mutateCreateUser(variables: { description?: (string | null), type: string, isSocialLogin: boolean, picture?: (string | null), lastName: string, firstName: string, socialId?: (string | null), password: string, email: string, username: string, name: string }, resultSelector: string | ((qb: UserModelSelector) => UserModelSelector) = userModelPrimitives.toString(), optimisticUpdate?: () => void) {
-      return self.mutate<{ createUser: UserModelType}>(`mutation createUser($description: String, $type: String!, $isSocialLogin: Boolean!, $picture: String, $lastName: String!, $firstName: String!, $socialId: String, $password: String!, $email: String!, $username: String!, $name: String!) { createUser(description: $description, type: $type, isSocialLogin: $isSocialLogin, picture: $picture, last_name: $lastName, first_name: $firstName, socialId: $socialId, password: $password, email: $email, username: $username, name: $name) {
+    queryGetActivities(variables: { userId: string }, options: QueryOptions = {}) {
+      return self.query<{ getActivities: any }>(`query getActivities($userId: String!) { getActivities(userId: $userId) }`, variables, options)
+    },
+    mutateCreateUser(variables: { banner?: (string | null), description?: (string | null), type: string, isSocialLogin: boolean, picture?: (string | null), lastName: string, firstName: string, socialId?: (string | null), password: string, email: string, username: string, name: string }, resultSelector: string | ((qb: UserModelSelector) => UserModelSelector) = userModelPrimitives.toString(), optimisticUpdate?: () => void) {
+      return self.mutate<{ createUser: UserModelType}>(`mutation createUser($banner: String, $description: String, $type: String!, $isSocialLogin: Boolean!, $picture: String, $lastName: String!, $firstName: String!, $socialId: String, $password: String!, $email: String!, $username: String!, $name: String!) { createUser(banner: $banner, description: $description, type: $type, isSocialLogin: $isSocialLogin, picture: $picture, last_name: $lastName, first_name: $firstName, socialId: $socialId, password: $password, email: $email, username: $username, name: $name) {
         ${typeof resultSelector === "function" ? resultSelector(new UserModelSelector()).toString() : resultSelector}
       } }`, variables, optimisticUpdate)
     },
@@ -1071,6 +1079,11 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     },
     mutateDeleteFriend(variables: { requestReciver?: InputreciverIdArray[] }, optimisticUpdate?: () => void) {
       return self.mutate<{ deleteFriend: any }>(`mutation deleteFriend($requestReciver: [InputreciverIdArray!]) { deleteFriend(requestReciver: $requestReciver) }`, variables, optimisticUpdate)
+    },
+    mutateOpenActivity(variables: { homePageId: string, userId: string }, resultSelector: string | ((qb: LastReadModelSelector) => LastReadModelSelector) = lastReadModelPrimitives.toString(), optimisticUpdate?: () => void) {
+      return self.mutate<{ openActivity: LastReadModelType}>(`mutation openActivity($homePageId: String!, $userId: String!) { openActivity(HomePageId: $homePageId, userId: $userId) {
+        ${typeof resultSelector === "function" ? resultSelector(new LastReadModelSelector()).toString() : resultSelector}
+      } }`, variables, optimisticUpdate)
     },
     subscribeNewMessageadd(variables?: {  }, resultSelector: string | ((qb: RoomChatModelSelector) => RoomChatModelSelector) = roomChatModelPrimitives.toString(), onData?: (item: any) => void, onError?: (error: Error) => void) {
       return self.subscribe<{ newMessageadd: RoomChatModelType}>(`subscription newMessageadd { newMessageadd {

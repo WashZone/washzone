@@ -26,13 +26,13 @@ interface StoryComponentProps {
 }
 
 export const Stories = observer(() => {
-  const { loadStories } = useHooks()
+  const { getActivities } = useHooks()
   const {
     feedStore: { stories },
   } = useStores()
 
   useEffect(() => {
-    loadStories()
+    getActivities()
   }, [])
 
   const navigationTopic = useNavigation<NavigationProp<TopicsTabParamList>>()
