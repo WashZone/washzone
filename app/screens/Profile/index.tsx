@@ -1,4 +1,4 @@
-import React, { FC, Ref, useEffect, useRef, useState } from "react"
+import React, { FC, useEffect, useRef, useState } from "react"
 import {
   TextStyle,
   ViewStyle,
@@ -27,14 +27,18 @@ import {
 } from "./tabViews"
 import { $contentCenter, $flex1, $flexRow, $justifyCenter } from "../styles"
 import { useHooks } from "../hooks"
-import { NavigationProp, useNavigation } from "@react-navigation/native"
+import {
+  NavigationProp,
+  useFocusEffect,
+  useIsFocused,
+  useNavigation,
+} from "@react-navigation/native"
 import { AppStackParamList } from "../../navigators"
 import { useStores } from "../../models"
 import ReportUserModal from "./reportUserModal"
 import Toast from "react-native-toast-message"
 import { toastMessages } from "../../utils/toastMessages"
 import { showAlertYesNo } from "../../utils/helpers"
-import { interpolateColor, useAnimatedStyle, useSharedValue } from "react-native-reanimated"
 import Loading from "../../components/Loading"
 
 const getIndexFromKey = (key: string) => {
@@ -52,37 +56,6 @@ const getIndexFromKey = (key: string) => {
     }
   }
 }
-
-// const BlockAndReport = observer(function BlockAndReport({
-//   setReportModalVisible,
-//   user,
-// }: {
-//   setReportModalVisible: (b: boolean) => void
-//   user: any
-// }) {
-
-//   return (
-//     <>
-//       {user?._id !== _id && (
-//         <>
-//           <Icon
-//             color={colors.palette.angry500}
-//             onPress={() => setReportModalVisible(true)}
-//             icon="reportUser"
-//             containerStyle={$reportIcon}
-//             size={22}
-//           />
-//           <Icon
-//             onPress={isBlocked(user?._id) ? unblockUser : blockUser}
-//             icon="block"
-//             containerStyle={$blockIcon}
-//             size={22}
-//           />
-//         </>
-//       )}
-//     </>
-//   )
-// })
 
 const renderTabBar = (
   props: SceneRendererProps & {
@@ -163,11 +136,10 @@ const renderTabBar = (
   )
 }
 
-const Options = ({ onMessage, setReportModalVisible, user }) => {
+const Options = ({ user, reportUser }) => {
   const {
     userStore: { _id, isBlocked },
   } = useStores()
-
   const { blockUser: blockUserHook, unblockUser: unblockUserHook } = useHooks()
 
   const [visible, setVisible] = useState(false)
@@ -210,13 +182,33 @@ const Options = ({ onMessage, setReportModalVisible, user }) => {
     })
   }
 
+  const onReport = () => {
+    hideMenu()
+    Alert.prompt(
+      "Report " + formatName(user?.name) + "?",
+      "Please input a reason for us to review the target user. The review will happen within 24 hours of reporting the user.",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel",
+        },
+        {
+          text: "OK",
+          onPress: reportUser,
+        },
+      ],
+      "plain-text",
+    )
+  }
+
   return (
     <Menu
       visible={visible}
       anchor={<Icon onPress={showMenu} icon="more" size={28} color={colors.palette.neutral100} />}
       onRequestClose={hideMenu}
     >
-      <MenuItem
+      {/* <MenuItem
         onPress={() => {
           onMessage()
           hideMenu()
@@ -231,16 +223,10 @@ const Options = ({ onMessage, setReportModalVisible, user }) => {
           />
           <Text text="Message" />
         </View>
-      </MenuItem>
-      <MenuDivider />
+      </MenuItem> */}
+      {/* <MenuDivider /> */}
 
-      <MenuItem
-        onPress={() => {
-          console.log("Setting Modal to true")
-          setReportModalVisible(true)
-          // hideMenu()
-        }}
-      >
+      <MenuItem onPress={onReport}>
         <View style={[{ height: "100%", width: 100, alignItems: "center" }, $flexRow]}>
           <Icon
             containerStyle={{ marginHorizontal: spacing.extraSmall }}
@@ -268,11 +254,25 @@ const Options = ({ onMessage, setReportModalVisible, user }) => {
 }
 
 const ProfileHeader = ({ user, isUser, onMessage }) => {
-  const [isReportModalVisible, setReportModalVisible] = useState(false)
   const {
     userStore: { _id },
     api: { mutateReportOnUser },
   } = useStores()
+  const { getProfileDetails } = useHooks()
+  const [profileDetails, setProfileDetails] = useState({
+    blocked: false,
+    data: { followercount: 0, followingCount: 0 },
+    following: false,
+  })
+  const syncProfile = async () => {
+    const resProfile = await getProfileDetails(user?._id)
+    console.log("syncProfile : resProfile", resProfile)
+    setProfileDetails({ ...resProfile })
+  }
+
+  useEffect(() => {
+    syncProfile()
+  }, [])
   const reportUser = async (reason: string) => {
     try {
       await mutateReportOnUser({
@@ -287,11 +287,10 @@ const ProfileHeader = ({ user, isUser, onMessage }) => {
     } catch (err) {
       Toast.show(toastMessages.somethingWentWrong)
     }
-    setReportModalVisible(false)
   }
 
   return (
-    <View style={{ height: 240, backgroundColor: colors.palette.neutral100 }}>
+    <View style={{ height: 300, backgroundColor: colors.palette.neutral100 }}>
       <FastImage
         source={{
           uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRjFPcJqziZXYjlWPPAUxepuQbt4lDJEJqvRbGn9UoSfA&s",
@@ -316,7 +315,12 @@ const ProfileHeader = ({ user, isUser, onMessage }) => {
                 size="xxs"
                 color={colors.palette.neutral400}
               />
-              <Text text="100" size="lg" weight="semiBold" color={colors.palette.primary100} />
+              <Text
+                text={profileDetails?.data?.followercount.toString()}
+                size="lg"
+                weight="semiBold"
+                color={colors.palette.primary100}
+              />
             </View>
             <View style={{ alignItems: "center" }}>
               <Text
@@ -325,7 +329,12 @@ const ProfileHeader = ({ user, isUser, onMessage }) => {
                 size="xxs"
                 color={colors.palette.neutral400}
               />
-              <Text text="100" size="lg" weight="semiBold" color={colors.palette.primary100} />
+              <Text
+                text={profileDetails?.data?.followingCount.toString()}
+                size="lg"
+                weight="semiBold"
+                color={colors.palette.primary100}
+              />
             </View>
           </View>
         </View>
@@ -344,22 +353,29 @@ const ProfileHeader = ({ user, isUser, onMessage }) => {
             />
           </View>
         )}
+        <View style={$flexRow}>
+          <TouchableOpacity
+            style={[$followContainer, { marginRight: spacing.extraSmall }, profileDetails?.following && { backgroundColor: colors.palette.primary100, }]}
+            onPress={() => setProfileDetails({ ...profileDetails, following: !profileDetails.following })}
+          >
+            <Icon containerStyle={{ marginRight: spacing.extraSmall }} size={22} color={profileDetails?.following ? colors.palette.neutral100 : colors.palette.primary100} icon={profileDetails?.following ? 'followed' : 'follow'} />
+            <Text weight="medium" color={profileDetails?.following ? colors.palette.neutral100 : colors.palette.primary100} text={profileDetails?.following ? 'Unfollow' : 'Follow'} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={$followContainer}
+            onPress={onMessage}
+          >
+            <Icon containerStyle={{ marginRight: spacing.extraSmall }} size={22} color={colors.palette.primary100} icon='chatMessage' />
+            <Text weight="medium" color={colors.palette.primary100} text='Message' />
+          </TouchableOpacity>
+        </View>
       </View>
+
       {!isUser && (
         <View style={$verticalThreeDots}>
-          <Options
-            onMessage={onMessage}
-            setReportModalVisible={setReportModalVisible}
-            user={user}
-          />
+          <Options reportUser={reportUser} user={user} />
         </View>
       )}
-      <ReportUserModal
-        isVisible={isReportModalVisible}
-        setVisible={setReportModalVisible}
-        onReport={reportUser}
-        userName={user?.first_name}
-      />
     </View>
   )
 }
@@ -367,9 +383,10 @@ const ProfileHeader = ({ user, isUser, onMessage }) => {
 export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ route }) {
   const { user, header } = route.params
   const [galleryItemsTopics, setGalleryItemsTopics] = useState([])
+
   const [galleryItemsClassifieds, setGalleryItemsClassifieds] = useState([])
   const [galleryItemsHomePosts, setGalleryItemsHomePosts] = useState([])
-  const { getOrCreateRoom, getUserById } = useHooks()
+  const { getOrCreateRoom, getUserById, getProfileDetails } = useHooks()
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
   const layout = useWindowDimensions()
   const {
@@ -388,12 +405,13 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
 
   const syncUser = async () => {
     const res = await getUserById(user?._id)
+
     navigation.setParams({ user: res })
     setLoading(false)
   }
 
   useEffect(() => {
-    Object.keys(user)?.length === 1 && syncUser()
+    syncUser()
   }, [])
 
   const renderScene = ({ route }) => {
@@ -455,6 +473,21 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
   )
 })
 
+// const $followingContainer: ViewStyle = {
+//   borderWidth: 1,
+//   borderColor: colors.palette.primary100,
+//   height: 40,
+//   width: 100,
+
+// }
+const $followContainer: ViewStyle = {
+  borderWidth: 1,
+  borderColor: colors.palette.primary100,
+  flexDirection: 'row', padding: spacing.extraSmall,
+  marginVertical: spacing.extraSmall,
+  borderRadius: spacing.extraSmall
+}
+
 const $verticalThreeDots: ViewStyle = {
   position: "absolute",
   top: 10,
@@ -479,18 +512,6 @@ const $tabBarItem: ViewStyle = {
   ...$contentCenter,
 }
 
-const $blockIcon: ViewStyle = {
-  position: "absolute",
-  top: 20,
-  right: 50,
-}
-
-const $reportIcon: ViewStyle = {
-  position: "absolute",
-  top: 20,
-  right: 20,
-}
-
 const $tab: TextStyle = {
   backgroundColor: colors.palette.primary100,
   fontSize: 14,
@@ -504,14 +525,14 @@ const $label: TextStyle = {
 
 const $indicator: ViewStyle = {
   backgroundColor: colors.palette.neutral100,
-  height: 0,
+  // height: 0,
 }
 
 const $topContainer: ImageStyle = {
   backgroundColor: colors.palette.neutral100,
   alignItems: "center",
   paddingBottom: spacing.medium,
-  height: 100,
+  height: 120,
 }
 
 const $descriptionText: TextStyle = {

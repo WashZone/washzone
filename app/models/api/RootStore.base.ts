@@ -287,6 +287,7 @@ queryGetfollower="queryGetfollower",
 queryGetfollowingCount="queryGetfollowingCount",
 queryGetfollowerCount="queryGetfollowerCount",
 queryCheckFOllowByfollower="queryCheckFOllowByfollower",
+queryFollowerDetailsByCallerId="queryFollowerDetailsByCallerId",
 queryGetratingOnUserId="queryGetratingOnUserId",
 queryCheckUserRating="queryCheckUserRating",
 queryGetratingByratingId="queryGetratingByratingId",
@@ -667,6 +668,9 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     },
     queryCheckFOllowByfollower(variables: { userId: string, followId: string }, options: QueryOptions = {}) {
       return self.query<{ checkFOllowByfollower: any }>(`query checkFOllowByfollower($userId: String!, $followId: String!) { checkFOllowByfollower(userId: $userId, followId: $followId) }`, variables, options)
+    },
+    queryFollowerDetailsByCallerId(variables: { followId: string, userId: string }, options: QueryOptions = {}) {
+      return self.query<{ followerDetailsByCallerId: any }>(`query followerDetailsByCallerId($followId: String!, $userId: String!) { followerDetailsByCallerId(followId: $followId, userId: $userId) }`, variables, options)
     },
     queryGetratingOnUserId(variables: { userId: string }, options: QueryOptions = {}) {
       return self.query<{ getratingOnUserId: any }>(`query getratingOnUserId($userId: String!) { getratingOnUserId(userId: $userId) }`, variables, options)

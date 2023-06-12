@@ -43,6 +43,7 @@ export function useHooks() {
       queryGetAllTopicByPageNumberInteraction,
       mutateCommentOnTopic,
       queryGetCommentsByTopicId,
+      queryFollowerDetailsByCallerId,
       queryGetAllClassifiedFeed,
       mutateUpdateUser,
       mutateCreateUserTopic,
@@ -272,10 +273,10 @@ export function useHooks() {
     if (title.length === 0 || content?.length === 0) return
     const imageUrl = attachment
       ? await uploadToS3({
-          uri: attachment?.uri,
-          type: attachment?.type,
-          name: attachment?.fileName,
-        })
+        uri: attachment?.uri,
+        type: attachment?.type,
+        name: attachment?.fileName,
+      })
       : undefined
 
     try {
@@ -291,6 +292,18 @@ export function useHooks() {
     } catch (err) {
       Alert.alert(err)
     }
+  }
+
+  const getProfileDetails = async (id: string) => {
+    const res = await queryFollowerDetailsByCallerId(
+      {
+        followId: id,
+        userId: userStore._id,
+      }, { fetchPolicy: 'no-cache' }
+    )
+    console.log("res:getProfileDetails  :", res.followerDetailsByCallerId)
+    return res.followerDetailsByCallerId
+
   }
   // refreshTopics()
   // loadStories()
@@ -351,10 +364,10 @@ export function useHooks() {
         typeof attachment === "string"
           ? attachment
           : await uploadToS3({
-              uri: attachment?.uri,
-              type: attachment?.type,
-              name: attachment?.fileName,
-            })
+            uri: attachment?.uri,
+            type: attachment?.type,
+            name: attachment?.fileName,
+          })
       const res = await mutateUpdateUser({
         user: {
           first_name: firstName,
@@ -626,7 +639,7 @@ export function useHooks() {
         status: inputInteraction,
       })
       updateVideoInteractionLocally(videoId, inputInteraction, newCount)
-    } catch (err) {}
+    } catch (err) { }
     return { interaction: inputInteraction, ...newCount }
   }
 
@@ -655,7 +668,7 @@ export function useHooks() {
         status: inputInteraction,
       })
       updateHomePostInteractionLocally(postId, inputInteraction, newCount)
-    } catch (err) {}
+    } catch (err) { }
     return { interaction: inputInteraction, ...newCount }
   }
 
@@ -684,7 +697,7 @@ export function useHooks() {
         status: inputInteraction,
       })
       updateTopicInteractionLocally(topicId, inputInteraction, newCount)
-    } catch (err) {}
+    } catch (err) { }
     return { interaction: inputInteraction, ...newCount }
   }
 
@@ -792,7 +805,7 @@ export function useHooks() {
         userId: userStore._id,
         deviceId,
       })
-    } catch (err) {}
+    } catch (err) { }
   }
 
   const isUserBlocked = async () => {
@@ -806,7 +819,7 @@ export function useHooks() {
       if (res.getBlockedUser?.status) {
         setAuthToken(undefined)
       }
-    } catch (err) {}
+    } catch (err) { }
   }
 
   const rateUser = async (userId: string, rating: number) => {
@@ -1001,7 +1014,7 @@ export function useHooks() {
         },
       })
       console.log("CREATED USER MESSAGE", res.createUserMessage)
-    } catch (err) {}
+    } catch (err) { }
   }
 
   const shareToFriend = async (roomId: string, shareOptions: any, receiverId: string) => {
@@ -1034,7 +1047,7 @@ export function useHooks() {
         },
       })
       console.log("CREATED USER MESSAGE", res.createUserMessage)
-    } catch (err) {}
+    } catch (err) { }
   }
 
   const sendCallOffer = async (
@@ -1064,7 +1077,7 @@ export function useHooks() {
         },
       })
       console.log("CREATED USER MESSAGE", res.createUserMessage)
-    } catch (err) {}
+    } catch (err) { }
   }
 
   const acceptCallOffer = async (roomId: string, receiverId: string, answer: string) => {
@@ -1084,7 +1097,7 @@ export function useHooks() {
         },
       })
       console.log("CREATED USER MESSAGE", res.createUserMessage)
-    } catch (err) {}
+    } catch (err) { }
   }
 
   const hangUpCall = async (roomId: string, receiverId: string) => {
@@ -1104,7 +1117,7 @@ export function useHooks() {
         },
       })
       console.log("CREATED USER MESSAGE", res.createUserMessage)
-    } catch (err) {}
+    } catch (err) { }
   }
 
   const getUserById = async (userId: string) => {
@@ -1136,7 +1149,7 @@ export function useHooks() {
         console.log("ROOM FOUND", res.getroomBymembers)
 
         return res.getroomBymembers?.data[0]?._id
-      } catch (err) {}
+      } catch (err) { }
     }
   }
 
@@ -1163,7 +1176,7 @@ export function useHooks() {
         },
       })
       console.log("CREATED USER MESSAGE", res.createUserMessage)
-    } catch (err) {}
+    } catch (err) { }
   }
 
   const deleteChatRoom = async (roomId: string) => {
@@ -1173,7 +1186,7 @@ export function useHooks() {
         roomId,
       })
       syncAllChats()
-    } catch (err) {}
+    } catch (err) { }
   }
 
   const updateNotificationToken = async () => {
@@ -1380,6 +1393,7 @@ export function useHooks() {
     searchUsers,
     shareToFriend,
     getActivities,
+    getProfileDetails,
   }
 }
 

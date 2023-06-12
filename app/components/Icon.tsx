@@ -164,6 +164,8 @@ export const iconRegistry = {
   shareCursive: require("../../assets/icons/share-cursive.png"),
   reportUser: require("../../assets/icons/report-user.png"),
   flag: require("../../assets/icons/flag.png"),
+  follow: require("../../assets/icons/follow.png"),
+  followed: require("../../assets/icons/followed.png"),
   block: require("../../assets/icons/block.png"),
   blockUser: require("../../assets/icons/block-user.png"),
   attachment: require("../../assets/icons/attachment.png"),

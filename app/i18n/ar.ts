@@ -38,6 +38,26 @@ const ar: Translations = {
       content: "No data found yet. Try clicking the button to refresh or reload the app.",
       button: "Let's try this again",
     },
+    emptyPosts: {
+      heading: "No Posts Found!",
+      content: "",
+      button: "Reload",
+    },
+    emptyDiscussions: {
+      heading: "No Discussions Found!",
+      content: "",
+      button: "Reload",
+    },
+    emptyGallery: {
+      heading: "No Images Found!",
+      content: "",
+      button: "Reload",
+    },
+    emptyClassifieds: {
+      heading: "No Classifeds Found!",
+      content: "",
+      button: "Reload",
+    },
   },
 
   errors: {

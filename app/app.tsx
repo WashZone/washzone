@@ -147,7 +147,4 @@ function App(props: AppProps) {
 }
 
 export default App
-// Access Key ID:
-// AKIAY5ERXJV4ZHSJQWFL
-// Secret Access Key:
-// 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
+

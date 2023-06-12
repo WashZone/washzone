@@ -147,7 +147,31 @@ const EmptyStatePresets = {
     heading: translate("emptyStateComponent.blocked.heading"),
     content: translate("emptyStateComponent.blocked.content"),
     button: translate("emptyStateComponent.blocked.button"),
-  }
+  },
+  emptyPosts : {
+    imageSource: sadFace,
+    heading: translate("emptyStateComponent.emptyPosts.heading"),
+    content: translate("emptyStateComponent.emptyPosts.content"),
+    button: translate("emptyStateComponent.emptyPosts.button"),
+  },
+  emptyDiscussions : {
+    imageSource: sadFace,
+    heading: translate("emptyStateComponent.emptyDiscussions.heading"),
+    content: translate("emptyStateComponent.emptyDiscussions.content"),
+    button: translate("emptyStateComponent.emptyDiscussions.button"),
+  },
+  emptyClassifieds : {
+    imageSource: sadFace,
+    heading: translate("emptyStateComponent.emptyClassifieds.heading"),
+    content: translate("emptyStateComponent.emptyClassifieds.content"),
+    button: translate("emptyStateComponent.emptyClassifieds.button"),
+  },
+  emptyGallery : {
+    imageSource: sadFace,
+    heading: translate("emptyStateComponent.emptyGallery.heading"),
+    content: translate("emptyStateComponent.emptyGallery.content"),
+    button: translate("emptyStateComponent.emptyGallery.button"),
+  },
 } as const
 
 /**

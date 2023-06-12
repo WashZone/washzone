@@ -56,6 +56,26 @@ const en = {
       content: "",
       button: "Back",
     },
+    emptyPosts: {
+      heading: "No Posts Found!",
+      content: "",
+      button: "Reload",
+    },
+    emptyDiscussions: {
+      heading: "No Discussions Found!",
+      content: "",
+      button: "Reload",
+    },
+    emptyGallery: {
+      heading: "No Images Found!",
+      content: "",
+      button: "Reload",
+    },
+    emptyClassifieds: {
+      heading: "No Classifieds Found!",
+      content: "",
+      button: "Reload",
+    },
   },
 
   errors: {

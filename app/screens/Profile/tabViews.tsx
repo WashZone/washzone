@@ -4,7 +4,7 @@ import { colors, spacing } from "../../theme"
 import { useHooks } from "../hooks"
 import { ClassifiedComponent } from "../ClassifiedsFeed"
 import { TopicComponent } from "../TopicsFeed"
-import { AutoImage } from "../../components"
+import { AutoImage, EmptyState } from "../../components"
 import { HFlatList, HScrollView } from "react-native-head-tab-view"
 import { PostComponent } from "../Feed/partials"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
@@ -12,9 +12,10 @@ import { HomeTabParamList } from "../../tabs"
 import Loading from "../../components/Loading"
 import { VideoBlockFullWidth } from "../Playlist"
 import ImageView from "react-native-image-viewing"
+import { ImageViewConfigType } from "../Feed"
+import { EmptyTabState } from "./emptyTabComponent"
 
 const GalleryItem = ({ uri, onPress }) => {
-
   return (
     <TouchableOpacity onPress={onPress}>
       <AutoImage
@@ -70,21 +71,23 @@ export const GalleryTabView = ({ galleryItems }: { galleryItems: Array<any> }) =
   if (loading) return <Loading />
 
   return (
-    <HScrollView showsVerticalScrollIndicator={false}
-      index={3}
-      style={$screenContainer}>
-      <View style={$flexRow}>
-        <View style={{ flex: 1 / 2 }}>
-          {imageData.left.map((e, index) => (
-            <GalleryItem onPress={() => onImagePress(e)} uri={e?.uri} key={index} />
-          ))}
+    <HScrollView showsVerticalScrollIndicator={false} index={3} style={$screenContainer}>
+      {imageData?.left?.length === 0 && imageData?.right?.length === 0 ? (
+        <EmptyTabState preset="emptyGallery" />
+      ) : (
+        <View style={$flexRow}>
+          <View style={{ flex: 1 / 2 }}>
+            {imageData.left.map((e, index) => (
+              <GalleryItem onPress={() => onImagePress(e)} uri={e?.uri} key={index} />
+            ))}
+          </View>
+          <View style={{ flex: 1 / 2 }}>
+            {imageData.right.map((e, index) => (
+              <GalleryItem onPress={() => onImagePress(e)} uri={e?.uri} key={index} />
+            ))}
+          </View>
         </View>
-        <View style={{ flex: 1 / 2 }}>
-          {imageData.right.map((e, index) => (
-            <GalleryItem onPress={() => onImagePress(e)} uri={e?.uri} key={index} />
-          ))}
-        </View>
-      </View>
+      )}
       <ImageView
         images={filteredItems}
         imageIndex={currentIndex}
@@ -138,7 +141,17 @@ export const HomePostsTabScreen = ({
       bounces={false}
       data={userPosts}
       showsVerticalScrollIndicator={false}
-      renderItem={({ item, index }) => <PostComponent post={item} navigateOnPress index={index} />}
+      ListHeaderComponent={userPosts?.length === 0 && <EmptyTabState preset="emptyPosts" />}
+      renderItem={({ item, index }) => (
+        <PostComponent
+          post={item}
+          navigateOnPress
+          index={index}
+          setImageViewConfig={function (t: ImageViewConfigType): void {
+            throw new Error("Function not implemented. " + JSON.stringify(t))
+          }}
+        />
+      )}
     />
   )
 }
@@ -176,6 +189,7 @@ export const TopicsTabScreen = ({
   return (
     <HFlatList
       index={1}
+      ListHeaderComponent={userTopics?.length === 0 && <EmptyTabState preset="emptyDiscussions" />}
       style={$screenContainer}
       bounces={false}
       data={userTopics}
@@ -220,6 +234,9 @@ export const ClassifiedsTabScreen = ({
   return (
     <HFlatList
       index={2}
+      ListHeaderComponent={
+        userClassifieds?.length === 0 && <EmptyTabState preset="emptyClassifieds" />
+      }
       data={userClassifieds}
       style={$screenContainer}
       showsVerticalScrollIndicator={false}
