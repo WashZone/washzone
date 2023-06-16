@@ -107,7 +107,7 @@ export const ShareModal = observer(() => {
   )
 })
 
-const UserComponent = observer(
+export const UserComponent = observer(
   ({
     data,
     myId,

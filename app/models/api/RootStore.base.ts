@@ -395,6 +395,7 @@ mutateCommentOnTopic="mutateCommentOnTopic",
 mutateDeleteCommentbyCommentId="mutateDeleteCommentbyCommentId",
 mutateFollowUser="mutateFollowUser",
 mutateUnfollowUser="mutateUnfollowUser",
+mutateUpdatelastreadPostId="mutateUpdatelastreadPostId",
 mutateCreateUserRating="mutateCreateUserRating",
 mutateUpdateRating="mutateUpdateRating",
 mutateCommentOnHomepage="mutateCommentOnHomepage",
@@ -1045,13 +1046,16 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     mutateDeleteCommentbyCommentId(variables: { commentId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ deleteCommentbyCommentId: boolean }>(`mutation deleteCommentbyCommentId($commentId: String!) { deleteCommentbyCommentId(commentId: $commentId) }`, variables, optimisticUpdate)
     },
-    mutateFollowUser(variables: { followId: string, userId: string }, resultSelector: string | ((qb: FollowUserModelSelector) => FollowUserModelSelector) = followUserModelPrimitives.toString(), optimisticUpdate?: () => void) {
-      return self.mutate<{ followUser: FollowUserModelType}>(`mutation followUser($followId: String!, $userId: String!) { followUser(followId: $followId, userId: $userId) {
+    mutateFollowUser(variables: { lastReadPostId?: (string | null), followId: string, userId: string }, resultSelector: string | ((qb: FollowUserModelSelector) => FollowUserModelSelector) = followUserModelPrimitives.toString(), optimisticUpdate?: () => void) {
+      return self.mutate<{ followUser: FollowUserModelType}>(`mutation followUser($lastReadPostId: String, $followId: String!, $userId: String!) { followUser(lastReadPostId: $lastReadPostId, followId: $followId, userId: $userId) {
         ${typeof resultSelector === "function" ? resultSelector(new FollowUserModelSelector()).toString() : resultSelector}
       } }`, variables, optimisticUpdate)
     },
     mutateUnfollowUser(variables: { userId: string, followId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ unfollowUser: any }>(`mutation unfollowUser($userId: String!, $followId: String!) { unfollowUser(userId: $userId, followId: $followId) }`, variables, optimisticUpdate)
+    },
+    mutateUpdatelastreadPostId(variables: { followId: string, userId: string, lastReadPostId: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ updatelastreadPostId: any }>(`mutation updatelastreadPostId($followId: String!, $userId: String!, $lastReadPostId: String!) { updatelastreadPostId(followId: $followId, userId: $userId, lastReadPostId: $lastReadPostId) }`, variables, optimisticUpdate)
     },
     mutateCreateUserRating(variables: { ratingStar?: (number | null), ratingByUserId: string, userId: string }, resultSelector: string | ((qb: UserRatingModelSelector) => UserRatingModelSelector) = userRatingModelPrimitives.toString(), optimisticUpdate?: () => void) {
       return self.mutate<{ createUserRating: UserRatingModelType}>(`mutation createUserRating($ratingStar: Float, $ratingByUserId: String!, $userId: String!) { createUserRating(ratingStar: $ratingStar, ratingByUserId: $ratingByUserId, userId: $userId) {

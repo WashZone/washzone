@@ -26,7 +26,7 @@ import { toastMessages } from "../../utils/toastMessages"
 import { observer } from "mobx-react-lite"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { HomeTabParamList } from "../../tabs"
-export const CreateTopic = observer(function CreateTopic() {
+export const CreateTopic = observer(function CreateTopic({focused}:{focused:boolean}) {
   const {
     userStore
   } = useStores()
@@ -37,7 +37,7 @@ export const CreateTopic = observer(function CreateTopic() {
   const inputRef = useRef<TextInput>()
   const inputTitleRef = useRef<TextInput>()
   const [selectedImage, setSelectedImage] = useState<any>({ height: 1, width: 1 })
-  const { createTopic, loadStories, refreshTopics } = useHooks()
+  const { createTopic, refreshTopics,getActivities } = useHooks()
   const navigation = useNavigation<NavigationProp<HomeTabParamList>>()
 
   const onPost = async () => {
@@ -60,8 +60,8 @@ export const CreateTopic = observer(function CreateTopic() {
         tagTopicUser:[]
       })
       refreshTopics()
-      loadStories()
     } catch (error) {
+      
     } finally {
       inputRef.current.clear()
       inputTitleRef.current.clear()

@@ -14,6 +14,7 @@ export const UserStoreModel = types
     isSocialLogin: types.optional(types.boolean, false),
     type: null || "facebook" || "google",
     blockedUser: types.maybe(types.frozen([])),
+    banner:types.optional(types.string, ""),
   })
   .actions((store) => ({
     setName(firstName?: string, lastName?: string) {
@@ -24,6 +25,9 @@ export const UserStoreModel = types
     setPicture(value: string) {
       store.picture = value
     },
+    setBanner(value: string) {
+      store.banner = value
+    },
     setEmail(value: string) {
       store.email = value
     },
@@ -33,10 +37,10 @@ export const UserStoreModel = types
       store.last_name = ""
       store.name = ""
       store.picture = ""
+      store.banner = ""
       store.socialId = ""
       store.isSocialLogin = false
       store.type = null
-      // store.blockedUser = []
     },
     setUser(user: any) {
       store.email = user?.email
@@ -45,6 +49,7 @@ export const UserStoreModel = types
       store.description = user?.description
       store.name = user?.name
       store.picture = user?.picture
+      store.banner = user?.banner
       store.socialId = user?.socialId
       store.isSocialLogin = user?.isSocialLogin
       store.type = user?.type

@@ -18,3 +18,7 @@ export * from "./ChooseMediaModal"
 export * from "./AddPostModal"
 export * from "./TagInput"
 export * from "./ParsedText"
+export * from "./UserComponents"
+export * from "./Loading"
+export * from "./LikesModal"
+

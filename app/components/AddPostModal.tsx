@@ -2,9 +2,14 @@ import React, { useState } from "react"
 import { TextStyle, ViewStyle } from "react-native"
 import { colors, spacing } from "../theme"
 import { Text, Button, BottomModal, Icon } from "."
+import { set } from "date-fns"
+import { navigationRef } from "../navigators"
+import { NavigationProp, useNavigation } from "@react-navigation/native"
+import { HomeTabParamList } from "../tabs"
 
 export const AddPostModal = () => {
   const [isVisible, setVisible] = useState(false)
+  const navigation = useNavigation<NavigationProp<HomeTabParamList>>()
   return (
     <>
       <Button style={$addButton} onPress={() => setVisible(true)}>
@@ -20,6 +25,10 @@ export const AddPostModal = () => {
           text="POST"
           textColor={colors.palette.neutral100}
           style={[$button, { backgroundColor: colors.palette.primary300 }]}
+          onPress={() =>{
+            setVisible(false)
+            navigation.navigate('Feed', {focused:true})
+          }}
         />
         <Button
           text="DISCUSS"

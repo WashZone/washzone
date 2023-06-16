@@ -8,7 +8,7 @@ import {
   Share,
   TouchableOpacity,
 } from "react-native"
-import { Button, Icon, IconTypes, Screen, Text } from "../../components"
+import { Button, Icon, IconTypes, LikesModal, Screen, Text } from "../../components"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { HomeTabParamList, VideosTabProps } from "../../tabs"
 import { colors, spacing } from "../../theme"
@@ -25,10 +25,16 @@ import { NavigationProp, useNavigation } from "@react-navigation/native"
 import * as Haptics from "expo-haptics"
 import { messageMetadataType } from "../../utils"
 
-const ActionButtons = observer(function TopicsFeed({ data }: { data: any }) {
+const ActionButtons = observer(function TopicsFeed({
+  data,
+  setLikesModalVisible,
+}: {
+  data: any
+  setLikesModalVisible: (b: boolean) => void
+}) {
   const {
     interaction: { isVideoSaved },
-    share:{share}
+    share: { share },
   } = useStores()
   const [loading, setLoading] = useState<boolean>(false)
 
@@ -46,6 +52,7 @@ const ActionButtons = observer(function TopicsFeed({ data }: { data: any }) {
     onPress: () => void
     status?: boolean
     count?: any
+    onTextPress?: () => void
   }> = useMemo(
     () => [
       {
@@ -63,6 +70,7 @@ const ActionButtons = observer(function TopicsFeed({ data }: { data: any }) {
         },
         status: true,
         count: dynamicData?.likeviews,
+        onTextPress: () => dynamicData?.likeviews && setLikesModalVisible(true),
       },
       {
         label: "Dislike",
@@ -87,9 +95,9 @@ const ActionButtons = observer(function TopicsFeed({ data }: { data: any }) {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
           share({
             url: `washzone://shared-video/${data?._id}`,
-            title:'',
-            message:'',
-            type: messageMetadataType.sharedVideo
+            title: "",
+            message: "",
+            type: messageMetadataType.sharedVideo,
           })
         },
       },
@@ -123,7 +131,7 @@ const ActionButtons = observer(function TopicsFeed({ data }: { data: any }) {
             }}
           />
           <Text text={option.label} style={$actionLabel} />
-          <Text text={option.count || ""} style={$actionLabel} />
+          <Text text={option.count || ""} style={$actionLabel} onPress={option?.onTextPress} />
         </View>
       ))}
     </View>
@@ -131,8 +139,8 @@ const ActionButtons = observer(function TopicsFeed({ data }: { data: any }) {
 })
 
 const VideoDescription = ({ data }: { data: any }) => {
+  const [isLikesModalVisible, setLikesModalVisible] = useState(false)
   const navigation = useNavigation<NavigationProp<HomeTabParamList>>()
-  console.log("TEST TEST DATA", data)
   return (
     <View style={$descriptionContainer}>
       <Text style={$titleText} numberOfLines={1} text={data?.videoHeading} weight="bold" />
@@ -146,7 +154,7 @@ const VideoDescription = ({ data }: { data: any }) => {
         numberOfLines={1}
         style={$viewsAndCreated}
       />
-      <ActionButtons data={data} />
+      <ActionButtons data={data} setLikesModalVisible={setLikesModalVisible} />
       <TouchableOpacity
         style={$publisherContainer}
         onPress={() => navigation.navigate("Profile", { user: data?.userId[0] || data?.userId })}
@@ -162,6 +170,12 @@ const VideoDescription = ({ data }: { data: any }) => {
         />
       </TouchableOpacity>
       <Text text={data?.description} style={$descriptionText} />
+      <LikesModal
+        module="video"
+        moduleId={data?._id}
+        isVisible={isLikesModalVisible}
+        setVisible={setLikesModalVisible}
+      />
     </View>
   )
 }

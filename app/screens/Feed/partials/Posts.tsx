@@ -1,6 +1,13 @@
 import React, { useCallback, useEffect, useRef, useState } from "react"
 import { Alert, Dimensions, Pressable, Share, TextStyle, View, ViewStyle } from "react-native"
-import { AutoImage, CustomFlatlist, Icon, ParsedTextComp, Text } from "../../../components"
+import {
+  AutoImage,
+  CustomFlatlist,
+  Icon,
+  LikesModal,
+  ParsedTextComp,
+  Text,
+} from "../../../components"
 import { colors, spacing } from "../../../theme"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { formatName } from "../../../utils/formatName"
@@ -30,7 +37,13 @@ export interface PostComponentProps {
   numberOfLines?: number
   setImageViewConfig: (t: ImageViewConfigType) => void
 }
-const Actions = observer(function ActionButtons({ item }: { item: any }) {
+const Actions = observer(function ActionButtons({
+  item,
+  setLikesModalVisible,
+}: {
+  item: any
+  setLikesModalVisible: (b: boolean) => void
+}) {
   const [loading, setLoading] = useState<boolean>(false)
   const { interactWithHomePost } = useHooks()
   const [dynamicData, setDynamicData] = useState({
@@ -41,7 +54,7 @@ const Actions = observer(function ActionButtons({ item }: { item: any }) {
   const {
     api: { mutateFlagsOnFeed },
     userStore: { _id },
-    share:{share}
+    share: { share },
   } = useStores()
 
   const flagPost = () => {
@@ -97,7 +110,9 @@ const Actions = observer(function ActionButtons({ item }: { item: any }) {
               }
             }}
           />
-          <Text>{dynamicData?.likeviews}</Text>
+          <Text onPress={() => dynamicData?.likeviews > 0 && setLikesModalVisible(true)}>
+            {dynamicData?.likeviews}
+          </Text>
         </View>
         <View style={$actionContainer}>
           <Icon
@@ -125,7 +140,12 @@ const Actions = observer(function ActionButtons({ item }: { item: any }) {
             size={20}
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
-              share({ message: "", title: "", url: `washzone://shared-post/${item?._id}`, type:messageMetadataType.sharedPost })
+              share({
+                message: "",
+                title: "",
+                url: `washzone://shared-post/${item?._id}`,
+                type: messageMetadataType.sharedPost,
+              })
             }}
           />
         </View>
@@ -147,6 +167,7 @@ export const PostComponent = ({
 
   const [currentIndex, setCurrentIndex] = useState(0)
   const [showMore, setShowMore] = useState(undefined)
+  const [isLikesModalVisible, setLikesModalVisible] = useState(false)
   const [tempNumberOfLines, setTempNumberOfLines] = useState(undefined)
 
   const windowWidth = Dimensions.get("window").width
@@ -230,16 +251,14 @@ export const PostComponent = ({
             <Text text={fromNow(post?.createdAt)} style={$agoStamp} />
           </View>
         </Pressable>
-        <Pressable 
-          onPress={onContainerPress}
-          >
-        <ParsedTextComp
-          style={$postContent}
-          numberOfLines={tempNumberOfLines}
-          onTextLayout={onTextLayout}
-          text={postDetails.content}
-          size="xs"
-        />
+        <Pressable onPress={onContainerPress}>
+          <ParsedTextComp
+            style={$postContent}
+            numberOfLines={tempNumberOfLines}
+            onTextLayout={onTextLayout}
+            text={postDetails.content}
+            size="xs"
+          />
         </Pressable>
         {showMore && tempNumberOfLines && (
           <Text
@@ -251,34 +270,6 @@ export const PostComponent = ({
             onPress={() => setTempNumberOfLines(undefined)}
           />
         )}
-        {/* {postDetails?.attachmentUrl && (
-          <ShimmerPlaceHolder
-            visible={loaded}
-            shimmerStyle={{
-              marginTop: spacing.extraSmall,
-              height: windowWidth,
-              width: windowWidth,
-            }}
-            LinearGradient={LinearGradient}
-          >
-            <FastImage
-              style={[attachmentDimensions, { marginTop: spacing.extraSmall }]}
-              source={{ uri: postDetails?.attachmentUrl }}
-              onLoadStart={() => console.log("LOADINGGGG STARTED")}
-              resizeMode={FastImage.resizeMode.stretch}
-              onLoad={(res) => {
-                console.log("ONLOAD POST ATTACHMENT", res.nativeEvent)
-                setAttachmentDimensions({
-                  height: (windowWidth * res.nativeEvent.height) / res.nativeEvent.width,
-                  width: windowWidth,
-                })
-              }}
-              onLoadEnd={() => {
-                setLoaded(true)
-              }}
-            />
-          </ShimmerPlaceHolder>
-        )} */}
         <View>
           <Carousel
             pagingEnabled
@@ -300,12 +291,21 @@ export const PostComponent = ({
             activeDotIndex={currentIndex}
             dotsLength={postDetails.attachmentUrl.length}
             renderDots={(activeIndex, total) => {
-              console.log('activeIndex', activeIndex)
-              console.log('total', total)
+              console.log("activeIndex", activeIndex)
+              console.log("total", total)
 
-              return <View style={[$flexRow, { padding: 5, backgroundColor: colors.palette.overlayNeutral50, borderRadius: 10 }]}>
-                {
-                  [...Array(total).keys()].map((i, index) => (
+              return (
+                <View
+                  style={[
+                    $flexRow,
+                    {
+                      padding: 5,
+                      backgroundColor: colors.palette.overlayNeutral50,
+                      borderRadius: 10,
+                    },
+                  ]}
+                >
+                  {[...Array(total).keys()].map((i, index) => (
                     <View
                       key={index}
                       // eslint-disable-next-line react-native/no-inline-styles
@@ -315,23 +315,37 @@ export const PostComponent = ({
                         borderRadius: 3,
                         marginHorizontal: 3,
                         backgroundColor:
-                          activeIndex === index ? colors.palette.primary100 : colors.palette.neutral100,
+                          activeIndex === index
+                            ? colors.palette.primary100
+                            : colors.palette.neutral100,
                       }}
                     />
                   ))}
-              </View>
-            }
-            }
-            containerStyle={{ position: 'absolute', bottom: -10, justifyContent: 'center', width: '100%' }}
+                </View>
+              )
+            }}
+            containerStyle={{
+              position: "absolute",
+              bottom: -10,
+              justifyContent: "center",
+              width: "100%",
+            }}
           />
         </View>
-        <Actions item={post} />
+        <Actions item={post} setLikesModalVisible={setLikesModalVisible} />
       </View>
       {index % 5 === 0 && (
         <>
           <NativeAdView />
         </>
       )}
+      <LikesModal
+        key={post?._id}
+        module="post"
+        moduleId={post?._id}
+        isVisible={isLikesModalVisible}
+        setVisible={setLikesModalVisible}
+      />
     </>
   )
 }
@@ -341,15 +355,15 @@ export const Posts = observer(
     const {
       feedStore: { homeFeed },
     } = useStores()
-    const { refreshHomeFeed, loadMoreHomeFeed, loadStories } = useHooks()
+    const { refreshHomeFeed, loadMoreHomeFeed, getActivities } = useHooks()
+
     useEffect(() => {
       refreshHomeFeed()
-      loadStories()
     }, [])
 
     const onRefresh = async () => {
       await refreshHomeFeed()
-      await loadStories()
+      await getActivities()
     }
 
     return (

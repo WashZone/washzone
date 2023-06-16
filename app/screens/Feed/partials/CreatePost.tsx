@@ -9,7 +9,15 @@ import {
   ActivityIndicator,
   TouchableOpacity,
 } from "react-native"
-import { Icon, iconRegistry, Text, TextField, Button, TagInput, userTagRegEx } from "../../../components"
+import {
+  Icon,
+  iconRegistry,
+  Text,
+  TextField,
+  Button,
+  TagInput,
+  userTagRegEx,
+} from "../../../components"
 import { colors, spacing } from "../../../theme"
 import { useStores } from "../../../models"
 import FastImage, { ImageStyle } from "react-native-fast-image"
@@ -30,7 +38,9 @@ import { getTaggedIds } from "../../../utils/helpers"
 
 export const CreatePost = observer(function CreatePost({
   progress,
+  focused,
 }: {
+  focused: boolean
   progress: SharedValue<number>
 }) {
   const { createPost } = useHooks()
@@ -41,6 +51,11 @@ export const CreatePost = observer(function CreatePost({
   const inputRef = useRef<TextInput>()
   const [selectedImages, setSelectedImages] = useState<Array<any>>([])
   const navigation = useNavigation<NavigationProp<HomeTabParamList>>()
+
+  useEffect(() => {
+    console.log("FOCUSING createPost : ", focused)
+    focused && inputRef.current.focus()
+  }, [focused])
 
   const onPost = async () => {
     setIsPosting(true)
@@ -57,7 +72,7 @@ export const CreatePost = observer(function CreatePost({
       setIsPosting(false)
       progress.value = withTiming(0, { duration: 400 })
       setSelectedImages([])
-      setPostContent('')
+      setPostContent("")
       inputRef.current.blur()
     }
   }
@@ -85,7 +100,7 @@ export const CreatePost = observer(function CreatePost({
           progress.value = withTiming(1, { duration: 300 })
         }, 100)
       }
-    } catch (e) { }
+    } catch (e) {}
   }
 
   const onAddMoreImages = async () => {
@@ -98,7 +113,7 @@ export const CreatePost = observer(function CreatePost({
         //   progress.value = withTiming(1, { duration: 300 })
         // }, 100)
       }
-    } catch (e) { }
+    } catch (e) {}
   }
 
   const onDeletePress = (item) => {
@@ -185,6 +200,10 @@ export const CreatePost = observer(function CreatePost({
             onChange={setPostContent}
             inputRef={inputRef}
             onFocus={onFocus}
+            onBlur={() => {
+              console.log("BLURRING")
+              focused && navigation.setParams({ focused: false })
+            }}
             containerStyle={$inputContainer}
             style={$inputText}
             multiline
@@ -195,7 +214,6 @@ export const CreatePost = observer(function CreatePost({
             portalized
           />
         </View>
-
       </View>
       <Animated.View style={animatedMediaContainer}>
         <DraggableFlatList
@@ -241,12 +259,14 @@ export const CreatePost = observer(function CreatePost({
           <AnimatedPressable disabled={isPosting} onPress={onPost} style={animatedPostButton}>
             {isPosting ? (
               <View style={$flexRow}>
-                {selectedImages?.length > 0 && <Text
-                  text={uploadProgress}
-                  color={colors.palette.neutral100}
-                  weight="medium"
-                  size="xs"
-                />}
+                {selectedImages?.length > 0 && (
+                  <Text
+                    text={uploadProgress}
+                    color={colors.palette.neutral100}
+                    weight="medium"
+                    size="xs"
+                  />
+                )}
                 <ActivityIndicator
                   color={colors.palette.neutral100}
                   style={$loadingIndicator}

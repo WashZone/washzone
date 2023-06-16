@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native"
-import { CustomFlatlist, Icon, Screen, Text } from "../../components"
+import { CustomFlatlist, Icon, LikesModal, Screen, Text } from "../../components"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { HomeTabParamList, TopicsTabParamList, TopicsTabProps } from "../../tabs"
 import { colors, spacing } from "../../theme"
@@ -30,7 +30,13 @@ import NativeAdView from "../../utils/NativeAd"
 import * as Haptics from "expo-haptics"
 import { Host } from "react-native-portalize"
 
-const Actions = observer(function ActionButtons({ item }: { item: any }) {
+const Actions = observer(function ActionButtons({
+  item,
+  setLikesModalVisible,
+}: {
+  item: any
+  setLikesModalVisible: (b: boolean) => void
+}) {
   const [loading, setLoading] = useState<boolean>(false)
   const { interactWithTopic } = useHooks()
   const [dynamicData, setDynamicData] = useState({
@@ -72,7 +78,6 @@ const Actions = observer(function ActionButtons({ item }: { item: any }) {
         }
       },
     })
-    console.log("FLAGGING POST : ", item?._id)
   }
 
   return (
@@ -96,7 +101,9 @@ const Actions = observer(function ActionButtons({ item }: { item: any }) {
               }
             }}
           />
-          <Text>{dynamicData?.likeviews}</Text>
+          <Text onPress={() => dynamicData?.likeviews > 0 && setLikesModalVisible(true)}>
+            {dynamicData?.likeviews}
+          </Text>
         </View>
         <View style={$actionContainer}>
           <Icon
@@ -141,6 +148,7 @@ const Actions = observer(function ActionButtons({ item }: { item: any }) {
 
 export const TopicComponent = observer(({ topic, index }: { topic: any; index: number }) => {
   const [loaded, setLoaded] = useState(false)
+  const [isLikesModalVisible, setLikesModalVisible] = useState(false)
   const navigation = useNavigation<NavigationProp<TopicsTabParamList>>()
   const navigationHome = useNavigation<NavigationProp<HomeTabParamList>>()
   const topicDetails = {
@@ -211,9 +219,16 @@ export const TopicComponent = observer(({ topic, index }: { topic: any; index: n
             </View>
           )}
         </View>
-        <Actions item={topic} />
+        <Actions item={topic} setLikesModalVisible={setLikesModalVisible} />
       </Pressable>
       {index % 5 === 0 && <NativeAdView />}
+      <LikesModal
+        key={topic?._id}
+        module="discussion"
+        moduleId={topic?._id}
+        isVisible={isLikesModalVisible}
+        setVisible={setLikesModalVisible}
+      />
     </>
   )
 })
@@ -221,6 +236,7 @@ export const TopicComponent = observer(({ topic, index }: { topic: any; index: n
 export const TopicComponentFullView = ({ topic }) => {
   const [loaded, setLoaded] = useState(false)
   const windowWidth = Dimensions.get("window").width
+  const [isLikesModalVisible, setLikesModalVisible] = useState(false)
 
   const [attachmentDimensions, setAttachmentDimensions] = useState({
     width: windowWidth,
@@ -301,16 +317,22 @@ export const TopicComponentFullView = ({ topic }) => {
             </ShimmerPlaceholder>
           </View>
         )}
-        <Actions item={topic} />
+        <Actions item={topic} setLikesModalVisible={setLikesModalVisible} />
       </View>
       <NativeAdView />
-
+      <LikesModal
+        key={topic?._id}
+        module="discussion"
+        moduleId={topic?._id}
+        isVisible={isLikesModalVisible}
+        setVisible={setLikesModalVisible}
+      />
       {/* <NativeAdView /> */}
     </>
   )
 }
 
-export const TopicsFeed: FC<TopicsTabProps<"TopicsFeed">> = observer(function TopicsFeed(_props) {
+export const TopicsFeed: FC<TopicsTabProps<"TopicsFeed">> = observer(function TopicsFeed(props) {
   const { refreshTopics, loadMoreTopics } = useHooks()
   const {
     topics: { topics },
@@ -325,7 +347,7 @@ export const TopicsFeed: FC<TopicsTabProps<"TopicsFeed">> = observer(function To
       <Host>
         <CustomFlatlist
           customRefresh={onRefresh}
-          ListHeaderComponent={<CreateTopic />}
+          ListHeaderComponent={<CreateTopic focused={props.route.params?.focused} />}
           stickyHeaderIndices={[0]}
           style={$container}
           onEndReached={loadMoreTopics}

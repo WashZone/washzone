@@ -170,6 +170,7 @@ export const iconRegistry = {
   blockUser: require("../../assets/icons/block-user.png"),
   attachment: require("../../assets/icons/attachment.png"),
   verifiedTick: require("../../assets/icons/verified-tick.png"),
+  editPhoto: require("../../assets/icons/photo.png"),
 
 }
 

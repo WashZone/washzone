@@ -7,7 +7,7 @@ import {
   View,
   ViewStyle,
 } from "react-native"
-import { Header, Screen, Text, TextField, Button } from "../../components"
+import { Header, Screen, TextField, Button, Icon } from "../../components"
 import { colors, spacing } from "../../theme"
 
 import { AppStackParamList, AppStackScreenProps } from "../../navigators"
@@ -77,6 +77,7 @@ export const EditProfile: FC<AppStackScreenProps<"EditProfile">> = function Edit
         lastName,
         bio,
         picture?.uri === userStore.picture ? picture?.uri : picture,
+        banner?.uri === userStore.banner ? banner?.uri : banner,
       )
       navigation.goBack()
       setButtonLoading(false)
@@ -94,17 +95,27 @@ export const EditProfile: FC<AppStackScreenProps<"EditProfile">> = function Edit
       />
       <Screen contentContainerStyle={$container}>
         <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
-          {/* <View style={}> */}
-          <TouchableOpacity onPress={onEditBanner}>
-            <ImageBackground
-              style={{ backgroundColor: colors.palette.primary400, marginBottom: spacing.medium }}
-              source={{ uri: banner?.uri }}
+          <ImageBackground
+            style={{ backgroundColor: colors.palette.primary400, marginBottom: spacing.medium }}
+            source={{ uri: banner?.uri }}
+          >
+            <TouchableOpacity
+              style={{
+                position: "absolute",
+                right: 10,
+                top: 10,
+                padding: 8,
+                borderRadius: 19,
+                backgroundColor: colors.palette.overlayNeutral50,
+              }}
+              onPress={onEditBanner}
             >
-              <TouchableOpacity onPress={onEditPP} style={$pictureWrapper}>
-                <FastImage source={{ uri: picture?.uri }} style={$picture} />
-              </TouchableOpacity>
-            </ImageBackground>
-          </TouchableOpacity>
+              <Icon icon="editPhoto" size={22} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={onEditPP} style={$pictureWrapper}>
+              <FastImage source={{ uri: picture?.uri }} style={$picture} />
+            </TouchableOpacity>
+          </ImageBackground>
           <View style={$content}>
             <TextField
               value={firstName}
@@ -202,10 +213,14 @@ const $picture: ImageStyle = {
   height: 100,
   width: 100,
   borderRadius: 50,
-
 }
 
-const $pictureWrapper: ViewStyle = { alignSelf: 'center', borderRadius: 50, backgroundColor: 'red', marginVertical: 30, }
+const $pictureWrapper: ViewStyle = {
+  alignSelf: "center",
+  borderRadius: 50,
+  backgroundColor: "red",
+  marginVertical: 30,
+}
 
 const $titleStyle: TextStyle = {
   color: colors.palette.primary100,

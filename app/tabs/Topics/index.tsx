@@ -5,7 +5,7 @@ import { observer } from "mobx-react-lite"
 import { TopicDetails, TopicInfo, TopicsFeed } from "../../screens"
 
 export type TopicsTabParamList = {
-  TopicsFeed: undefined
+  TopicsFeed: { focused?: boolean }
   TopicDetails: { topic: any }
   TopicInfo: { topic: any }
 }

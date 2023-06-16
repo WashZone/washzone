@@ -28,7 +28,7 @@ export const BottomModal = ({
   title,
   avoidKeyboard,
   backgroundColor,
-  showIndicator = true
+  showIndicator = true,
 }: CustomModalProps) => {
   const safeArea = useSafeAreaInsets()
   const closeModal = () => setVisible(false)
@@ -44,12 +44,18 @@ export const BottomModal = ({
     >
       <View>
         {showIndicator && <Handle />}
-        <View style={[$content, { paddingBottom: safeArea.bottom }, backgroundColor && { backgroundColor }]}>
+        <View
+          style={[
+            $content,
+            { paddingBottom: safeArea.bottom },
+            backgroundColor && { backgroundColor },
+          ]}
+        >
           <Text text={title} style={$title} weight="semiBold" />
           {children}
         </View>
       </View>
-    </Modal >
+    </Modal>
   )
 }
 

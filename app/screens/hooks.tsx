@@ -44,6 +44,8 @@ export function useHooks() {
       mutateCommentOnTopic,
       queryGetCommentsByTopicId,
       queryFollowerDetailsByCallerId,
+      queryGetfollower,
+      queryGetfollowing,
       queryGetAllClassifiedFeed,
       mutateUpdateUser,
       mutateCreateUserTopic,
@@ -57,6 +59,8 @@ export function useHooks() {
       mutateGetClassifiedByUserId,
       queryGetUploadedVideoByUserIdPage,
       queryGetVideoPlaylistByPlaylistId,
+      mutateFollowUser,
+      mutateUnfollowUser,
       mutateLikeDislikeTopic,
       mutateLikeDislikeVideo,
       mutateUpdateDeletesavedVideo,
@@ -96,6 +100,10 @@ export function useHooks() {
       mutateBlockUserId,
       mutateUnblockUserId,
       queryGetActivities,
+      queryGetuserLikesonhome,
+      queryGetuserLikesonTopic,
+      queryGetuserLikesonVideo,
+      mutateUpdatelastreadPostId,
     },
     userStore,
   } = useStores()
@@ -222,7 +230,7 @@ export function useHooks() {
         name: selectedMedia?.fileName,
       })
     }
-    const res = await mutateCommentOnTopic({
+    await mutateCommentOnTopic({
       userId: userStore._id,
       acttachmentUrl: imageUrl,
       acttachmentType: "image",
@@ -273,10 +281,10 @@ export function useHooks() {
     if (title.length === 0 || content?.length === 0) return
     const imageUrl = attachment
       ? await uploadToS3({
-        uri: attachment?.uri,
-        type: attachment?.type,
-        name: attachment?.fileName,
-      })
+          uri: attachment?.uri,
+          type: attachment?.type,
+          name: attachment?.fileName,
+        })
       : undefined
 
     try {
@@ -299,15 +307,52 @@ export function useHooks() {
       {
         followId: id,
         userId: userStore._id,
-      }, { fetchPolicy: 'no-cache' }
+      },
+      { fetchPolicy: "no-cache" },
     )
     console.log("res:getProfileDetails  :", res.followerDetailsByCallerId)
     return res.followerDetailsByCallerId
-
   }
-  // refreshTopics()
-  // loadStories()
-  // setTimeout(loadStories, 1000)
+
+  const getFollowers = async (id) => {
+    const res = await queryGetfollower(
+      {
+        followId: id,
+      },
+      { fetchPolicy: "no-cache" },
+    )
+    console.log("res:getProfileDetails  :", res.getfollower)
+    return res.getfollower
+  }
+
+  const getFollowings = async (id) => {
+    const res = await queryGetfollowing(
+      {
+        userId: id,
+      },
+      { fetchPolicy: "no-cache" },
+    )
+    console.log("res:getProfileDetails  :", res.getfollowing)
+    return res.getfollowing
+  }
+
+  const getLikesOnPost = async (homePageId: string) => {
+    const res = await queryGetuserLikesonhome({ homePageId }, { fetchPolicy: "no-cache" })
+    console.log("getLikesOnPost", res.getuserLikesonhome)
+    return res.getuserLikesonhome
+  }
+
+  const getLikesOnDiscussion = async (topicId: string) => {
+    const res = await queryGetuserLikesonTopic({ topicId }, { fetchPolicy: "no-cache" })
+    console.log("getLikesOnDiscussionHOOK", JSON.stringify(res.getuserLikesonTopic))
+    return res.getuserLikesonTopic
+  }
+
+  const getLikesOnVideo = async (videoId: string) => {
+    const res = await queryGetuserLikesonVideo({ videoId }, { fetchPolicy: "no-cache" })
+    console.log("getLikesOnPost", res.getuserLikesonVideo)
+    return res.getuserLikesonVideo
+  }
 
   const createPost = async ({
     content,
@@ -350,7 +395,6 @@ export function useHooks() {
       Alert.alert("Something Went Wrong!")
     }
     refreshHomeFeed()
-    loadStories()
   }
 
   const updateProfile = async (
@@ -358,16 +402,25 @@ export function useHooks() {
     lastName: string,
     bio: string,
     attachment?: any,
+    banner?: any,
   ) => {
     try {
       const imageUrl =
         typeof attachment === "string"
           ? attachment
           : await uploadToS3({
-            uri: attachment?.uri,
-            type: attachment?.type,
-            name: attachment?.fileName,
-          })
+              uri: attachment?.uri,
+              type: attachment?.type,
+              name: attachment?.fileName,
+            })
+      const bannerUrl =
+        typeof banner === "string"
+          ? banner
+          : await uploadToS3({
+              uri: banner?.uri,
+              type: banner?.type,
+              name: banner?.fileName,
+            })
       const res = await mutateUpdateUser({
         user: {
           first_name: firstName,
@@ -375,6 +428,7 @@ export function useHooks() {
           name: firstName + " " + lastName,
           picture: imageUrl,
           description: bio,
+          banner: bannerUrl,
         },
         userId: userStore._id,
       })
@@ -386,6 +440,7 @@ export function useHooks() {
         name: firstName + " " + lastName,
         picture: imageUrl,
         description: bio,
+        banner: bannerUrl,
       })
     } catch (err) {
       Toast.show(toastMessages.somethingWentWrong)
@@ -528,6 +583,15 @@ export function useHooks() {
   //   }
   // }
 
+  const updateLastReadPost = async ({ lastReadPostId, followId }) => {
+    const res = await mutateUpdatelastreadPostId({
+      lastReadPostId,
+      userId: userStore._id,
+      followId,
+    })
+    console.log("updateLastReadPost : RES ", res)
+  }
+
   const refreshVideos = async () => {
     try {
       const res = await getVideosCategorically()
@@ -566,7 +630,6 @@ export function useHooks() {
       },
       { fetchPolicy: "no-cache" },
     )
-
     return res.getUploadedVideoByUserIdPage.data
   }
 
@@ -574,23 +637,13 @@ export function useHooks() {
     console.log("CALLING GET ACTIVITIES : ")
 
     try {
-      const res = await queryGetActivities({ userId: userStore?._id })
+      const res = await queryGetActivities({ userId: userStore?._id }, { fetchPolicy: "no-cache" })
       console.log("RES GET ACTIVITIES : ", res.getActivities)
+      setStories(res.getActivities)
     } catch (err) {
       console.log("ERROR GET ACTIVITIES : ", err)
     }
-    // setStories(res.getActivities?.data || [])
   }
-
-  // const getVideoByVideoId = async (videoId: string) => {
-  //   const res = await queryGetUploadedVideoByUserIdPage({
-  //     userId,
-  //     callerId: userStore._id,
-  //     pageNumber: 1,
-  //   })
-
-  //   return res.getUploadedVideoByUserIdPage.data
-  // }
 
   const getUserClassifieds = async (userId: string) => {
     const res = await mutateGetClassifiedByUserId({
@@ -612,6 +665,26 @@ export function useHooks() {
       res.getVideoPlaylistByPlaylistId?.data?.length > 0 &&
       res.getVideoPlaylistByPlaylistId?.data[0]
     )
+  }
+
+  const followUser = async (id: string) => {
+    const res = await mutateFollowUser({
+      followId: id,
+      userId: userStore._id,
+    })
+    console.log("RES FOLLOW USER : ", res)
+
+    return res.followUser
+  }
+
+  const unfollowUser = async (id: string) => {
+    const res = await mutateUnfollowUser({
+      followId: id,
+      userId: userStore._id,
+    })
+    console.log("RES UNFOLLOW USER : ", res)
+
+    return res.unfollowUser
   }
 
   const interactWithVideo = async ({
@@ -639,7 +712,7 @@ export function useHooks() {
         status: inputInteraction,
       })
       updateVideoInteractionLocally(videoId, inputInteraction, newCount)
-    } catch (err) { }
+    } catch (err) {}
     return { interaction: inputInteraction, ...newCount }
   }
 
@@ -668,7 +741,7 @@ export function useHooks() {
         status: inputInteraction,
       })
       updateHomePostInteractionLocally(postId, inputInteraction, newCount)
-    } catch (err) { }
+    } catch (err) {}
     return { interaction: inputInteraction, ...newCount }
   }
 
@@ -697,7 +770,7 @@ export function useHooks() {
         status: inputInteraction,
       })
       updateTopicInteractionLocally(topicId, inputInteraction, newCount)
-    } catch (err) { }
+    } catch (err) {}
     return { interaction: inputInteraction, ...newCount }
   }
 
@@ -805,7 +878,7 @@ export function useHooks() {
         userId: userStore._id,
         deviceId,
       })
-    } catch (err) { }
+    } catch (err) {}
   }
 
   const isUserBlocked = async () => {
@@ -819,7 +892,7 @@ export function useHooks() {
       if (res.getBlockedUser?.status) {
         setAuthToken(undefined)
       }
-    } catch (err) { }
+    } catch (err) {}
   }
 
   const rateUser = async (userId: string, rating: number) => {
@@ -875,7 +948,7 @@ export function useHooks() {
     refreshTopics()
     refreshClassifieds()
     refreshVideos()
-    loadStories()
+    getActivities()
     await updateNotificationToken()
   }
 
@@ -1014,7 +1087,7 @@ export function useHooks() {
         },
       })
       console.log("CREATED USER MESSAGE", res.createUserMessage)
-    } catch (err) { }
+    } catch (err) {}
   }
 
   const shareToFriend = async (roomId: string, shareOptions: any, receiverId: string) => {
@@ -1047,7 +1120,7 @@ export function useHooks() {
         },
       })
       console.log("CREATED USER MESSAGE", res.createUserMessage)
-    } catch (err) { }
+    } catch (err) {}
   }
 
   const sendCallOffer = async (
@@ -1077,7 +1150,7 @@ export function useHooks() {
         },
       })
       console.log("CREATED USER MESSAGE", res.createUserMessage)
-    } catch (err) { }
+    } catch (err) {}
   }
 
   const acceptCallOffer = async (roomId: string, receiverId: string, answer: string) => {
@@ -1097,7 +1170,7 @@ export function useHooks() {
         },
       })
       console.log("CREATED USER MESSAGE", res.createUserMessage)
-    } catch (err) { }
+    } catch (err) {}
   }
 
   const hangUpCall = async (roomId: string, receiverId: string) => {
@@ -1117,7 +1190,7 @@ export function useHooks() {
         },
       })
       console.log("CREATED USER MESSAGE", res.createUserMessage)
-    } catch (err) { }
+    } catch (err) {}
   }
 
   const getUserById = async (userId: string) => {
@@ -1149,7 +1222,7 @@ export function useHooks() {
         console.log("ROOM FOUND", res.getroomBymembers)
 
         return res.getroomBymembers?.data[0]?._id
-      } catch (err) { }
+      } catch (err) {}
     }
   }
 
@@ -1176,7 +1249,7 @@ export function useHooks() {
         },
       })
       console.log("CREATED USER MESSAGE", res.createUserMessage)
-    } catch (err) { }
+    } catch (err) {}
   }
 
   const deleteChatRoom = async (roomId: string) => {
@@ -1186,7 +1259,7 @@ export function useHooks() {
         roomId,
       })
       syncAllChats()
-    } catch (err) { }
+    } catch (err) {}
   }
 
   const updateNotificationToken = async () => {
@@ -1394,6 +1467,14 @@ export function useHooks() {
     shareToFriend,
     getActivities,
     getProfileDetails,
+    followUser,
+    unfollowUser,
+    getFollowings,
+    getFollowers,
+    getLikesOnVideo,
+    getLikesOnPost,
+    getLikesOnDiscussion,
+    updateLastReadPost,
   }
 }
 

@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef, useState } from "react"
+import React, { FC, useCallback, useEffect, useRef, useState } from "react"
 import {
   TextStyle,
   ViewStyle,
@@ -16,7 +16,7 @@ import { NavigationState, SceneRendererProps, TabBar } from "react-native-tab-vi
 import { observer } from "mobx-react-lite"
 
 import { colors, spacing } from "../../theme"
-import { HomeTabProps } from "../../tabs"
+import { HomeTabParamList, HomeTabProps } from "../../tabs"
 import { Button, Header, Screen, Text, Icon } from "../../components"
 import { formatName } from "../../utils/formatName"
 import {
@@ -25,21 +25,16 @@ import {
   HomePostsTabScreen,
   TopicsTabScreen,
 } from "./tabViews"
-import { $contentCenter, $flex1, $flexRow, $justifyCenter } from "../styles"
+import { $contentCenter, $flex1, $flexRow } from "../styles"
 import { useHooks } from "../hooks"
-import {
-  NavigationProp,
-  useFocusEffect,
-  useIsFocused,
-  useNavigation,
-} from "@react-navigation/native"
+import { NavigationProp, StackActions, useNavigation } from "@react-navigation/native"
 import { AppStackParamList } from "../../navigators"
 import { useStores } from "../../models"
-import ReportUserModal from "./reportUserModal"
 import Toast from "react-native-toast-message"
 import { toastMessages } from "../../utils/toastMessages"
 import { showAlertYesNo } from "../../utils/helpers"
 import Loading from "../../components/Loading"
+import { ActivityIndicator } from "react-native-paper"
 
 const getIndexFromKey = (key: string) => {
   switch (key) {
@@ -258,21 +253,27 @@ const ProfileHeader = ({ user, isUser, onMessage }) => {
     userStore: { _id },
     api: { mutateReportOnUser },
   } = useStores()
-  const { getProfileDetails } = useHooks()
+  const { getProfileDetails, followUser, unfollowUser } = useHooks()
   const [profileDetails, setProfileDetails] = useState({
     blocked: false,
     data: { followercount: 0, followingCount: 0 },
     following: false,
   })
+  const [descriptionLineCount, setDescriptionLineCount] = useState(undefined)
+  const [showMore, setShowMore] = useState(false)
+
   const syncProfile = async () => {
     const resProfile = await getProfileDetails(user?._id)
     console.log("syncProfile : resProfile", resProfile)
     setProfileDetails({ ...resProfile })
   }
 
+  const [followLoading, setFollowLoading] = useState(false)
+
   useEffect(() => {
     syncProfile()
-  }, [])
+  }, [user])
+
   const reportUser = async (reason: string) => {
     try {
       await mutateReportOnUser({
@@ -289,11 +290,61 @@ const ProfileHeader = ({ user, isUser, onMessage }) => {
     }
   }
 
+  const onFollowUnfollow = async () => {
+    setFollowLoading(true)
+    try {
+      if (profileDetails.following) {
+        await unfollowUser(user?._id)
+      } else {
+        await followUser(user?._id)
+      }
+    } catch (err) {
+      Toast.show(toastMessages.somethingWentWrong)
+    } finally {
+      await syncProfile()
+      setFollowLoading(false)
+    }
+  }
+
+  const onTextLayout = useCallback((e) => {
+    console.log("onTextLayout :  descriptionLineCount", descriptionLineCount)
+    if (descriptionLineCount === undefined) {
+      console.log("e.nativeEvent.lines.length ", e.nativeEvent.lines.length)
+      setDescriptionLineCount(e.nativeEvent.lines.length)
+    }
+  }, [])
+
+  const getParentHeightOffset = () => {
+    console.log("descriptionLineCount : showMore", descriptionLineCount, showMore)
+    if (descriptionLineCount < 3) return descriptionLineCount * 17
+    if (descriptionLineCount >= 3) {
+      return 3 * 17
+    }
+
+    if (descriptionLineCount === 3) {
+      return 3 * 17
+    }
+    if (descriptionLineCount >= 3 && !showMore) {
+      return 3 * 17
+    }
+    if (descriptionLineCount >= 3 && showMore) {
+      return descriptionLineCount * 17
+    }
+    return 0
+  }
+
+  const navigationHome = useNavigation<NavigationProp<HomeTabParamList>>()
+
   return (
-    <View style={{ height: 300, backgroundColor: colors.palette.neutral100 }}>
+    <View
+      style={{
+        height: 245 + getParentHeightOffset() - (isUser ? 50 : 0),
+        backgroundColor: colors.palette.neutral100,
+      }}
+    >
       <FastImage
         source={{
-          uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRjFPcJqziZXYjlWPPAUxepuQbt4lDJEJqvRbGn9UoSfA&s",
+          uri: user?.banner,
         }}
         style={$topContainer}
       />
@@ -305,10 +356,21 @@ const ProfileHeader = ({ user, isUser, onMessage }) => {
             style={[
               $flexRow,
               $flex1,
-              { justifyContent: "space-around", paddingHorizontal: spacing.medium },
+              {
+                justifyContent: "space-around",
+                paddingHorizontal: spacing.medium,
+              },
             ]}
           >
-            <View style={{ alignItems: "center" }}>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() =>
+                navigationHome.dispatch(
+                  StackActions.push("FollowerFollowing", { user, initialTab: "followers" }),
+                )
+              }
+              style={{ alignItems: "center" }}
+            >
               <Text
                 text="Followers"
                 weight="semiBold"
@@ -321,8 +383,16 @@ const ProfileHeader = ({ user, isUser, onMessage }) => {
                 weight="semiBold"
                 color={colors.palette.primary100}
               />
-            </View>
-            <View style={{ alignItems: "center" }}>
+            </TouchableOpacity>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() =>
+                navigationHome.dispatch(
+                  StackActions.push("FollowerFollowing", { user, initialTab: "following" }),
+                )
+              }
+              style={{ alignItems: "center" }}
+            >
               <Text
                 text="Following"
                 weight="semiBold"
@@ -335,40 +405,85 @@ const ProfileHeader = ({ user, isUser, onMessage }) => {
                 weight="semiBold"
                 color={colors.palette.primary100}
               />
-            </View>
+            </TouchableOpacity>
           </View>
         </View>
         <View style={[$flexRow, { alignItems: "center", marginTop: spacing.tiny }]}>
-          <Text text={formatName(user?.name)} style={$publisherName} weight="semiBold" />
+          <Text
+            text={formatName(user?.name)}
+            numberOfLines={1}
+            style={$publisherName}
+            weight="semiBold"
+          />
           <Icon icon="verifiedTick" size={20} containerStyle={{ marginLeft: spacing.extraSmall }} />
         </View>
-        {user?.description && (
+        {user?.description + " " && (
           <View>
             <Text
+              onTextLayout={onTextLayout}
               color={colors.palette.neutral900}
-              numberOfLines={3}
+              numberOfLines={
+                descriptionLineCount && descriptionLineCount > 3 ? 3 : descriptionLineCount
+              }
               weight="normal"
               text={user?.description + "sadfasdfsdaf"}
               style={$descriptionText}
             />
           </View>
         )}
-        <View style={$flexRow}>
-          <TouchableOpacity
-            style={[$followContainer, { marginRight: spacing.extraSmall }, profileDetails?.following && { backgroundColor: colors.palette.primary100, }]}
-            onPress={() => setProfileDetails({ ...profileDetails, following: !profileDetails.following })}
-          >
-            <Icon containerStyle={{ marginRight: spacing.extraSmall }} size={22} color={profileDetails?.following ? colors.palette.neutral100 : colors.palette.primary100} icon={profileDetails?.following ? 'followed' : 'follow'} />
-            <Text weight="medium" color={profileDetails?.following ? colors.palette.neutral100 : colors.palette.primary100} text={profileDetails?.following ? 'Unfollow' : 'Follow'} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={$followContainer}
-            onPress={onMessage}
-          >
-            <Icon containerStyle={{ marginRight: spacing.extraSmall }} size={22} color={colors.palette.primary100} icon='chatMessage' />
-            <Text weight="medium" color={colors.palette.primary100} text='Message' />
-          </TouchableOpacity>
-        </View>
+        {!isUser && (
+          <View style={$flexRow}>
+            <TouchableOpacity
+              style={[
+                $followContainer,
+                { marginRight: spacing.extraSmall },
+                profileDetails?.following && { backgroundColor: colors.palette.primary100 },
+              ]}
+              onPress={onFollowUnfollow}
+            >
+              {followLoading ? (
+                <ActivityIndicator
+                  color={
+                    profileDetails?.following
+                      ? colors.palette.neutral100
+                      : colors.palette.primary100
+                  }
+                />
+              ) : (
+                <>
+                  <Icon
+                    containerStyle={{ marginRight: spacing.extraSmall }}
+                    size={22}
+                    color={
+                      profileDetails?.following
+                        ? colors.palette.neutral100
+                        : colors.palette.primary100
+                    }
+                    icon={profileDetails?.following ? "followed" : "follow"}
+                  />
+                  <Text
+                    weight="medium"
+                    color={
+                      profileDetails?.following
+                        ? colors.palette.neutral100
+                        : colors.palette.primary100
+                    }
+                    text={profileDetails?.following ? "Unfollow" : "Follow"}
+                  />
+                </>
+              )}
+            </TouchableOpacity>
+            <TouchableOpacity style={$followContainer} onPress={onMessage}>
+              <Icon
+                containerStyle={{ marginRight: spacing.extraSmall }}
+                size={22}
+                color={colors.palette.primary100}
+                icon="chatMessage"
+              />
+              <Text weight="medium" color={colors.palette.primary100} text="Message" />
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
 
       {!isUser && (
@@ -405,7 +520,6 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
 
   const syncUser = async () => {
     const res = await getUserById(user?._id)
-
     navigation.setParams({ user: res })
     setLoading(false)
   }
@@ -483,9 +597,12 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
 const $followContainer: ViewStyle = {
   borderWidth: 1,
   borderColor: colors.palette.primary100,
-  flexDirection: 'row', padding: spacing.extraSmall,
+  flexDirection: "row",
+  padding: spacing.extraSmall,
   marginVertical: spacing.extraSmall,
-  borderRadius: spacing.extraSmall
+  borderRadius: spacing.extraSmall,
+  flex: 1,
+  justifyContent: "center",
 }
 
 const $verticalThreeDots: ViewStyle = {

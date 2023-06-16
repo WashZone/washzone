@@ -23,6 +23,7 @@ export const FollowUserModelBase = ModelBase
     updatedAt: types.union(types.undefined, types.frozen()),
     userId: types.union(types.undefined, types.null, types.late((): any => UserModel)),
     followId: types.union(types.undefined, types.null, types.late((): any => UserModel)),
+    lastReadPostId: types.union(types.undefined, types.null, types.string),
     status: types.union(types.undefined, types.null, types.string),
   })
   .views(self => ({
@@ -35,6 +36,7 @@ export class FollowUserModelSelector extends QueryBuilder {
   get _id() { return this.__attr(`_id`) }
   get createdAt() { return this.__attr(`createdAt`) }
   get updatedAt() { return this.__attr(`updatedAt`) }
+  get lastReadPostId() { return this.__attr(`lastReadPostId`) }
   get status() { return this.__attr(`status`) }
   userId(builder: string | UserModelSelector | ((selector: UserModelSelector) => UserModelSelector) | undefined) { return this.__child(`userId`, UserModelSelector, builder) }
   followId(builder: string | UserModelSelector | ((selector: UserModelSelector) => UserModelSelector) | undefined) { return this.__child(`followId`, UserModelSelector, builder) }
@@ -43,4 +45,4 @@ export function selectFromFollowUser() {
   return new FollowUserModelSelector()
 }
 
-export const followUserModelPrimitives = selectFromFollowUser()._id.createdAt.updatedAt.status
+export const followUserModelPrimitives = selectFromFollowUser()._id.createdAt.updatedAt.lastReadPostId.status

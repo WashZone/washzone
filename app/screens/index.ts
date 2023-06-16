@@ -31,4 +31,7 @@ export * from "./CallScreen/videoCallAndroid"
 export * from './VerifyOTP'
 export * from './ViewChannel'
 export * from './BlockedUsers'
+export * from './FollowerFollowing'
+export * from './PostList'
+
 
