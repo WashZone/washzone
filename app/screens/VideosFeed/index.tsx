@@ -10,7 +10,7 @@ import { fromNow } from "../../utils/agoFromNow"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { useHooks } from "../hooks"
 import { useStores } from "../../models"
-import { AppStackParamList } from "../../navigators"
+// import { AppStackParamList } from "../../navigators"
 import ShimmerPlaceholder from "react-native-shimmer-placeholder"
 import LinearGradient from "react-native-linear-gradient"
 import { BROKEN_IMAGE } from "../../utils"
@@ -138,7 +138,6 @@ export const VideoRowList = ({ channelDetails }) => {
 // https://www.youtube.com/watch?v=7gMtv_Ylc78
 export const VideosFeed: FC<VideosTabProps<"VideosFeed">> = observer(function VideosFeed(_props) {
   const { refreshVideos } = useHooks()
-  const navigation = useNavigation<NavigationProp<AppStackParamList>>()
   const {
     videos: { videos },
   } = useStores()
@@ -176,7 +175,7 @@ export default VideosFeed
 
 const $flex1: ViewStyle = { flex: 1 }
 
-const $listHeader: ViewStyle = { height: 30 }
+// const $listHeader: ViewStyle = { height: 30 }
 
 const $videoDetailsContent: ViewStyle = {
   padding: spacing.homeScreen,
@@ -208,30 +207,30 @@ const $conditionContainer: ViewStyle = {
   flex: 1,
 }
 
-const $uploadContainerIsUserEmpty: ViewStyle = {
-  backgroundColor: colors.palette.primary300,
-  height: 50,
-  width: 200,
-  borderRadius: 10,
-  flexDirection: "row",
-  alignItems: "center",
-  padding: spacing.medium / 2,
-  justifyContent: "space-around",
-}
+// const $uploadContainerIsUserEmpty: ViewStyle = {
+//   backgroundColor: colors.palette.primary300,
+//   height: 50,
+//   width: 200,
+//   borderRadius: 10,
+//   flexDirection: "row",
+//   alignItems: "center",
+//   padding: spacing.medium / 2,
+//   justifyContent: "space-around",
+// }
 
-const $uploadContainer: ViewStyle = {
-  position: "absolute",
-  backgroundColor: colors.palette.primary300,
-  height: 36,
-  width: 140,
-  right: spacing.medium,
-  top: spacing.medium,
-  borderRadius: 10,
-  flexDirection: "row",
-  alignItems: "center",
-  padding: spacing.medium / 2,
-  justifyContent: "space-around",
-}
+// const $uploadContainer: ViewStyle = {
+//   position: "absolute",
+//   backgroundColor: colors.palette.primary300,
+//   height: 36,
+//   width: 140,
+//   right: spacing.medium,
+//   top: spacing.medium,
+//   borderRadius: 10,
+//   flexDirection: "row",
+//   alignItems: "center",
+//   padding: spacing.medium / 2,
+//   justifyContent: "space-around",
+// }
 
 const $container: ViewStyle = { flex: 1 }
 
@@ -239,11 +238,11 @@ const $videoRowContainer: ViewStyle = {
   marginVertical: spacing.medium,
 }
 
-const $uploadText: TextStyle = {
-  fontSize: 13,
-  color: colors.palette.neutral100,
-  lineHeight: 20,
-}
+// const $uploadText: TextStyle = {
+//   fontSize: 13,
+//   color: colors.palette.neutral100,
+//   lineHeight: 20,
+// }
 
 const $textViewAll: TextStyle = {
   fontSize: 14,
@@ -266,10 +265,10 @@ const $videoTitle: TextStyle = {
   lineHeight: 22,
 }
 
-const $publisherName: TextStyle = {
-  fontSize: 14,
-  lineHeight: 22,
-}
+// const $publisherName: TextStyle = {
+//   fontSize: 14,
+//   lineHeight: 22,
+// }
 
 const $viewsAndCreated: TextStyle = {
   fontSize: 12,

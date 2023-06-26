@@ -1,13 +1,10 @@
 import React, { useEffect, useState } from "react"
-import { Alert, FlatList, Pressable, TextStyle, View, ViewStyle } from "react-native"
+import { FlatList, Pressable, TextStyle, View, ViewStyle } from "react-native"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import LinearGradient from "react-native-linear-gradient"
 
 import {
-  TopicsTabParamList,
-  ClassifiedsTabParamList,
-  VideosTabParamList,
   HomeTabParamList,
 } from "../../../tabs"
 import { useHooks } from "../../hooks"

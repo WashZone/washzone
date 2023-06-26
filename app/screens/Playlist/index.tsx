@@ -7,7 +7,6 @@ import { colors, spacing } from "../../theme"
 
 import { observer } from "mobx-react-lite"
 import { fromNow } from "../../utils/agoFromNow"
-import { formatName } from "../../utils/formatName"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { $flex1 } from "../styles"
 import { useHooks } from "../hooks"
@@ -180,13 +179,6 @@ const $videoPoster: ImageStyle = {
 const $videoTitle: TextStyle = {
   fontSize: 16,
   lineHeight: 22,
-}
-
-const $publisherName: TextStyle = {
-  fontSize: 14,
-  lineHeight: 28,
-  color: colors.palette.neutral100,
-  alignSelf: "center",
 }
 
 const $viewsAndCreated: TextStyle = {

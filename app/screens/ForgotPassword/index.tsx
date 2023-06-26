@@ -74,7 +74,6 @@ export const ForgotPassword: FC<AppStackScreenProps<"ForgotPassword">> = functio
           maxLength={100}
         />
         <Text text={error} size="xxs" color={colors.palette.angry500} />
-
         <Button
           onPress={onReset}
           disabled={buttonLoading}

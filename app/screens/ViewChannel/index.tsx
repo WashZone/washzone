@@ -1,8 +1,8 @@
 import React, { FC, useEffect, useState } from "react"
-import { View, TextStyle, ViewStyle, Pressable, FlatList, Dimensions, NativeSyntheticEvent, NativeScrollEvent } from "react-native"
-import { Button, Icon, Screen, Text } from "../../components"
+import { View, TextStyle, ViewStyle, FlatList, Dimensions, NativeSyntheticEvent, NativeScrollEvent } from "react-native"
+import {  Screen, Text } from "../../components"
 import FastImage, { ImageStyle } from "react-native-fast-image"
-import { VideosTabParamList, VideosTabProps } from "../../tabs"
+import {  VideosTabProps } from "../../tabs"
 import { colors, spacing } from "../../theme"
 
 import { observer } from "mobx-react-lite"
@@ -66,7 +66,7 @@ export const ViewChannel: FC<VideosTabProps<"ViewChannel">> = observer(function 
                 shimmerStyle={$shimmer}
               />
             ) : (
-              <VideoBlockFullWidth index={index} key={index} videoDetails={item} />
+              <VideoBlockFullWidth  key={index} videoDetails={item} />
             )
           }
         />

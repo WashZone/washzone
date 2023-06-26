@@ -1,12 +1,12 @@
 import { observer } from "mobx-react-lite"
 import React, { FC, useEffect, useState } from "react"
 import { AppStackScreenProps } from "../../navigators"
-import { $flex1, $flexRow } from "../styles"
+import { $flex1 } from "../styles"
 import { Chat, MessageType } from "@flyerhq/react-native-chat-ui"
 // import DocumentPicker from 'react-native-document-picker'
 import FileViewer from "react-native-file-viewer"
-import { PanGestureHandler } from "react-native-gesture-handler"
-import { Animated, Dimensions, TextStyle, View, ViewStyle } from "react-native"
+
+import {  TextStyle, View, ViewStyle } from "react-native"
 import { colors, spacing } from "../../theme"
 import { MediaPicker } from "../../utils/device/MediaPicker"
 import { CustomChatMessage, P2PHeader } from "./partials"
@@ -19,8 +19,7 @@ import LinearGradient from "react-native-linear-gradient"
 import Lottie from "lottie-react-native"
 import { CommentInput, Text, Screen } from "../../components"
 import moment from "moment"
-import { CommentsDetailModelSelector } from "../../models/api"
-import { useSafeAreaInsetsStyle } from "../../utils/useSafeAreaInsetsStyle"
+
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { Host } from "react-native-portalize"
 
@@ -139,6 +138,7 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
     return (
       <>
         <View
+          // eslint-disable-next-line react-native/no-inline-styles
           style={{
             backgroundColor: isLog
               ? getColorFromType(message?.metaData?.metaDataType)
@@ -162,6 +162,7 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
             weight="medium"
             color={colors.palette.neutral500}
             style={[
+              // eslint-disable-next-line react-native/no-inline-styles
               {
                 position: "absolute",
                 bottom: -12,
@@ -169,6 +170,7 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
                 minWidth: 55,
                 textAlign: isAuthorMe ? "right" : "left",
               },
+              // eslint-disable-next-line react-native/no-inline-styles
               isAuthorMe && { right: 0 },
             ]}
             numberOfLines={1}
@@ -215,7 +217,8 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
         sendButtonVisibilityMode="editing"
         emptyState={() =>
           syncing && (
-            <Lottie
+            <Lottie          
+               // eslint-disable-next-line react-native/no-inline-styles
               style={{ height: 40 }}
               source={require("../../../assets/lottie/loader.json")}
               autoPlay
@@ -259,7 +262,7 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
           borders: { inputBorderRadius: 10, messageBorderRadius: 10 },
         }}
         messages={getRoomMessages({ roomId })}
-        renderCustomMessage={(message, messageWidth) => <CustomChatMessage message={message} />}
+        renderCustomMessage={(message) => <CustomChatMessage message={message} />}
         onAttachmentPress={onAttachmentPress}
         onMessagePress={handleMessagePress}
         // onMessageLongPress={handleOnMessageLongPress}

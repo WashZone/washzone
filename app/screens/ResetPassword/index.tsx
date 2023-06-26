@@ -25,7 +25,7 @@ export const ResetPassword: FC<AppStackScreenProps<"ResetPassword">> = function 
   const onSave = async () => {
     setButtonLoading(true)
     try {
-      const res = await mutateResetPassword({
+      await mutateResetPassword({
         userId: _id,
         newPassword: confirmPass,
         oldPassword: currentPass,

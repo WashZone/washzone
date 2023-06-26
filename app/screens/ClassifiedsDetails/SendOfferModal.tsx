@@ -19,7 +19,7 @@ export const SendOfferModal = ({ isVisible, setVisible, receiver, classified }) 
     setLoading(true)
     const roomId = await getOrCreateRoom(receiver?._id)
 
-    const res = await sendClassfiedOffer(roomId, receiver?._id, amount, {
+    await sendClassfiedOffer(roomId, receiver?._id, amount, {
       id: classified?._id,
       amount,
       title: classified?.title,
@@ -49,17 +49,22 @@ export const SendOfferModal = ({ isVisible, setVisible, receiver, classified }) 
         />
         <View>
           <TextField
+            // eslint-disable-next-line react-native/no-inline-styles
             containerStyle={[{ height: 50 }]}
+            // eslint-disable-next-line react-native/no-inline-styles
             inputWrapperStyle={{ height: 50 }}
             value={amount}
             onChangeText={setAmount}
             keyboardType="number-pad"
-            style={[$inputTextStyle, { marginLeft: 42 }]}
+            style={[$inputTextStyle, 
+            // eslint-disable-next-line react-native/no-inline-styles
+            { marginLeft: 42 }]}
           />
           <Text
             text="$"
             style={[
               $inputTextStyle,
+            // eslint-disable-next-line react-native/no-inline-styles
               {
                 position: "absolute",
                 left: 10,
@@ -84,11 +89,6 @@ export const SendOfferModal = ({ isVisible, setVisible, receiver, classified }) 
 
 const $button: ViewStyle = { marginTop: spacing.medium, height: 45 }
 
-const $textButton: TextStyle = {
-  fontSize: 16,
-  color: colors.palette.primary100,
-}
-
 const $inputTextStyle: TextStyle = {
   textAlignVertical: "center",
   fontSize: 40,
@@ -103,14 +103,4 @@ const $inputTextStyle: TextStyle = {
 
 const $contentCenter: ViewStyle = {
   padding: spacing.medium,
-}
-
-const $container: ViewStyle = {
-  paddingHorizontal: spacing.large,
-  flexDirection: "row",
-}
-
-const $optionLabel: TextStyle = {
-  ...$fontWeightStyles.medium,
-  color: colors.palette.neutral100,
 }

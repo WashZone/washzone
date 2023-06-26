@@ -19,9 +19,7 @@ import { useHooks } from "../hooks"
 import { observer } from "mobx-react-lite"
 import { CreateTopic } from "./CreateTopic"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
-// import AppLovinMAX from "react-native-applovin-max/src/index"
 import { $flex1, $flexRow } from "../styles"
-import Share from "react-native-share"
 import { getIconForInteraction, showAlertYesNo } from "../../utils/helpers"
 import { defaultImages, messageMetadataType } from "../../utils"
 import LinearGradient from "react-native-linear-gradient"
@@ -32,12 +30,11 @@ import { Host } from "react-native-portalize"
 
 const Actions = observer(function ActionButtons({
   item,
-  setLikesModalVisible,
 }: {
   item: any
-  setLikesModalVisible: (b: boolean) => void
 }) {
   const [loading, setLoading] = useState<boolean>(false)
+  const [isLikesModalVisible, setLikesModalVisible] = useState(false)
   const { interactWithTopic } = useHooks()
   const [dynamicData, setDynamicData] = useState({
     interaction: item?.interaction,
@@ -81,68 +78,78 @@ const Actions = observer(function ActionButtons({
   }
 
   return (
-    <View style={$actionsContainer}>
-      <View style={$flexRow}>
-        <View style={$actionContainer}>
-          <Icon
-            icon={getIconForInteraction(dynamicData.interaction, "liked")}
-            size={20}
-            style={{ marginRight: spacing.extraSmall }}
-            onPress={async () => {
-              if (!loading) {
-                setLoading(true)
-                const res = await interactWithTopic({
-                  topicId: item?._id,
-                  button: "like",
-                  previousData: dynamicData,
+    <>
+      <View style={$actionsContainer}>
+        <View style={$flexRow}>
+          <View style={$actionContainer}>
+            <Icon
+              icon={getIconForInteraction(dynamicData.interaction, "liked")}
+              size={20}
+              style={{ marginRight: spacing.extraSmall }}
+              onPress={async () => {
+                if (!loading) {
+                  setLoading(true)
+                  const res = await interactWithTopic({
+                    topicId: item?._id,
+                    button: "like",
+                    previousData: dynamicData,
+                  })
+                  setDynamicData(res)
+                  setLoading(false)
+                }
+              }}
+            />
+            <Text onPress={() => dynamicData?.likeviews > 0 && setLikesModalVisible(true)}>
+              {dynamicData?.likeviews}
+            </Text>
+          </View>
+          <View style={$actionContainer}>
+            <Icon
+              icon={getIconForInteraction(dynamicData.interaction, "disliked")}
+              size={20}
+              style={{ marginRight: spacing.extraSmall }}
+              onPress={async () => {
+                if (!loading) {
+                  setLoading(true)
+                  const res = await interactWithTopic({
+                    topicId: item?._id,
+                    button: "dislike",
+                    previousData: dynamicData,
+                  })
+                  setDynamicData(res)
+                  setLoading(false)
+                }
+              }}
+            />
+            <Text>{dynamicData?.dislikeviews}</Text>
+          </View>
+          <View style={$actionContainer}>
+            <Icon
+              icon="shareCursive"
+              size={20}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
+                share({
+                  message: "",
+                  title: "",
+                  url: `washzone://shared-topic/${item?._id}`,
+                  type: messageMetadataType.sharedDiscussion,
                 })
-                setDynamicData(res)
-                setLoading(false)
-              }
-            }}
-          />
-          <Text onPress={() => dynamicData?.likeviews > 0 && setLikesModalVisible(true)}>
-            {dynamicData?.likeviews}
-          </Text>
+              }}
+            />
+          </View>
         </View>
-        <View style={$actionContainer}>
-          <Icon
-            icon={getIconForInteraction(dynamicData.interaction, "disliked")}
-            size={20}
-            style={{ marginRight: spacing.extraSmall }}
-            onPress={async () => {
-              if (!loading) {
-                setLoading(true)
-                const res = await interactWithTopic({
-                  topicId: item?._id,
-                  button: "dislike",
-                  previousData: dynamicData,
-                })
-                setDynamicData(res)
-                setLoading(false)
-              }
-            }}
-          />
-          <Text>{dynamicData?.dislikeviews}</Text>
-        </View>
-        <View style={$actionContainer}>
-          <Icon
-            icon="shareCursive"
-            size={20}
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
-              share({
-                message: "",
-                title: "",
-                url: `washzone://shared-topic/${item?._id}`,
-                type: messageMetadataType.sharedDiscussion,
-              })
-            }}
-          />
-        </View>
+        <Icon icon="flag" size={20} onPress={flagTopic} />
       </View>
-      <Icon icon="flag" size={20} onPress={flagTopic} />
-    </View>
+      <LikesModal
+        likesCount={dynamicData?.likeviews}
+        key={item?._id}
+        module="discussion"
+        moduleId={item?._id}
+        isVisible={isLikesModalVisible}
+        setVisible={setLikesModalVisible}
+      />
+    </>
   )
 })
 
@@ -180,7 +187,9 @@ export const TopicComponent = observer(({ topic, index }: { topic: any; index: n
                   style={$picture}
                 />
               </TouchableOpacity>
-              <View style={[$textContainer, { justifyContent: "center" }]}>
+              <View style={[$textContainer,
+                // eslint-disable-next-line react-native/no-inline-styles
+                { justifyContent: "center" }]}>
                 <Text
                   text={formatName(topicDetails.first_name + " " + topicDetails.last_name)}
                   preset="subheading2"
@@ -222,13 +231,7 @@ export const TopicComponent = observer(({ topic, index }: { topic: any; index: n
         <Actions item={topic} setLikesModalVisible={setLikesModalVisible} />
       </Pressable>
       {index % 5 === 0 && <NativeAdView />}
-      <LikesModal
-        key={topic?._id}
-        module="discussion"
-        moduleId={topic?._id}
-        isVisible={isLikesModalVisible}
-        setVisible={setLikesModalVisible}
-      />
+
     </>
   )
 })
@@ -236,7 +239,6 @@ export const TopicComponent = observer(({ topic, index }: { topic: any; index: n
 export const TopicComponentFullView = ({ topic }) => {
   const [loaded, setLoaded] = useState(false)
   const windowWidth = Dimensions.get("window").width
-  const [isLikesModalVisible, setLikesModalVisible] = useState(false)
 
   const [attachmentDimensions, setAttachmentDimensions] = useState({
     width: windowWidth,
@@ -276,7 +278,9 @@ export const TopicComponentFullView = ({ topic }) => {
                 style={$picture}
               />
             </TouchableOpacity>
-            <View style={[$textContainer, $flexRow, { alignItems: "center" }]}>
+            <View style={[$textContainer, $flexRow,
+              // eslint-disable-next-line react-native/no-inline-styles
+              { alignItems: "center" }]}>
               <Text
                 text={formatName(topicDetails.first_name + " " + topicDetails.last_name)}
                 preset="subheading2"
@@ -317,16 +321,10 @@ export const TopicComponentFullView = ({ topic }) => {
             </ShimmerPlaceholder>
           </View>
         )}
-        <Actions item={topic} setLikesModalVisible={setLikesModalVisible} />
+        <Actions item={topic} />
       </View>
       <NativeAdView />
-      <LikesModal
-        key={topic?._id}
-        module="discussion"
-        moduleId={topic?._id}
-        isVisible={isLikesModalVisible}
-        setVisible={setLikesModalVisible}
-      />
+ 
       {/* <NativeAdView /> */}
     </>
   )

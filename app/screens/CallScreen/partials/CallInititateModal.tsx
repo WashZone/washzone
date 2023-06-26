@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react"
-import { TextStyle, TouchableOpacity, View, ViewStyle } from "react-native"
-import { $fontWeightStyles, BottomModal, Icon, IconTypes, Text } from "../../../components"
+import React from "react"
+import {  View, ViewStyle } from "react-native"
+import {  BottomModal, Icon, Text } from "../../../components"
 import { colors, spacing } from "../../../theme"
-import { MediaPicker } from "../../../utils/device/MediaPicker"
 import { $contentCenter } from "../../styles"
 
 export const CallInititateModal = ({ isVisible, setVisible, receiver, sendCall, handleLeave }) => {
@@ -14,6 +13,7 @@ export const CallInititateModal = ({ isVisible, setVisible, receiver, sendCall, 
           icon="x"
           onPress={handleLeave}
           containerStyle={[
+            // eslint-disable-next-line react-native/no-inline-styles
             {
               height: 70,
               width: 70,
@@ -27,6 +27,7 @@ export const CallInititateModal = ({ isVisible, setVisible, receiver, sendCall, 
           icon="audioCall"
           onPress={sendCall}
           containerStyle={[
+            // eslint-disable-next-line react-native/no-inline-styles
             {
               height: 70,
               width: 70,
@@ -41,17 +42,8 @@ export const CallInititateModal = ({ isVisible, setVisible, receiver, sendCall, 
   )
 }
 
-const $optionContainer: ViewStyle = {
-  width: "50%",
-  ...$contentCenter,
-}
-
 const $container: ViewStyle = {
   paddingHorizontal: spacing.large,
   flexDirection: "row",
 }
 
-const $optionLabel: TextStyle = {
-  ...$fontWeightStyles.medium,
-  color: colors.palette.neutral100,
-}

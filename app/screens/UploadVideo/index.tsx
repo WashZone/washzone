@@ -134,6 +134,7 @@ export const UploadVideo: FC<AppStackScreenProps<"UploadVideo">> = function Uplo
           theme={$theme}
           placeholder="Enter a short description here!"
           numberOfLines={3}
+          // eslint-disable-next-line react-native/no-inline-styles
           contentStyle={{ height: 120 }}
           blurOnSubmit
         />

@@ -128,7 +128,6 @@ const NotificationComponent = ({
     case NotificationType.likeOnPost:
     case NotificationType.likeOnTopic:
     case NotificationType.likeOnVideo: {
-      const author = item?.authorId
       const details =
         item?.notificationType === NotificationType.likeOnPost
           ? {
@@ -165,7 +164,6 @@ const NotificationComponent = ({
     }
     case NotificationType.commentOnTopic:
     case NotificationType.commentOnPost: {
-      const author = item?.authorId
       const details =
         item?.notificationType === NotificationType.commentOnPost
           ? {

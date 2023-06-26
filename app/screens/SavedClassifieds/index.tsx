@@ -1,16 +1,15 @@
 import React, { FC, useEffect, useState } from "react"
 import { Dimensions, Pressable, RefreshControl, TextStyle, View, ViewStyle } from "react-native"
-import { EmptyState, Header, Icon, IconTypes, ListItem, Screen, Text } from "../../components"
-import { colors, spacing } from "../../theme"
-
 import { AppStackParamList, AppStackScreenProps } from "../../navigators"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import FastImage, { ImageStyle } from "react-native-fast-image"
-import { useHooks } from "../hooks"
-import Share from "react-native-share"
 import { FlatList } from "react-native-gesture-handler"
-import { useStores } from "../../models"
 import { observer } from "mobx-react-lite"
+
+import { useHooks } from "../hooks"
+import { colors, spacing } from "../../theme"
+import { EmptyState, Header, Icon, IconTypes, ListItem, Screen, Text } from "../../components"
+import { useStores } from "../../models"
 import { ClassifiedsTabParamList, VideosTabParamList } from "../../tabs"
 import { messageMetadataType } from "../../utils"
 

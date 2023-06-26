@@ -1,8 +1,7 @@
 import { observer } from "mobx-react-lite"
-import React, { FC, useEffect, useMemo, useRef, useState } from "react"
+import React, { FC, useMemo, useRef, useState } from "react"
 import {
   ActivityIndicator,
-  Alert,
   Pressable,
   TextInput,
   TextStyle,
@@ -78,6 +77,7 @@ export const SignupScreen: FC<SignupProps> = observer(function LoginScreen(_prop
           email,
           name,
           picture: defaultImages.profile,
+          username: ""
         })
         setUser({
           name: res.createUser.name,
@@ -89,7 +89,7 @@ export const SignupScreen: FC<SignupProps> = observer(function LoginScreen(_prop
           type: "",
           isSocialLogin: false,
           _id: res.createUser._id,
-          blockedUser : [],
+          blockedUser: [],
         })
         setIsSubmitted(false)
         const token = new Date()

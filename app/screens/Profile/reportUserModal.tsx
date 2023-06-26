@@ -1,6 +1,5 @@
 import React, { useState } from "react"
 import { ActivityIndicator } from "react-native-paper"
-import { Colors } from "react-native/Libraries/NewAppScreen"
 import { BottomModal, Button, Text, TextField } from "../../components"
 import { colors, spacing } from "../../theme"
 import { $contentCenter } from "../styles"
@@ -25,6 +24,7 @@ export const ReportUserModal = ({ isVisible, setVisible, onReport, userName }) =
                 text={"Report " + userName + "?"}
                 size="lg"
                 weight="semiBold"
+                // eslint-disable-next-line react-native/no-inline-styles
                 style={{ textAlign: "center", margin: spacing.homeScreen }}
                 color={colors.palette.angry500}
             />

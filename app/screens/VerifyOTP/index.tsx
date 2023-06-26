@@ -1,6 +1,6 @@
 import React, { FC, useState } from "react"
 import { ActivityIndicator, Alert, TextStyle, View, ViewStyle } from "react-native"
-import { Button, Header, Icon, Screen, Text, TextField } from "../../components"
+import { Button, Header, Icon, Text, TextField } from "../../components"
 import { colors, spacing } from "../../theme"
 
 import { AppStackParamList, AppStackScreenProps } from "../../navigators"

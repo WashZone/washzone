@@ -245,8 +245,6 @@ const $resultContainer: ViewStyle = {
   padding: spacing.extraSmall,
 }
 
-const $loader: ViewStyle = { marginTop: spacing.massive }
-
 const $inputContent: ViewStyle = {
   marginRight: spacing.large,
 }

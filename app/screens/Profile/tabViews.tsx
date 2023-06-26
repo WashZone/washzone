@@ -4,7 +4,7 @@ import { colors, spacing } from "../../theme"
 import { useHooks } from "../hooks"
 import { ClassifiedComponent } from "../ClassifiedsFeed"
 import { TopicComponent } from "../TopicsFeed"
-import { AutoImage, EmptyState } from "../../components"
+import { AutoImage } from "../../components"
 import { HFlatList, HScrollView } from "react-native-head-tab-view"
 import { PostComponent } from "../Feed/partials"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
@@ -42,6 +42,7 @@ export const GalleryTabView = ({ galleryItems }: { galleryItems: Array<any> }) =
     const right = []
     const res = []
 
+    // eslint-disable-next-line array-callback-return
     galleryItems.map((data) => {
       if (res.filter((i) => i?.uri === data?.uri)?.length === 0) res.push(data)
     })
@@ -109,7 +110,6 @@ export const HomePostsTabScreen = ({
 
   const [userPosts, setUserPosts] = React.useState([])
   const { getUsersHomePosts } = useHooks()
-  const navigation = useNavigation<NavigationProp<HomeTabParamList>>()
 
   const fetchUserPosts = async () => {
     const res = await getUsersHomePosts(userId)
@@ -170,6 +170,7 @@ export const TopicsTabScreen = ({
   const fetchUserTopics = async () => {
     const res = await getUserTopics(userId)
     setUserTopics(res)
+    
     const galleryImages = res.map((i, index) => {
       if (i.attachmentUrl) return { uri: i?.attachmentUrl || "", id: "topic" + index }
     })
@@ -289,7 +290,7 @@ export const VideosTabScreen = ({
       showsVerticalScrollIndicator={false}
       ListHeaderComponent={<View style={{ height: spacing.homeScreen }} />}
       renderItem={({ item, index }) => (
-        <View style={$videoBlockContainer}>
+        <View style={$videoBlockContainer} key={index}>
           <VideoBlockFullWidth videoDetails={item} />
         </View>
       )}

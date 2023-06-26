@@ -13,10 +13,8 @@ import {
   Icon,
   iconRegistry,
   Text,
-  TextField,
   Button,
   TagInput,
-  userTagRegEx,
 } from "../../../components"
 import { colors, spacing } from "../../../theme"
 import { useStores } from "../../../models"
@@ -33,7 +31,7 @@ import { observer } from "mobx-react-lite"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { HomeTabParamList } from "../../../tabs"
 import DraggableFlatList, { ScaleDecorator } from "react-native-draggable-flatlist"
-import { $flexRow } from "../../styles"
+import { $contentCenter, $flexRow } from "../../styles"
 import { getTaggedIds } from "../../../utils/helpers"
 
 export const CreatePost = observer(function CreatePost({
@@ -100,7 +98,7 @@ export const CreatePost = observer(function CreatePost({
           progress.value = withTiming(1, { duration: 300 })
         }, 100)
       }
-    } catch (e) {}
+    } catch (e) { }
   }
 
   const onAddMoreImages = async () => {
@@ -113,7 +111,7 @@ export const CreatePost = observer(function CreatePost({
         //   progress.value = withTiming(1, { duration: 300 })
         // }, 100)
       }
-    } catch (e) {}
+    } catch (e) { }
   }
 
   const onDeletePress = (item) => {
@@ -189,7 +187,9 @@ export const CreatePost = observer(function CreatePost({
   })
 
   return (
-    <View style={{ position: "absolute", top: 0, width: "100%" }}>
+    <View
+      // eslint-disable-next-line react-native/no-inline-styles
+      style={{ position: "absolute", top: 0, width: "100%" }}>
       <View style={$container}>
         <TouchableOpacity onPress={() => navigation.navigate("Profile", { user: userStore })}>
           <FastImage source={{ uri: userStore?.picture }} style={$picture} resizeMode="cover" />
@@ -202,7 +202,7 @@ export const CreatePost = observer(function CreatePost({
             onFocus={onFocus}
             onBlur={() => {
               console.log("BLURRING")
-              focused && navigation.setParams({ focused: false })
+              if (focused) navigation.setParams({ focused: false })
             }}
             containerStyle={$inputContainer}
             style={$inputText}
@@ -210,6 +210,7 @@ export const CreatePost = observer(function CreatePost({
             placeholder="What's on your mind?"
             placeholderTextColor={colors.palette.neutral700}
             additionalPartTypes={{ isBottomMentionSuggestionsRender: true, trigger: "@" }}
+            // eslint-disable-next-line react-native/no-inline-styles
             suggestionsContainerStyle={{ top: 70 }}
             portalized
           />
@@ -230,14 +231,14 @@ export const CreatePost = observer(function CreatePost({
             )
           }
           renderItem={({ item, drag, isActive }) => (
-            <ScaleDecorator>
-              <Pressable onLongPress={drag} disabled={isActive}>
+            <ScaleDecorator >
+              <Pressable onLongPress={drag} disabled={isActive} style={{ width: 120, marginVertical: spacing.extraSmall }} >
                 <Animated.View style={animatedPreviewContainer(item)}>
                   <FastImage source={{ uri: item?.uri }} style={previewImage(item)} />
                 </Animated.View>
-                <Pressable style={$deleteIcon} onPress={() => onDeletePress(item)}>
-                  <Icon icon="delete" size={item.uri ? 24 : 0.0001} />
-                </Pressable>
+
+                <Icon icon="x" size={item.uri ? 22 : 0.0001} containerStyle={$deleteIcon} onPress={() => onDeletePress(item)} />
+
               </Pressable>
             </ScaleDecorator>
           )}
@@ -245,7 +246,9 @@ export const CreatePost = observer(function CreatePost({
             return item?.uri
           }}
         />
-        <View style={[$bottomActionContainer, { zIndex: -1 }]}>
+        <View style={[$bottomActionContainer,
+          // eslint-disable-next-line react-native/no-inline-styles
+          { zIndex: -1 }]}>
           <View style={$actionButtonsContainer}>
             <Pressable onPress={onGalleryPress}>
               {useMemo(
@@ -287,9 +290,10 @@ const $addImagesButton: ViewStyle = {
   height: 80,
   width: 80,
   borderRadius: 10,
-  marginLeft: 40,
+  marginLeft: 30,
   marginRight: 40,
   backgroundColor: colors.palette.primary300,
+  marginVertical: spacing.extraSmall
 }
 
 const $loadingIndicator: ViewStyle = {
@@ -298,9 +302,16 @@ const $loadingIndicator: ViewStyle = {
 }
 
 const $deleteIcon: ViewStyle = {
+
+
+  justifyContent: "center",
+  alignItems: "center",
+  borderRadius: 8,
+  backgroundColor: colors.background,
   position: "absolute",
-  top: 3,
-  right: spacing.small,
+  top: -5,
+  left: 85,
+  ...$contentCenter
 }
 
 const $actionButtonsContainer: ViewStyle = {
@@ -344,12 +355,6 @@ const $inputContainer: ViewStyle = {
   borderWidth: 0,
   paddingHorizontal: spacing.extraSmall,
   width: "100%",
-}
-
-const $inputWrapper: ViewStyle = {
-  width: "100%",
-  maxHeight: "100%",
-  borderBottomWidth: 0,
 }
 
 const $container: ViewStyle = {

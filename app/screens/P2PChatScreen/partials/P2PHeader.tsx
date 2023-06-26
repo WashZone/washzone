@@ -78,13 +78,6 @@ export const P2PHeader = ({ data, roomId }) => {
   )
 }
 
-const $statusIcon: ViewStyle = {
-  height: 6,
-  width: 6,
-  borderRadius: 3,
-  alignSelf: "center",
-  marginRight: spacing.tiny,
-}
 
 const $usernameText: TextStyle = {
   color: colors.palette.neutral100,

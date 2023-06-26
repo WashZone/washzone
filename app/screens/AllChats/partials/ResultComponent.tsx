@@ -1,15 +1,14 @@
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import React from "react"
-import { Keyboard, TextStyle, View, ViewStyle } from "react-native"
+import { Keyboard, View, ViewStyle } from "react-native"
 import FastImage, { ImageStyle } from "react-native-fast-image"
-import { color } from "react-native-reanimated"
-import { Icon, ListItem, Text } from "../../../components"
-import { useStores } from "../../../models"
+import Toast from 'react-native-toast-message'
+
+import { ListItem, Text } from "../../../components"
 import { AppStackParamList } from "../../../navigators"
 import { colors, spacing } from "../../../theme"
 import { formatName } from "../../../utils/formatName"
 import { useHooks } from "../../hooks"
-import Toast from 'react-native-toast-message'
 import { toastMessages } from "../../../utils/toastMessages"
 
 export const ResultComponent = ({
@@ -33,6 +32,7 @@ export const ResultComponent = ({
     <ListItem
       onPress={handlePress}
       height={44}
+      // eslint-disable-next-line react-native/no-inline-styles
       style={{ alignItems: "center", justifyContent: "flex-start" }}
       containerStyle={$container}
       LeftComponent={
@@ -46,17 +46,20 @@ export const ResultComponent = ({
         </View>
       }
     >
-      <View style={{ justifyContent: "center",  }}>
+      <View 
+      // eslint-disable-next-line react-native/no-inline-styles
+      style={{ justifyContent: "center"  }}>
         <Text text={formatName(data?.name)} color={colors.palette.neutral100} weight="medium" />
         {data?.description && (
           <Text
 
+            // eslint-disable-next-line react-native/no-inline-styles
             style={{height:20 }}
             text={data?.description}
             numberOfLines={1}
             size="xxs"
             color={colors.palette.neutral100}
-            // ellipsizeMode="tail"
+
           />
         )}
       </View>
@@ -64,12 +67,6 @@ export const ResultComponent = ({
   )
 }
 
-const $contentContainer: ViewStyle = {
-  height: 44,
-  flex: 1,
-  marginLeft: spacing.medium,
-  justifyContent: "center",
-}
 
 const $container: ViewStyle = {
   borderTopWidth: 0.25,

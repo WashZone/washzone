@@ -1,12 +1,12 @@
 import React, { useMemo } from "react"
 import { Pressable, View, ViewStyle } from "react-native"
 import FastImage, { ImageStyle } from "react-native-fast-image"
+import { NavigationProp, useNavigation } from "@react-navigation/native"
+
 import { Text } from "../../../components"
-import { useStores } from "../../../models"
 import { colors, spacing } from "../../../theme"
 import { messageMetadataType } from "../../../utils"
 import { $flexRow } from "../../styles"
-import { NavigationProp, useNavigation } from "@react-navigation/native"
 import {
   ClassifiedsTabParamList,
   HomeTabParamList,
@@ -19,9 +19,7 @@ export enum CustomMessageType {
 }
 
 export const CustomChatMessage = ({ message }: { message: any }) => {
-  const {
-    userStore: { _id: myId },
-  } = useStores()
+
   const data = useMemo(() => message?.metaData, [])
   const navigationClassified = useNavigation<NavigationProp<ClassifiedsTabParamList>>()
   const navigationTopic = useNavigation<NavigationProp<TopicsTabParamList>>()
@@ -39,15 +37,20 @@ export const CustomChatMessage = ({ message }: { message: any }) => {
             size="sm"
             weight="semiBold"
           />
-          <View style={[$flexRow, { maxWidth: 300, marginTop: spacing.tiny }]}>
+          <View style={[$flexRow,
+                // eslint-disable-next-line react-native/no-inline-styles
+                { maxWidth: 300, marginTop: spacing.tiny }]}>
             <FastImage style={$image} source={{ uri: parsedData?.image }} />
-            <View style={{ justifyContent: "flex-end" }}>
+            <View 
+                // eslint-disable-next-line react-native/no-inline-styles
+                style={{ justifyContent: "flex-end" }}>
               <Text
                 text={parsedData?.title}
                 color={colors.palette.neutral100}
                 size="sm"
                 weight="bold"
                 numberOfLines={1}
+                // eslint-disable-next-line react-native/no-inline-styles
                 style={{ maxWidth: 170 }}
                 ellipsizeMode="tail"
               />
@@ -56,6 +59,7 @@ export const CustomChatMessage = ({ message }: { message: any }) => {
                 color={colors.palette.neutral300}
                 weight="normal"
                 numberOfLines={1}
+                // eslint-disable-next-line react-native/no-inline-styles
                 style={{ maxWidth: 170 }}
                 ellipsizeMode="tail"
               />
@@ -64,6 +68,7 @@ export const CustomChatMessage = ({ message }: { message: any }) => {
                 color={colors.palette.neutral100}
                 size="xl"
                 numberOfLines={1}
+                // eslint-disable-next-line react-native/no-inline-styles
                 style={{ maxWidth: 170 }}
                 ellipsizeMode="tail"
                 weight="medium"

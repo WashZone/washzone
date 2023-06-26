@@ -17,10 +17,9 @@ import Modal from "react-native-modal"
 import {
   RTCPeerConnection,
   RTCSessionDescription,
-  RTCView,
   mediaDevices,
 } from "react-native-webrtc"
-import { AppStackScreenProps, goBack, navigationRef } from "../../navigators"
+import { AppStackScreenProps, goBack } from "../../navigators"
 import { observer } from "mobx-react-lite"
 import { CallTypes, useHooks } from "../hooks"
 import { colors, spacing } from "../../theme"
@@ -32,7 +31,7 @@ import { Ring } from "./partials/RInger"
 import { IncomingCallHook } from "../../utils/incomingCall"
 
 const STUN_SERVER = "stun:stun.l.google.com:19302"
-const TURN_SERVER = "turn:18.219.176.209:3478?transport=tcp"
+// const TURN_SERVER = "turn:18.219.176.209:3478?transport=tcp"
 const sessionConstraints = {
   mandatory: {
     OfferToReceiveAudio: true,

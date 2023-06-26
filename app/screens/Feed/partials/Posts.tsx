@@ -1,7 +1,6 @@
-import React, { useCallback, useEffect, useRef, useState } from "react"
-import { Alert, Dimensions, Pressable, Share, TextStyle, View, ViewStyle } from "react-native"
+import React, { useCallback, useEffect, useState } from "react"
+import { Alert, Dimensions, Pressable, TextStyle, View, ViewStyle } from "react-native"
 import {
-  AutoImage,
   CustomFlatlist,
   Icon,
   LikesModal,
@@ -170,7 +169,6 @@ export const PostComponent = ({
   const [isLikesModalVisible, setLikesModalVisible] = useState(false)
   const [tempNumberOfLines, setTempNumberOfLines] = useState(undefined)
 
-  const windowWidth = Dimensions.get("window").width
 
   const navigation = useNavigation<NavigationProp<HomeTabParamList>>()
   const onContainerPress = () => {
@@ -298,6 +296,8 @@ export const PostComponent = ({
                 <View
                   style={[
                     $flexRow,
+
+                    // eslint-disable-next-line react-native/no-inline-styles
                     {
                       padding: 5,
                       backgroundColor: colors.palette.overlayNeutral50,
@@ -324,6 +324,7 @@ export const PostComponent = ({
                 </View>
               )
             }}
+            // eslint-disable-next-line react-native/no-inline-styles
             containerStyle={{
               position: "absolute",
               bottom: -10,

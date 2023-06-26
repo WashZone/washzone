@@ -31,7 +31,9 @@ export const CommentComponent = ({ comment }: { comment: any }) => {
             }}
           />
         </TouchableOpacity>
-        <View style={{ justifyContent: "space-around" }}>
+        <View 
+        // eslint-disable-next-line react-native/no-inline-styles
+        style={{ justifyContent: "space-around" }}>
           <View style={$nameView}>
             <Text text={formatName(comment?.users?.name)} style={$publisherName} weight="medium" />
             <Text text={fromNow(comment?.createdAt)} style={$fromNow} />

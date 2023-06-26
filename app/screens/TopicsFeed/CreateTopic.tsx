@@ -26,10 +26,8 @@ import { toastMessages } from "../../utils/toastMessages"
 import { observer } from "mobx-react-lite"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { HomeTabParamList } from "../../tabs"
-export const CreateTopic = observer(function CreateTopic({focused}:{focused:boolean}) {
-  const {
-    userStore
-  } = useStores()
+export const CreateTopic = observer(function CreateTopic({ focused }: { focused: boolean }) {
+  const { userStore } = useStores()
   const [topicDescription, setTopicDescription] = useState<string>("")
   const [topicTitle, setTopicTitle] = useState<string>("")
   const [isPosting, setIsPosting] = useState<boolean>(false)
@@ -37,7 +35,7 @@ export const CreateTopic = observer(function CreateTopic({focused}:{focused:bool
   const inputRef = useRef<TextInput>()
   const inputTitleRef = useRef<TextInput>()
   const [selectedImage, setSelectedImage] = useState<any>({ height: 1, width: 1 })
-  const { createTopic, refreshTopics,getActivities } = useHooks()
+  const { createTopic, refreshTopics } = useHooks()
   const navigation = useNavigation<NavigationProp<HomeTabParamList>>()
 
   const onPost = async () => {
@@ -57,11 +55,10 @@ export const CreateTopic = observer(function CreateTopic({focused}:{focused:bool
         content: topicDescription.trim(),
         attachment: selectedImage,
         title: topicTitle.trim(),
-        tagTopicUser:[]
+        tagTopicUser: [],
       })
       refreshTopics()
     } catch (error) {
-      
     } finally {
       inputRef.current.clear()
       inputTitleRef.current.clear()
@@ -95,7 +92,7 @@ export const CreateTopic = observer(function CreateTopic({focused}:{focused:bool
           progress.value = withTiming(1, { duration: 300 })
         }, 100)
       }
-    } catch (e) { }
+    } catch (e) {}
   }
 
   const onDeletePress = () => {
@@ -173,7 +170,7 @@ export const CreateTopic = observer(function CreateTopic({focused}:{focused:bool
       }}
     >
       <View style={$container}>
-        <TouchableOpacity onPress={() => navigation.navigate('Profile', { user: userStore })}>
+        <TouchableOpacity onPress={() => navigation.navigate("Profile", { user: userStore })}>
           <FastImage source={{ uri: userStore?.picture }} style={$picture} resizeMode="cover" />
         </TouchableOpacity>
         <View style={$contentContainer}>

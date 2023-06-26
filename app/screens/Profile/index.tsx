@@ -9,15 +9,16 @@ import {
   View,
 } from "react-native"
 import { Menu, MenuItem, MenuDivider } from "react-native-material-menu"
-
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { CollapsibleHeaderTabView } from "react-native-tab-view-collapsible-header"
 import { NavigationState, SceneRendererProps, TabBar } from "react-native-tab-view"
 import { observer } from "mobx-react-lite"
+import { ActivityIndicator } from "react-native-paper"
+import { NavigationProp, StackActions, useNavigation } from "@react-navigation/native"
 
 import { colors, spacing } from "../../theme"
 import { HomeTabParamList, HomeTabProps } from "../../tabs"
-import { Button, Header, Screen, Text, Icon } from "../../components"
+import { Header, Screen, Text, Icon } from "../../components"
 import { formatName } from "../../utils/formatName"
 import {
   ClassifiedsTabScreen,
@@ -27,14 +28,12 @@ import {
 } from "./tabViews"
 import { $contentCenter, $flex1, $flexRow } from "../styles"
 import { useHooks } from "../hooks"
-import { NavigationProp, StackActions, useNavigation } from "@react-navigation/native"
 import { AppStackParamList } from "../../navigators"
 import { useStores } from "../../models"
 import Toast from "react-native-toast-message"
 import { toastMessages } from "../../utils/toastMessages"
 import { showAlertYesNo } from "../../utils/helpers"
 import Loading from "../../components/Loading"
-import { ActivityIndicator } from "react-native-paper"
 
 const getIndexFromKey = (key: string) => {
   switch (key) {
@@ -61,10 +60,6 @@ const renderTabBar = (
   index: number,
 ) => {
   position.current = props.position
-  const color = position.current.interpolate({
-    inputRange: [0.5, 1],
-    outputRange: [colors.palette.neutral100, colors.palette.primary100],
-  })
 
   return (
     <TabBar
@@ -111,6 +106,7 @@ const renderTabBar = (
               ]}
             >
               <Animated.Text
+                // eslint-disable-next-line react-native/no-inline-styles
                 style={{
                   color:
                     getIndexFromKey(props.key) === index
@@ -222,7 +218,10 @@ const Options = ({ user, reportUser }) => {
       {/* <MenuDivider /> */}
 
       <MenuItem onPress={onReport}>
-        <View style={[{ height: "100%", width: 100, alignItems: "center" }, $flexRow]}>
+        <View style={[
+          // eslint-disable-next-line react-native/no-inline-styles
+          { height: "100%", width: 100, alignItems: "center" },
+          $flexRow]}>
           <Icon
             containerStyle={{ marginHorizontal: spacing.extraSmall }}
             color={colors.palette.angry500}
@@ -239,7 +238,10 @@ const Options = ({ user, reportUser }) => {
           isBlocked(user?._id) ? unblockUser() : blockUser()
         }}
       >
-        <View style={[{ height: "100%", width: 100, alignItems: "center" }, $flexRow]}>
+        <View style={[
+          // eslint-disable-next-line react-native/no-inline-styles
+          { height: "100%", width: 100, alignItems: "center" }
+          , $flexRow]}>
           <Icon icon="block" size={22} containerStyle={{ marginHorizontal: spacing.extraSmall }} />
           <Text text={isBlocked(user?._id) ? "UnBlock" : "Block"} />
         </View>
@@ -260,7 +262,7 @@ const ProfileHeader = ({ user, isUser, onMessage }) => {
     following: false,
   })
   const [descriptionLineCount, setDescriptionLineCount] = useState(undefined)
-  const [showMore, setShowMore] = useState(false)
+
 
   const syncProfile = async () => {
     const resProfile = await getProfileDetails(user?._id)
@@ -315,7 +317,6 @@ const ProfileHeader = ({ user, isUser, onMessage }) => {
   }, [])
 
   const getParentHeightOffset = () => {
-    console.log("descriptionLineCount : showMore", descriptionLineCount, showMore)
     if (descriptionLineCount < 3) return descriptionLineCount * 17
     if (descriptionLineCount >= 3) {
       return 3 * 17
@@ -324,10 +325,10 @@ const ProfileHeader = ({ user, isUser, onMessage }) => {
     if (descriptionLineCount === 3) {
       return 3 * 17
     }
-    if (descriptionLineCount >= 3 && !showMore) {
+    if (descriptionLineCount >= 3) {
       return 3 * 17
     }
-    if (descriptionLineCount >= 3 && showMore) {
+    if (descriptionLineCount >= 3) {
       return descriptionLineCount * 17
     }
     return 0
@@ -356,6 +357,7 @@ const ProfileHeader = ({ user, isUser, onMessage }) => {
             style={[
               $flexRow,
               $flex1,
+              // eslint-disable-next-line react-native/no-inline-styles
               {
                 justifyContent: "space-around",
                 paddingHorizontal: spacing.medium,
@@ -369,6 +371,7 @@ const ProfileHeader = ({ user, isUser, onMessage }) => {
                   StackActions.push("FollowerFollowing", { user, initialTab: "followers" }),
                 )
               }
+              // eslint-disable-next-line react-native/no-inline-styles
               style={{ alignItems: "center" }}
             >
               <Text
@@ -391,6 +394,7 @@ const ProfileHeader = ({ user, isUser, onMessage }) => {
                   StackActions.push("FollowerFollowing", { user, initialTab: "following" }),
                 )
               }
+              // eslint-disable-next-line react-native/no-inline-styles
               style={{ alignItems: "center" }}
             >
               <Text
@@ -408,7 +412,10 @@ const ProfileHeader = ({ user, isUser, onMessage }) => {
             </TouchableOpacity>
           </View>
         </View>
-        <View style={[$flexRow, { alignItems: "center", marginTop: spacing.tiny }]}>
+        <View style={[$flexRow,
+          // eslint-disable-next-line react-native/no-inline-styles
+          { alignItems: "center", marginTop: spacing.tiny }
+        ]}>
           <Text
             text={formatName(user?.name)}
             numberOfLines={1}
@@ -501,7 +508,7 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
 
   const [galleryItemsClassifieds, setGalleryItemsClassifieds] = useState([])
   const [galleryItemsHomePosts, setGalleryItemsHomePosts] = useState([])
-  const { getOrCreateRoom, getUserById, getProfileDetails } = useHooks()
+  const { getOrCreateRoom, getUserById } = useHooks()
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
   const layout = useWindowDimensions()
   const {
@@ -655,14 +662,6 @@ const $topContainer: ImageStyle = {
 const $descriptionText: TextStyle = {
   fontSize: 14,
   lineHeight: 17,
-}
-
-const $messageButton: ViewStyle = {
-  padding: spacing.extraSmall,
-  paddingHorizontal: spacing.medium,
-  height: 45,
-  width: 148,
-  marginTop: spacing.medium,
 }
 
 const $publisherName: TextStyle = {

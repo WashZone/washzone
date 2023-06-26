@@ -4,7 +4,7 @@ import { $fontWeightStyles, BottomModal, IconTypes, ListItem } from "../../../co
 import { colors, spacing } from "../../../theme"
 import { CustomMessageType } from "./CustomChatMessage"
 
-export const MessageOptionsModal = ({ isVisible, setVisible, message, metadata }) => {
+export const MessageOptionsModal = ({ isVisible, setVisible, message }) => {
   const getDefaultOptions = (type: string, metadata?: { type: string }) => {
     const defaultOptions = [
       {
@@ -43,6 +43,7 @@ export const MessageOptionsModal = ({ isVisible, setVisible, message, metadata }
                 },
               ]
           }
+          break
         default:
           return []
       }

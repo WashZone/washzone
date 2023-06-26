@@ -1,7 +1,7 @@
 import { useIsFocused } from "@react-navigation/native"
 import { observer } from "mobx-react-lite"
 import React, { FC, useEffect, useMemo, useState } from "react"
-import { Dimensions, Image, Keyboard, KeyboardAvoidingView, Linking, TextStyle, View, ViewStyle } from "react-native"
+import { Dimensions, Image, Keyboard, Linking, TextStyle, View, ViewStyle } from "react-native"
 import Animated, {
   interpolate,
   SharedValue,

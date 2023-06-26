@@ -1,5 +1,5 @@
 import React from "react"
-import { Platform, Pressable, TextStyle, View, ViewStyle } from "react-native"
+import { Alert, Platform, Pressable, TextStyle, View, ViewStyle } from "react-native"
 import { Icon, Text } from "../../components"
 import { colors, spacing } from "../../theme"
 import {
@@ -63,6 +63,7 @@ export function SocialLogin() {
                     name: userInfo?.user?.name,
                     picture: userInfo?.user?.photo,
                     socialId: userInfo.user.id,
+                    username: ""
                   })
                 }
                 console.log("TEST USER GOT", resGetUserBySocialId.getUserBysocialId[0])
@@ -129,6 +130,7 @@ export function SocialLogin() {
                 isSocialLogin: true,
                 type: "facebook",
                 password: "",
+                username: ""
               })
             }
             setUser({
@@ -158,6 +160,7 @@ export function SocialLogin() {
   const loginWithFacebook = () => {
     LoginManager.logInWithPermissions(["public_profile"]).then(
       (login) => {
+        // eslint-disable-next-line no-empty
         if (login.isCancelled) {
         } else {
           AccessToken.getCurrentAccessToken().then((data) => {
@@ -166,7 +169,7 @@ export function SocialLogin() {
           })
         }
       },
-      (error) => { },
+      (error) => { Alert.alert(error) },
     )
   }
   const signInWithApple = async () => {
@@ -207,6 +210,7 @@ export function SocialLogin() {
             name: appleAuthRequestResponse.fullName.givenName + ' ' + appleAuthRequestResponse.fullName.familyName,
             picture: defaultImages.profile,
             socialId: appleAuthRequestResponse.user,
+            username: ""
           })
         }
         console.log("TEST USER GOT", resGetUserBySocialId.getUserBysocialId[0])

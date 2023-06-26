@@ -37,7 +37,9 @@ export const FollowersList = ({ user }) => {
   }
   
   if (data?.length === 0) {
-    return <Text weight='medium' style={{textAlign:'center' , marginTop:spacing.massive} } text={user?.first_name +` isn't followed by anyone.`}/>
+    return <Text weight='medium' 
+            // eslint-disable-next-line react-native/no-inline-styles
+            style={{textAlign:'center' , marginTop:spacing.massive} } text={user?.first_name +` isn't followed by anyone.`}/>
   }
 
   return (

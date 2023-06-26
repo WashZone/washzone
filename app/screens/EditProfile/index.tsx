@@ -100,6 +100,7 @@ export const EditProfile: FC<AppStackScreenProps<"EditProfile">> = function Edit
             source={{ uri: banner?.uri }}
           >
             <TouchableOpacity
+            // eslint-disable-next-line react-native/no-inline-styles
               style={{
                 position: "absolute",
                 right: 10,
@@ -202,12 +203,6 @@ const $submitButton: ViewStyle = {
   marginTop: spacing.small,
 }
 
-const $editPP: TextStyle = {
-  alignSelf: "center",
-  color: colors.palette.primary100,
-  marginBottom: 50,
-  marginTop: 10,
-}
 
 const $picture: ImageStyle = {
   height: 100,

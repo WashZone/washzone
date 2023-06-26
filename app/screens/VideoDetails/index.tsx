@@ -5,7 +5,6 @@ import {
   ViewStyle,
   Dimensions,
   ScrollView,
-  Share,
   TouchableOpacity,
 } from "react-native"
 import { Button, Icon, IconTypes, LikesModal, Screen, Text } from "../../components"
@@ -119,7 +118,9 @@ const ActionButtons = observer(function TopicsFeed({
       {options.map((option) => (
         // eslint-disable-next-line react-native/no-inline-styles
         <View
-          style={[$pressableAction, option.count !== undefined && { width: 80 }]}
+          style={[$pressableAction, option.count !== undefined &&
+                // eslint-disable-next-line react-native/no-inline-styles
+                { width: 80 }]}
           key={option.label}
         >
           <Icon

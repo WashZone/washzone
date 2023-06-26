@@ -1,11 +1,9 @@
-import React, { useEffect, useState } from "react"
+import React from "react"
 import { TextStyle, ViewStyle } from "react-native"
 import { $fontWeightStyles, BottomModal, IconTypes, ListItem } from "../../../components"
 import { colors, spacing } from "../../../theme"
-import { useHooks } from "../../hooks"
 
 export const OptionsModal = ({ isVisible, setVisible, onDelete }) => {
-  const { deleteChatRoom } = useHooks()
 
   const options = [
     {

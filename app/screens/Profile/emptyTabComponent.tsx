@@ -1,15 +1,11 @@
-import { translate } from "i18n-js"
 import React from "react"
-import { ButtonProps, View, ViewStyle } from "react-native"
+import {  View, ViewStyle } from "react-native"
 import { Text } from "../../components"
 import { spacing } from "../../theme"
 import { $contentCenter } from "../styles"
 
-
-
 const EmptyTabPresets = {
     emptyPosts: {
-
         heading: "emptyStateComponent.emptyPosts.heading",
         content: "emptyStateComponent.emptyPosts.content",
         button: "emptyStateComponent.emptyPosts.button",
@@ -33,10 +29,9 @@ const EmptyTabPresets = {
 } as const
 
 export const EmptyTabState = ({
-    buttonOnPress,
     preset,
 }: {
-    buttonOnPress?: ButtonProps["onPress"]
+
     preset?: keyof typeof EmptyTabPresets
 }) => {
     return (

@@ -2,7 +2,7 @@ import { observer } from "mobx-react-lite"
 import React, { FC, useEffect, useState } from "react"
 import { AppStackScreenProps } from "../../navigators"
 import { $flex1 } from "../styles"
-import { Screen, Header, EmptyState } from "../../components"
+import { Header, EmptyState } from "../../components"
 import { useNavigation } from "@react-navigation/native"
 import { colors, spacing } from "../../theme"
 import { AddMessageModal, P2PUserComponent } from "./partials"
@@ -11,7 +11,7 @@ import { useStores } from "../../models"
 import { OptionsModal } from "./partials/OptionsModal"
 import { useHooks } from "../hooks"
 
-export const AllChats: FC<AppStackScreenProps<"AllChats">> = observer(function AllChats(props) {
+export const AllChats: FC<AppStackScreenProps<"AllChats">> = observer(function AllChats(_props) {
   const [addModalVisible, setAddModalVisible] = useState(false)
   const [optionsVisible, setOptionsModalVisible] = useState(false)
   const [selectedRoomId, setSelectedRoomId] = useState("")

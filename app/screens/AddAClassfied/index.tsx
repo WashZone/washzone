@@ -188,6 +188,7 @@ export const AddAClassified: FC<AppStackScreenProps<"AddAClassified">> = functio
           maxLength={240}
           placeholder="Enter a short description here!"
           multiline
+          // eslint-disable-next-line react-native/no-inline-styles
           contentStyle={{ height: 120 }}
           blurOnSubmit
         />
@@ -216,11 +217,11 @@ export const AddAClassified: FC<AppStackScreenProps<"AddAClassified">> = functio
 
         <MediaHandlerComponent selectedMedia={selectedMedia} setSelectedMedia={setSelectedMedia} />
 
-        <Pressable onPress={() => setTNCAccepted(!TNCAccepted)} style={[$flexRow]}>
+        <Pressable onPress={() => setTNCAccepted(!TNCAccepted)} style={$flexRow}>
           <Toggle onPress={() => setTNCAccepted(!TNCAccepted)} value={TNCAccepted} />
           <TouchableOpacity onPress={() => setTNCAccepted(!TNCAccepted)} style={$flexRow}>
             <Text style={$tnc} tx="addAVideo.iAgree" weight="medium" />
-            <TouchableOpacity onPress={() => navigation.navigate("Legal")} style={{ marginLeft: -4 }}>
+            <TouchableOpacity onPress={() => navigation.navigate("Legal")} style={{ marginLeft: -spacing.tiny }}>
               <Text
                 color={colors.palette.primary100}
                 style={$tnc}

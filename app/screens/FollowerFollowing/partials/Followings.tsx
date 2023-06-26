@@ -39,7 +39,8 @@ export const FollowingList = ({ user }) => {
     return (
       <Text
         weight="medium"
-        style={{ textAlign: "center", marginTop: spacing.massive }}
+            // eslint-disable-next-line react-native/no-inline-styles
+            style={{ textAlign: "center", marginTop: spacing.massive }}
         text={user?.first_name + ` doesn't follow anyone.`}
       />
     )

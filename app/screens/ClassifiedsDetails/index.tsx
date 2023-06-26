@@ -14,7 +14,6 @@ import { ClassifiedsTabProps, HomeTabParamList } from "../../tabs"
 import { colors, spacing } from "../../theme"
 import { observer } from "mobx-react-lite"
 import FastImage, { ImageStyle } from "react-native-fast-image"
-import Share from "react-native-share"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { ActivityIndicator } from "react-native-paper"
 
@@ -361,24 +360,6 @@ const $publisherChildContainer: ViewStyle = {
   alignItems: "flex-start",
   flex: 1,
 }
-
-// const $reviewsButtonContainer: ViewStyle = {
-//   height: 40,
-//   justifyContent: "center",
-//   alignItems: "center",
-//   marginHorizontal: spacing.medium,
-//   backgroundColor: colors.palette.grey,
-//   borderRadius: 10,
-// }
-
-// const $followButton: ViewStyle = {
-//   height: 50,
-//   width: 100,
-//   backgroundColor: colors.palette.grey,
-//   borderRadius: 10,
-//   justifyContent: "center",
-//   alignItems: "center",
-// }
 
 const $flexHori: ViewStyle = { flexDirection: "row" }
 
