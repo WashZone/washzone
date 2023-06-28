@@ -4,9 +4,9 @@ import { withSetPropAction } from "./helpers/withSetPropAction"
 export const FeedStoreModel = types
   .model("FeedStore")
   .props({
-    topics: types.frozen(),
-    stories: types.frozen(),
-    homeFeed: types.frozen(),
+    topics: types.frozen([]),
+    stories: types.frozen([]),
+    homeFeed: types.frozen([]),
   })
   .actions(withSetPropAction)
   .actions((self) => ({

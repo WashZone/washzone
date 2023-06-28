@@ -38,10 +38,10 @@ export interface PostComponentProps {
 }
 const Actions = observer(function ActionButtons({
   item,
-  setLikesModalVisible,
+
 }: {
   item: any
-  setLikesModalVisible: (b: boolean) => void
+
 }) {
   const [loading, setLoading] = useState<boolean>(false)
   const { interactWithHomePost } = useHooks()
@@ -50,6 +50,8 @@ const Actions = observer(function ActionButtons({
     dislikeviews: item?.dislikeviews,
     likeviews: item?.likeviews,
   })
+  const [isLikesModalVisible, setLikesModalVisible] = useState(false)
+
   const {
     api: { mutateFlagsOnFeed },
     userStore: { _id },
@@ -89,69 +91,79 @@ const Actions = observer(function ActionButtons({
   }, [item])
 
   return (
-    <View style={$actionsContainer}>
-      <View style={$flexRow}>
-        <View style={$actionContainer}>
-          <Icon
-            icon={getIconForInteraction(dynamicData.interaction, "liked")}
-            size={20}
-            style={{ marginRight: spacing.extraSmall }}
-            onPress={async () => {
-              if (!loading) {
-                setLoading(true)
-                const res = await interactWithHomePost({
-                  postId: item?._id,
-                  button: "like",
-                  previousData: dynamicData,
+    <>
+      <View style={$actionsContainer}>
+        <View style={$flexRow}>
+          <View style={$actionContainer}>
+            <Icon
+              icon={getIconForInteraction(dynamicData.interaction, "liked")}
+              size={20}
+              style={{ marginRight: spacing.extraSmall }}
+              onPress={async () => {
+                if (!loading) {
+                  setLoading(true)
+                  const res = await interactWithHomePost({
+                    postId: item?._id,
+                    button: "like",
+                    previousData: dynamicData,
+                  })
+                  setDynamicData(res)
+                  setLoading(false)
+                }
+              }}
+            />
+            <Text onPress={() => dynamicData?.likeviews > 0 && setLikesModalVisible(true)}>
+              {dynamicData?.likeviews}
+            </Text>
+          </View>
+          <View style={$actionContainer}>
+            <Icon
+              icon={getIconForInteraction(dynamicData.interaction, "disliked")}
+              size={20}
+              style={{ marginRight: spacing.extraSmall }}
+              onPress={async () => {
+                if (!loading) {
+                  setLoading(true)
+                  const res = await interactWithHomePost({
+                    postId: item?._id,
+                    button: "dislike",
+                    previousData: dynamicData,
+                  })
+                  setDynamicData(res)
+                  setLoading(false)
+                }
+              }}
+            />
+            <Text>{dynamicData?.dislikeviews}</Text>
+          </View>
+          <View style={$actionContainer}>
+            <Icon
+              icon="shareCursive"
+              size={20}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
+                share({
+                  message: "",
+                  title: "",
+                  url: `washzone://shared-post/${item?._id}`,
+                  type: messageMetadataType.sharedPost,
                 })
-                setDynamicData(res)
-                setLoading(false)
-              }
-            }}
-          />
-          <Text onPress={() => dynamicData?.likeviews > 0 && setLikesModalVisible(true)}>
-            {dynamicData?.likeviews}
-          </Text>
+              }}
+            />
+          </View>
         </View>
-        <View style={$actionContainer}>
-          <Icon
-            icon={getIconForInteraction(dynamicData.interaction, "disliked")}
-            size={20}
-            style={{ marginRight: spacing.extraSmall }}
-            onPress={async () => {
-              if (!loading) {
-                setLoading(true)
-                const res = await interactWithHomePost({
-                  postId: item?._id,
-                  button: "dislike",
-                  previousData: dynamicData,
-                })
-                setDynamicData(res)
-                setLoading(false)
-              }
-            }}
-          />
-          <Text>{dynamicData?.dislikeviews}</Text>
-        </View>
-        <View style={$actionContainer}>
-          <Icon
-            icon="shareCursive"
-            size={20}
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
-              share({
-                message: "",
-                title: "",
-                url: `washzone://shared-post/${item?._id}`,
-                type: messageMetadataType.sharedPost,
-              })
-            }}
-          />
-        </View>
-      </View>
 
-      <Icon icon="flag" size={20} onPress={flagPost} />
-    </View>
+        <Icon icon="flag" size={20} onPress={flagPost} />
+      </View>
+      <LikesModal
+        key={item?._id}
+        module="post"
+        moduleId={item?._id}
+        likesCount={dynamicData?.likeviews}
+        isVisible={isLikesModalVisible}
+        setVisible={setLikesModalVisible}
+      />
+    </>
   )
 })
 
@@ -166,7 +178,6 @@ export const PostComponent = ({
 
   const [currentIndex, setCurrentIndex] = useState(0)
   const [showMore, setShowMore] = useState(undefined)
-  const [isLikesModalVisible, setLikesModalVisible] = useState(false)
   const [tempNumberOfLines, setTempNumberOfLines] = useState(undefined)
 
 
@@ -333,20 +344,14 @@ export const PostComponent = ({
             }}
           />
         </View>
-        <Actions item={post} setLikesModalVisible={setLikesModalVisible} />
+        <Actions item={post} />
       </View>
       {index % 5 === 0 && (
         <>
           <NativeAdView />
         </>
       )}
-      <LikesModal
-        key={post?._id}
-        module="post"
-        moduleId={post?._id}
-        isVisible={isLikesModalVisible}
-        setVisible={setLikesModalVisible}
-      />
+
     </>
   )
 }

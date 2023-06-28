@@ -7,11 +7,10 @@ import { TopicComponent } from "../TopicsFeed"
 import { AutoImage } from "../../components"
 import { HFlatList, HScrollView } from "react-native-head-tab-view"
 import { PostComponent } from "../Feed/partials"
-import { NavigationProp, useNavigation } from "@react-navigation/native"
-import { HomeTabParamList } from "../../tabs"
 import Loading from "../../components/Loading"
 import { VideoBlockFullWidth } from "../Playlist"
-import ImageView from "react-native-image-viewing"
+import ImageView from "react-native-fast-image-viewing"
+
 import { ImageViewConfigType } from "../Feed"
 import { EmptyTabState } from "./emptyTabComponent"
 

@@ -25,6 +25,7 @@ export function SocialLogin() {
   const {
     authenticationStore: { setAuthToken },
     userStore: { setUser },
+    allChats:{setMyUserId},
     api: { queryGetUserBysocialId, mutateCreateUser },
   } = useStores()
   const siginGoogle = () => {
@@ -83,6 +84,8 @@ export function SocialLogin() {
                   type: "google",
                   blockedUser: user?.blockedUser || [],
                 })
+                setMyUserId(user?._id)
+
                 setAuthToken(user?._id)
               } catch (err) {
                 console.log('API ERR : ', JSON.stringify(err))
@@ -147,6 +150,8 @@ export function SocialLogin() {
               type: "facebook",
               blockedUser: user?.blockedUser || [],
             })
+            setMyUserId(user?._id)
+
             setAuthToken(token)
           } catch (err) {
             Toast.show(toastMessages.emailAlreadyExists)
@@ -230,6 +235,7 @@ export function SocialLogin() {
           type: "google",
           blockedUser: user?.blockedUser || [],
         })
+        setMyUserId(user?._id)
         setAuthToken(user?._id)
       } catch (err) {
         Toast.show(toastMessages.emailAlreadyExists)

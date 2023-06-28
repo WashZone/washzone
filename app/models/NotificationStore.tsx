@@ -20,7 +20,6 @@ export const NotificationStoreModel = types
   }))
   .views((self) => ({
     getUnreadCount() {
-      console.log("SELF>LASTREAD", self.lastReadDate)
       if (self.lastReadDate === "") return "0"
       let count = 0
       self.notifications.forEach((i) => {

@@ -4,37 +4,41 @@ import FastImage, { ImageStyle } from "react-native-fast-image"
 import { colors, spacing } from "../theme"
 import { Text, ListItem } from "."
 import { formatName } from "../utils/formatName"
+import { TouchableOpacity } from "react-native-gesture-handler"
 
 export const MiniUserComponent = ({ onPress, item }: { onPress?: (a: any) => void; item: any }) => {
   return (
-    <ListItem
-      onPress={() => {
-        onPress(item)
-      }}
-      height={33}
-      style={$alignCenter}
-      containerStyle={$container}
-      LeftComponent={
-        <View>
-          <FastImage
-            style={$imageContainer}
-            source={{
-              uri: item?.picture,
-            }}
+    <TouchableOpacity onPress={() => {
+      onPress(item)
+    }}>
+      <ListItem
+        disabled
+
+        height={40}
+        style={$alignCenter}
+        containerStyle={$container}
+        LeftComponent={
+          <View>
+            <FastImage
+              style={$imageContainer}
+              source={{
+                uri: item?.picture,
+              }}
+            />
+          </View>
+        }
+      >
+        <View style={$contentContainer}>
+          <Text
+            text={formatName(item?.name)}
+            numberOfLines={1}
+            size="sm"
+            weight={"medium"}
+            style={{ color: colors.palette.neutral900 }}
           />
         </View>
-      }
-    >
-      <View style={$contentContainer}>
-        <Text
-          text={formatName(item?.name)}
-          numberOfLines={1}
-          size="sm"
-          weight={"medium"}
-          style={{ color: colors.palette.neutral900 }}
-        />
-      </View>
-    </ListItem>
+      </ListItem>
+    </TouchableOpacity>
   )
 }
 

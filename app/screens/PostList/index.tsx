@@ -9,7 +9,8 @@ import { formatName } from "../../utils/formatName"
 import { useHooks } from "../hooks"
 import { PostComponent } from "../Feed/partials"
 import { ImageViewConfigType } from "../Feed"
-import ImageView from "react-native-image-viewing"
+import ImageView from "react-native-fast-image-viewing"
+
 import Loading from "../../components/Loading"
 import { $flex1 } from "../styles"
 

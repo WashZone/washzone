@@ -46,7 +46,7 @@ export const TopicInfo: FC<HomeTabProps<"TopicInfo">> = function PostInfo(props)
   }
 
   const onComment = async (commentText, selectedMedia) => {
-    await postComment(commentText, selectedMedia, topicDetails?._id,[])
+    await postComment(commentText, selectedMedia, topicDetails?._id)
     await syncComments(topicDetails?._id)
   }
 

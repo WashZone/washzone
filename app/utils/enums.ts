@@ -12,7 +12,7 @@ export enum NotificationType {
   classified ='ClassifiedMessage',
   commentOnTopic='CommentOnTopic',
   commentOnPost='CommentOnPost',
- likeOnVideo='LikeOnVideo',
+  likeOnVideo='LikeOnVideo',
   likeOnPost='LikeOnPost',
   likeOnTopic='LikeOnTopic',
 }

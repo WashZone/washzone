@@ -51,6 +51,7 @@ export const SignupScreen: FC<SignupProps> = observer(function LoginScreen(_prop
   const {
     authenticationStore: { setAuthToken },
     userStore: { setUser },
+    allChats:{setMyUserId},
     api: { mutateCreateUser },
   } = useStores()
 
@@ -91,6 +92,7 @@ export const SignupScreen: FC<SignupProps> = observer(function LoginScreen(_prop
           _id: res.createUser._id,
           blockedUser: [],
         })
+        setMyUserId(res.createUser._id)
         setIsSubmitted(false)
         const token = new Date()
         setAuthToken(token.toString())

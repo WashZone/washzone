@@ -9,10 +9,13 @@ export const ChatRoomStoreModel = types
     chatMessages: types.frozen({}),
     rooms: types.frozen({}),
     unreadCount: types.number,
+    myUserId: types.string
   })
   .actions(withSetPropAction)
   .actions((self) => ({
-   
+    setMyUserId(id: string) {
+      self.myUserId = id
+    },
     getChatRooms() {
       const res = self.allChatRooms.filter(i => !this.getLatestMessageForRoom(i?._id).isEmpty)
       return res
@@ -68,8 +71,9 @@ export const ChatRoomStoreModel = types
       console.log("ROOMSSSSSS, rooms", rooms)
       Object.keys(rooms).forEach((key) => {
         const latestMessage = this.getLatestMessageForRoom(key)
+        console.log("LATEST MESSAGE : getUnreadCount ",JSON.stringify(latestMessage))
         console.log("LATEST MESSAGE ID :", latestMessage.id, rooms[key])
-        if (latestMessage.id !== rooms[key] && !latestMessage.isEmpty) count++
+        if (latestMessage.id !== rooms[key] && !latestMessage.isEmpty && latestMessage.authorId !== self.myUserId) count++
       })
       console.log("UNREAD COUNT", count)
       return count
@@ -119,12 +123,15 @@ export const ChatRoomStoreModel = types
     getLatestMessageForRoom(roomId: string) {
       // Getting the latest Message from the room Object !
       const room = self.allChatRooms.filter((room) => room?._id === roomId)[0]
+
       const latestMessageFromRoomObject = {
         id: room?.latestMessage?._id,
         message: room?.latestMessage?.text || "sent a media !",
         time: new Date(room?.latestMessage?.createdAt),
         isEmpty: room?.latestMessage?.membersId?.length === 0,
+        authorId: room?.latestMessage?.authorId
       }
+      console.log('getLatestMessageForRoom : ', room)
 
       // If we have never opened the room, then just return the latest message from the Room Object
       if (!(self.chatMessages[roomId]?.length > 0)) return latestMessageFromRoomObject
@@ -135,6 +142,7 @@ export const ChatRoomStoreModel = types
         message: self.chatMessages[roomId][0]?.text,
         time: new Date(self.chatMessages[roomId][0]?.createdAt),
         isEmpty: false,
+        authorId: self.chatMessages[roomId][0]?.authorId?._id
       }
 
       // return whichever message is the latest
@@ -153,8 +161,8 @@ export const ChatRoomStoreModel = types
     get getAllChatRooms() {
       return store.allChatRooms
     },
-    getRoomDetails(id:string) {
-      const res = store.allChatRooms.filter(i => i?._id===id)
+    getRoomDetails(id: string) {
+      const res = store.allChatRooms.filter(i => i?._id === id)
       return res?.[0]
     },
   }))

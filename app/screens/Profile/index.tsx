@@ -69,6 +69,7 @@ const renderTabBar = (
       indicatorStyle={$indicator}
       scrollEnabled
       renderTabBarItem={(props) => {
+        console.log('props render tab abr',props)
         return (
           <TouchableOpacity
             onPress={() => {
@@ -92,10 +93,11 @@ const renderTabBar = (
               }
             }}
           >
-            <Animated.View
+            <View
               style={[
                 $tabBarItem,
                 {
+                  width:props?.defaultTabWidth,
                   backgroundColor:
                     getIndexFromKey(props.key) === index
                       ? colors.palette.neutral100
@@ -105,20 +107,21 @@ const renderTabBar = (
                 },
               ]}
             >
-              <Animated.Text
+              <Text
                 // eslint-disable-next-line react-native/no-inline-styles
                 style={{
                   color:
                     getIndexFromKey(props.key) === index
                       ? colors.palette.primary100
                       : colors.palette.neutral250,
-                  fontWeight: getIndexFromKey(props.key) === index ? "700" : "500",
+
                   fontSize: spacing.medium,
                 }}
+                weight={getIndexFromKey(props.key) === index ? 'semiBold' : 'medium'}
               >
                 {props?.key.toUpperCase()}
-              </Animated.Text>
-            </Animated.View>
+              </Text>
+            </View>
           </TouchableOpacity>
         )
       }}
@@ -344,9 +347,9 @@ const ProfileHeader = ({ user, isUser, onMessage }) => {
       }}
     >
       <FastImage
-        source={{
+        source={user?.banner ? {
           uri: user?.banner,
-        }}
+        } : require('../../../assets/images/mock_banner.png')}
         style={$topContainer}
       />
       <View style={$userDetailsContainer}>
@@ -422,7 +425,7 @@ const ProfileHeader = ({ user, isUser, onMessage }) => {
             style={$publisherName}
             weight="semiBold"
           />
-          <Icon icon="verifiedTick" size={20} containerStyle={{ marginLeft: spacing.extraSmall }} />
+          {user?.blueTick && <Icon icon="verifiedTick" size={20} containerStyle={{ marginLeft: spacing.extraSmall }} />}
         </View>
         {user?.description + " " && (
           <View>
@@ -631,7 +634,9 @@ const $userDetailsContainer: ViewStyle = {
 
 const $tabBarItem: ViewStyle = {
   height: 50,
-  width: 171.2, // Default Tab Width as per docs
+  // width: 171.2, // Default Tab Width as per docs
+  // width:'100%',
+  flex: 1,
   backgroundColor: "pink",
   ...$contentCenter,
 }

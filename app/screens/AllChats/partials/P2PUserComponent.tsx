@@ -38,7 +38,7 @@ export const P2PUserComponent = observer(function p2PUserComponent({
   useEffect(() => {
     console.log('rooms', rooms)
     console.log("IS READ:", rooms[data?._id], ' === ', latestMessage?.id)
-    if (rooms[data?._id] === latestMessage?.id) setIsRead(true)
+    if (rooms[data?._id] === latestMessage?.id&& latestMessage.authorId !==myId ) setIsRead(true)
     else {
       setIsRead(false)
     }

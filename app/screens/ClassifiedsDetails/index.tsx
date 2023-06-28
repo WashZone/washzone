@@ -9,22 +9,24 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native"
-import { Text, IconTypes, Icon } from "../../components"
-import { ClassifiedsTabProps, HomeTabParamList } from "../../tabs"
-import { colors, spacing } from "../../theme"
+
 import { observer } from "mobx-react-lite"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { ActivityIndicator } from "react-native-paper"
+import { Rating } from "react-native-ratings"
+import Toast from "react-native-toast-message"
+import ImageView from "react-native-fast-image-viewing"
+
 
 import { useHooks } from "../hooks"
 import { useStores } from "../../models"
 import { RateUserModal } from "./RateUser"
 import { SendOfferModal } from "./SendOfferModal"
 import Loading from "../../components/Loading"
-import { Rating } from "react-native-ratings"
-import Toast from "react-native-toast-message"
-import ImageView from "react-native-image-viewing"
+import { Text, IconTypes, Icon ,} from "../../components"
+import { ClassifiedsTabProps, HomeTabParamList } from "../../tabs"
+import { colors, spacing } from "../../theme"
 import { formatName } from "../../utils/formatName"
 import * as Haptics from "expo-haptics"
 import { showAlertYesNo } from "../../utils/helpers"

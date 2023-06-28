@@ -34,7 +34,7 @@ export const RootStoreModel = types
     userStore: types.optional(UserStoreModel, {}),
     feedStore: types.optional(FeedStoreModel, {}),
     topics: types.optional(TopicsStoreModel, {}),
-    allChats: types.optional(ChatRoomStoreModel, { unreadCount: 0 }),
+    allChats: types.optional(ChatRoomStoreModel, { unreadCount: 0 , myUserId:''}),
     classfieds: types.optional(ClassifiedStoreModel, {}),
     videos: types.optional(VideosStoreModel, {}),
     saved: types.optional(SavedStoreModel, {}),

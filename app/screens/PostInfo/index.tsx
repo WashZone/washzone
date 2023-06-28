@@ -7,7 +7,7 @@ import { useHooks } from "../hooks"
 import { useStores } from "../../models"
 import { CommentComponent } from "../TopicInfo/Comments"
 import Loading from "../../components/Loading"
-import ImageView from "react-native-image-viewing"
+import ImageView from "react-native-fast-image-viewing"
 import { ImageViewConfigType } from ".."
 import { Host } from "react-native-portalize"
 
@@ -49,7 +49,7 @@ export const PostInfo: FC<HomeTabProps<"PostInfo">> = function PostInfo(props) {
   }
 
   const onComment = async (commentText, selectedMedia) => {
-    await postCommentOnHomePagePost(commentText, selectedMedia, postDetails?._id, [])
+    await postCommentOnHomePagePost(commentText, selectedMedia, postDetails?._id)
     await syncComments(postDetails?._id)
   }
 

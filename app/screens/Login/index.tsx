@@ -15,7 +15,7 @@ import { colors, spacing } from "../../theme"
 import LoginView from "./Login"
 import { SocialLogin } from "./SocialLoginButtons"
 
-interface LoginScreenProps extends AppStackScreenProps<"Login"> {}
+interface LoginScreenProps extends AppStackScreenProps<"Login"> { }
 
 interface LogoProps {
   animVal: SharedValue<number>
@@ -28,12 +28,12 @@ const Logo = ({ animVal }: LogoProps) => {
     const height = interpolate(
       animVal.value,
       [0, 1, 2],
-      [dimesions.height - 550, dimesions.height - 650, 0],
+      [dimesions.height - 650, dimesions.height - 750, 0],
     )
     const width = interpolate(
       animVal.value,
       [0, 1, 2],
-      [dimesions.height - 550, dimesions.height - 650, 0],
+      [dimesions.height - 650, dimesions.height - 750, 0],
     )
 
     return {

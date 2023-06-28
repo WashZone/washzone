@@ -24,6 +24,7 @@ export const LoginView = observer(({ handleKeyboard } :{handleKeyboard : (b:bool
       validationErrors,
     },
     userStore: { setUser },
+    allChats:{setMyUserId},
     api: { mutateSignin },
   } = useStores()
 
@@ -47,6 +48,8 @@ export const LoginView = observer(({ handleKeyboard } :{handleKeyboard : (b:bool
         _id: res.signin._id,
         blockedUser: res.signin.blockedUser,
       })
+      setMyUserId(res.signin._id)
+
       setAuthToken(String(Date.now()))
     } catch (error) {
       console.log("LOGIN ERROR", error)
