@@ -19,7 +19,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
-import { ChooseMediaModal, } from "."
+import { ChooseMediaModal } from "."
 import { TagInput } from "./TagInput"
 import { Host } from "react-native-portalize"
 // import { getTaggedIds } from "../utils/helpers"
@@ -28,9 +28,15 @@ interface CommentInputProps {
   createComment: (text: string, selectedMedia: any) => Promise<void>
   placeholder?: string
   bottomSafe?: boolean
+  tagable?: boolean
 }
 
-export const CommentInput = ({ createComment, bottomSafe, placeholder }: CommentInputProps) => {
+export const CommentInput = ({
+  createComment,
+  bottomSafe,
+  placeholder,
+  tagable = true,
+}: CommentInputProps) => {
   const [commentText, setCommentText] = useState("")
   const [selectedMedia, setSelectedMedia] = useState(undefined)
   const [isCommenting, setIsCommenting] = useState(false)
@@ -64,7 +70,7 @@ export const CommentInput = ({ createComment, bottomSafe, placeholder }: Comment
   const $animatedContainer = useAnimatedStyle(() => {
     return {
       marginBottom: interpolate(focus.value, [0, 1], [bottomSafe ? safeAreInsets.bottom : 0, 0]),
-      height: interpolate(focus.value, [0, 1], [54, 100]),
+      height: interpolate(focus.value, [0, 1], [50, 100]),
     }
   })
 
@@ -110,29 +116,33 @@ export const CommentInput = ({ createComment, bottomSafe, placeholder }: Comment
         />
 
         <View style={$inputWrapper}>
-          {/* <TextInput
-            ref={inputRef}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
-            value={commentText}
-            onChangeText={setCommentText}
-            placeholder={placeholder || "Write a comment!"}
-            placeholderTextColor={colors.palette.overlay50}
-            style={$commentInput}
-            multiline
-          /> */}
-          <TagInput
-            value={commentText}
-            onChange={setCommentText}
-            inputRef={inputRef}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
-            placeholder={placeholder || "Write a comment!"}
-            placeholderTextColor={colors.palette.overlay50}
-            containerStyle={$commentInput}
-            multiline
-            suggestionsContainerStyle={{ bottom: 90 }}
-          />
+          {tagable ? (
+            <TagInput
+              value={commentText}
+              onChange={setCommentText}
+              inputRef={inputRef}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+              placeholder={placeholder || "Write a comment!"}
+              placeholderTextColor={colors.palette.overlay50}
+              containerStyle={$commentInput}
+              multiline
+              suggestionsContainerStyle={{ bottom: 90 }}
+              style={{lineHeight:20}}
+            />
+          ) : (
+            <TextInput
+              ref={inputRef}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+              value={commentText}
+              onChangeText={setCommentText}
+              placeholder={placeholder || "Write a comment!"}
+              placeholderTextColor={colors.palette.overlay50}
+              style={$commentInput}
+              multiline
+            />
+          )}
         </View>
         <TouchableOpacity onPress={!isCommenting && onComment} style={$rightIconContainer}>
           {isCommenting ? (
@@ -191,9 +201,10 @@ const $commentInput: TextStyle = {
   borderRadius: 10,
   paddingHorizontal: 10,
   // textAlignVertical: "center",
-  paddingVertical: spacing.extraSmall,
+  // paddingVertical: spacing.extraSmall,
   // back:'red',
   textAlignVertical: "top",
+  lineHeight:20,
   color: colors.palette.neutral800,
 }
 

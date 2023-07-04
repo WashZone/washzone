@@ -69,7 +69,7 @@ const renderTabBar = (
       indicatorStyle={$indicator}
       scrollEnabled
       renderTabBarItem={(props) => {
-        console.log('props render tab abr',props)
+        console.log("props render tab abr", props)
         return (
           <TouchableOpacity
             onPress={() => {
@@ -97,7 +97,7 @@ const renderTabBar = (
               style={[
                 $tabBarItem,
                 {
-                  width:props?.defaultTabWidth,
+                  width: props?.defaultTabWidth,
                   backgroundColor:
                     getIndexFromKey(props.key) === index
                       ? colors.palette.neutral100
@@ -117,7 +117,7 @@ const renderTabBar = (
 
                   fontSize: spacing.medium,
                 }}
-                weight={getIndexFromKey(props.key) === index ? 'semiBold' : 'medium'}
+                weight={getIndexFromKey(props.key) === index ? "semiBold" : "medium"}
               >
                 {props?.key.toUpperCase()}
               </Text>
@@ -221,10 +221,13 @@ const Options = ({ user, reportUser }) => {
       {/* <MenuDivider /> */}
 
       <MenuItem onPress={onReport}>
-        <View style={[
-          // eslint-disable-next-line react-native/no-inline-styles
-          { height: "100%", width: 100, alignItems: "center" },
-          $flexRow]}>
+        <View
+          style={[
+            // eslint-disable-next-line react-native/no-inline-styles
+            { height: "100%", width: 100, alignItems: "center" },
+            $flexRow,
+          ]}
+        >
           <Icon
             containerStyle={{ marginHorizontal: spacing.extraSmall }}
             color={colors.palette.angry500}
@@ -241,10 +244,13 @@ const Options = ({ user, reportUser }) => {
           isBlocked(user?._id) ? unblockUser() : blockUser()
         }}
       >
-        <View style={[
-          // eslint-disable-next-line react-native/no-inline-styles
-          { height: "100%", width: 100, alignItems: "center" }
-          , $flexRow]}>
+        <View
+          style={[
+            // eslint-disable-next-line react-native/no-inline-styles
+            { height: "100%", width: 100, alignItems: "center" },
+            $flexRow,
+          ]}
+        >
           <Icon icon="block" size={22} containerStyle={{ marginHorizontal: spacing.extraSmall }} />
           <Text text={isBlocked(user?._id) ? "UnBlock" : "Block"} />
         </View>
@@ -265,7 +271,6 @@ const ProfileHeader = ({ user, isUser, onMessage }) => {
     following: false,
   })
   const [descriptionLineCount, setDescriptionLineCount] = useState(undefined)
-
 
   const syncProfile = async () => {
     const resProfile = await getProfileDetails(user?._id)
@@ -320,19 +325,18 @@ const ProfileHeader = ({ user, isUser, onMessage }) => {
   }, [])
 
   const getParentHeightOffset = () => {
-    if (descriptionLineCount < 3) return descriptionLineCount * 17
-    if (descriptionLineCount >= 3) {
+    if (descriptionLineCount + 1 < 3) return descriptionLineCount + 1 * 17
+    if (descriptionLineCount + 1 >= 3) {
       return 3 * 17
     }
-
-    if (descriptionLineCount === 3) {
+    if (descriptionLineCount + 1 === 3) {
       return 3 * 17
     }
-    if (descriptionLineCount >= 3) {
+    if (descriptionLineCount + 1 >= 3) {
       return 3 * 17
     }
-    if (descriptionLineCount >= 3) {
-      return descriptionLineCount * 17
+    if (descriptionLineCount + 1 >= 3) {
+      return descriptionLineCount + 1 * 17
     }
     return 0
   }
@@ -342,14 +346,18 @@ const ProfileHeader = ({ user, isUser, onMessage }) => {
   return (
     <View
       style={{
-        height: 245 + getParentHeightOffset() - (isUser ? 50 : 0),
+        height: 260 + getParentHeightOffset() - (isUser ? 50 : 0),
         backgroundColor: colors.palette.neutral100,
       }}
     >
       <FastImage
-        source={user?.banner ? {
-          uri: user?.banner,
-        } : require('../../../assets/images/mock_banner.png')}
+        source={
+          user?.banner
+            ? {
+                uri: user?.banner,
+              }
+            : require("../../../assets/images/mock_banner.png")
+        }
         style={$topContainer}
       />
       <View style={$userDetailsContainer}>
@@ -415,17 +423,26 @@ const ProfileHeader = ({ user, isUser, onMessage }) => {
             </TouchableOpacity>
           </View>
         </View>
-        <View style={[$flexRow,
-          // eslint-disable-next-line react-native/no-inline-styles
-          { alignItems: "center", marginTop: spacing.tiny }
-        ]}>
+        <View
+          style={[
+            $flexRow,
+            // eslint-disable-next-line react-native/no-inline-styles
+            { alignItems: "center", marginTop: spacing.tiny },
+          ]}
+        >
           <Text
             text={formatName(user?.name)}
             numberOfLines={1}
             style={$publisherName}
             weight="semiBold"
           />
-          {user?.blueTick && <Icon icon="verifiedTick" size={20} containerStyle={{ marginLeft: spacing.extraSmall }} />}
+          {user?.blueTick && (
+            <Icon
+              icon="verifiedTick"
+              size={20}
+              containerStyle={{ marginLeft: spacing.extraSmall }}
+            />
+          )}
         </View>
         {user?.description + " " && (
           <View>
@@ -436,7 +453,7 @@ const ProfileHeader = ({ user, isUser, onMessage }) => {
                 descriptionLineCount && descriptionLineCount > 3 ? 3 : descriptionLineCount
               }
               weight="normal"
-              text={user?.description + "sadfasdfsdaf"}
+              text={user?.description?.trim()}
               style={$descriptionText}
             />
           </View>
@@ -508,7 +525,6 @@ const ProfileHeader = ({ user, isUser, onMessage }) => {
 export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ route }) {
   const { user, header } = route.params
   const [galleryItemsTopics, setGalleryItemsTopics] = useState([])
-
   const [galleryItemsClassifieds, setGalleryItemsClassifieds] = useState([])
   const [galleryItemsHomePosts, setGalleryItemsHomePosts] = useState([])
   const { getOrCreateRoom, getUserById } = useHooks()

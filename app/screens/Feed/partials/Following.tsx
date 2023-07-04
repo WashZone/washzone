@@ -4,9 +4,7 @@ import { NavigationProp, useNavigation } from "@react-navigation/native"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import LinearGradient from "react-native-linear-gradient"
 
-import {
-  HomeTabParamList,
-} from "../../../tabs"
+import { HomeTabParamList } from "../../../tabs"
 import { useHooks } from "../../hooks"
 import { useStores } from "../../../models"
 import { formatName } from "../../../utils/formatName"
@@ -91,6 +89,7 @@ export const Stories = observer(() => {
   //     Alert.alert("Something Went Wrong!", "Please ask the publisher to either Repost or Delete.")
   //   }
   // }
+  if (stories.length === 0) return null
 
   return (
     <View style={$container}>

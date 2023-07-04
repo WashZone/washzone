@@ -6,7 +6,7 @@ import { Chat, MessageType } from "@flyerhq/react-native-chat-ui"
 // import DocumentPicker from 'react-native-document-picker'
 import FileViewer from "react-native-file-viewer"
 
-import {  TextStyle, View, ViewStyle } from "react-native"
+import { TextStyle, View, ViewStyle } from "react-native"
 import { colors, spacing } from "../../theme"
 import { MediaPicker } from "../../utils/device/MediaPicker"
 import { CustomChatMessage, P2PHeader } from "./partials"
@@ -66,7 +66,7 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
     if (message.type === "file") {
       try {
         await FileViewer.open(message.uri, { showOpenWithDialog: true })
-      } catch { }
+      } catch {}
     }
   }
 
@@ -143,8 +143,8 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
             backgroundColor: isLog
               ? getColorFromType(message?.metaData?.metaDataType)
               : isAuthorMe
-                ? colors.palette.messageAuthor
-                : colors.palette.messageReceiver,
+              ? colors.palette.messageAuthor
+              : colors.palette.messageReceiver,
             padding: isImage ? 0 : spacing.tiny,
             paddingHorizontal: isImage ? 0 : spacing.extraSmall,
             borderRadius: isLog ? 8 : 10,
@@ -207,99 +207,102 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
 
   return (
     <Host>
-
-    <Screen contentContainerStyle={$flex1}>
-      <P2PHeader data={receiver} roomId={roomId} />
-      <Chat
-        showUserNames
-        renderImageMessage={renderImageMessage}
-        isAttachmentUploading={isAttachmentUploading}
-        sendButtonVisibilityMode="editing"
-        emptyState={() =>
-          syncing && (
-            <Lottie          
-               // eslint-disable-next-line react-native/no-inline-styles
-              style={{ height: 40 }}
-              source={require("../../../assets/lottie/loader.json")}
-              autoPlay
-              loop
-            />
-          )
-        }
-        onEndReached={onChatEndReached}
-        theme={{
-          insets: {
-            messageInsetsHorizontal: 10,
-            messageInsetsVertical: 10,
-          },
-          colors: {
-            background: colors.palette.neutral100,
-            inputBackground: colors.palette.primary100,
-            inputText: colors.palette.neutral100,
-            error: colors.palette.angry500,
-            primary: colors.palette.primaryOverlay80,
-            secondary: colors.palette.neutral100,
-            receivedMessageDocumentIcon: colors.palette.neutral100,
-            sentMessageDocumentIcon: colors.palette.neutral100,
-            userAvatarImageBackground: colors.background,
-            userAvatarNameColors: [colors.palette.neutral800],
-          },
-          fonts: {
-            dateDividerTextStyle: testTextStyle,
-            emptyChatPlaceholderTextStyle: testTextStyle,
-            inputTextStyle: testTextStyle,
-            receivedMessageBodyTextStyle: { color: colors.palette.neutral700 },
-            receivedMessageCaptionTextStyle: { color: colors.palette.neutral700 },
-            receivedMessageLinkDescriptionTextStyle: testTextStyle,
-            receivedMessageLinkTitleTextStyle: testTextStyle,
-            sentMessageBodyTextStyle: { color: colors.palette.neutral100 },
-            sentMessageCaptionTextStyle: { color: colors.palette.neutral100 },
-            sentMessageLinkDescriptionTextStyle: testTextStyle,
-            sentMessageLinkTitleTextStyle: testTextStyle,
-            userAvatarTextStyle: testTextStyle,
-            userNameTextStyle: testTextStyle,
-          },
-          borders: { inputBorderRadius: 10, messageBorderRadius: 10 },
-        }}
-        messages={getRoomMessages({ roomId })}
-        renderCustomMessage={(message) => <CustomChatMessage message={message} />}
-        onAttachmentPress={onAttachmentPress}
-        onMessagePress={handleMessagePress}
-        // onMessageLongPress={handleOnMessageLongPress}
-        onSendPress={handleSendPressFlyer}
-        user={user}
-        renderBubble={renderBubble}
-        enableAnimation
-        isLastPage={isLastPage}
-        showUserAvatars
-        customBottomComponent={() =>
-          getRoomDetails(roomId)?.blocked ? (
-            <View style={[$blockedContainer, { marginBottom: useSafeAreaInsets().bottom }]}>
-              <Text
-                style={$blockedText}
-                weight="semiBold"
-                color={colors.palette.neutral600}
-                text={
-                  userStore?.isBlocked(receiver?._id)
-                    ? "You blocked " + receiver?.first_name + '.'
-                    : "You have been blocked by " + receiver?.first_name + '.'
-                }
+      <Screen contentContainerStyle={$flex1}>
+        <P2PHeader data={receiver} roomId={roomId} />
+        <Chat
+          showUserNames
+          renderImageMessage={renderImageMessage}
+          isAttachmentUploading={isAttachmentUploading}
+          sendButtonVisibilityMode="editing"
+          emptyState={() =>
+            syncing && (
+              <Lottie
+                // eslint-disable-next-line react-native/no-inline-styles
+                style={{ height: 40 }}
+                source={require("../../../assets/lottie/loader.json")}
+                autoPlay
+                loop
               />
-            </View>
-          ) : (
-            <CommentInput bottomSafe createComment={handleSendPress} placeholder="Message ..." />
-          )
-        }
-      />
-      {/* <MessageOptionsModal
+            )
+          }
+          onEndReached={onChatEndReached}
+          theme={{
+            insets: {
+              messageInsetsHorizontal: 10,
+              messageInsetsVertical: 10,
+            },
+            colors: {
+              background: colors.palette.neutral100,
+              inputBackground: colors.palette.primary100,
+              inputText: colors.palette.neutral100,
+              error: colors.palette.angry500,
+              primary: colors.palette.primaryOverlay80,
+              secondary: colors.palette.neutral100,
+              receivedMessageDocumentIcon: colors.palette.neutral100,
+              sentMessageDocumentIcon: colors.palette.neutral100,
+              userAvatarImageBackground: colors.background,
+              userAvatarNameColors: [colors.palette.neutral800],
+            },
+            fonts: {
+              dateDividerTextStyle: testTextStyle,
+              emptyChatPlaceholderTextStyle: testTextStyle,
+              inputTextStyle: testTextStyle,
+              receivedMessageBodyTextStyle: { color: colors.palette.neutral700 },
+              receivedMessageCaptionTextStyle: { color: colors.palette.neutral700 },
+              receivedMessageLinkDescriptionTextStyle: testTextStyle,
+              receivedMessageLinkTitleTextStyle: testTextStyle,
+              sentMessageBodyTextStyle: { color: colors.palette.neutral100 },
+              sentMessageCaptionTextStyle: { color: colors.palette.neutral100 },
+              sentMessageLinkDescriptionTextStyle: testTextStyle,
+              sentMessageLinkTitleTextStyle: testTextStyle,
+              userAvatarTextStyle: testTextStyle,
+              userNameTextStyle: testTextStyle,
+            },
+            borders: { inputBorderRadius: 10, messageBorderRadius: 10 },
+          }}
+          messages={getRoomMessages({ roomId })}
+          renderCustomMessage={(message) => <CustomChatMessage message={message} />}
+          onAttachmentPress={onAttachmentPress}
+          onMessagePress={handleMessagePress}
+          // onMessageLongPress={handleOnMessageLongPress}
+          onSendPress={handleSendPressFlyer}
+          user={user}
+          renderBubble={renderBubble}
+          enableAnimation
+          isLastPage={isLastPage}
+          showUserAvatars
+          customBottomComponent={() =>
+            getRoomDetails(roomId)?.blocked ? (
+              <View style={[$blockedContainer, { marginBottom: useSafeAreaInsets().bottom }]}>
+                <Text
+                  style={$blockedText}
+                  weight="semiBold"
+                  color={colors.palette.neutral600}
+                  text={
+                    userStore?.isBlocked(receiver?._id)
+                      ? "You blocked " + receiver?.first_name + "."
+                      : "You have been blocked by " + receiver?.first_name + "."
+                  }
+                />
+              </View>
+            ) : (
+              <CommentInput
+                tagable={false}
+                bottomSafe
+                createComment={handleSendPress}
+                placeholder="Message ..."
+              />
+            )
+          }
+        />
+        {/* <MessageOptionsModal
         message={selectedMessage}
         isVisible={optionsModalVisible}
         setVisible={setOptionsModalVisible}
         metadata={selectedMessage?.metadata}
       /> */}
-    </Screen>
+      </Screen>
     </Host>
-
   )
 })
 const $blockedContainer: ViewStyle = {

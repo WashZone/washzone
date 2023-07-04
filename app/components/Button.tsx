@@ -143,7 +143,7 @@ const $baseViewStyle: ViewStyle = {
   overflow: "hidden",
 }
 
-const $baseTextStyle: TextStyle = {
+export const $baseTextStyle: TextStyle = {
   fontSize: 14,
   lineHeight: 20,
   fontFamily: typography.fonts.helveticaNeue.medium,

@@ -29,6 +29,7 @@ import Toast from "react-native-toast-message"
 import { notificationHandler } from "./utils"
 import RNCallKeep from "react-native-callkeep"
 import { ShareModal } from "./components"
+import { GestureHandlerRootView } from "react-native-gesture-handler"
 
 const options = {
   ios: {
@@ -135,11 +136,13 @@ function App(props: AppProps) {
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
       <ErrorBoundary catchErrors={Config.catchErrors}>
-        <AppNavigator
-          linking={linking}
-          initialState={initialNavigationState}
-          onStateChange={onNavigationStateChange}
-        />
+        {/* <GestureHandlerRootView> */}
+          <AppNavigator
+            linking={linking}
+            initialState={initialNavigationState}
+            onStateChange={onNavigationStateChange}
+          />
+        {/* </GestureHandlerRootView> */}
         <Toast />
       </ErrorBoundary>
     </SafeAreaProvider>
@@ -147,4 +150,3 @@ function App(props: AppProps) {
 }
 
 export default App
-

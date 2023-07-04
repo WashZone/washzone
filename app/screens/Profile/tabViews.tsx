@@ -170,6 +170,7 @@ export const TopicsTabScreen = ({
     const res = await getUserTopics(userId)
     setUserTopics(res)
     
+    // eslint-disable-next-line array-callback-return
     const galleryImages = res.map((i, index) => {
       if (i.attachmentUrl) return { uri: i?.attachmentUrl || "", id: "topic" + index }
     })
@@ -214,6 +215,7 @@ export const ClassifiedsTabScreen = ({
   const fetchUserClassifieds = async () => {
     const res = await getUserClassifieds(userId)
     setUserClassifieds(res)
+    // eslint-disable-next-line array-callback-return
     const galleryImages = res.map((i, index) => {
       if (i.attachmentUrl) return { uri: i?.attachmentUrl || "", id: "classified" + index }
     })
@@ -265,6 +267,7 @@ export const VideosTabScreen = ({
   const fetchUserVideos = async () => {
     const res = await getUserVideos(userId)
     setUserVideos(res)
+    // eslint-disable-next-line array-callback-return
     const galleryImages = res.map((i, index) => {
       if (i.thumbnailUrl) return { uri: i?.thumbnailUrl || "", id: "video" + index }
     })
@@ -311,7 +314,7 @@ const $classifiedBlockContainer: ViewStyle = {
 
 const $screenContainer: ViewStyle = {
   flex: 1,
-  backgroundColor: colors.palette.neutral100,
+  backgroundColor: colors.background,
 }
 
 const $marginAutoImage: ImageStyle = { margin: 10 }

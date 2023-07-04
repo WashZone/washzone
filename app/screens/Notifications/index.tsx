@@ -134,7 +134,7 @@ const NotificationComponent = ({
               onPress: () =>
                 navigationHome.navigate("PostInfo", { post: item?.HomePageId[0]?._id }),
               module: "post",
-              image: item?.HomePageId[0]?.attachmentUrl,
+              image: item?.HomePageId[0]?.attachmentUrl[0],
             }
           : item?.notificationType === NotificationType.likeOnTopic
           ? {

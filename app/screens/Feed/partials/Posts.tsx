@@ -279,7 +279,7 @@ export const PostComponent = ({
             onPress={() => setTempNumberOfLines(undefined)}
           />
         )}
-        <View>
+        <View style={{backgroundColor: colors.palette.overlayNeutral50}}>
           <Carousel
             pagingEnabled
             pinchGestureEnabled

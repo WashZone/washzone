@@ -72,6 +72,7 @@ export function DrawerNavigator() {
 
   return (
     <DrawerLayout
+useNativeAnimations
       drawerLockMode="locked-closed"
       ref={drawerRef}
       drawerWidth={Platform.select({ default: 326, web: Dimensions.get("screen").width * 0.3 })}
