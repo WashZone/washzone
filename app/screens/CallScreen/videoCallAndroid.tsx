@@ -334,7 +334,6 @@ export const VideoCallAndroid: FC<AppStackScreenProps<"VideoCallAndroid">> = obs
           return ans
         })
         .then(function (answer) {
-          console.log("ANSWER", JSON.stringify(answer))
           yourConn.current.setLocalDescription(answer)
           setStatus(CallStatus.connected)
           sendSilentAlert(receiver?.notificationToken, CallTypes.answer, roomId, {
@@ -345,7 +344,6 @@ export const VideoCallAndroid: FC<AppStackScreenProps<"VideoCallAndroid">> = obs
 
     // when we got an answer from a remote user
     const handleAnswer = () => {
-      console.log("handleAnswer:handleAnswer", answer)
       setCallActive(true)
       yourConn.current.setRemoteDescription(new RTCSessionDescription(JSON.parse(answer)))
       setStatus(CallStatus.connected)
@@ -390,7 +388,6 @@ export const VideoCallAndroid: FC<AppStackScreenProps<"VideoCallAndroid">> = obs
     /**
      * Calling Stuff Ends
      */
-    console.log("localStream.toURL()", localStream.toURL())
     return (
       <ScrollView style={styles.root}>
         <View style={$localVideoContainer}>

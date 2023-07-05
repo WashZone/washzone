@@ -7,7 +7,6 @@ import {
   ViewStyle,
   Pressable,
   ActivityIndicator,
-  TouchableOpacity,
 } from "react-native"
 import {
   Icon,
@@ -33,30 +32,36 @@ import { HomeTabParamList } from "../../../tabs"
 import DraggableFlatList, { ScaleDecorator } from "react-native-draggable-flatlist"
 import { $contentCenter, $flexRow } from "../../styles"
 import { getTaggedIds } from "../../../utils/helpers"
+import Toast from "react-native-toast-message"
 
 export const CreatePost = observer(function CreatePost({
   progress,
   focused,
+  setLoading,
+  loading,
+  hideModal
 }: {
   focused: boolean
+  loading: boolean
   progress: SharedValue<number>
+  setLoading: (b: boolean) => void
+  hideModal : () => void
 }) {
   const { createPost } = useHooks()
   const { userStore } = useStores()
   const [postContent, setPostContent] = useState<string>("")
-  const [isPosting, setIsPosting] = useState<boolean>(false)
   const [uploadProgress, setUploadProgress] = useState<string>("0/0")
   const inputRef = useRef<TextInput>()
   const [selectedImages, setSelectedImages] = useState<Array<any>>([])
   const navigation = useNavigation<NavigationProp<HomeTabParamList>>()
 
   useEffect(() => {
-    console.log("FOCUSING createPost : ", focused)
     focused && inputRef.current.focus()
   }, [focused])
 
   const onPost = async () => {
-    setIsPosting(true)
+
+    setLoading(true)
     try {
       await createPost({
         tagUser: getTaggedIds(postContent),
@@ -67,11 +72,13 @@ export const CreatePost = observer(function CreatePost({
     } catch (error) {
       console.log("Create Post", error)
     } finally {
-      setIsPosting(false)
+      setLoading(false)
       progress.value = withTiming(0, { duration: 400 })
       setSelectedImages([])
       setPostContent("")
       inputRef.current.blur()
+      Toast.show({text1:'Posted Successfully !'})
+      hideModal()
     }
   }
 
@@ -91,7 +98,6 @@ export const CreatePost = observer(function CreatePost({
   const onGalleryPress = async () => {
     try {
       const images = await MediaPicker({ selectionLimit: 5 })
-      console.log(images)
       if (images?.length > 0) {
         setSelectedImages(images)
         setTimeout(() => {
@@ -190,17 +196,14 @@ export const CreatePost = observer(function CreatePost({
     <View
     >
       <View style={$container}>
-       
-          <FastImage source={{ uri: userStore?.picture }} style={$picture} resizeMode="cover" />
-        
+        <FastImage source={{ uri: userStore?.picture }} style={$picture} resizeMode="cover" />
         <View style={$contentContainer}>
           <TagInput
             value={postContent}
-            onChange={setPostContent}
+            onChange={(e) => { if (!loading) { setPostContent(e) } }}
             inputRef={inputRef}
             onFocus={onFocus}
             onBlur={() => {
-              console.log("BLURRING")
               if (focused) navigation.setParams({ focused: false })
             }}
             containerStyle={$inputContainer}
@@ -208,10 +211,8 @@ export const CreatePost = observer(function CreatePost({
             multiline
             placeholder="What's on your mind?"
             placeholderTextColor={colors.palette.neutral700}
-            additionalPartTypes={{ isBottomMentionSuggestionsRender: true, trigger: "@" }}
             // eslint-disable-next-line react-native/no-inline-styles
-            suggestionsContainerStyle={{ top: 70 }}
-            portalized
+            suggestionsContainerStyle={{ bottom: 70 }}
           />
         </View>
       </View>
@@ -231,9 +232,9 @@ export const CreatePost = observer(function CreatePost({
           }
           renderItem={({ item, drag, isActive }) => (
             <ScaleDecorator >
-              <Pressable onLongPress={drag} disabled={isActive} 
-              // eslint-disable-next-line react-native/no-inline-styles
-              style={{ width: 120, marginVertical: spacing.extraSmall }} >
+              <Pressable onLongPress={drag} disabled={isActive}
+                // eslint-disable-next-line react-native/no-inline-styles
+                style={{ width: 120, marginVertical: spacing.extraSmall }} >
                 <Animated.View style={animatedPreviewContainer(item)}>
                   <FastImage source={{ uri: item?.uri }} style={previewImage(item)} />
                 </Animated.View>
@@ -260,8 +261,8 @@ export const CreatePost = observer(function CreatePost({
               )}
             </Pressable>
           </View>
-          <AnimatedPressable disabled={isPosting} onPress={onPost} style={animatedPostButton}>
-            {isPosting ? (
+          <AnimatedPressable disabled={loading} onPress={onPost} style={animatedPostButton}>
+            {loading ? (
               <View style={$flexRow}>
                 {selectedImages?.length > 0 && (
                   <Text

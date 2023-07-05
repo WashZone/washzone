@@ -27,16 +27,14 @@ export const ForgotPassword: FC<AppStackScreenProps<"ForgotPassword">> = functio
       return
     }
     try {
-      console.log("email", email)
-      const res = await mutateSendOtpOnEmailByEmail({
+
+       await mutateSendOtpOnEmailByEmail({
         email,
       })
-      console.log(res)
       setButtonLoading(false)
       navigation.navigate("VerifyOTP", { email })
       setEmail("")
     } catch (e) {
-      console.log("erroer", e)
       Alert.alert("Email Not Found!")
       setButtonLoading(false)
     }

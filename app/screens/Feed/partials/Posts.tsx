@@ -28,6 +28,7 @@ import NativeAdView from "../../../utils/NativeAd"
 import { defaultImages, messageMetadataType } from "../../../utils"
 import { ImageViewConfigType } from ".."
 import { TouchableOpacity } from "react-native-gesture-handler"
+import LinearGradient from "react-native-linear-gradient"
 
 export interface PostComponentProps {
   post: any
@@ -77,12 +78,9 @@ const Actions = observer(function ActionButtons({
         }
       },
     })
-
-    console.log("FLAGGING POST : ", item?._id)
   }
 
   useEffect(() => {
-    console.log("CHANGING DYANMIC DATA")
     setDynamicData({
       interaction: item?.interaction,
       dislikeviews: item?.dislikeviews,
@@ -167,6 +165,23 @@ const Actions = observer(function ActionButtons({
   )
 })
 
+
+const CourouselItem = ({ item, index, onAttachmentsPress }) => {
+  const [isLoaded, setLoaded] = useState(false)
+  return (
+    <Pressable key={index} onPress={onAttachmentsPress}>
+      <ShimmerPlaceHolder visible={isLoaded} shimmerStyle={$carouselItem} LinearGradient={LinearGradient}>
+        <FastImage
+          onLoadEnd={() => { setLoaded(true); }}
+          source={{ uri: item }}
+          style={$carouselItem}
+          resizeMode="contain"
+        />
+      </ShimmerPlaceHolder>
+      {/* <FastImage source={{ uri: item.imgUrl }} resizeMode={"cover"} style={{ width: SCREEN_WIDTH, height: 240 }} /> */}
+    </Pressable>
+  )
+}
 export const PostComponent = ({
   post,
   navigateOnPress,
@@ -222,23 +237,7 @@ export const PostComponent = ({
     }
   }, [])
 
-  const CourouselItem = ({ item, index }) => {
-    const [loaded, setLoaded] = useState(true)
-    console.log("CourouselItem : ITEM", item)
-    return (
-      <Pressable key={index} onPress={onAttachmentsPress}>
-        <ShimmerPlaceHolder visible={loaded} shimmerStyle={$carouselItem}>
-          <FastImage
-            onLoadEnd={() => setLoaded(true)}
-            source={{ uri: item }}
-            style={$carouselItem}
-            resizeMode="contain"
-          />
-        </ShimmerPlaceHolder>
-        {/* <FastImage source={{ uri: item.imgUrl }} resizeMode={"cover"} style={{ width: SCREEN_WIDTH, height: 240 }} /> */}
-      </Pressable>
-    )
-  }
+
 
   return (
     <>
@@ -279,7 +278,7 @@ export const PostComponent = ({
             onPress={() => setTempNumberOfLines(undefined)}
           />
         )}
-        <View style={{backgroundColor: colors.palette.overlayNeutral50}}>
+        <View style={{ backgroundColor: colors.palette.overlayNeutral50 }}>
           <Carousel
             pagingEnabled
             pinchGestureEnabled
@@ -289,7 +288,7 @@ export const PostComponent = ({
             // autoplay={true}
             layout={"default"}
             // loop={true}
-            renderItem={({ item, index }) => <CourouselItem item={item} index={index} />}
+            renderItem={({ item, index }) => <CourouselItem onAttachmentsPress={onAttachmentsPress} item={item} index={index} />}
             onSnapToItem={(ind) => setCurrentIndex(ind)}
             //  loopClonesPerSide={bannersDataLength}
             sliderWidth={SCREEN_WIDTH}
@@ -300,9 +299,6 @@ export const PostComponent = ({
             activeDotIndex={currentIndex}
             dotsLength={postDetails.attachmentUrl.length}
             renderDots={(activeIndex, total) => {
-              console.log("activeIndex", activeIndex)
-              console.log("total", total)
-
               return (
                 <View
                   style={[

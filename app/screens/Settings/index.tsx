@@ -24,7 +24,6 @@ export const Settings: FC<AppStackScreenProps<"Settings">> = observer(function S
 
   const syncStatus = async () => {
     const res = await getUserById(_id)
-    console.log("notificationStatus", res?.notificationStatus)
     setStatus(res?.notificationStatus)
   }
 

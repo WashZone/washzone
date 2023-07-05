@@ -37,7 +37,6 @@ export const Search: FC<AppStackScreenProps<"Search">> = observer(function Searc
   useEffect(
     () =>
       debounce(() => {
-        console.log("IS EMPTY", isEmpty)
         if (isEmpty() && searchKey !== "") setNotResultsFound(true)
         else {
           setNotResultsFound(false)
@@ -45,7 +44,6 @@ export const Search: FC<AppStackScreenProps<"Search">> = observer(function Searc
       }, 600),
     [isEmpty()],
   )
-  console.log("search Reults", searchResults)
 
   const onSearch = async () => {
     if (searchKey.length > 2) {

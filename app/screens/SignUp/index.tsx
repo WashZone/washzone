@@ -98,7 +98,6 @@ export const SignupScreen: FC<SignupProps> = observer(function LoginScreen(_prop
         setAuthToken(token.toString())
         setLoading(false)
       } catch (err) {
-        console.log("SIGN UP ERROR", err)
         Toast.show({
           type: "error",
           text1: err?.response?.errors?.length > 0 && err?.response?.errors[0].message,

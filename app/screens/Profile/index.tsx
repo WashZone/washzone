@@ -69,7 +69,6 @@ const renderTabBar = (
       indicatorStyle={$indicator}
       scrollEnabled
       renderTabBarItem={(props) => {
-        console.log("props render tab abr", props)
         return (
           <TouchableOpacity
             onPress={() => {
@@ -154,7 +153,6 @@ const Options = ({ user, reportUser }) => {
             `${user?.first_name} is now blocked and won't be able to now interact.`,
           )
         } catch (err) {
-          console.log("ERRRR", err)
           Toast.show({ text1: JSON.stringify(err?.response?.errors?.[0]?.message) })
         }
       },
@@ -274,7 +272,6 @@ const ProfileHeader = ({ user, isUser, onMessage }) => {
 
   const syncProfile = async () => {
     const resProfile = await getProfileDetails(user?._id)
-    console.log("syncProfile : resProfile", resProfile)
     setProfileDetails({ ...resProfile })
   }
 
@@ -317,9 +314,7 @@ const ProfileHeader = ({ user, isUser, onMessage }) => {
   }
 
   const onTextLayout = useCallback((e) => {
-    console.log("onTextLayout :  descriptionLineCount", descriptionLineCount)
     if (descriptionLineCount === undefined) {
-      console.log("e.nativeEvent.lines.length ", e.nativeEvent.lines.length)
       setDescriptionLineCount(e.nativeEvent.lines.length)
     }
   }, [])

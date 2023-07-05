@@ -78,7 +78,6 @@ export const Playlist: FC<VideosTabProps<"Playlist">> = observer(function Playli
 
   const syncPlaylistData = async () => {
     const res = await getPlaylist(playlistId)
-    console.log("PLAYLISYT DATA", res)
     setPlaylistData(res)
     setLoading(false)
   }

@@ -53,7 +53,6 @@ export function useHooks() {
       queryGetAllSavedByUserId,
       mutateGetClassifiedById,
       mutateUpdateDeletesavedclassified,
-      queryGetAllStory,
       mutateSaveLikedVideo,
       queryGetTopicByUsersId,
       mutateGetClassifiedByUserId,
@@ -110,7 +109,6 @@ export function useHooks() {
 
   const syncUser = async () => {
     const res = await getUserById(userStore?._id)
-    console.log("NEW BLOCKED USERS", res?.blockedUser)
     userStore?.setUser({
       ...userStore,
       picture: res?.picture,
@@ -119,7 +117,6 @@ export function useHooks() {
   }
 
   const resetPassword = async ({ email, otp, password }) => {
-    console.log("password", password, email, otp)
     const res = await mutateVerifyEmailByEmail({ email, otp, password })
     return res.verifyEmailByEmail?.Succes
   }
@@ -130,7 +127,6 @@ export function useHooks() {
       { pageNumber: parseInt((homeFeed.length / 10 + 1).toFixed(0)), userId: userStore._id },
       { fetchPolicy: "network-only" },
     )
-    console.log("MORE POSTS", res.getAllHomePagesByPageNumber)
     const morePosts = res.getAllHomePagesByPageNumber?.data
     if (res.getAllHomePagesByPageNumber.totalCount > homeFeed?.length) {
       addToHomeFeed(morePosts)
@@ -151,7 +147,6 @@ export function useHooks() {
         { pageNumber: 1, userId: userStore._id },
         { fetchPolicy: "no-cache" },
       )
-      console.log("HOME FEED", res.getAllHomePagesByPageNumber)
       setHomeFeed(res.getAllHomePagesByPageNumber?.data)
       // syncInteractedVideosAndTopics()
     } catch (err) {
@@ -180,7 +175,6 @@ export function useHooks() {
   }
 
   const loadMoreTopics = async () => {
-    console.log("LOAD MORE TOPICS")
     const res = await queryGetAllTopicByPageNumberInteraction(
       { userId: userStore._id, pageNumber: parseInt((topics.length / 10 + 1).toFixed(0)) },
       { fetchPolicy: "no-cache" },
@@ -199,9 +193,7 @@ export function useHooks() {
         { userId: userStore._id, pageNumber: 1 },
         { fetchPolicy: "no-cache" },
       )
-      console.log("DATA:queryGetAllTopicByPageNumber", JSON.stringify(res))
       setTopics(res.getAllTopicByPageNumberInteraction?.data)
-      console.log("TOPICS TOPICS FROM DB", res.getAllTopicByPageNumberInteraction?.data)
       // await syncInteractedVideosAndTopics()
     } catch (err) {
       console.log(err)
@@ -249,7 +241,7 @@ export function useHooks() {
     }
     const taggedHomeComment = getTaggedIds(comment)
 
-    const res = await mutateCommentOnHomepage({
+    await mutateCommentOnHomepage({
       userId: userStore._id,
       acttachmentUrl: imageUrl,
       acttachmentType: "image",
@@ -259,7 +251,6 @@ export function useHooks() {
         return { taghomecommentId: i }
       }),
     })
-    console.log("postCommentOnHomePagePost", res)
   }
 
   const getCommentsOnPost = async (topicId: string) => {
@@ -270,7 +261,6 @@ export function useHooks() {
 
   const getCommentsOnHomePagePost = async (homePageId: string) => {
     const res = await queryGetCommentsByHomePageId({ homePageId }, { fetchPolicy: "network-only" })
-    console.log("getCommentsOnHomePagePost", res.getCommentsByHomePageId[0])
     return res.getCommentsByHomePageId.length === 1 && res.getCommentsByHomePageId[0]?.comments
   }
 
@@ -285,7 +275,7 @@ export function useHooks() {
       : undefined
 
     try {
-      const res = await mutateCreateUserTopic({
+      await mutateCreateUserTopic({
         tagTopicUser,
         attachmentUrl: imageUrl,
         attachmentType: attachment?.type || "",
@@ -293,7 +283,6 @@ export function useHooks() {
         userId: userStore._id,
         title,
       })
-      console.log("RES CREATE TOPIC", res)
     } catch (err) {
       Alert.alert(err)
     }
@@ -307,7 +296,6 @@ export function useHooks() {
       },
       { fetchPolicy: "no-cache" },
     )
-    console.log("res:getProfileDetails  :", res.followerDetailsByCallerId)
     return res.followerDetailsByCallerId
   }
 
@@ -318,7 +306,6 @@ export function useHooks() {
       },
       { fetchPolicy: "no-cache" },
     )
-    console.log("res:getProfileDetails  :", res.getfollower)
     return res.getfollower
   }
 
@@ -329,25 +316,21 @@ export function useHooks() {
       },
       { fetchPolicy: "no-cache" },
     )
-    console.log("res:getProfileDetails  :", res.getfollowing)
     return res.getfollowing
   }
 
   const getLikesOnPost = async (homePageId: string) => {
     const res = await queryGetuserLikesonhome({ homePageId }, { fetchPolicy: "no-cache" })
-    console.log("getLikesOnPost", res.getuserLikesonhome)
     return res.getuserLikesonhome
   }
 
   const getLikesOnDiscussion = async (topicId: string) => {
     const res = await queryGetuserLikesonTopic({ topicId }, { fetchPolicy: "no-cache" })
-    console.log("getLikesOnDiscussionHOOK", JSON.stringify(res.getuserLikesonTopic))
     return res.getuserLikesonTopic
   }
 
   const getLikesOnVideo = async (videoId: string) => {
     const res = await queryGetuserLikesonVideo({ videoId }, { fetchPolicy: "no-cache" })
-    console.log("getLikesOnPost", res.getuserLikesonVideo)
     return res.getuserLikesonVideo
   }
 
@@ -388,7 +371,6 @@ export function useHooks() {
         discription: content,
       })
     } catch (err) {
-      console.log("mutateCreateUserHomePagesERrr", err)
       Alert.alert("Something Went Wrong!")
     }
     refreshHomeFeed()
@@ -418,7 +400,7 @@ export function useHooks() {
             type: banner?.type,
             name: banner?.fileName,
           })
-      const res = await mutateUpdateUser({
+      await mutateUpdateUser({
         user: {
           first_name: firstName,
           last_name: lastName,
@@ -429,7 +411,6 @@ export function useHooks() {
         },
         userId: userStore._id,
       })
-      console.log("UPDATE USER MUTATION", res)
       userStore.setUser({
         ...userStore,
         first_name: firstName,
@@ -448,7 +429,6 @@ export function useHooks() {
   const getMoreChatMessages = async ({ roomId }) => {
     const prePage = parseInt((chatMessages[roomId]?.length / 20).toFixed(0))
     const res = await mutateGetchatByRoomId({ roomId, pageNumber: prePage + 1 })
-    console.log("ROOM MESSAGES", res.getchatByRoomId)
     mergeChatPage({ roomId, messages: res.getchatByRoomId?.data, previousPage: prePage })
     if (res.getchatByRoomId?.data?.length < 20) {
       return { lastPage: true }
@@ -462,8 +442,6 @@ export function useHooks() {
         { userId: userStore?._id },
         { fetchPolicy: "no-cache" },
       )
-
-      console.log("ALL SAVED INTERACTIONS", JSON.stringify(res))
       const savedVideoIds: Array<string> = []
       const savedClassifiedIds: Array<string> = []
       // eslint-disable-next-line array-callback-return
@@ -475,7 +453,6 @@ export function useHooks() {
           savedVideoIds.push(item?.VideoDetail[0]?._id)
         }
       })
-      console.log("SAVED VIDEO IDSSS", savedVideoIds)
       syncSavedInteractions({
         savedClassifieds: [...savedClassifiedIds],
         savedVideos: [...savedVideoIds],
@@ -487,7 +464,6 @@ export function useHooks() {
 
   const interactWithSaveOnClassified = async (classifiedFeedId: string) => {
     const currentStatus = getInteractionOnClassified(classifiedFeedId)
-    console.log("CLASSIFIED:", classifiedFeedId, currentStatus)
     try {
       if (currentStatus === Interaction.notSaved) {
         await mutateSaveLikedClassifiedFeed({
@@ -514,7 +490,6 @@ export function useHooks() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
 
     const currentStatus = getSavedInteractionOnVideo(videoId)
-    console.log("SAVE VIDEO", videoId, "Current Status : ", currentStatus)
     try {
       if (currentStatus === Interaction.notSaved) {
         await mutateSaveLikedVideo({
@@ -565,12 +540,11 @@ export function useHooks() {
 
 
   const updateLastReadPost = async ({ lastReadPostId, followId }) => {
-    const res = await mutateUpdatelastreadPostId({
+    await mutateUpdatelastreadPostId({
       lastReadPostId,
       userId: userStore._id,
       followId,
     })
-    console.log("updateLastReadPost : RES ", res)
   }
 
   const refreshVideos = async () => {
@@ -615,11 +589,8 @@ export function useHooks() {
   }
 
   const getActivities = async () => {
-    console.log("CALLING GET ACTIVITIES : ")
-
     try {
       const res = await queryGetActivities({ userId: userStore?._id }, { fetchPolicy: "no-cache" })
-      console.log("RES GET ACTIVITIES : ", res.getActivities)
       setStories(res.getActivities)
     } catch (err) {
       console.log("ERROR GET ACTIVITIES : ", err)
@@ -881,7 +852,6 @@ export function useHooks() {
           ratingStar: rating,
         })
       } catch (err) {
-        console.log("mutateCreateUserRating :ERRRRRR", err)
       }
       const updatedRes = await queryGetratingOnUserId({ userId }, { fetchPolicy: "no-cache" })
       const avg =
@@ -890,19 +860,16 @@ export function useHooks() {
           : 0
       return { success: true, avg }
     } catch (err) {
-      console.log("ERRRRRR", err)
       return false
     }
   }
 
   const getRatingOnUser = async (userId: string) => {
-    console.log("userId : ", userId, userStore._id)
     try {
       const res = await queryCheckUserRating(
         { userId, ratingByUserId: userStore._id },
         { fetchPolicy: "no-cache" },
       )
-      console.log("res.res.checkUserRating", res.checkUserRating)
       return res.checkUserRating?.ratingStar
     } catch (err) {
       return 0
@@ -915,12 +882,10 @@ export function useHooks() {
   }
 
   const onLoggedInBoot = async () => {
-    console.log("RUNNING = onLoggedInBoot")
     subscribeAll()
     syncAllChats().then(() => syncUnreadCount())
     fetchNotifications()
     await syncSavedInteractionsHook()
-    // await syncInteractedVideosAndTopics()
     syncUser()
     refreshTopics()
     refreshClassifieds()
@@ -938,7 +903,6 @@ export function useHooks() {
   }
 
   const searchKeyword = async (searchKey: string) => {
-    console.log("SEARCHING", searchKey)
     try {
       const resTopics = await queryGetSearchedTopic(
         { searchKey, pageNumber: 1 },
@@ -1003,10 +967,8 @@ export function useHooks() {
   }
 
   const syncChatMessages = async (roomId: string) => {
-    console.log("RROM ORROMORMORMRO ID", roomId)
     try {
       const res = await mutateGetchatByRoomId({ roomId, pageNumber: 1 })
-      console.log("ROOM MESSAGES", res.getchatByRoomId)
       updateRoomMessages({ roomId, messages: res.getchatByRoomId?.data || [] })
       if (res.getchatByRoomId?.data?.length < 20) {
         return { lastPage: true }
@@ -1024,7 +986,7 @@ export function useHooks() {
         uri: attachment?.uri,
         type: attachment?.type,
       })
-      const res = await mutateCreateUserMessage({
+      await mutateCreateUserMessage({
         roomId,
         authorId: userStore._id,
         text: "",
@@ -1040,17 +1002,14 @@ export function useHooks() {
           data: "",
         },
       })
-      console.log("CREATED USER MESSAGE", res.createUserMessage)
     } catch (err) {
       Alert.alert("Unable to Send Attachment!")
     }
   }
 
   const sendTextMessage = async (roomId: string, text: string, receiverId: string) => {
-    console.log("userStore._id", userStore._id)
-    console.log("receiverId", userStore._id)
     try {
-      const res = await mutateCreateUserMessage({
+      await mutateCreateUserMessage({
         roomId,
         authorId: userStore._id,
         text,
@@ -1063,7 +1022,6 @@ export function useHooks() {
           data: "",
         },
       })
-      console.log("CREATED USER MESSAGE", res.createUserMessage)
     } catch (err) { }
   }
 
@@ -1083,7 +1041,7 @@ export function useHooks() {
       }
     }
     try {
-      const res = await mutateCreateUserMessage({
+      await mutateCreateUserMessage({
         roomId,
         authorId: userStore._id,
         text: text(),
@@ -1096,7 +1054,6 @@ export function useHooks() {
           data: JSON.stringify(shareOptions),
         },
       })
-      console.log("CREATED USER MESSAGE", res.createUserMessage)
     } catch (err) { }
   }
 
@@ -1106,11 +1063,8 @@ export function useHooks() {
     offer: string,
     mode: "video" | "audio",
   ) => {
-    console.log("userStore._id", userStore._id)
-    console.log("receiverId", receiverId)
-    console.log("offer", offer)
     try {
-      const res = await mutateCreateUserMessage({
+      await mutateCreateUserMessage({
         roomId,
         authorId: userStore._id,
         text: "Initiated Call !",
@@ -1126,14 +1080,12 @@ export function useHooks() {
           data: JSON.stringify(offer),
         },
       })
-      console.log("CREATED USER MESSAGE", res.createUserMessage)
     } catch (err) { }
   }
 
   const acceptCallOffer = async (roomId: string, receiverId: string, answer: string) => {
-    console.log("userStore._id", userStore._id)
     try {
-      const res = await mutateCreateUserMessage({
+      await mutateCreateUserMessage({
         roomId,
         authorId: userStore._id,
         text: "Accepted Call !",
@@ -1146,14 +1098,12 @@ export function useHooks() {
           data: JSON.stringify(answer),
         },
       })
-      console.log("CREATED USER MESSAGE", res.createUserMessage)
     } catch (err) { }
   }
 
   const hangUpCall = async (roomId: string, receiverId: string) => {
-    console.log("userStore._id", userStore._id)
     try {
-      const res = await mutateCreateUserMessage({
+      await mutateCreateUserMessage({
         roomId,
         authorId: userStore._id,
         text: "",
@@ -1166,15 +1116,12 @@ export function useHooks() {
           data: "",
         },
       })
-      console.log("CREATED USER MESSAGE", res.createUserMessage)
     } catch (err) { }
   }
 
   const getUserById = async (userId: string) => {
     try {
-      console.log("getUserById : ", userId)
       const res = await mutateGetUserById({ userId })
-      console.log("CONNECTED USER FOR ", userStore.name, res.getUserById)
       return res.getUserById
     } catch (err) {
       return undefined
@@ -1182,21 +1129,17 @@ export function useHooks() {
   }
 
   const getOrCreateRoom = async (receiverId: string) => {
-    console.log("RECEIVER", receiverId)
-    console.log("SENDER", userStore?._id)
     try {
       const resCreate = await mutateCreateChatRoom({
         membersId: [{ userId1: receiverId }, { userId1: userStore?._id }],
         adminId: receiverId,
       })
-      console.log("resCreate", resCreate.createChatRoom)
       return resCreate.createChatRoom?._id
     } catch (err) {
       try {
         const res = await mutateGetroomBymembers({
           members: [{ userId1: receiverId }, { userId1: userStore?._id }],
         })
-        console.log("ROOM FOUND", res.getroomBymembers)
 
         return res.getroomBymembers?.data[0]?._id
       } catch (err) { }
@@ -1209,10 +1152,9 @@ export function useHooks() {
     amount: string,
     classifiedData: any,
   ) => {
-    console.log("SEND CLASSIFIED OFFER , ", roomId, amount)
     const currency = "$"
     try {
-      const res = await mutateCreateUserMessage({
+      await mutateCreateUserMessage({
         roomId,
         authorId: userStore._id,
         text: `Offered ${currency + amount} on ${classifiedData?.title}`,
@@ -1225,12 +1167,10 @@ export function useHooks() {
           data: JSON.stringify(classifiedData),
         },
       })
-      console.log("CREATED USER MESSAGE", res.createUserMessage)
     } catch (err) { }
   }
 
   const deleteChatRoom = async (roomId: string) => {
-    console.log("Delete Chat Room ", roomId)
     try {
       await mutateDeleteChatRoom({
         roomId,
@@ -1242,11 +1182,10 @@ export function useHooks() {
   const updateNotificationToken = async () => {
     try {
       const token = await messaging().getToken()
-      const res = await mutateAddNotificationToken({
+      await mutateAddNotificationToken({
         userId: userStore._id,
         notificationToken: token,
       })
-      console.log("mutateAddNotificationToken", res)
     } catch (err) {
       console.log("ERR:mutateAddNotificationToken", err)
     }
@@ -1268,12 +1207,9 @@ export function useHooks() {
       secretKey: "j+ANlfn9p1CkWfG5oEGQLyBf8mxKMCzdbf9BWah6",
       successActionStatus: 201,
     }
-    console.log("FILE", file)
     file = { ...file, name: file.name + Date.now().toString() }
     try {
-      console.log("UPLOADING")
       const response = await RNS3.put(file, options).progress((e) => console.log("PRGORESS", e))
-      console.log("UPLOADED")
       if (response.status === 201) {
         return response.body?.postResponse?.location
       } else {
@@ -1304,14 +1240,13 @@ export function useHooks() {
     data: { offer?: string; answer?: string },
     setter?: boolean,
   ) => {
-    const resAddConnectionData = await mutateAddOfferanswerInRoom({ ...data, roomId })
-    console.log("resAddConnectionData", resAddConnectionData)
+    await mutateAddOfferanswerInRoom({ ...data, roomId })
     const { _id, name } = userStore
 
     // we have to send a setter alert and then a actualy display alert
     // as we send the alert twice we need a way to identify each, we will do that via a type key in receiver
     // (Why Receiver? cuz rn, i am using Stringified JSON in receiver field and that being so, i can add remove feilds as per i see fit)
-    const res = await mutateSendCallNotification({
+    await mutateSendCallNotification({
       data: {
         roomId,
         type,
@@ -1319,13 +1254,11 @@ export function useHooks() {
       },
       notificationToken: token,
     })
-    console.log("mutateSendCallNotification", res)
   }
 
   const getRoomById = async (roomId: string) => {
     try {
       const res = await mutateGetroomByroomId({ roomId })
-      console.log("RES::getRoomById", res.getroomByroomId?.data[0])
       return res.getroomByroomId?.data[0]
     } catch (err) {
       Alert.alert("Unable to Establish Connection!", "Please try again.")
@@ -1338,10 +1271,8 @@ export function useHooks() {
         { reciverId: userStore._id },
         { fetchPolicy: "no-cache" },
       )
-      console.log("RES NOTIFICATIONS : ", JSON.stringify(res))
       setNotifications(res.getNotification)
     } catch (err) {
-      console.log("res.getNotificationERR", err)
       Alert.alert(
         "Something doesnt look right.",
         "Please hold or try again later. Sorry for the trouble.",
@@ -1351,7 +1282,6 @@ export function useHooks() {
 
   const getVideosCategorically = async () => {
     const res = await queryGetAllPlaylistVideo()
-    console.log(res)
     return res.getAllPlaylistVideo
   }
 

@@ -27,7 +27,6 @@ export const RateUserModal = ({
   const syncRating = async () => {
     setLoading(true)
     const res = await getRatingOnUser(userId)
-    console.log("syncRating", res)
     setRating(res)
     setLoading(false)
   }

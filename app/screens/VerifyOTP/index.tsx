@@ -46,7 +46,6 @@ export const VerifyOTP: FC<AppStackScreenProps<"VerifyOTP">> = function VerifyOT
       }
     } catch (e) {
       Alert.alert('Something Went Wrong!')
-      console.log("erroer", e)
       setButtonLoading(false)
     }
   }

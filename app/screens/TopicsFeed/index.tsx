@@ -47,7 +47,6 @@ const Actions = observer(function ActionButtons({
   } = useStores()
 
   useEffect(() => {
-    console.log("CHANGING DYANMIC DATA")
     setDynamicData({
       interaction: item?.interaction,
       dislikeviews: item?.dislikeviews,

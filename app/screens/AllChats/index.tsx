@@ -24,13 +24,11 @@ export const AllChats: FC<AppStackScreenProps<"AllChats">> = observer(function A
   const { deleteChatRoom, syncAllChats } = useHooks()
 
   const onLongPress = (id: string) => {
-    console.log("ID", id)
     setSelectedRoomId(id)
     setOptionsModalVisible(true)
   }
 
   const onDelete = () => {
-    console.log("selectedRoomId:onDelete", selectedRoomId)
     deleteChatRoom(selectedRoomId)
     setOptionsModalVisible(false)
   }

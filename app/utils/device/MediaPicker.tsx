@@ -50,9 +50,7 @@ export const MediaPicker = async (props?: { selectionLimit?: number }) => {
     options,
     (response: { didCancel: any; errorMessage: any; assets: any[] }) => {
       if (response.errorMessage) return undefined
-      if (response.didCancel) {
-      } else if (response?.errorMessage) {
-      } else if (response?.assets) {
+      if (!response.didCancel && !response?.errorMessage && response?.assets) {
         image = props?.selectionLimit ? response?.assets : response?.assets?.[0]
       }
     },

@@ -8,7 +8,6 @@ import ImageView from "react-native-fast-image-viewing"
 
 import { ImageSource } from "react-native-image-viewing/dist/@types"
 import Animated, { interpolate, useAnimatedStyle, useSharedValue } from "react-native-reanimated"
-import { Host } from "react-native-portalize"
 
 export interface ImageViewConfigType {
   images: ImageSource[]
@@ -22,14 +21,10 @@ export const Feed: FC<HomeTabProps<"Feed">> = function Home(props) {
     currentIndex: 0,
     show: false,
   })
-  const progress = useSharedValue(0)
-
-  console.log("imageViewConfig : ", imageViewConfig)
-
  
   return (
     <Screen preset="fixed" keyboardOffset={-180} contentContainerStyle={$container}>
-      <Host>
+
         {/* <Animated.View style={animatedMediaContainer} /> */}
         <Posts setImageViewConfig={setImageViewConfig} />
         <ImageView
@@ -39,7 +34,6 @@ export const Feed: FC<HomeTabProps<"Feed">> = function Home(props) {
           onRequestClose={() => setImageViewConfig({ ...imageViewConfig, show: false })}
         />
         {/* <CreatePost progress={progress} focused={props?.route.params?.focused} /> */}
-      </Host>
     </Screen>
   )
 }

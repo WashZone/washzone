@@ -119,6 +119,8 @@ const $defaultSuggestionContainerStyle: ViewStyle = {
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
     zIndex: 99999,
+    shadowColor:colors.palette.neutral900,
+    shadowRadius:10, 
 }
 
 const $picture: ImageStyle = {

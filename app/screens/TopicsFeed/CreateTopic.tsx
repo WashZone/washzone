@@ -24,26 +24,32 @@ import Toast from "react-native-toast-message"
 import { toastMessages } from "../../utils/toastMessages"
 import { observer } from "mobx-react-lite"
 
-export const CreateTopic = observer(function CreateTopic({ progress }: { progress: SharedValue<number> }) {
+export const CreateTopic = observer(function CreateTopic({
+  progress, loading, setLoading, hideModal
+}: {
+  progress: SharedValue<number>
+  loading: boolean
+  setLoading: (b: boolean) => void
+  hideModal : () => void
+}) {
   const { userStore } = useStores()
   const [topicDescription, setTopicDescription] = useState<string>("")
   const [topicTitle, setTopicTitle] = useState<string>("")
-  const [isPosting, setIsPosting] = useState<boolean>(false)
   const inputRef = useRef<TextInput>()
   const inputTitleRef = useRef<TextInput>()
   const [selectedImage, setSelectedImage] = useState<any>({ height: 1, width: 1 })
   const { createTopic, refreshTopics } = useHooks()
 
   const onPost = async () => {
-    setIsPosting(true)
+    setLoading(true)
     if (topicTitle.replace(/\s/g, "")?.length === 0) {
       Toast.show(toastMessages.inputTitle)
-      setIsPosting(false)
+      setLoading(false)
       return
     }
     if (topicDescription.replace(/\s/g, "")?.length === 0) {
       Toast.show(toastMessages.inputDescription)
-      setIsPosting(false)
+      setLoading(false)
       return
     }
     try {
@@ -60,9 +66,11 @@ export const CreateTopic = observer(function CreateTopic({ progress }: { progres
       inputTitleRef.current.clear()
       inputTitleRef.current.blur()
       inputRef.current.blur()
-      setIsPosting(false)
+      setLoading(false)
       progress.value = withTiming(0, { duration: 400 })
       setSelectedImage({ height: 1, windth: 1 })
+      Toast.show({ text1: 'Posted !', text2: 'Your discussion was successfully posted!' })
+      hideModal()
     }
   }
 
@@ -217,8 +225,8 @@ export const CreateTopic = observer(function CreateTopic({ progress }: { progres
               )}
             </Pressable>
           </View>
-          <AnimatedPressable disabled={isPosting} onPress={onPost} style={animatedPostButton}>
-            {isPosting ? (
+          <AnimatedPressable disabled={loading} onPress={onPost} style={animatedPostButton}>
+            {loading ? (
               <ActivityIndicator
                 color={colors.palette.neutral100}
                 style={$loadingIndicator}

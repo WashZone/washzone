@@ -14,7 +14,6 @@ import { formatName } from "../../utils/formatName"
 export const FollowerFollowing: FC<HomeTabProps<"FollowerFollowing">> = observer(
   function FollowerFollowing(props) {
     const { initialTab, user } = props.route.params
-    console.log("USER FollowerFollowing", user)
     const navigation = useNavigation()
     const [index, setIndex] = React.useState(initialTab === "followers" ? 0 : 1)
     const [routes] = React.useState([

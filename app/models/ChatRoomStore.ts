@@ -21,7 +21,6 @@ export const ChatRoomStoreModel = types
       return res
     },
     setChatRooms(chatRooms: any) {
-      console.log("NEW CHAT ROOMS", JSON.stringify(chatRooms))
       self.allChatRooms = [...chatRooms]
       this.syncLastReadOnRooms()
     },
@@ -48,54 +47,36 @@ export const ChatRoomStoreModel = types
     },
     async mergeChatPage(props: { roomId: string; messages: any; previousPage: number }) {
       // if (self.chatMessages[props.roomId] !== undefined) {
-      console.log("ADDING to room", props?.messages.length, props)
       const temp = { ...self.chatMessages }
-      console.log("PASTMESSAGES", self.chatMessages)
-      console.log(
-        "PASTMESSAGES",
-        temp[props.roomId].slice(0, props.previousPage * 20 + 1).length,
-        temp[props.roomId].slice(0, props.previousPage * 20 + 1),
-      )
+
       temp[props.roomId] = [
         ...temp[props.roomId].slice(0, props.previousPage * 20 + 1),
         ...props.messages,
       ]
-      console.log("NEWMESSAGES", temp[props.roomId].length, temp[props.roomId])
-      console.log()
+ 
       self.setProp("chatMessages", temp)
       // }
     },
     getUnreadCount() {
       const rooms = { ...self.rooms }
       let count = 0
-      console.log("ROOMSSSSSS, rooms", rooms)
       Object.keys(rooms).forEach((key) => {
         const latestMessage = this.getLatestMessageForRoom(key)
-        console.log("LATEST MESSAGE : getUnreadCount ",JSON.stringify(latestMessage))
-        console.log("LATEST MESSAGE ID :", latestMessage.id, rooms[key])
         if (latestMessage.id !== rooms[key] && !latestMessage.isEmpty && latestMessage.authorId !== self.myUserId) count++
       })
-      console.log("UNREAD COUNT", count)
       return count
     },
     setLastReadId(roomId: string, latestMessageId: string) {
       const rooms = { ...self.rooms }
-      console.log("roomId:roomId:setLastReadId", roomId, latestMessageId)
       rooms[roomId] = latestMessageId
       self.rooms = rooms
       this.syncUnreadCount()
-      console.log("rooomsghjgkjhg", self.rooms)
-      console.log("rooomsghjgkjhg", self.rooms)
     },
     async addToMessages(props: { roomId: string; message: any }) {
-      console.log("ADDING to room:self.chatMessages", self.chatMessages)
-      console.log("self.chatMessages[props.roomId]", self.chatMessages[props.roomId])
       // if (self.chatMessages[props.roomId].length > 0) {
-      console.log("ADDING to room", props)
       const temp = { ...self.chatMessages }
       temp[props.roomId] = [props.message, ...(self.chatMessages?.[props.roomId] || [])]
       self.setProp("chatMessages", temp)
-      console.log("ADDED TO MESSAGES SUCCESSFULLY")
       this.syncUnreadCount()
     },
     syncLastReadOnRooms() {
@@ -107,7 +88,6 @@ export const ChatRoomStoreModel = types
       this.syncUnreadCount()
     },
     syncUnreadCount() {
-      console.log("SYNCING UNREAD COUNT")
       const count = this.getUnreadCount()
       self.setProp("unreadCount", count)
     },
@@ -131,7 +111,6 @@ export const ChatRoomStoreModel = types
         isEmpty: room?.latestMessage?.membersId?.length === 0,
         authorId: room?.latestMessage?.authorId
       }
-      console.log('getLatestMessageForRoom : ', room)
 
       // If we have never opened the room, then just return the latest message from the Room Object
       if (!(self.chatMessages[roomId]?.length > 0)) return latestMessageFromRoomObject

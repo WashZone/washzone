@@ -28,7 +28,6 @@ const BottomActions = ({
   type: "video" | "classified"
   refreshSavedClassifieds: () => void
 }) => {
-  console.log("DATADATA SAVED", JSON.stringify(data))
   const { interactWithSaveOnClassified, interactWithSaveOnVideo } = useHooks()
   const {
     share: { share },

@@ -42,11 +42,11 @@ export function DrawerNavigator() {
   const toggleDrawer = () => {
     if (!drawerRef.current.state.drawerOpened) {
       Keyboard.dismiss()
-      console.log("OPENING,")
+   
       drawerRef.current?.openDrawer({ speed: 2 })
       // setOpen(true)
     } else {
-      console.log("CLOSING,")
+
       drawerRef.current?.closeDrawer({ speed: 10 })
       // setOpen(false)
     }

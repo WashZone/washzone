@@ -45,10 +45,8 @@ const PublisherDetails = ({ publisher, price }: { publisher: any; price: string 
   const { rateUser } = useHooks()
 
   const navigation = useNavigation<NavigationProp<HomeTabParamList>>()
-  console.log("PUBLISHER RATING", publisher)
 
   const onRateUser = async (rating: number) => {
-    console.log("RATING USER")
     const res = await rateUser(publisher?._id, rating)
     if (res) {
       setRateUserModalVisible(false)
@@ -136,7 +134,6 @@ const BottomActions = ({ classified }: { classified: any }) => {
   const {
     userStore: { _id },
   } = useStores()
-  console.log("SEND OFFER VISIBLE", _id, classified?.userId?._id)
 
   const bottomOptions: Array<ActionProps> = [
     {
@@ -203,7 +200,6 @@ const BottomActions = ({ classified }: { classified: any }) => {
 export const ClassifiedsDetails: FC<ClassifiedsTabProps<"ClassifiedsDetails">> = observer(
   function ClassifiedsDetails(props) {
     const classified = props.route.params.classified
-    console.log("ClassifiedsDetails", JSON.stringify(classified))
     const navigation = useNavigation()
     const [classifiedDetails, setClassifiedDetails] = useState<any>(classified)
     const [loading, setLoading] = useState<boolean>(typeof classified === "string")
@@ -250,7 +246,6 @@ export const ClassifiedsDetails: FC<ClassifiedsTabProps<"ClassifiedsDetails">> =
         },
       })
 
-      console.log("FLAGGING CALSSIFIED : ", classifiedDetails?._id)
     }
 
     if (loading) {

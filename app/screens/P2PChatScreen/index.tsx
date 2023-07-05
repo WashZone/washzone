@@ -44,7 +44,6 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
     userStore,
     allChats: { getRoomMessages, setLastReadId, getRoomDetails },
   } = useStores()
-  console.log("GETROOMDETALIS< ", getRoomDetails(roomId))
   const { syncChatMessages, sendTextMessage, getMoreChatMessages, sendAttachment } = useHooks()
   // const [optionsModalVisible, setOptionsModalVisible] = useState(false)
   const [isLastPage, setIsLastPage] = useState(false)
@@ -53,7 +52,6 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
   const [syncing, setSyncing] = useState(true)
   const [isAttachmentUploading, setIsAttachmentUploading] = useState(false)
   const allMessages = getRoomMessages({ roomId })
-  console.log('allMessages', allMessages)
   // const [selectedMessage, setSelectedMessage] = useState<any>({ type: "unsupported" })
   const user = {
     id: userStore._id,
@@ -115,7 +113,6 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
   const onChatEndReached = async () => {
     setLoadingMore(true)
     if (!isLastPage && !sending && !syncing) {
-      console.log("END REACHD")
       const res = await getMoreChatMessages({ roomId })
       setIsLastPage(res.lastPage)
     }
@@ -128,7 +125,6 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
     nextMessageInGroup: boolean
   }) => {
     const { child, message, nextMessageInGroup } = payload
-    console.log("nextMessageInGroup", nextMessageInGroup)
 
     const isAuthorMe = message?.author?.id === userStore._id
     const isImage = message?.type === "image"
@@ -181,7 +177,6 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
   }
 
   const renderImageMessage = (message: MessageType.Image, messageWidth: number) => {
-    console.log("renderImageMessage", JSON.stringify(message), messageWidth)
     const [loaded, setLoaded] = useState(false)
     const messageHeight =
       message?.height && message?.width

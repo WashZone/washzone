@@ -63,7 +63,6 @@ export const GalleryTabView = ({ galleryItems }: { galleryItems: Array<any> }) =
   }, [galleryItems])
 
   const onImagePress = (e) => {
-    console.log(filteredItems.indexOf(e))
     setCurrentIndex(filteredItems.indexOf(e))
     setIsVisible(true)
   }
@@ -116,11 +115,9 @@ export const HomePostsTabScreen = ({
     const galleryImages = []
     res.forEach((i, index) => {
       i?.attachmentUrl?.forEach((j: any, jIndex: string) => {
-        console.log("JJJJ : ", j)
         galleryImages.push({ uri: j, id: "topic" + index + "-" + jIndex })
       })
     })
-    console.log("GalleryImages", galleryImages)
     const filteredImages = galleryImages.filter((i) => i?.uri)
     addToGallery(filteredImages)
 
@@ -208,7 +205,6 @@ export const ClassifiedsTabScreen = ({
   addToGallery: (toAdd: Array<any>) => void
 }) => {
   const [loading, setLoading] = useState(true)
-  console.log("USER ID : :: :", userId)
   const [userClassifieds, setUserClassifieds] = React.useState([])
   const { getUserClassifieds } = useHooks()
 
@@ -219,7 +215,6 @@ export const ClassifiedsTabScreen = ({
     const galleryImages = res.map((i, index) => {
       if (i.attachmentUrl) return { uri: i?.attachmentUrl || "", id: "classified" + index }
     })
-    console.log("GalleryImages", galleryImages)
     const filteredImages = galleryImages.filter((i) => i?.uri)
     addToGallery(filteredImages)
     setLoading(false)

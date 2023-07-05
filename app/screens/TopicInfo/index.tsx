@@ -41,7 +41,6 @@ export const TopicInfo: FC<HomeTabProps<"TopicInfo">> = function PostInfo(props)
 
   async function syncComments(id: string) {
     const data = await getCommentsOnPost(id)
-    console.log("ALL COMMENTS", data)
     setComments(data || [])
   }
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, FC } from "react"
+import React, { useState, useEffect, useRef, } from "react"
 import {
   View,
   TextInput,
@@ -21,7 +21,6 @@ import Animated, {
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { ChooseMediaModal } from "."
 import { TagInput } from "./TagInput"
-import { Host } from "react-native-portalize"
 // import { getTaggedIds } from "../utils/helpers"
 
 interface CommentInputProps {
@@ -93,6 +92,7 @@ export const CommentInput = ({
         <Animated.View style={$animatedMediaContainer}>
           <FastImage
             source={{ uri: selectedMedia?.uri }}
+          // eslint-disable-next-line react-native/no-inline-styles
             style={{ height: 100, width: 100, borderRadius: 2 }}
           />
           <Icon
@@ -125,7 +125,9 @@ export const CommentInput = ({
               placeholderTextColor={colors.palette.overlay50}
               containerStyle={$commentInput}
               multiline
+          // eslint-disable-next-line react-native/no-inline-styles
               suggestionsContainerStyle={{ bottom: 90 }}
+          // eslint-disable-next-line react-native/no-inline-styles
               style={{lineHeight:20}}
             />
           ) : (

@@ -19,6 +19,7 @@ interface CustomModalProps {
   showIndicator?: boolean
   backgroundColor?: ColorValue
   keyboardOffset?: number
+  disableUnMount?: boolean
 }
 
 export const BottomModal = ({
@@ -31,6 +32,7 @@ export const BottomModal = ({
   backgroundColor,
   keyboardOffset = 0,
   showIndicator = true,
+  disableUnMount = false,
 }: CustomModalProps) => {
   const safeArea = useSafeAreaInsets()
   const closeModal = () => setVisible(false)
@@ -61,11 +63,13 @@ export const BottomModal = ({
       isVisible={isVisible}
       style={$modal}
       avoidKeyboard={avoidKeyboard}
-      swipeDirection={["down"]}
-      onSwipeComplete={closeModal}
-      onBackdropPress={closeModal}
+      swipeDirection={disableUnMount ? [] : ["down"]}
+      onSwipeComplete={() => { !disableUnMount && closeModal() }}
+      onBackdropPress={() => { !disableUnMount && closeModal() }}
     >
-      <View style={{ marginBottom: isKeyboardVisible ? keyboardOffset : 0 }}>
+      <View 
+          // eslint-disable-next-line react-native/no-inline-styles
+          style={{ marginBottom: isKeyboardVisible ? keyboardOffset : 0 }}>
         {showIndicator && <Handle />}
         <View
           style={[

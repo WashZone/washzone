@@ -108,7 +108,6 @@ export const InteractionStoreModel = types
       return Interaction.null
     },
     getSavedInteractionOnVideo(id: string) {
-      console.log('store.videos.saved', store.videos.saved)
       if (store.videos.saved.includes(id)) return Interaction.saved
       return Interaction.notSaved
     },

@@ -20,7 +20,6 @@ export const FollowingList = ({ user }) => {
     try {
       const res = await getFollowings(user?._id)
       setData(res)
-      console.log("syncFollowing", res)
     } catch (err) {
     } finally {
       setLoading(false)

@@ -54,7 +54,6 @@ export const RootStoreModel = types
   .actions(withSetPropAction)
   .actions((self) => ({
     subscribeAll() {
-      console.log("SUBSCRIBING", self.userStore.name, self.userStore._id)
       self.api.subscribeNewuserchat(
         { userId: self.userStore._id },
         usersChatModelPrimitives
@@ -64,7 +63,6 @@ export const RootStoreModel = types
           .toString(),
         // Handling New Message Arrival
         async (message) => {
-          console.log("NEW MESSAGE", message)
           const isNewRoom =
             !self.allChats.chatMessages[message?.roomId?._id]?.length ||
             self.allChats.chatMessages[message?.roomId?._id]?.length === 0

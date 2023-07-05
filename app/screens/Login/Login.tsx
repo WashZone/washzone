@@ -35,7 +35,6 @@ export const LoginView = observer(({ handleKeyboard } :{handleKeyboard : (b:bool
         email: authEmail,
         password: authPassword,
       })
-      console.log("res:mutateSignin", res)
       setUser({
         name: res.signin.name,
         email: res.signin.email,
@@ -52,7 +51,6 @@ export const LoginView = observer(({ handleKeyboard } :{handleKeyboard : (b:bool
 
       setAuthToken(String(Date.now()))
     } catch (error) {
-      console.log("LOGIN ERROR", error)
       Toast.show({ ...toastMessages.incorrectCredentials })
     }
   }

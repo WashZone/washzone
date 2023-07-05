@@ -34,8 +34,6 @@ export const Stories = observer(() => {
     getActivities()
   }, [])
 
-  console.log("ACTIVITIES IN STORE : ", stories)
-
   // const navigationTopic = useNavigation<NavigationProp<TopicsTabParamList>>()
   // const navigationClassified = useNavigation<NavigationProp<ClassifiedsTabParamList>>()
   // const navigationVideo = useNavigation<NavigationProp<VideosTabParamList>>()

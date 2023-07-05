@@ -41,7 +41,6 @@ export function SocialLogin() {
         if (hasPlayService) {
           GoogleSignin.signIn()
             .then(async (userInfo) => {
-              console.log('GOOGLE userInfo : ', JSON.stringify(userInfo))
               const resGetUserBySocialId = await queryGetUserBysocialId(
                 {
                   socialId: userInfo.user.id,
@@ -49,10 +48,8 @@ export function SocialLogin() {
                 { fetchPolicy: "network-only" },
               )
               const userFound = resGetUserBySocialId.getUserBysocialId.length > 0
-              console.log('USER FOUND : ', JSON.stringify(userFound))
               try {
                 let resCreateUser: { createUser: any }
-                console.log("GOOGLE USER INFO! ", userInfo)
                 if (!userFound) {
                   resCreateUser = await mutateCreateUser({
                     type: "google",
@@ -67,7 +64,6 @@ export function SocialLogin() {
                     username: ""
                   })
                 }
-                console.log("TEST USER GOT", resGetUserBySocialId.getUserBysocialId[0])
                 const user = userFound
                   ? resGetUserBySocialId.getUserBysocialId[0]
                   : resCreateUser.createUser
@@ -88,12 +84,10 @@ export function SocialLogin() {
 
                 setAuthToken(user?._id)
               } catch (err) {
-                console.log('API ERR : ', JSON.stringify(err))
                 Toast.show(toastMessages.somethingWentWrong)
               }
             })
             .catch((e) => {
-              console.log("Module ERR : ", JSON.stringify(e))
               console.log(e)
             })
         }
@@ -192,7 +186,6 @@ export function SocialLogin() {
     // use credentialState response to ensure the user is authenticated
     if (credentialState === appleAuth.State.AUTHORIZED) {
       // user is authenticated
-      console.log("appleAuthRequestResponse", appleAuthRequestResponse)
 
       const resGetUserBySocialId = await queryGetUserBysocialId(
         {
@@ -218,7 +211,6 @@ export function SocialLogin() {
             username: ""
           })
         }
-        console.log("TEST USER GOT", resGetUserBySocialId.getUserBysocialId[0])
         const user = userFound
           ? resGetUserBySocialId.getUserBysocialId[0]
           : resCreateUser.createUser

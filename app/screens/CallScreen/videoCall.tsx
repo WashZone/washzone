@@ -390,7 +390,6 @@ export const VideoCall: FC<AppStackScreenProps<"VideoCall">> = observer(
     /**
      * Calling Stuff Ends
      */
-    console.log("localStream.toURL()", localStream.toURL())
     return (
       <ScrollView style={styles.root}>
         <View style={$localVideoContainer}>

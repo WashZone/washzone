@@ -20,7 +20,6 @@ export const FollowersList = ({ user }) => {
     try {
       const res = await getFollowers(user?._id)
       setData(res)
-      console.log('syncFollowers',res)
 
     } catch (err) {
     } finally {
