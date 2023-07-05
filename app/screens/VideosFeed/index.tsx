@@ -24,7 +24,6 @@ export const VideoBlock = ({
 }) => {
   const [loaded, setLoaded] = useState(false)
   const navigation = useNavigation<NavigationProp<VideosTabParamList>>()
-  console.log("videoDetailsvideoDetails", videoDetails)
   const handleOnPress = () => {
     if (!disabled) {
       navigation.navigate("VideoDetails", { data: videoDetails?._id })

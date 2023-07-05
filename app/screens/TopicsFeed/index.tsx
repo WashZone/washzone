@@ -17,7 +17,6 @@ import { formatName } from "../../utils/formatName"
 import { useStores } from "../../models"
 import { useHooks } from "../hooks"
 import { observer } from "mobx-react-lite"
-import { CreateTopic } from "./CreateTopic"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { $flex1, $flexRow } from "../styles"
 import { getIconForInteraction, showAlertYesNo } from "../../utils/helpers"
@@ -155,7 +154,6 @@ const Actions = observer(function ActionButtons({
 
 export const TopicComponent = observer(({ topic, index }: { topic: any; index: number }) => {
   const [loaded, setLoaded] = useState(false)
-  const [isLikesModalVisible, setLikesModalVisible] = useState(false)
   const navigation = useNavigation<NavigationProp<TopicsTabParamList>>()
   const navigationHome = useNavigation<NavigationProp<HomeTabParamList>>()
   const topicDetails = {
@@ -228,7 +226,7 @@ export const TopicComponent = observer(({ topic, index }: { topic: any; index: n
             </View>
           )}
         </View>
-        <Actions item={topic} setLikesModalVisible={setLikesModalVisible} />
+        <Actions item={topic} />
       </Pressable>
       {index % 5 === 0 && <NativeAdView />}
 
@@ -324,13 +322,11 @@ export const TopicComponentFullView = ({ topic }) => {
         <Actions item={topic} />
       </View>
       <NativeAdView />
- 
-      {/* <NativeAdView /> */}
     </>
   )
 }
 
-export const TopicsFeed: FC<TopicsTabProps<"TopicsFeed">> = observer(function TopicsFeed(props) {
+export const TopicsFeed: FC<TopicsTabProps<"TopicsFeed">> = observer(function TopicsFeed(_props) {
   const { refreshTopics, loadMoreTopics } = useHooks()
   const {
     topics: { topics },
@@ -345,8 +341,7 @@ export const TopicsFeed: FC<TopicsTabProps<"TopicsFeed">> = observer(function To
       <Host>
         <CustomFlatlist
           customRefresh={onRefresh}
-          ListHeaderComponent={<CreateTopic focused={props.route.params?.focused} />}
-          stickyHeaderIndices={[0]}
+          // ListHeaderComponent={<CreateTopic focused={props.route.params?.focused} />}
           style={$container}
           onEndReached={loadMoreTopics}
           data={topics}
@@ -400,7 +395,7 @@ const $postParentContainer: ViewStyle = {
   justifyContent: "space-between",
   borderBottomWidth: 1,
   borderBottomColor: colors.separator,
-  // marginTop: 10,
+  marginTop: 6,
 }
 
 const $publisherInfoContainer: ViewStyle = {

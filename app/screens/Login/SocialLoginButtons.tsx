@@ -25,7 +25,7 @@ export function SocialLogin() {
   const {
     authenticationStore: { setAuthToken },
     userStore: { setUser },
-    allChats:{setMyUserId},
+    allChats: { setMyUserId },
     api: { queryGetUserBysocialId, mutateCreateUser },
   } = useStores()
   const siginGoogle = () => {

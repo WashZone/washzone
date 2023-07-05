@@ -23,7 +23,6 @@ export const LikesModal = ({ setVisible, isVisible, moduleId, module, likesCount
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    console.log("LikesModal", module, isVisible, moduleId)
     isVisible && syncData()
   }, [isVisible])
 
@@ -32,7 +31,7 @@ export const LikesModal = ({ setVisible, isVisible, moduleId, module, likesCount
       case "discussion": {
         setLoading(true)
         const res = await getLikesOnDiscussion(moduleId)
-        console.log("getLikesOnDiscussion:syncData", res?.data)
+  
         setData(res?.data)
         setLoading(false)
         break
@@ -40,7 +39,7 @@ export const LikesModal = ({ setVisible, isVisible, moduleId, module, likesCount
       case "video": {
         setLoading(true)
         const res = await getLikesOnVideo(moduleId)
-        console.log("getLikesOnVideo", res?.data)
+  
         setData(res?.data)
         setLoading(false)
         break
@@ -48,7 +47,6 @@ export const LikesModal = ({ setVisible, isVisible, moduleId, module, likesCount
       case "post": {
         setLoading(true)
         const res = await getLikesOnPost(moduleId)
-        console.log("getLikesOnPost", res?.data)
         setData(res?.data)
         setLoading(false)
         break

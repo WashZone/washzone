@@ -12,7 +12,6 @@ export const CallStoreModel = types
   .actions(withSetPropAction)
   .actions((self) => ({
     setOngoingCall(status: boolean) {
-      console.log("SETTING CALL TO", status)
       self.ongoingCall = status
     },
     setStatus(status: string) {

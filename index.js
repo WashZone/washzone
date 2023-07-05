@@ -45,16 +45,13 @@ function IgniteApp() {
     const { type, receiver, roomId } = data
     const { name, _id, setter } = JSON.parse(receiver)
 
-    console.log("INDEX>JS MODE type", type, name, receiver)
     if (setter) {
-      console.log("SETTER IDENTIFIED")
       return
     }
 
     switch (type) {
       case CallTypes.answer: {
         const res = await getRoomById(roomId)
-        console.log("RECEIVEd AN ANSWER FROM : ", roomId)
         navigationRef.current.setParams({ answer: res?.answer })
         break
       }
@@ -69,13 +66,10 @@ function IgniteApp() {
           const res = await getRoomById(roomId)
           const receiverData = await getUserById(_id)
 
-          console.log("Current Screen", navigationRef.getCurrentRoute())
 
           navigateVideo(res, roomId, receiverData)
-          console.log("navigationRef.current.getCurrentRoute")
           setTimeout(() => {
             if (navigationRef.current.getCurrentRoute()?.name === "VideoCall") {
-              console.log("SETTING PARAMS ON Video CALL")
               navigationRef.setParams({
                 offer: res?.offer,
                 receiver: receiverData,
@@ -83,7 +77,6 @@ function IgniteApp() {
                 roomId,
               })
             } else {
-              console.log("Navigating to Video Call")
 
               navigationRef.navigate("VideoCall", {
                 offer: res?.offer,
@@ -115,12 +108,10 @@ function IgniteApp() {
           const res = await getRoomById(roomId)
           const receiverData = await getUserById(_id)
 
-          console.log("Current Screen", navigationRef.getCurrentRoute())
           navigateAudio(res, roomId, receiverData)
 
           setTimeout(() => {
             if (navigationRef.current.getCurrentRoute()?.name === "AudioCall") {
-              console.log("SETTING PARAMS ON AUDIO CALL")
               navigationRef.setParams({
                 offer: res?.offer,
                 receiver: receiverData,
@@ -128,7 +119,6 @@ function IgniteApp() {
                 roomId,
               })
             } else {
-              console.log("Navigating to  AUDIO CALL")
               navigationRef.navigate("AudioCall", {
                 offer: res?.offer,
                 receiver: receiverData,

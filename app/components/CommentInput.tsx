@@ -55,7 +55,7 @@ export const CommentInput = ({
     setIsCommenting(false)
     inputRef.current.blur()
   }
-  console.log("commentText : ", commentText)
+
   const onAddImage = async () => {
     const res = await MediaPicker()
     res && setSelectedMedia(res)
@@ -63,7 +63,6 @@ export const CommentInput = ({
 
   const onCapture = async () => {
     const res = await Capture()
-    console.log("RES:onCapture", res)
     res && setSelectedMedia(res)
   }
 
@@ -82,7 +81,6 @@ export const CommentInput = ({
   })
 
   useEffect(() => {
-    console.log("FOCUSING", isFocused)
     if (isFocused) focus.value = withTiming(1, { duration: 200 })
     else {
       focus.value = withTiming(0, { duration: 200 })

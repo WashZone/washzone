@@ -1,27 +1,26 @@
 import { observer } from "mobx-react-lite"
 import React, { FC, useEffect, useState } from "react"
-import { AppStackScreenProps } from "../../navigators"
-import { $flex1 } from "../styles"
 import { Chat, MessageType } from "@flyerhq/react-native-chat-ui"
-// import DocumentPicker from 'react-native-document-picker'
 import FileViewer from "react-native-file-viewer"
-
+import moment from "moment"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
+import { Host } from "react-native-portalize"
 import { TextStyle, View, ViewStyle } from "react-native"
+import ShimmerPlaceholder from "react-native-shimmer-placeholder"
+import FastImage from "react-native-fast-image"
+import LinearGradient from "react-native-linear-gradient"
+import Lottie from "lottie-react-native"
+
 import { colors, spacing } from "../../theme"
 import { MediaPicker } from "../../utils/device/MediaPicker"
 import { CustomChatMessage, P2PHeader } from "./partials"
 import { useStores } from "../../models"
 import { useHooks } from "../hooks"
 import { messageMetadataType } from "../../utils"
-import ShimmerPlaceholder from "react-native-shimmer-placeholder"
-import FastImage from "react-native-fast-image"
-import LinearGradient from "react-native-linear-gradient"
-import Lottie from "lottie-react-native"
 import { CommentInput, Text, Screen } from "../../components"
-import moment from "moment"
+import { AppStackScreenProps } from "../../navigators"
+import { $flex1 } from "../styles"
 
-import { useSafeAreaInsets } from "react-native-safe-area-context"
-import { Host } from "react-native-portalize"
 
 const getColorFromType = (type: any) => {
   switch (type) {
@@ -54,6 +53,7 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
   const [syncing, setSyncing] = useState(true)
   const [isAttachmentUploading, setIsAttachmentUploading] = useState(false)
   const allMessages = getRoomMessages({ roomId })
+  console.log('allMessages', allMessages)
   // const [selectedMessage, setSelectedMessage] = useState<any>({ type: "unsupported" })
   const user = {
     id: userStore._id,

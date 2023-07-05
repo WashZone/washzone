@@ -18,7 +18,6 @@ import { Portal } from "react-native-portalize"
 // ]
 
 export const SuggestionItem = ({ portalized, keyword, onSuggestionPress, containerStyle }) => {
-    console.log("keyword : ", keyword)
     if (keyword === undefined) {
         return null
     }

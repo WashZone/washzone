@@ -11,7 +11,7 @@ import { useEffect } from "react"
 import { Alert } from "react-native"
 
 const configureNotifications = () => {
- 
+
 
   //  const  { updateNotificationToken} = useHooks()
   // const configure =() => PushNotification.configure({
@@ -151,21 +151,18 @@ export { configureNotifications }
 // }
 
 export const notificationHandler = async () => {
-  const authStatus = await messaging().requestPermission()
-  const enabled =
-    authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-    authStatus === messaging.AuthorizationStatus.PROVISIONAL
+  await messaging().requestPermission()
+  // const enabled =
+  //   authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+  //   authStatus === messaging.AuthorizationStatus.PROVISIONAL
 
-  if (enabled) {
-    console.log("Authorization status:", authStatus)
-  }
+  // if (enabled) {
+  // }
 
   if (!messaging().isDeviceRegisteredForRemoteMessages) {
     await messaging().registerDeviceForRemoteMessages()
   }
 
-  const token = await messaging().getToken()
-  console.log("FCM TOKEN", token)
 
   // messaging().onMessage(onMessageReceived)
   // messaging().setBackgroundMessageHandler(onMessageReceived)

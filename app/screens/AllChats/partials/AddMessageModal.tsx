@@ -34,7 +34,7 @@ export const AddMessageModal = ({ isVisible, setVisible }) => {
   }
 
   return (
-    <BottomModal propagateSwipe avoidKeyboard={true} isVisible={isVisible} setVisible={setVisible}>
+    <BottomModal propagateSwipe isVisible={isVisible} setVisible={setVisible}>
       <View style={$contentContainer} >
         <TextField
           value={searchKey}
@@ -53,7 +53,7 @@ export const AddMessageModal = ({ isVisible, setVisible }) => {
           showsVerticalScrollIndicator={false}
         >
           {searchResults.map((result, index) => (
-            <ResultComponent key={index} data={result} setVisible={setVisible}/>
+            <ResultComponent key={index} data={result} setVisible={setVisible} />
           ))}
         </KeyboardAwareScrollView>
       </View>
@@ -66,7 +66,7 @@ const $scrollContainer: ViewStyle = {
 }
 
 const $contentContainer: ViewStyle = {
-  height: Platform.OS==='android'? 300 : 600,
+  height: Platform.OS === 'android' ? 300 : 600,
   width: "100%",
   paddingHorizontal: spacing.medium,
   paddingTop: spacing.large,

@@ -1,3 +1,4 @@
+import { Alert } from 'react-native';
 import { RNS3 } from 'react-native-upload-aws-s3';
 
 
@@ -19,7 +20,6 @@ export async function uploadFile(inFile:any){
   try{
     const response = await RNS3.put(file, options)
     if (response.status === 201){
-      console.log("Success: ", response.body)
       /**
        * {
        *   postResponse: {
@@ -31,9 +31,9 @@ export async function uploadFile(inFile:any){
        * }
        */
     } else {
-      console.log("Failed to upload image to S3: ", response)
+      Alert.alert("Failed to upload image")
     }
   } catch(error){
-    console.log(error)
+    Alert.alert(error)
   }
 }

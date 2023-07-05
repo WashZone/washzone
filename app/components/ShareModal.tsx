@@ -21,15 +21,6 @@ export const ShareModal = observer(() => {
     share: { shareOptions, isShareOpen, close },
   } = useStores()
   const { shareToFriend } = useHooks()
-  //  !visible && setVisible(true)
-  console.log(shareOptions)
-  // const shareOptions = {
-  //   title: "React Native",
-  //   message: "Hola mundo",
-  //   url: "http://facebook.github.io/react-native/",
-  //   type: "post",
-  //   metadata: {}, //  for email
-  // }
 
   const handlePress = (roomId: string, receiverId: string, receiverName: string) => {
     close()
@@ -47,8 +38,6 @@ export const ShareModal = observer(() => {
   }
 
   const onCancel = () => {
-    console.log("CANCEL")
-    // setVisible(false)
     close()
   }
 

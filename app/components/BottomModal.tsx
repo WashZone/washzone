@@ -1,5 +1,5 @@
-import React from "react"
-import { ColorValue, TextStyle, View, ViewStyle } from "react-native"
+import React, { useEffect, useState } from "react"
+import { ColorValue, Keyboard, TextStyle, View, ViewStyle } from "react-native"
 import Modal from "react-native-modal"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { colors } from "../theme"
@@ -18,6 +18,7 @@ interface CustomModalProps {
   avoidKeyboard?: boolean
   showIndicator?: boolean
   backgroundColor?: ColorValue
+  keyboardOffset?: number
 }
 
 export const BottomModal = ({
@@ -28,10 +29,32 @@ export const BottomModal = ({
   title,
   avoidKeyboard,
   backgroundColor,
+  keyboardOffset = 0,
   showIndicator = true,
 }: CustomModalProps) => {
   const safeArea = useSafeAreaInsets()
   const closeModal = () => setVisible(false)
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardWillShow',
+      () => {
+        setKeyboardVisible(true); // or some other action
+      }
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardWillHide',
+      () => {
+        setKeyboardVisible(false); // or some other action
+      }
+    );
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
   return (
     <Modal
       propagateSwipe={propagateSwipe}
@@ -42,7 +65,7 @@ export const BottomModal = ({
       onSwipeComplete={closeModal}
       onBackdropPress={closeModal}
     >
-      <View>
+      <View style={{ marginBottom: isKeyboardVisible ? keyboardOffset : 0 }}>
         {showIndicator && <Handle />}
         <View
           style={[

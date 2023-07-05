@@ -50,7 +50,6 @@ export const IncomingCallHook = () => {
 
   // These method will display the incoming call
   const displayIncomingCall = (callerName, isVideo) => {
-    console.log("DISPLAYING CALL")
     Platform.OS === "android" && RNCallKeep.setAvailable(false)
 
     RNCallKeep.displayIncomingCall(

@@ -44,7 +44,6 @@ const ActionButtons = observer(function TopicsFeed({
   })
   const { interactWithVideo, interactWithSaveOnVideo } = useHooks()
 
-  console.log("VIDEO DATA", data)
   const options: Array<{
     label: string
     icon: IconTypes
@@ -216,14 +215,11 @@ export const VideoDetails: FC<VideosTabProps<"VideoDetails">> = observer(functio
     api: { mutateGetVideoByVideoId },
     share: { share },
   } = useStores()
-  console.log("VIDEO VIDEO", data)
 
   const handleDataType = async () => {
     if (typeof data === "string") {
       setLoading(true)
-      console.log("DATAID", data)
       const res = await mutateGetVideoByVideoId({ videoId: data, callerId: _id })
-      console.log("VIDEO DATA FROM API : ", res)
 
       setVideoDetails(res.getVideoByVideoId?.data?.length === 1 && res.getVideoByVideoId?.data[0])
       setLoading(false)

@@ -50,14 +50,12 @@ export function CustomFlatlist(props: CustomListProps) {
     }
   })
   const onRefresh = async () => {
-    console.log("refreshinggggg")
     setRefreshing(true)
     await customRefresh()
     setRefreshing(false)
   }
 
   const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    console.log(event.nativeEvent.contentOffset.y / refreshHeight, ":", loaderProgress.value * 24)
     if (!refreshing) {
       const newVal = -event.nativeEvent.contentOffset.y / refreshHeight
       loaderProgress.value = newVal < 1 ? newVal : 1

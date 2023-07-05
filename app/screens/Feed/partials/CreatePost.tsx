@@ -182,18 +182,17 @@ export const CreatePost = observer(function CreatePost({
       height,
       width: "100%",
       justifyContent: "center",
-      backgroundColor: colors.palette.neutral100,
+      // backgroundColor: colors.palette.neutral100,
     }
   })
 
   return (
     <View
-      // eslint-disable-next-line react-native/no-inline-styles
-      style={{ position: "absolute", top: 0, width: "100%" }}>
+    >
       <View style={$container}>
-        <TouchableOpacity onPress={() => navigation.navigate("Profile", { user: userStore })}>
+       
           <FastImage source={{ uri: userStore?.picture }} style={$picture} resizeMode="cover" />
-        </TouchableOpacity>
+        
         <View style={$contentContainer}>
           <TagInput
             value={postContent}
@@ -232,7 +231,9 @@ export const CreatePost = observer(function CreatePost({
           }
           renderItem={({ item, drag, isActive }) => (
             <ScaleDecorator >
-              <Pressable onLongPress={drag} disabled={isActive} style={{ width: 120, marginVertical: spacing.extraSmall }} >
+              <Pressable onLongPress={drag} disabled={isActive} 
+              // eslint-disable-next-line react-native/no-inline-styles
+              style={{ width: 120, marginVertical: spacing.extraSmall }} >
                 <Animated.View style={animatedPreviewContainer(item)}>
                   <FastImage source={{ uri: item?.uri }} style={previewImage(item)} />
                 </Animated.View>
@@ -360,14 +361,10 @@ const $inputContainer: ViewStyle = {
 const $container: ViewStyle = {
   width: "100%",
   height: 80,
-  backgroundColor: colors.palette.neutral100,
+  // backgroundColor: colors.palette.neutral100,
   paddingHorizontal: spacing.homeScreen,
   flexDirection: "row",
   alignItems: "center",
   // borderBottomWidth: 0.5,
   // borderBottomColor: colors.background,
-  shadowColor: colors.background,
-  shadowRadius: 10,
-  shadowOpacity: 0.8,
-  shadowOffset: { height: 1, width: 0 },
 }

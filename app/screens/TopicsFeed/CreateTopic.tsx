@@ -7,7 +7,6 @@ import {
   ViewStyle,
   Pressable,
   ActivityIndicator,
-  TouchableOpacity,
 } from "react-native"
 import { $fontWeightStyles, Icon, iconRegistry, Text, TextField } from "../../components"
 import { colors, spacing } from "../../theme"
@@ -16,27 +15,24 @@ import FastImage, { ImageStyle } from "react-native-fast-image"
 import { MediaPicker } from "../../utils/device/MediaPicker"
 import Animated, {
   interpolate,
+  SharedValue,
   useAnimatedStyle,
-  useSharedValue,
   withTiming,
 } from "react-native-reanimated"
 import { useHooks } from "../hooks"
 import Toast from "react-native-toast-message"
 import { toastMessages } from "../../utils/toastMessages"
 import { observer } from "mobx-react-lite"
-import { NavigationProp, useNavigation } from "@react-navigation/native"
-import { HomeTabParamList } from "../../tabs"
-export const CreateTopic = observer(function CreateTopic({ focused }: { focused: boolean }) {
+
+export const CreateTopic = observer(function CreateTopic({ progress }: { progress: SharedValue<number> }) {
   const { userStore } = useStores()
   const [topicDescription, setTopicDescription] = useState<string>("")
   const [topicTitle, setTopicTitle] = useState<string>("")
   const [isPosting, setIsPosting] = useState<boolean>(false)
-  const progress = useSharedValue(0)
   const inputRef = useRef<TextInput>()
   const inputTitleRef = useRef<TextInput>()
   const [selectedImage, setSelectedImage] = useState<any>({ height: 1, width: 1 })
   const { createTopic, refreshTopics } = useHooks()
-  const navigation = useNavigation<NavigationProp<HomeTabParamList>>()
 
   const onPost = async () => {
     setIsPosting(true)
@@ -92,7 +88,7 @@ export const CreateTopic = observer(function CreateTopic({ focused }: { focused:
           progress.value = withTiming(1, { duration: 300 })
         }, 100)
       }
-    } catch (e) {}
+    } catch (e) { }
   }
 
   const onDeletePress = () => {
@@ -159,20 +155,19 @@ export const CreateTopic = observer(function CreateTopic({ focused }: { focused:
       height,
       width: "100%",
       justifyContent: "center",
-      backgroundColor: colors.palette.neutral100,
+
     }
   })
 
   return (
     <View
       style={{
-        marginBottom: spacing.medium,
       }}
     >
       <View style={$container}>
-        <TouchableOpacity onPress={() => navigation.navigate("Profile", { user: userStore })}>
-          <FastImage source={{ uri: userStore?.picture }} style={$picture} resizeMode="cover" />
-        </TouchableOpacity>
+
+        <FastImage source={{ uri: userStore?.picture }} style={$picture} resizeMode="cover" />
+
         <View style={$contentContainer}>
           <TextField
             value={topicTitle}
@@ -264,7 +259,7 @@ const $bottomActionContainer: ViewStyle = {
   flexDirection: "row",
   justifyContent: "space-between",
   paddingHorizontal: 20,
-  marginBottom: 10,
+  // marginBottom: 10,
 }
 
 const $picture: ImageStyle = {
@@ -310,12 +305,12 @@ const $inputWrapper: ViewStyle = {
 const $container: ViewStyle = {
   width: "100%",
   height: 115,
-  backgroundColor: colors.palette.neutral100,
+
   paddingHorizontal: spacing.homeScreen,
   flexDirection: "row",
   alignItems: "center",
-  shadowColor: colors.background,
-  shadowRadius: 10,
-  shadowOpacity: 0.9,
-  shadowOffset: { height: -10, width: 1 },
+  // shadowColor: colors.background,
+  // shadowRadius: 10,
+  // shadowOpacity: 0.9,
+  // shadowOffset: { height: -10, width: 1 },
 }

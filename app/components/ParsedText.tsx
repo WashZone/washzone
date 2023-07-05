@@ -22,7 +22,6 @@ export const userTagRegEx = /@\[([^[\]]+)\]\(([^)]+)\)/;
 
 const renderText = (matchingString) => {
     const match = matchingString.match(userTagRegEx);
-    console.log("MATCH: ", match)
     return `@${match[1]}`;
 }
 
@@ -56,7 +55,6 @@ export function ParsedTextComp(props: TextProps) {
 
 const handleUserTagPress = (text:string) => {
     const match = text.match(userTagRegEx);
-    console.log("MATCH: ", match)
     navigation.navigate('Profile', {user:{_id :match[2].trim()}})
 }
 

@@ -154,7 +154,7 @@ export const Search: FC<AppStackScreenProps<"Search">> = observer(function Searc
   ]
 
   return (
-    <Screen preset="fixed" contentContainerStyle={$container}>
+    <View  style={$container}>
       <Header
         leftIcon="caretLeft"
         title="Search"
@@ -215,7 +215,7 @@ export const Search: FC<AppStackScreenProps<"Search">> = observer(function Searc
           />
         </View>
       </View>
-    </Screen>
+    </View>
   )
 })
 

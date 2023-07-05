@@ -255,7 +255,7 @@ export function useHooks() {
       acttachmentType: "image",
       comment,
       homePageId,
-      taginHomeComment :taggedHomeComment?.map((i) => {
+      taginHomeComment: taggedHomeComment?.map((i) => {
         return { taghomecommentId: i }
       }),
     })

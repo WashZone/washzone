@@ -1,21 +1,22 @@
-import React, { useState } from "react"
-import { TextInput, TextStyle, TouchableOpacity, View, ViewStyle } from "react-native"
+import React, { useEffect, useState } from "react"
+import { TextStyle, TouchableOpacity, View, ViewStyle } from "react-native"
 import { colors, spacing } from "../theme"
 import { Text, Button, BottomModal, Icon, $baseTextStyle } from "."
-import { set } from "date-fns"
-import { navigationRef } from "../navigators"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { HomeTabParamList } from "../tabs"
 import Animated, {
-  Easing,
+  interpolate,
+  interpolateColor,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated"
 import { $contentCenter } from "../screens/styles"
-const expandedHeight = 400
-const buttonColors = ["#FF5733", "#33FFA8", "#3373FF"]
-const buttons = [{ label: "Post" }, { label: "Discuss" }]
+import { CreatePost } from "../screens/Feed/partials"
+
+import { CreateTopic } from "../screens/TopicsFeed/CreateTopic"
+
+
 
 export const AddPostModal = () => {
   const [isVisible, setVisible] = useState(false)
@@ -26,6 +27,8 @@ export const AddPostModal = () => {
         <Icon icon={"plus"} size={40} color={colors.palette.primary300} />
       </Button>
       <BottomModal
+        avoidKeyboard
+        keyboardOffset = {-100}
         isVisible={isVisible}
         setVisible={setVisible}
         backgroundColor={colors.palette.neutral100}
@@ -37,27 +40,81 @@ export const AddPostModal = () => {
 }
 
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity)
+
 export const BottomModalContent = ({ hide }) => {
-  const buttonHeights = buttons.map(() => useSharedValue(50))
-  const textInputOpacities = buttons.map(() => useSharedValue(0))
-  const sharedVal = useSharedValue(0)
-  const navigation = useNavigation<NavigationProp<HomeTabParamList>>()
+  const sharedValPost = useSharedValue(0)
+  const sharedValDiscuss = useSharedValue(0)
+  const [expanded, setExpanded] = useState<'post' | 'discuss' | undefined>(undefined)
+
   const expandPost = () => {
-    // buttonHeights.forEach((height, i) => {
-    //   height.value = withTiming(i === index ? expandedHeight : 50, {
-    //     duration: 300,
-    //     easing: Easing.out(Easing.exp),
-    //   })
-    //   textInputOpacities[i].value = withTiming(i === index ? 1 : 0, {
-    //     duration: 300,
-    //     easing: Easing.out(Easing.exp),
-    //   })
-    // })
+    setExpanded('post')
   }
 
+  const expandDiscuss = () => {
+    setExpanded('discuss')
+  }
+
+
+  useEffect(() => {
+    if (expanded === 'discuss') {
+      sharedValDiscuss.value = withTiming(0.5, { duration: 300 })
+      sharedValPost.value = withTiming(0, { duration: 300 })
+    }
+    if (expanded === 'post') {
+      sharedValDiscuss.value = withTiming(0, { duration: 300 })
+      sharedValPost.value = withTiming(0.5, { duration: 300 })
+    }
+    if (expanded === undefined) {
+      sharedValDiscuss.value = withTiming(0, { duration: 300 })
+      sharedValPost.value = withTiming(0, { duration: 300 })
+    }
+  }, [expanded])
+
+
+
   const $postButtonAnimated = useAnimatedStyle(() => {
-    return {}
+    return {
+      height: interpolate(sharedValPost.value, [0, 0.5, 1], [52, 150, 235]),
+      backgroundColor: interpolateColor(sharedValPost.value, [0, 0.5], [colors.palette.primary300, colors.transparent])
+    }
   })
+
+  const $discussButtonAnimated = useAnimatedStyle(() => {
+    return {
+      height: interpolate(sharedValDiscuss.value, [0, 0.5, 1], [52, 180, 280]),
+
+      backgroundColor: interpolateColor(sharedValDiscuss.value, [0, 0.5], [colors.palette.primary300, colors.transparent])
+    }
+  })
+
+  const $animatedPostText = useAnimatedStyle(() => {
+    return {
+      transform: [{ scaleY: interpolate(sharedValPost.value, [0, 0.5, 1], [1, 0, 0]) }]
+    }
+  })
+
+  const $animatedDiscussText = useAnimatedStyle(() => {
+    return {
+      transform: [{ scaleY: interpolate(sharedValDiscuss.value, [0, 0.5, 1], [1, 0, 0]), }]
+    }
+  })
+
+  const $animatedCreateTopicContainer = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: interpolate(sharedValDiscuss.value, [0, 0.5, 1], [0, 1, 1]) }]
+    }
+  })
+
+  const $animatedCreatePostContainer = useAnimatedStyle(() => {
+    const transform = [{
+      scale: interpolate(sharedValPost.value, [0, 0.5, 1], [0, 1, 1]),
+    }]
+    return {
+      transform
+    }
+  })
+
+
 
   return (
     <View>
@@ -67,38 +124,30 @@ export const BottomModalContent = ({ hide }) => {
         style={$headerText}
         weight="medium"
       />
-      {/* {buttons.map(({ label }, index) => ( */}
+
       <AnimatedTouchable
-        style={[$button, { backgroundColor: colors.palette.primary300 }, $postButtonAnimated]}
+        disabled={expanded === 'post'}
+        style={[$button, $postButtonAnimated]}
         onPress={expandPost}
       >
-        {/* <TextInput style={$textInput} placeholder="Enter text" /> */}
-
-        <Text style={$baseTextStyle} color={colors.palette.neutral100} text="POST" />
+        <Animated.Text style={[$baseTextStyle, { color: colors.palette.neutral100 }, $animatedPostText]}>POST</Animated.Text>
+        <Animated.View style={[{ width: '100%', position: 'absolute' }, $animatedCreatePostContainer]}><CreatePost focused={false} progress={sharedValPost} /></Animated.View >
       </AnimatedTouchable>
-      {/* ))} */}
 
-      <Button
-        text="DISCUSS"
-        textColor={colors.palette.neutral100}
-        style={[$button, { backgroundColor: colors.palette.primary300 }]}
-      />
+      <AnimatedTouchable
+        disabled={expanded === 'discuss'}
+        style={[$button, $discussButtonAnimated]}
+        onPress={expandDiscuss}
+      >
+        <Animated.Text style={[$baseTextStyle, { color: colors.palette.neutral100 }, $animatedDiscussText]}>DISCUSS</Animated.Text>
+        <Animated.View style={[{ width: '100%', position: 'absolute' }, $animatedCreateTopicContainer]}><CreateTopic progress={sharedValDiscuss} /></Animated.View >
+      </AnimatedTouchable>
+
+
       <Button text="CANCEL" textColor={colors.palette.primary300} style={$button} onPress={hide} />
+
     </View>
   )
-}
-
-const $textInput: ViewStyle = {
-  width: "100%",
-  height: 40,
-  paddingHorizontal: 10,
-  marginTop: 10,
-  backgroundColor: "white",
-}
-
-const $buttonText: TextStyle = {
-  color: "white",
-  fontSize: 16,
 }
 
 const $addButton: ViewStyle = {
@@ -114,6 +163,7 @@ const $addButton: ViewStyle = {
 const $headerText: TextStyle = {
   marginVertical: spacing.medium,
   textAlign: "center",
+
 }
 
 const $button: ViewStyle = {

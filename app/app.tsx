@@ -99,13 +99,12 @@ function App(props: AppProps) {
     AppLovinMAX.setDoNotSell(false)
 
     AppLovinMAX.initialize(SDK_KEY)
-      .then((configuration) => {
+      .then(() => {
         // SDK is initialized, start loading ads
-        console.log("CONFIGURATION", configuration)
+
         setAppLovinSDKRegistered(true)
       })
-      .catch((error) => {
-        console.log("Failed to initialize SDK ", error)
+      .catch(() => {
         // Failed to initialize SDK
       })
 

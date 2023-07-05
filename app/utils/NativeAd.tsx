@@ -42,24 +42,25 @@ export const NativeAdView = () => {
         onAdLoaded={(adInfo) => {
           setAspectRatio(adInfo.nativeAd.mediaContentAspectRatio)
           setLoaded(true)
-
-          console.log("Native ad loaded from " + JSON.stringify(adInfo))
         }}
         onAdLoadFailed={(errorInfo) => {
           setIsNull(true)
-          console.log("Native ad failed to load with error " + JSON.stringify(errorInfo))
+       
         }}
         onAdClicked={(adInfo) => {
-          console.log("Native ad clicked")
+
         }}
         onAdRevenuePaid={(adInfo) => {
-          console.log("Native ad revenue paid: " + adInfo.revenue)
+     
         }}
       >
-        <View style={{ flex: 1, flexDirection: "column", justifyContent: "center" }}>
-          <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+        <View 
+        style={{ flex: 1, flexDirection: "column", justifyContent: "center" }}>
+          <View 
+          style={{ flexDirection: "row", justifyContent: "space-between" }}>
             <AppLovinMAX.NativeAdView.IconView style={styles.icon} />
-            <View style={{ flexDirection: "column", flexGrow: 1 }}>
+            <View 
+            style={{ flexDirection: "column", flexGrow: 1 }}>
               <AppLovinMAX.NativeAdView.TitleView style={styles.title} />
               {/* <AppLovinMAX.NativeAdView.StarRatingView style={styles.starRatingView} /> */}
               <AppLovinMAX.NativeAdView.AdvertiserView style={styles.advertiser} />

@@ -26,16 +26,11 @@ export const Feed: FC<HomeTabProps<"Feed">> = function Home(props) {
 
   console.log("imageViewConfig : ", imageViewConfig)
 
-  const animatedMediaContainer = useAnimatedStyle(() => {
-    const height = interpolate(progress.value, [0, 0.5, 1], [80, 50 + 80, 130 + 80])
-    return {
-      height,
-    }
-  })
+ 
   return (
     <Screen preset="fixed" keyboardOffset={-180} contentContainerStyle={$container}>
       <Host>
-        <Animated.View style={animatedMediaContainer} />
+        {/* <Animated.View style={animatedMediaContainer} /> */}
         <Posts setImageViewConfig={setImageViewConfig} />
         <ImageView
           images={imageViewConfig.images}
@@ -43,7 +38,7 @@ export const Feed: FC<HomeTabProps<"Feed">> = function Home(props) {
           visible={imageViewConfig.show}
           onRequestClose={() => setImageViewConfig({ ...imageViewConfig, show: false })}
         />
-        <CreatePost progress={progress} focused={props?.route.params?.focused} />
+        {/* <CreatePost progress={progress} focused={props?.route.params?.focused} /> */}
       </Host>
     </Screen>
   )

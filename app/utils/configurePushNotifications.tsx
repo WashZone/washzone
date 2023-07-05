@@ -6,23 +6,17 @@ import PushNotification from "react-native-push-notification"
 // Must be outside of any component LifeCycle (such as `componentDidMount`).
 PushNotification.configure({
   // (optional) Called when Token is generated (iOS and Android)
-  onRegister: function (token) {
-    console.log("TOKEN:", token)
+  onRegister: function () {
+
   },
 
   // (required) Called when a remote is received or opened, or local notification is opened
   onNotification: function (notification) {
-    console.log("NOTIFICATION:", notification)
-
-
     notification.finish(PushNotificationIOS.FetchResult.NoData)
   },
 
   // (optional) Called when Registered Action is pressed and invokeApp is false, if true onNotification will be called (Android)
-  onAction: function (notification) {
-    console.log("ACTION:", notification.action)
-    console.log("NOTIFICATION:", notification)
-
+  onAction: function () {
     // process the action
   },
 

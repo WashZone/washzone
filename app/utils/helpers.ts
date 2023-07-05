@@ -109,10 +109,8 @@ export const getTaggedIds = (content: string) => {
 
   const ids = matchedSubstrings.map(i => {
     const match = i.match(userTagRegEx);
-    console.log("MATCH: ", match)
     return match[2]
   })
-  console.log(" TAGGED IDS ", ids)
   return ids
 
 }
