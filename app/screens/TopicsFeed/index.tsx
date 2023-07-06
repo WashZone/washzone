@@ -128,10 +128,11 @@ const Actions = observer(function ActionButtons({
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
                 share({
-                  message: "",
-                  title: "",
+                  message: item?.topicContent || '',
+                  title:item?.title || '',
                   url: `washzone://shared-topic/${item?._id}`,
                   type: messageMetadataType.sharedDiscussion,
+                  attachment: item?.attachmentUrl || ''
                 })
               }}
             />

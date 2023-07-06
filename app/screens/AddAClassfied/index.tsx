@@ -100,11 +100,11 @@ export const AddAClassified: FC<AppStackScreenProps<"AddAClassified">> = functio
   const { createClassified, refreshClassifieds } = useHooks()
 
   const handleCreatePress = async () => {
-    if (title.length === 0) {
+    if (title.trim().length === 0) {
       Toast.show({ ...toastMessages.inputTitle })
       return
     }
-    if (description.length === 0) {
+    if (description.trim().length === 0) {
       Toast.show({ ...toastMessages.inputDescription })
       return
     }

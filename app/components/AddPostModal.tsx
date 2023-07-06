@@ -14,6 +14,9 @@ import { $contentCenter } from "../screens/styles"
 import { CreatePost } from "../screens/Feed/partials"
 
 import { CreateTopic } from "../screens/TopicsFeed/CreateTopic"
+import { NavigationProp, useNavigation } from "@react-navigation/native"
+import { ClassifiedsTabParamList } from "../tabs"
+import { AppStackParamList } from "../navigators"
 
 export const AddPostModal = () => {
   const [isVisible, setVisible] = useState(false)
@@ -27,7 +30,7 @@ export const AddPostModal = () => {
       <BottomModal
         disableUnMount={loading}
         avoidKeyboard
-        keyboardOffset={-100}
+        keyboardOffset={-170}
         isVisible={isVisible}
         setVisible={setVisible}
         backgroundColor={colors.palette.neutral100}
@@ -47,9 +50,14 @@ export const AddPostModal = () => {
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity)
 
 export const BottomModalContent = ({ hide, setLoading, loading }) => {
+  const navigation = useNavigation<NavigationProp<AppStackParamList>>()
   const sharedValPost = useSharedValue(0)
   const sharedValDiscuss = useSharedValue(0)
   const [expanded, setExpanded] = useState<"post" | "discuss" | undefined>(undefined)
+
+  // this is to change the progress according to the fact whether the images are present or not 
+  const [discussionImage, setDiscussionImage] = useState<any>({ height: 1, width: 1 })
+  const [selectedPostImages, setSelectedPostImages] = useState<Array<any>>([])
 
   const expandPost = () => {
     !loading && setExpanded("post")
@@ -61,12 +69,12 @@ export const BottomModalContent = ({ hide, setLoading, loading }) => {
 
   useEffect(() => {
     if (expanded === "discuss") {
-      sharedValDiscuss.value = withTiming(0.5, { duration: 300 })
+      sharedValDiscuss.value = withTiming(discussionImage?.uri ? 1 : 0.5, { duration: 300 })
       sharedValPost.value = withTiming(0, { duration: 300 })
     }
     if (expanded === "post") {
       sharedValDiscuss.value = withTiming(0, { duration: 300 })
-      sharedValPost.value = withTiming(0.5, { duration: 300 })
+      sharedValPost.value = withTiming(selectedPostImages?.length > 0 ? 1 : 0.5, { duration: 300 })
     }
     if (expanded === undefined) {
       sharedValDiscuss.value = withTiming(0, { duration: 300 })
@@ -157,6 +165,8 @@ export const BottomModalContent = ({ hide, setLoading, loading }) => {
             loading={loading}
             progress={sharedValDiscuss}
             setLoading={setLoading}
+            selectedImage={discussionImage}
+            setSelectedImage={setDiscussionImage}
           />
         </Animated.View>
       </AnimatedTouchable>
@@ -177,12 +187,22 @@ export const BottomModalContent = ({ hide, setLoading, loading }) => {
           <CreatePost
             hideModal={hide}
             loading={loading}
+            selectedImages={selectedPostImages}
+            setSelectedImages={setSelectedPostImages}
             focused={false}
             progress={sharedValPost}
             setLoading={setLoading}
           />
         </Animated.View>
       </AnimatedTouchable>
+      <Button
+        text="CLASSIFIED"
+        textColor={colors.palette.neutral100}
+        style={[$button, { backgroundColor: colors.palette.primary300 }]}
+        onPress={() => {
+          if (!loading) { hide(); setTimeout(() => navigation.navigate('AddAClassified'), 200) }
+        }}
+      />
       <Button
         text="CANCEL"
         textColor={colors.palette.primary300}

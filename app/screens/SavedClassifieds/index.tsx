@@ -51,12 +51,15 @@ const BottomActions = ({
       onPress: () =>
         share({
           message: "",
-          title: data?.title||'',
+          title: data?.title || '',
           url: `washzone://shared-${type}/${data?._id}`,
           type:
             type === "classified"
               ? messageMetadataType.sharedClassified
               : messageMetadataType.sharedVideo,
+          attachment: type === "classified"
+            ? data?.attachmentUrl
+            : data?.thumbnailUrl
         }),
     },
   ]

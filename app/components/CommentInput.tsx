@@ -42,6 +42,7 @@ export const CommentInput = ({
   const [isFocused, setIsFocused] = useState(false)
   const [showChooseMediaModal, setShowChooseMediaModal] = useState(false)
   const focus = useSharedValue(0)
+  const animMediaVal = useSharedValue(0)
   const inputRef = useRef<TextInput>()
   const safeAreInsets = useSafeAreaInsets()
 
@@ -74,25 +75,47 @@ export const CommentInput = ({
 
   const $animatedMediaContainer = useAnimatedStyle(() => {
     return {
-      bottom: interpolate(focus.value, [0, 1], [bottomSafe ? 54 + safeAreInsets.bottom : 54, 100]),
-      position: "absolute",
+      width: interpolate(animMediaVal.value, [0, 1], [40, 100]),
+      height: interpolate(animMediaVal.value, [0, 1], [24, 100]),
+      justifyContent: 'center', alignItems: 'center'
     }
   })
 
+  const $animatedImageContainer = useAnimatedStyle(() => {
+    return {
+      width: interpolate(animMediaVal.value, [0, 1], [0, 100]),
+      height: interpolate(animMediaVal.value, [0, 1], [0, 100]),
+      position: 'absolute', top: 0, justifyContent: 'center', alignItems: 'center'
+    }
+  })
+
+  const $animatedAttachIconContainer = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: interpolate(animMediaVal.value, [0, 1], [1, 0]) }],
+      opacity: interpolate(animMediaVal.value, [0, 1], [1, 0]),
+     paddingLeft:4
+    }
+  })
   useEffect(() => {
     if (isFocused) focus.value = withTiming(1, { duration: 200 })
     else {
-      focus.value = withTiming(0, { duration: 200 })
+      if (selectedMedia === undefined) { focus.value = withTiming(0, { duration: 200 }) }
     }
   }, [isFocused])
 
+  useEffect(() => {
+
+    animMediaVal.value = withTiming(selectedMedia ? 1 : 0, { duration: 200 })
+    if (selectedMedia !== undefined) { setIsFocused(true) }
+  }, [selectedMedia])
+
   return (
     <>
-      {selectedMedia && (
-        <Animated.View style={$animatedMediaContainer}>
+      {/* {selectedMedia && (
+        <Animated.View >
           <FastImage
             source={{ uri: selectedMedia?.uri }}
-          // eslint-disable-next-line react-native/no-inline-styles
+            // eslint-disable-next-line react-native/no-inline-styles
             style={{ height: 100, width: 100, borderRadius: 2 }}
           />
           <Icon
@@ -103,16 +126,33 @@ export const CommentInput = ({
             disabled={isCommenting}
           />
         </Animated.View>
-      )}
+      )} */}
       <Animated.View style={[$postCommentContainer, $animatedContainer]}>
-        <Icon
-          icon="attachment"
-          containerStyle={{ marginRight: spacing.extraSmall }}
-          disabled={isCommenting}
-          size={24}
-          onPress={() => setShowChooseMediaModal(true)}
-        />
+        <Animated.View style={$animatedMediaContainer}>
+          <Animated.View style={$animatedAttachIconContainer}>
+            <Icon
+              icon="attachment"
+              disabled={isCommenting}
+              size={24}
+              onPress={() => setShowChooseMediaModal(true)}
+            />
+          </Animated.View>
+          <Animated.View style={$animatedImageContainer} >
+            <FastImage
+              source={{ uri: selectedMedia?.uri }}
+              // eslint-disable-next-line react-native/no-inline-styles
+              style={{ height: '80%', width: '80%', borderRadius: 2 }}
+            />
+            {selectedMedia && <Icon
+              icon="x"
+              size={20}
+              onPress={() => setSelectedMedia(undefined)}
+              containerStyle={$iconXContainer}
+              disabled={isCommenting}
+            />}
+          </Animated.View>
 
+        </Animated.View>
         <View style={$inputWrapper}>
           {tagable ? (
             <TagInput
@@ -125,10 +165,10 @@ export const CommentInput = ({
               placeholderTextColor={colors.palette.overlay50}
               containerStyle={$commentInput}
               multiline
-          // eslint-disable-next-line react-native/no-inline-styles
+              // eslint-disable-next-line react-native/no-inline-styles
               suggestionsContainerStyle={{ bottom: 90 }}
-          // eslint-disable-next-line react-native/no-inline-styles
-              style={{lineHeight:20}}
+              // eslint-disable-next-line react-native/no-inline-styles
+              style={{ lineHeight: 20 }}
             />
           ) : (
             <TextInput
@@ -180,19 +220,22 @@ const $iconXContainer: ViewStyle = {
   borderRadius: 8,
   backgroundColor: colors.background,
   position: "absolute",
-  top: -5,
-  left: 85,
+  top: 5,
+  right: 5,
 }
 
 const $rightIconContainer: ViewStyle = {
   width: 28,
+  marginRight: 10
 }
 
 const $inputWrapper: ViewStyle = {
-  width: Dimensions.get("window").width - 115,
+  width: Dimensions.get("window").width,
   backgroundColor: colors.background,
-  marginHorizontal: 10,
+  marginRight: 10,
+  marginLeft: 5,
   borderRadius: 8,
+  flex: 1,
 }
 
 const $commentInput: TextStyle = {
@@ -204,13 +247,13 @@ const $commentInput: TextStyle = {
   // paddingVertical: spacing.extraSmall,
   // back:'red',
   textAlignVertical: "top",
-  lineHeight:20,
+  lineHeight: 20,
   color: colors.palette.neutral800,
 }
 
 const $postCommentContainer: ViewStyle = {
   flexDirection: "row",
-  paddingHorizontal: spacing.medium,
+  // paddingHorizontal: spacing.medium,
   paddingVertical: spacing.extraSmall,
   backgroundColor: colors.palette.neutral100,
   alignItems: "center",

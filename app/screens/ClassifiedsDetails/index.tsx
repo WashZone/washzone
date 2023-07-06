@@ -24,7 +24,7 @@ import { useStores } from "../../models"
 import { RateUserModal } from "./RateUser"
 import { SendOfferModal } from "./SendOfferModal"
 import Loading from "../../components/Loading"
-import { Text, IconTypes, Icon ,} from "../../components"
+import { Text, IconTypes, Icon, } from "../../components"
 import { ClassifiedsTabProps, HomeTabParamList } from "../../tabs"
 import { colors, spacing } from "../../theme"
 import { formatName } from "../../utils/formatName"
@@ -152,10 +152,11 @@ const BottomActions = ({ classified }: { classified: any }) => {
       title: "Share",
       onPress: () =>
         share({
-          message: "",
+          message: classified?.classifiedDetail,
           type: messageMetadataType.sharedClassified,
-          title: classified?.classifiedDetail,
-          url: `washzone:// /${classified._id}`,
+          title: classified?.title,
+          url: `washzone://shared-classified/${classified._id}`,
+          attachment: classified?.attachmentUrl,
         }),
     },
     {
@@ -259,7 +260,7 @@ export const ClassifiedsDetails: FC<ClassifiedsTabProps<"ClassifiedsDetails">> =
             <FastImage
               source={{ uri: classifiedDetails?.attachmentUrl }}
               style={$posterImage}
-              // resizeMode="contain"
+            // resizeMode="contain"
             />
           </TouchableOpacity>
           <PublisherDetails

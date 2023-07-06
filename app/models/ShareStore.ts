@@ -6,6 +6,7 @@ const ShareOptionsModel = types.model({
   title: types.optional(types.string, ""),
   url: types.optional(types.string, ""),
   type: types.optional(types.string, ""),
+  attachment: types.optional(types.string, ""),
 })
 
 export const ShareStoreModel = types
@@ -16,7 +17,13 @@ export const ShareStoreModel = types
   })
   .actions(withSetPropAction)
   .actions((self) => ({
-    share(shareOptions: { message: string; title: string; url: string; type: string }) {
+    share(shareOptions: {
+      message: string;
+      title: string;
+      url: string;
+      type: string,
+      attachment: string,
+    }) {
       self.shareOptions = shareOptions
       self.isShareOpen = true
     },
@@ -30,5 +37,5 @@ export const ShareStoreModel = types
     },
   }))
 
-export interface ShareStore extends Instance<typeof ShareStoreModel> {}
-export interface ShareStoreSnapshot extends SnapshotOut<typeof ShareStoreModel> {}
+export interface ShareStore extends Instance<typeof ShareStoreModel> { }
+export interface ShareStoreSnapshot extends SnapshotOut<typeof ShareStoreModel> { }

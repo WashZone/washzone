@@ -33,6 +33,11 @@ const getColorFromType = (type: any) => {
       return colors.palette.angry100
     case messageMetadataType.classifiedOffer:
       return colors.palette.primary200
+    case messageMetadataType.sharedClassified:
+    case messageMetadataType.sharedDiscussion:
+    case messageMetadataType.sharedPost:
+    case messageMetadataType.sharedVideo:
+      return colors.palette.primary300
     default:
       return colors.palette.neutral100
   }
@@ -64,7 +69,7 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
     if (message.type === "file") {
       try {
         await FileViewer.open(message.uri, { showOpenWithDialog: true })
-      } catch {}
+      } catch { }
     }
   }
 
@@ -127,10 +132,10 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
     const { child, message, nextMessageInGroup } = payload
 
     const isAuthorMe = message?.author?.id === userStore._id
-    const isImage = message?.type === "image"
+    const isImage = message?.type === "image" || [messageMetadataType.sharedClassified, messageMetadataType.sharedDiscussion, messageMetadataType.sharedPost, messageMetadataType.sharedVideo].includes(message?.metaData?.metaDataType)
     const isLog =
       message?.type === "custom" &&
-      [messageMetadataType.classifiedOffer].includes(message?.metaData?.metaDataType)
+      [messageMetadataType.classifiedOffer, messageMetadataType.sharedClassified, messageMetadataType.sharedDiscussion, messageMetadataType.sharedPost, messageMetadataType.sharedVideo].includes(message?.metaData?.metaDataType)
     return (
       <>
         <View
@@ -139,8 +144,8 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
             backgroundColor: isLog
               ? getColorFromType(message?.metaData?.metaDataType)
               : isAuthorMe
-              ? colors.palette.messageAuthor
-              : colors.palette.messageReceiver,
+                ? colors.palette.messageAuthor
+                : colors.palette.messageReceiver,
             padding: isImage ? 0 : spacing.tiny,
             paddingHorizontal: isImage ? 0 : spacing.extraSmall,
             borderRadius: isLog ? 8 : 10,

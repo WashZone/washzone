@@ -93,9 +93,10 @@ const ActionButtons = observer(function TopicsFeed({
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
           share({
             url: `washzone://shared-video/${data?._id}`,
-            title: "",
-            message: "",
+            title: data?.videoHeading || '',
+            message: data?.description || '',
             type: messageMetadataType.sharedVideo,
+            attachment: data?.thumbnailUrl || ''
           })
         },
       },
@@ -118,8 +119,8 @@ const ActionButtons = observer(function TopicsFeed({
         // eslint-disable-next-line react-native/no-inline-styles
         <View
           style={[$pressableAction, option.count !== undefined &&
-                // eslint-disable-next-line react-native/no-inline-styles
-                { width: 80 }]}
+            // eslint-disable-next-line react-native/no-inline-styles
+            { width: 80 }]}
           key={option.label}
         >
           <Icon
@@ -175,7 +176,7 @@ const VideoDescription = ({ data }: { data: any }) => {
         moduleId={data?._id}
         isVisible={isLikesModalVisible}
         setVisible={setLikesModalVisible}
-      />
+         />
     </View>
   )
 }
@@ -238,8 +239,9 @@ export const VideoDetails: FC<VideosTabProps<"VideoDetails">> = observer(functio
     share({
       url: `washzone://shared-video/${videoDetails?._id}`,
       type: messageMetadataType.sharedVideo,
-      title: "",
-      message: "",
+      title: videoDetails?.videoHeading || '',
+      message: videoDetails?.description || '',
+      attachment: videoDetails?.thumbnailUrl || ''
     })
   }
 

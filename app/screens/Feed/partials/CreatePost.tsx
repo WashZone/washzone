@@ -39,20 +39,22 @@ export const CreatePost = observer(function CreatePost({
   focused,
   setLoading,
   loading,
-  hideModal
+  hideModal, selectedImages, setSelectedImages
 }: {
   focused: boolean
   loading: boolean
   progress: SharedValue<number>
   setLoading: (b: boolean) => void
-  hideModal : () => void
+  hideModal: () => void
+  selectedImages: Array<any>
+  setSelectedImages : (s: Array<any>) => void
 }) {
   const { createPost } = useHooks()
   const { userStore } = useStores()
   const [postContent, setPostContent] = useState<string>("")
   const [uploadProgress, setUploadProgress] = useState<string>("0/0")
   const inputRef = useRef<TextInput>()
-  const [selectedImages, setSelectedImages] = useState<Array<any>>([])
+  // const [selectedImages, setSelectedImages] = useState<Array<any>>([])
   const navigation = useNavigation<NavigationProp<HomeTabParamList>>()
 
   useEffect(() => {
@@ -77,7 +79,7 @@ export const CreatePost = observer(function CreatePost({
       setSelectedImages([])
       setPostContent("")
       inputRef.current.blur()
-      Toast.show({text1:'Posted Successfully !'})
+      Toast.show({ text1: 'Posted Successfully !' })
       hideModal()
     }
   }

@@ -25,19 +25,20 @@ import { toastMessages } from "../../utils/toastMessages"
 import { observer } from "mobx-react-lite"
 
 export const CreateTopic = observer(function CreateTopic({
-  progress, loading, setLoading, hideModal
+  progress, loading, setLoading, hideModal, selectedImage, setSelectedImage
 }: {
   progress: SharedValue<number>
   loading: boolean
   setLoading: (b: boolean) => void
-  hideModal : () => void
+  hideModal: () => void
+  selectedImage: any
+  setSelectedImage: (a: any) => void
 }) {
   const { userStore } = useStores()
   const [topicDescription, setTopicDescription] = useState<string>("")
   const [topicTitle, setTopicTitle] = useState<string>("")
   const inputRef = useRef<TextInput>()
   const inputTitleRef = useRef<TextInput>()
-  const [selectedImage, setSelectedImage] = useState<any>({ height: 1, width: 1 })
   const { createTopic, refreshTopics } = useHooks()
 
   const onPost = async () => {

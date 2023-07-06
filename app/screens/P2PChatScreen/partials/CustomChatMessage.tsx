@@ -5,7 +5,7 @@ import { NavigationProp, useNavigation } from "@react-navigation/native"
 
 import { Text } from "../../../components"
 import { colors, spacing } from "../../../theme"
-import { messageMetadataType } from "../../../utils"
+import { BROKEN_IMAGE, messageMetadataType } from "../../../utils"
 import { $flexRow } from "../../styles"
 import {
   ClassifiedsTabParamList,
@@ -38,12 +38,12 @@ export const CustomChatMessage = ({ message }: { message: any }) => {
             weight="semiBold"
           />
           <View style={[$flexRow,
-                // eslint-disable-next-line react-native/no-inline-styles
-                { maxWidth: 300, marginTop: spacing.tiny }]}>
+            // eslint-disable-next-line react-native/no-inline-styles
+            { maxWidth: 300, marginTop: spacing.tiny }]}>
             <FastImage style={$image} source={{ uri: parsedData?.image }} />
-            <View 
-                // eslint-disable-next-line react-native/no-inline-styles
-                style={{ justifyContent: "flex-end" }}>
+            <View
+              // eslint-disable-next-line react-native/no-inline-styles
+              style={{ justifyContent: "flex-end" }}>
               <Text
                 text={parsedData?.title}
                 color={colors.palette.neutral100}
@@ -102,18 +102,22 @@ export const CustomChatMessage = ({ message }: { message: any }) => {
       const id = parsedData?.url.split("/")[parsedData?.url.split("/")?.length - 1]
 
       return (
-        <Pressable onPress={() => navigationClassified.navigate('ClassifiedsDetails', { classified: id })}>
+        <Pressable style={$maxWidthClip} onPress={() => navigationClassified.navigate('ClassifiedsDetails', { classified: id })}>
+
+          <FastImage defaultSource={BROKEN_IMAGE} style={$thumbnailImage} resizeMode='cover' source={{ uri: parsedData?.attachment }} />
           <Text
-            text="Shared a classified"
-            size="xs"
-            weight="medium"
-            color={colors.palette.neutral100}
+            style={{ marginHorizontal: spacing.extraSmall, marginBottom: spacing.zero, marginVertical: spacing.tiny }}
+            text={parsedData?.title} size="xs" weight="medium" color={colors.palette.neutral100} />
+          <Text numberOfLines={3}
+            style={{ marginHorizontal: spacing.extraSmall, marginBottom: spacing.zero, marginVertical: spacing.tiny }}
+            text={parsedData?.message} size="xxs" weight="normal" color={colors.palette.neutral100}
           />
           <Text
-            text="Click to view"
+            text="CLASSIFIED * Click to view"
             size="xxxs"
             weight="medium"
-            color={colors.palette.neutral300}
+            style={{ marginHorizontal: spacing.extraSmall, marginVertical: spacing.tiny }}
+            color={colors.palette.neutral250}
           />
         </Pressable>
       )
@@ -123,18 +127,22 @@ export const CustomChatMessage = ({ message }: { message: any }) => {
       const id = parsedData?.url.split("/")[parsedData?.url.split("/")?.length - 1]
 
       return (
-        <Pressable onPress={() => navigationTopic.navigate("TopicInfo", { topic: id })}>
+        <Pressable style={$maxWidthClip} onPress={() => navigationTopic.navigate("TopicInfo", { topic: id })}>
+          <FastImage defaultSource={BROKEN_IMAGE} style={$thumbnailImage} resizeMode='cover' source={{ uri: parsedData?.attachment }} />
           <Text
-            text="Shared a discussion"
-            size="xs"
-            weight="medium"
-            color={colors.palette.neutral100}
+            style={{ marginHorizontal: spacing.extraSmall, marginBottom: spacing.zero, marginVertical: spacing.tiny }}
+            text={parsedData?.title} size="xs" weight="medium" color={colors.palette.neutral100} />
+          <Text numberOfLines={3}
+            style={{ marginHorizontal: spacing.extraSmall, marginBottom: spacing.zero, marginVertical: spacing.tiny }}
+            text={parsedData?.message} size="xxs" weight="normal" color={colors.palette.neutral100}
           />
           <Text
-            text="Click to view"
+            text="DISCUSSION * Click to view"
             size="xxxs"
             weight="medium"
             color={colors.palette.neutral300}
+            style={{ marginHorizontal: spacing.extraSmall, marginVertical: spacing.tiny }}
+
           />
         </Pressable>
       )
@@ -144,13 +152,14 @@ export const CustomChatMessage = ({ message }: { message: any }) => {
       const id = parsedData?.url.split("/")[parsedData?.url.split("/")?.length - 1]
 
       return (
-        <Pressable onPress={() => navigationHome.navigate("PostInfo", { post: id })}>
-          <Text text="Shared a post" size="xs" weight="medium" color={colors.palette.neutral100} />
+        <Pressable style={$maxWidthClip} onPress={() => navigationHome.navigate("PostInfo", { post: id })}>
+          <FastImage defaultSource={BROKEN_IMAGE} style={$thumbnailImage} resizeMode='cover' source={{ uri: parsedData?.attachment }} />
           <Text
-            text="Click to view"
+            text="POST * Click to view"
             size="xxxs"
             weight="medium"
-            color={colors.palette.neutral300}
+            style={{ marginHorizontal: spacing.extraSmall, marginVertical: spacing.tiny }}
+            color={colors.palette.neutral250}
           />
         </Pressable>
       )
@@ -160,13 +169,21 @@ export const CustomChatMessage = ({ message }: { message: any }) => {
       const id = parsedData?.url.split("/")[parsedData?.url.split("/")?.length - 1]
 
       return (
-        <Pressable onPress={() => navigationVideo.navigate("VideoDetails", { data: id })}>
-          <Text text="Shared a video" size="xs" weight="medium" color={colors.palette.neutral100} />
+        <Pressable style={$maxWidthClip} onPress={() => navigationVideo.navigate("VideoDetails", { data: id })}>
+          <FastImage defaultSource={BROKEN_IMAGE} style={$thumbnailImage} resizeMode='cover' source={{ uri: parsedData?.attachment }} />
           <Text
-            text="Click to view"
+            style={{ marginHorizontal: spacing.extraSmall, marginBottom: spacing.zero, marginVertical: spacing.tiny }}
+            text={parsedData?.title} size="xs" weight="medium" color={colors.palette.neutral100} />
+          <Text numberOfLines={3}
+            style={{ marginHorizontal: spacing.extraSmall, marginBottom: spacing.zero, marginVertical: spacing.tiny }}
+            text={parsedData?.message} size="xxs" weight="normal" color={colors.palette.neutral100}
+          />
+          <Text
+            text="VIDEO * Click to view"
             size="xxxs"
             weight="medium"
-            color={colors.palette.neutral300}
+            style={{ marginHorizontal: spacing.extraSmall, marginVertical: spacing.tiny }}
+            color={colors.palette.neutral250}
           />
         </Pressable>
       )
@@ -175,6 +192,8 @@ export const CustomChatMessage = ({ message }: { message: any }) => {
       return null
   }
 }
+
+const $maxWidthClip :ViewStyle ={ width: 200 }
 
 const $image: ImageStyle = {
   height: 80,
@@ -186,3 +205,5 @@ const $image: ImageStyle = {
 const $offerContainer: ViewStyle = {
   paddingVertical: spacing.tiny,
 }
+
+const $thumbnailImage: ImageStyle = { height: 200, width: 200, borderTopLeftRadius: 8, borderTopRightRadius: 8 }
