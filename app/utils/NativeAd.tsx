@@ -3,11 +3,11 @@ import { Dimensions, StyleSheet, Text, View } from "react-native"
 import AppLovinMAX from "react-native-applovin-max"
 import { NATIVE_AD_UNIT_ID } from "./AppLovin"
 import { colors } from "../theme"
-import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated"
+import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated"
 import Lottie from "lottie-react-native"
 
 export const NativeAdView = () => {
-  const [aspectRatio, setAspectRatio] = useState(1.0)
+  const [aspectRatio, setAspectRatio] = useState<undefined | number>(undefined)
   const [visible, setVisible] = useState(false)
   const [mediaViewSize, setMediaViewSize] = useState({})
   const [isNull, setIsNull] = useState(false)
@@ -19,20 +19,34 @@ export const NativeAdView = () => {
   //     ref.current && ref?.current?.loadAd()
   //   }, [ref.current])
   useEffect(() => {
-    success.value = withTiming(340, { duration: 200 })
-    if (aspectRatio > 1) {
-      // landscape
-      setMediaViewSize({ aspectRatio, width: "100%", height: undefined })
+
+    console.log("ASPECT RATIO ", aspectRatio)
+    if (aspectRatio !== undefined) {
+
+      if (aspectRatio > 1) {
+        // landscape
+
+        setMediaViewSize({ aspectRatio, width: "100%", height: undefined })
+      } else {
+        // portrait or square
+        setMediaViewSize({ aspectRatio, width: undefined, height: 180 })
+      }
+      success.value = withTiming(1, { duration: 200 })
+
     } else {
-      // portrait or square
-      setMediaViewSize({ aspectRatio, width: undefined, height: 180 })
+      success.value = withTiming(0, { duration: 200 })
     }
   }, [aspectRatio])
 
-  if (isNull) return null
+  const $animatedAdContainer = useAnimatedStyle(() => {
+    return {
+      transform: [{ scaleY: interpolate(success.value, [0, 1], [0, 1]) }],
+      height: interpolate(success.value, [0, 1], [0, 320]), backgroundColor: 'red'
+    }
+  })
 
   return (
-    <>
+    <Animated.View style={$animatedAdContainer}>
       <AppLovinMAX.NativeAdView
         adUnitId={NATIVE_AD_UNIT_ID}
         //   placement="myplacement"
@@ -45,22 +59,22 @@ export const NativeAdView = () => {
         }}
         onAdLoadFailed={(errorInfo) => {
           setIsNull(true)
-       
+          setAspectRatio(undefined)
         }}
         onAdClicked={(adInfo) => {
 
         }}
         onAdRevenuePaid={(adInfo) => {
-     
+
         }}
       >
-        <View 
-        style={{ flex: 1, flexDirection: "column", justifyContent: "center" }}>
-          <View 
-          style={{ flexDirection: "row", justifyContent: "space-between" }}>
+        <View
+          style={{ flex: 1, flexDirection: "column", justifyContent: "center" }}>
+          <View
+            style={{ flexDirection: "row", justifyContent: "space-between" }}>
             <AppLovinMAX.NativeAdView.IconView style={styles.icon} />
-            <View 
-            style={{ flexDirection: "column", flexGrow: 1 }}>
+            <View
+              style={{ flexDirection: "column", flexGrow: 1 }}>
               <AppLovinMAX.NativeAdView.TitleView style={styles.title} />
               {/* <AppLovinMAX.NativeAdView.StarRatingView style={styles.starRatingView} /> */}
               <AppLovinMAX.NativeAdView.AdvertiserView style={styles.advertiser} />
@@ -70,7 +84,7 @@ export const NativeAdView = () => {
           {/* <AppLovinMAX.NativeAdView.BodyView style={styles.body} /> */}
           <AppLovinMAX.NativeAdView.MediaView style={{ ...styles.mediaView, ...mediaViewSize }} />
           <AppLovinMAX.NativeAdView.CallToActionView style={styles.callToAction} />
-          {!loaded && (
+          {/* {!loaded && (
             <Lottie
               style={{
                 height: 40,
@@ -82,18 +96,19 @@ export const NativeAdView = () => {
               autoPlay
               loop
             />
-          )}
+          )} */}
         </View>
       </AppLovinMAX.NativeAdView>
-    </>
+    </Animated.View>
   )
 }
 
 const styles = StyleSheet.create({
   nativead: {
-    margin: 10,
+    // margin: 10,
     padding: 10,
     backgroundColor: "#EFEFEF",
+    height: '100%'
   },
   title: {
     fontSize: 16,
@@ -122,16 +137,17 @@ const styles = StyleSheet.create({
     // backgroundColor: colors.palette.primary100,
   },
   advertiser: {
-    marginHorizontal: 5,
-    textAlign: "left",
+    color: colors.palette.neutral700,
     fontSize: 12,
     fontWeight: "400",
-    color: colors.palette.neutral700,
+    marginHorizontal: 5,
+    textAlign: "left",
   },
+  // eslint-disable-next-line react-native/no-unused-styles
   body: {
+    color: colors.palette.neutral700,
     fontSize: 14,
     marginVertical: 4,
-    color: colors.palette.neutral700,
   },
   mediaView: {
     alignSelf: "center",

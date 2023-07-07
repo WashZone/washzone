@@ -99,9 +99,9 @@ export const CreatePost = observer(function CreatePost({
 
   const onGalleryPress = async () => {
     try {
-      const images = await MediaPicker({ selectionLimit: 5 })
+      const images = await MediaPicker({ selectionLimit: 5 - selectedImages.length })
       if (images?.length > 0) {
-        setSelectedImages(images)
+        setSelectedImages([...selectedImages, ...images])
         setTimeout(() => {
           progress.value = withTiming(1, { duration: 300 })
         }, 100)

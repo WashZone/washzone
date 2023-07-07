@@ -111,22 +111,7 @@ export const CommentInput = ({
 
   return (
     <>
-      {/* {selectedMedia && (
-        <Animated.View >
-          <FastImage
-            source={{ uri: selectedMedia?.uri }}
-            // eslint-disable-next-line react-native/no-inline-styles
-            style={{ height: 100, width: 100, borderRadius: 2 }}
-          />
-          <Icon
-            icon="x"
-            size={20}
-            onPress={() => setSelectedMedia(undefined)}
-            containerStyle={$iconXContainer}
-            disabled={isCommenting}
-          />
-        </Animated.View>
-      )} */}
+
       <Animated.View style={[$postCommentContainer, $animatedContainer]}>
         <Animated.View style={$animatedMediaContainer}>
           <Animated.View style={$animatedAttachIconContainer}>

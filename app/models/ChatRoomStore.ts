@@ -53,7 +53,7 @@ export const ChatRoomStoreModel = types
         ...temp[props.roomId].slice(0, props.previousPage * 20 + 1),
         ...props.messages,
       ]
- 
+
       self.setProp("chatMessages", temp)
       // }
     },

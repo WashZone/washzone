@@ -123,6 +123,7 @@ export const HomePostsTabScreen = ({
 
     setLoading(false)
   }
+  const [imageViewConfig, setImageViewConfig] = useState({show:false, images:[], currentIndex:0})
 
   useEffect(() => {
     fetchUserPosts()
@@ -131,24 +132,30 @@ export const HomePostsTabScreen = ({
   if (loading) return <Loading />
 
   return (
-    <HFlatList
-      index={0}
-      style={$screenContainer}
-      bounces={false}
-      data={userPosts}
-      showsVerticalScrollIndicator={false}
-      ListHeaderComponent={userPosts?.length === 0 && <EmptyTabState preset="emptyPosts" />}
-      renderItem={({ item, index }) => (
-        <PostComponent
-          post={item}
-          navigateOnPress
-          index={index}
-          setImageViewConfig={function (t: ImageViewConfigType): void {
-            throw new Error("Function not implemented. " + JSON.stringify(t))
-          }}
-        />
-      )}
-    />
+    <>
+      <HFlatList
+        index={0}
+        style={$screenContainer}
+        bounces={false}
+        data={userPosts}
+        showsVerticalScrollIndicator={false}
+        ListHeaderComponent={userPosts?.length === 0 && <EmptyTabState preset="emptyPosts" />}
+        renderItem={({ item, index }) => (
+          <PostComponent
+            post={item}
+            navigateOnPress
+            index={index}
+            setImageViewConfig={setImageViewConfig}
+          />
+        )}
+      />
+      <ImageView
+        images={imageViewConfig.images}
+        imageIndex={imageViewConfig.currentIndex}
+        visible={imageViewConfig.show}
+        onRequestClose={() => {setImageViewConfig({...imageViewConfig , show:false})}}
+      />
+    </>
   )
 }
 export const TopicsTabScreen = ({
@@ -166,7 +173,7 @@ export const TopicsTabScreen = ({
   const fetchUserTopics = async () => {
     const res = await getUserTopics(userId)
     setUserTopics(res)
-    
+
     // eslint-disable-next-line array-callback-return
     const galleryImages = res.map((i, index) => {
       if (i.attachmentUrl) return { uri: i?.attachmentUrl || "", id: "topic" + index }

@@ -67,9 +67,9 @@ export const BottomModal = ({
       onSwipeComplete={() => { !disableUnMount && closeModal() }}
       onBackdropPress={() => { !disableUnMount && closeModal() }}
     >
-      <View 
-          // eslint-disable-next-line react-native/no-inline-styles
-          style={{ marginBottom: isKeyboardVisible ? keyboardOffset : 0 }}>
+      <View
+        // eslint-disable-next-line react-native/no-inline-styles
+        style={{ marginBottom: isKeyboardVisible ? keyboardOffset : 0 }}>
         {showIndicator && <Handle />}
         <View
           style={[

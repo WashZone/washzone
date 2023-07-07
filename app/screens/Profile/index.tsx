@@ -15,6 +15,7 @@ import { NavigationState, SceneRendererProps, TabBar } from "react-native-tab-vi
 import { observer } from "mobx-react-lite"
 import { ActivityIndicator } from "react-native-paper"
 import { NavigationProp, StackActions, useNavigation } from "@react-navigation/native"
+import ImageView from "react-native-fast-image-viewing"
 
 import { colors, spacing } from "../../theme"
 import { HomeTabParamList, HomeTabProps } from "../../tabs"
@@ -34,6 +35,7 @@ import Toast from "react-native-toast-message"
 import { toastMessages } from "../../utils/toastMessages"
 import { showAlertYesNo } from "../../utils/helpers"
 import Loading from "../../components/Loading"
+import { defaultImages } from "../../utils"
 
 const getIndexFromKey = (key: string) => {
   switch (key) {
@@ -257,7 +259,7 @@ const Options = ({ user, reportUser }) => {
   )
 }
 
-const ProfileHeader = ({ user, isUser, onMessage }) => {
+const ProfileHeader = ({ user, isUser, onMessage, onProfileImagePress, onBannerPress }) => {
   const {
     userStore: { _id },
     api: { mutateReportOnUser },
@@ -345,20 +347,23 @@ const ProfileHeader = ({ user, isUser, onMessage }) => {
         backgroundColor: colors.palette.neutral100,
       }}
     >
-      <FastImage
-        source={
-          user?.banner
-            ? {
+      <TouchableOpacity onPress={() => { if (user?.banner) onBannerPress() }}>
+        <FastImage
+          source={
+            user?.banner
+              ? {
                 uri: user?.banner,
               }
-            : require("../../../assets/images/mock_banner.png")
-        }
-        style={$topContainer}
-      />
+              : require("../../../assets/images/mock_banner.png")
+          }
+          style={$topContainer}
+        />
+      </TouchableOpacity>
       <View style={$userDetailsContainer}>
         <View style={$flexRow}>
-          <FastImage style={$profileImage} source={{ uri: user?.picture }} />
-
+          <TouchableOpacity onPress={onProfileImagePress}>
+            <FastImage style={$profileImage} source={{ uri: user?.picture }} />
+          </TouchableOpacity>
           <View
             style={[
               $flexRow,
@@ -532,6 +537,7 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
   const isUser = user?._id === _id
   const position = useRef(new Animated.Value(0))
   const [index, setIndex] = React.useState(0)
+  const [isImageViewVisible, setImageViewVisible] = React.useState<{ visible: boolean, type: 'picture' | 'banner' }>({ visible: false, type: 'picture' })
   const [routes] = React.useState([
     { key: "posts", title: "Posts" },
     { key: "topic", title: "Discussions" },
@@ -594,7 +600,16 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
       )}
       <CollapsibleHeaderTabView
         renderScrollHeader={() => (
-          <ProfileHeader user={user} isUser={isUser} onMessage={onMessage} />
+          <ProfileHeader
+            onProfileImagePress={
+              () => {
+                setImageViewVisible({ visible: true, type: 'picture' })
+              }
+            } onBannerPress={
+              () => {
+                setImageViewVisible({ visible: true, type: 'banner' })
+              }
+            } user={user} isUser={isUser} onMessage={onMessage} />
         )}
         enableSnap
         navigationState={{ index, routes }}
@@ -603,6 +618,14 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
         onIndexChange={setIndex}
         style={$flex1}
         initialLayout={{ width: layout.width }}
+      />
+      <ImageView
+        images={[{ uri: (isImageViewVisible.type === 'picture' ? (user?.picture || defaultImages.profile) : user?.banner) }]}
+        imageIndex={0}
+        visible={isImageViewVisible.visible}
+        swipeToCloseEnabled
+        animationType="fade"
+        onRequestClose={() => setImageViewVisible({ ...isImageViewVisible, visible: false })}
       />
     </Screen>
   )
