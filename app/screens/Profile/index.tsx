@@ -284,6 +284,10 @@ const ProfileHeader = ({ user, isUser, onMessage, onProfileImagePress, onBannerP
   }, [user])
 
   const reportUser = async (reason: string) => {
+    if(reason?.trim()?.length === 0) {
+      Toast.show({type:'error', text1:'Invalid Reason !', text2:'Type in a reason to successfully report.'})
+    return
+    }
     try {
       await mutateReportOnUser({
         reason,
@@ -546,6 +550,8 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
   ])
 
   const syncUser = async () => {
+    setLoading(true)
+
     const res = await getUserById(user?._id)
     navigation.setParams({ user: res })
     setLoading(false)
@@ -553,7 +559,7 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
 
   useEffect(() => {
     syncUser()
-  }, [])
+  }, [user?._id])
 
   const renderScene = ({ route }) => {
     switch (route.key) {

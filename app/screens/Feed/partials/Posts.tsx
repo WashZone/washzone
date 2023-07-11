@@ -407,7 +407,7 @@ const $agoStamp: TextStyle = {
 
 const $postContainer: ViewStyle = {
   backgroundColor: colors.palette.neutral100,
-  marginBottom: 10,
+  marginTop: 6,
   width: "100%",
   justifyContent: "space-between",
 }

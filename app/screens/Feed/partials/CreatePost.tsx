@@ -62,7 +62,7 @@ export const CreatePost = observer(function CreatePost({
   }, [focused])
 
   const onPost = async () => {
-
+if(postContent?.trim()?.length ===0 && selectedImages?.length === 0) return 
     setLoading(true)
     try {
       await createPost({
