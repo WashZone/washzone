@@ -57,7 +57,7 @@ const renderTabBar = (
   props: SceneRendererProps & {
     navigationState: NavigationState<any>
   },
-  position: React.MutableRefObject<Animated.Value>,
+  position: { current: Animated.AnimatedInterpolation },
   setIndex: (n: number) => void,
   index: number,
 ) => {
@@ -284,9 +284,9 @@ const ProfileHeader = ({ user, isUser, onMessage, onProfileImagePress, onBannerP
   }, [user])
 
   const reportUser = async (reason: string) => {
-    if(reason?.trim()?.length === 0) {
-      Toast.show({type:'error', text1:'Invalid Reason !', text2:'Type in a reason to successfully report.'})
-    return
+    if (reason?.trim()?.length === 0) {
+      Toast.show({ type: 'error', text1: 'Invalid Reason !', text2: 'Type in a reason to successfully report.' })
+      return
     }
     try {
       await mutateReportOnUser({

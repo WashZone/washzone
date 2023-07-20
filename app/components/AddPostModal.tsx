@@ -10,12 +10,11 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated"
-import { $contentCenter } from "../screens/styles"
+import { $contentCenter, $flexRow } from "../screens/styles"
 import { CreatePost } from "../screens/Feed/partials"
 
 import { CreateTopic } from "../screens/TopicsFeed/CreateTopic"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
-import { ClassifiedsTabParamList } from "../tabs"
 import { AppStackParamList } from "../navigators"
 
 export const AddPostModal = () => {
@@ -105,13 +104,13 @@ export const BottomModalContent = ({ hide, setLoading, loading }) => {
     }
   })
 
-  const $animatedPostText = useAnimatedStyle(() => {
+  const $animatedPostComponent = useAnimatedStyle(() => {
     return {
       transform: [{ scaleY: interpolate(sharedValPost.value, [0, 0.5, 1], [1, 0, 0]) }],
     }
   })
 
-  const $animatedDiscussText = useAnimatedStyle(() => {
+  const $animatedDiscussComponent = useAnimatedStyle(() => {
     return {
       transform: [{ scaleY: interpolate(sharedValDiscuss.value, [0, 0.5, 1], [1, 0, 0]) }],
     }
@@ -151,11 +150,14 @@ export const BottomModalContent = ({ hide, setLoading, loading }) => {
         style={[$button, $discussButtonAnimated]}
         onPress={expandDiscuss}
       >
-        <Animated.Text
-          style={[$baseTextStyle, { color: colors.palette.neutral100 }, $animatedDiscussText]}
-        >
-          DISCUSS
-        </Animated.Text>
+        <Animated.View style={[$flexRow, $animatedDiscussComponent]}>
+          <Icon icon='topics' size={20} />
+          <Animated.Text
+            style={[$baseTextStyle, { color: colors.palette.neutral100 }, $animatedDiscussComponent]}
+          >
+            DISCUSS
+          </Animated.Text>
+        </Animated.View>
         <Animated.View
           // eslint-disable-next-line react-native/no-inline-styles
           style={[{ width: "100%", position: "absolute" }, $animatedCreateTopicContainer]}
@@ -175,11 +177,14 @@ export const BottomModalContent = ({ hide, setLoading, loading }) => {
         style={[$button, $postButtonAnimated]}
         onPress={expandPost}
       >
-        <Animated.Text
-          style={[$baseTextStyle, { color: colors.palette.neutral100 }, $animatedPostText]}
-        >
-          POST
-        </Animated.Text>
+        <Animated.View style={[$flexRow, $animatedPostComponent]}>
+          <Icon icon='classifieds' size={20} />
+          <Animated.Text
+            style={[$baseTextStyle, { color: colors.palette.neutral100 }, $animatedPostComponent]}
+          >
+            POST
+          </Animated.Text>
+        </Animated.View>
         <Animated.View
           // eslint-disable-next-line react-native/no-inline-styles
           style={[{ width: "100%", position: "absolute" }, $animatedCreatePostContainer]}
@@ -203,14 +208,17 @@ export const BottomModalContent = ({ hide, setLoading, loading }) => {
           if (!loading) { hide(); setTimeout(() => navigation.navigate('AddAClassified'), 200) }
         }}
       />
-      <Button
+      {/* <Button
         text="CANCEL"
         textColor={colors.palette.primary300}
         style={$button}
         onPress={() => {
           !loading && hide()
         }}
-      />
+      /> */}
+      <TouchableOpacity>
+        <Text  text="CANCEL"/>
+      </TouchableOpacity>
     </View>
   )
 }

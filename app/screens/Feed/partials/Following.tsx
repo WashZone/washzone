@@ -9,7 +9,7 @@ import { useHooks } from "../../hooks"
 import { useStores } from "../../../models"
 import { formatName } from "../../../utils/formatName"
 import { colors, spacing } from "../../../theme"
-import { Text } from "../../../components"
+import { Icon, Text } from "../../../components"
 import { observer } from "mobx-react-lite"
 import ShimmerPlaceholder from "react-native-shimmer-placeholder"
 import { BROKEN_IMAGE } from "../../../utils"
@@ -142,14 +142,21 @@ const StoryComponent = ({ item, index }: StoryComponentProps) => {
             <Text style={$unreadCountText} text={item?.unreadCount} weight="semiBold" />
           </View>
         )}
+        {item?.followId?.blueTick && (
+          <Icon
+            icon="verifiedTick"
+            size={18}
+            containerStyle={$blueTick}
+          />
+        )}
         <Text
           text={formatName(item?.followId?.name)}
           style={[
             $name,
             item?.unreadCount !== 0 &&
-              item?.unreadCount !== -1 && {
-                textShadowRadius: spacing.tiny,
-              },
+            item?.unreadCount !== -1 && {
+              textShadowRadius: spacing.tiny,
+            },
           ]}
           numberOfLines={1}
         />
@@ -212,5 +219,11 @@ const $container: ViewStyle = {
   backgroundColor: colors.palette.neutral100,
   flexDirection: "row",
   alignItems: "center",
-  marginVertical: 10,
+  marginBottom: 10,
+}
+
+const $blueTick :ViewStyle ={
+  position:'absolute',
+  top: 25,
+  right: 0,
 }
