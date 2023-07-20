@@ -135,13 +135,11 @@ function App(props: AppProps) {
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
       <ErrorBoundary catchErrors={Config.catchErrors}>
-        {/* <GestureHandlerRootView> */}
           <AppNavigator
             linking={linking}
             initialState={initialNavigationState}
             onStateChange={onNavigationStateChange}
           />
-        {/* </GestureHandlerRootView> */}
         <Toast />
       </ErrorBoundary>
     </SafeAreaProvider>

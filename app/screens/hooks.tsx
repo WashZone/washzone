@@ -1219,6 +1219,7 @@ export function useHooks() {
       console.log(error)
     }
   }
+  
   const setNotificationStatus = async (b: boolean) => {
     try {
       await mutateSetNotificationStatus({

@@ -106,6 +106,7 @@ export const Stories = observer(() => {
 const StoryComponent = ({ item, index }: StoryComponentProps) => {
   const [loaded, setLoaded] = useState(false)
   const navigationHome = useNavigation<NavigationProp<HomeTabParamList>>()
+  const isRead = item?.unreadCount === 0 || item?.unreadCount === -1
   return (
     <ShimmerPlaceholder
       visible={loaded}
@@ -117,14 +118,26 @@ const StoryComponent = ({ item, index }: StoryComponentProps) => {
         style={$storyContainer}
         key={index}
       >
-        <FastImage
-          onLoadEnd={() => setLoaded(true)}
-          defaultSource={BROKEN_IMAGE}
-          source={{ uri: item?.followId?.picture }}
-          resizeMode="cover"
-          style={$story}
-        />
-        {item?.unreadCount !== 0 && item?.unreadCount !== -1 && (
+        <View
+          style={[
+            $imageContainer,
+            {
+              borderColor: isRead ? colors.palette.neutral400 : colors.palette.primary300,
+            },
+          ]}
+        >
+          <FastImage
+            onLoadEnd={() => setLoaded(true)}
+            defaultSource={BROKEN_IMAGE}
+            source={{ uri: item?.followId?.picture }}
+            resizeMode="cover"
+            style={$story}
+          />
+        </View>
+        {/* <View style={$activityDot}>
+          <Text style={$unreadCountText} text={'1'} weight="semiBold" />
+        </View> */}
+        {!isRead && (
           <View style={$activityDot}>
             <Text style={$unreadCountText} text={item?.unreadCount} weight="semiBold" />
           </View>
@@ -143,6 +156,14 @@ const StoryComponent = ({ item, index }: StoryComponentProps) => {
       </Pressable>
     </ShimmerPlaceholder>
   )
+}
+
+const $imageContainer: ViewStyle = {
+  borderWidth: 2,
+  height: 80,
+  width: 80,
+  borderRadius: 40,
+  ...$contentCenter,
 }
 
 const $unreadCountText: TextStyle = {
@@ -165,9 +186,9 @@ const $activityDot: ViewStyle = {
 const $storyList: ViewStyle = { paddingHorizontal: spacing.homeScreen / 2 }
 
 const $story: ImageStyle = {
-  height: 80,
-  width: 80,
-  borderRadius: 40,
+  height: 74,
+  width: 74,
+  borderRadius: 37,
 }
 
 const $storyContainer: ViewStyle = {

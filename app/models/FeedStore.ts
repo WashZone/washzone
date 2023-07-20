@@ -20,6 +20,9 @@ export const FeedStoreModel = types
       })
       self.homeFeed = temp
     },
+    syncLocalRead(userId:string){
+      self.stories =  self.stories.map(i => i?.followId?._id ===userId? {...i, unreadCount:0} : i)
+    },
     setTopics(topics: any) {
       self.topics = topics
     },

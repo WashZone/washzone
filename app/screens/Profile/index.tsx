@@ -361,6 +361,7 @@ const ProfileHeader = ({ user, isUser, onMessage, onProfileImagePress, onBannerP
               : require("../../../assets/images/mock_banner.png")
           }
           style={$topContainer}
+          defaultSource={require("../../../assets/images/mock_banner.png")}
         />
       </TouchableOpacity>
       <View style={$userDetailsContainer}>

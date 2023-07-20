@@ -171,7 +171,6 @@ export const iconRegistry = {
   attachment: require("../../assets/icons/attachment.png"),
   verifiedTick: require("../../assets/icons/verified-tick.png"),
   editPhoto: require("../../assets/icons/photo.png"),
-
 }
 
 const $imageStyle: ImageStyle = {

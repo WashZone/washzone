@@ -51,7 +51,7 @@ export const AllChats: FC<AppStackScreenProps<"AllChats">> = observer(function A
 
   return (
     <>
-      <View style={$flex1}>
+      <View style={[$flex1, [{backgroundColor:colors.palette.neutral100}]]}>
         <Header
           titleStyle={{ color: colors.palette.neutral100 }}
           backgroundColor={colors.palette.primary100}

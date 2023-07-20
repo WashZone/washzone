@@ -47,7 +47,8 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
   const { receiver, roomId } = props.route.params
   const {
     userStore,
-    allChats: { getRoomMessages, setLastReadId, getRoomDetails },
+    allChats: {  getRoomMessages, setLastReadId, getRoomDetails, },
+    
   } = useStores()
   const { syncChatMessages, sendTextMessage, getMoreChatMessages, sendAttachment } = useHooks()
   // const [optionsModalVisible, setOptionsModalVisible] = useState(false)

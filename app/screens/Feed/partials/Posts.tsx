@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react"
-import { Alert, Dimensions, Pressable, TextStyle, View, ViewStyle } from "react-native"
+import { Alert, Dimensions, Pressable, TextStyle, View, ViewStyle, TouchableOpacity } from "react-native"
 import {
   CustomFlatlist,
   Icon,
@@ -27,7 +27,6 @@ import NativeAdView from "../../../utils/NativeAd"
 
 import { defaultImages, messageMetadataType } from "../../../utils"
 import { ImageViewConfigType } from ".."
-import { TouchableOpacity } from "react-native-gesture-handler"
 import LinearGradient from "react-native-linear-gradient"
 
 export interface PostComponentProps {

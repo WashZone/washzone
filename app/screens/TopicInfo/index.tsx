@@ -67,6 +67,7 @@ export const TopicInfo: FC<HomeTabProps<"TopicInfo">> = function PostInfo(props)
     </Screen>
   )
 }
+
 const $container: ViewStyle = {
   flex: 1,
 }
