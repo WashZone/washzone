@@ -190,13 +190,16 @@ export const Saved: FC<AppStackScreenProps<"Saved">> = observer(function Saved()
   }
 
   return (
-    <Screen preset="fixed" contentContainerStyle={$container}>
+    <Screen preset="fixed" contentContainerStyle={$container} 
+    >
       <Header
         leftIcon="caretLeft"
         title="Saved"
         titleStyle={$titleStyle}
         onLeftPress={() => navigation.goBack()}
         leftIconColor={colors.palette.neutral600}
+    backgroundColor={colors.palette.neutral100}
+
       />
       {savedClassifieds?.length === 0 ? (
         <EmptyState preset="saved" buttonOnPress={() => navigation.goBack()} />

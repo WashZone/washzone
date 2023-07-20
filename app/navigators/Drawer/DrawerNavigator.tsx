@@ -42,11 +42,10 @@ export function DrawerNavigator() {
   const toggleDrawer = () => {
     if (!drawerRef.current.state.drawerOpened) {
       Keyboard.dismiss()
-   
+
       drawerRef.current?.openDrawer({ speed: 2 })
       // setOpen(true)
     } else {
-
       drawerRef.current?.closeDrawer({ speed: 10 })
       // setOpen(false)
     }
@@ -72,7 +71,7 @@ export function DrawerNavigator() {
 
   return (
     <DrawerLayout
-useNativeAnimations
+      useNativeAnimations
       drawerLockMode="locked-closed"
       ref={drawerRef}
       drawerWidth={Platform.select({ default: 326, web: Dimensions.get("screen").width * 0.3 })}
@@ -108,11 +107,20 @@ useNativeAnimations
         contentContainerStyle={$screenContainer}
       >
         <View style={$headerContainer}>
-          <View style={{ position: "absolute", left: 0 }}>
+          <View
+            // eslint-disable-next-line react-native/no-inline-styles
+            style={{ position: "absolute", left: 0 }}
+          >
             <DrawerIconButton onPress={toggleDrawer} {...{ open, progress }} />
           </View>
           <Icon icon="appLogo" size={45} />
-          <View style={[$flexRow, { position: "absolute", right: 10 }]}>
+          <View
+            style={[
+              $flexRow,
+              // eslint-disable-next-line react-native/no-inline-styles
+              { position: "absolute", right: 10 },
+            ]}
+          >
             <Pressable style={$searchContainer} onPress={handleChatPress}>
               <Icon icon="addMessage" size={24} />
               <UnreadCountBadge />

@@ -50,8 +50,6 @@ const UserItem = ({ item, index, handleOnPress }) => {
   )
 }
 
-
-
 export const BlockedUsers: FC<AppStackScreenProps<"BlockedUsers">> = observer(
   function BlockedUsers() {
     const [loading, setLoading] = useState(true)
@@ -67,11 +65,12 @@ export const BlockedUsers: FC<AppStackScreenProps<"BlockedUsers">> = observer(
     const syncData = async () => {
       setLoading(true)
       try {
-        const res = await queryGetBlockedByUserId({ userId: _id }, { fetchPolicy: 'no-cache' })
+        const res = await queryGetBlockedByUserId({ userId: _id }, { fetchPolicy: "no-cache" })
         setData(res.getBlockedByUserId?.data)
-      } catch (err) { Alert.alert(err) }
+      } catch (err) {
+        Alert.alert(err)
+      }
       setLoading(false)
-
     }
 
     useEffect(() => {
@@ -97,8 +96,11 @@ export const BlockedUsers: FC<AppStackScreenProps<"BlockedUsers">> = observer(
           titleStyle={$titleStyle}
           onLeftPress={() => navigation.goBack()}
           leftIconColor={colors.palette.neutral600}
+          backgroundColor={colors.palette.neutral100}
         />
-        {loading ?<Loading/> :  data?.length === 0 ? (
+        {loading ? (
+          <Loading />
+        ) : data?.length === 0 ? (
           <EmptyState preset="blocked" buttonOnPress={() => navigation.goBack()} />
         ) : (
           <FlatList
@@ -119,7 +121,6 @@ export const BlockedUsers: FC<AppStackScreenProps<"BlockedUsers">> = observer(
     )
   },
 )
-
 
 const $image: ImageStyle = {
   height: 45,

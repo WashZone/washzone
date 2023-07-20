@@ -114,6 +114,7 @@ const en = {
     logout: "Logout",
     saved: "Saved",
     notification: "Notifications",
+    followerFollowing: "Followers/Following",
     version: "Version 1.0",
   },
   TabNavigator: {

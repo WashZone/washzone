@@ -1,31 +1,40 @@
-import React, { FC } from "react"
-import { useNavigation } from "@react-navigation/native"
+import React, { FC, useEffect } from "react"
+import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { TabBar, TabView } from "react-native-tab-view"
 import { observer } from "mobx-react-lite"
 
 import { Header, Screen } from "../../components"
-import { HomeTabProps } from "../../tabs"
+import { HomeTabParamList, HomeTabProps } from "../../tabs"
 import { colors } from "../../theme"
 import { $flex1 } from "../styles"
 import { FollowersList } from "./partials/Followers"
 import { FollowingList } from "./partials/Followings"
 import { formatName } from "../../utils/formatName"
+import { useStores } from "../../models"
 
 export const FollowerFollowing: FC<HomeTabProps<"FollowerFollowing">> = observer(
   function FollowerFollowing(props) {
-    const { initialTab, user } = props.route.params
-    const navigation = useNavigation()
-    const [index, setIndex] = React.useState(initialTab === "followers" ? 0 : 1)
+    const params = props.route.params
+    const navigation = useNavigation<NavigationProp<HomeTabParamList>>()
+    const { userStore } = useStores()
+    const [index, setIndex] = React.useState(params?.initialTab === 'following' ? 1 : 0)
     const [routes] = React.useState([
       { key: "followers", title: "Followers" },
       { key: "following", title: "Following" },
     ])
+
+    useEffect(() => {
+      if (!params?.user) {
+        navigation.setParams({ user: userStore })
+      }
+    }, [])
+
     const renderScene = ({ route }) => {
       switch (route.key) {
         case "followers":
-          return <FollowersList user={user} />
+          return <FollowersList user={params?.user} />
         case "following":
-          return <FollowingList user={user} />
+          return <FollowingList user={params?.user} />
         default:
           return null
       }
@@ -35,7 +44,7 @@ export const FollowerFollowing: FC<HomeTabProps<"FollowerFollowing">> = observer
       <Screen preset="fixed" contentContainerStyle={$flex1}>
         <Header
           safeAreaEdges={[]}
-          title={formatName(user?.name)}
+          title={formatName(params?.user?.name)}
           titleStyle={{ color: colors.palette.neutral100 }}
           leftIcon="caretLeft"
           backgroundColor={colors.palette.primary100}

@@ -54,6 +54,13 @@ export const DrawerOptions = observer(function DrawerOptions({
       },
     },
     {
+      icon: "people",
+      label: "DrawerNavigator.followerFollowing",
+      onPress() {
+        navigatonHome.navigate('FollowerFollowing')
+      },
+    },
+    {
       icon: "profile",
       label: "DrawerNavigator.profile",
       onPress() {

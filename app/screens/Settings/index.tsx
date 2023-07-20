@@ -39,6 +39,8 @@ export const Settings: FC<AppStackScreenProps<"Settings">> = observer(function S
         titleStyle={$titleStyle}
         onLeftPress={() => navigation.goBack()}
         leftIconColor={colors.palette.neutral600}
+    backgroundColor={colors.palette.neutral100}
+
       />
       <View style={$content}>
         <ListItem

@@ -35,7 +35,7 @@ import Toast from "react-native-toast-message"
 import { toastMessages } from "../../utils/toastMessages"
 import { showAlertYesNo } from "../../utils/helpers"
 import Loading from "../../components/Loading"
-import { defaultImages } from "../../utils"
+import { BROKEN_BANNER, defaultImages } from "../../utils"
 
 const getIndexFromKey = (key: string) => {
   switch (key) {
@@ -67,7 +67,7 @@ const renderTabBar = (
     <TabBar
       style={$tab}
       labelStyle={$label}
-      activeColor={colors.palette.neutral100}
+      activeColor={colors.palette.primary300}
       indicatorStyle={$indicator}
       scrollEnabled
       renderTabBarItem={(props) => {
@@ -101,7 +101,7 @@ const renderTabBar = (
                   width: props?.defaultTabWidth,
                   backgroundColor:
                     getIndexFromKey(props.key) === index
-                      ? colors.palette.neutral100
+                      ? colors.palette.primary300
                       : colors.palette.primary100,
                   borderTopRightRadius: spacing.tiny,
                   borderTopLeftRadius: spacing.tiny,
@@ -109,18 +109,13 @@ const renderTabBar = (
               ]}
             >
               <Text
-                // eslint-disable-next-line react-native/no-inline-styles
                 style={{
-                  color:
-                    getIndexFromKey(props.key) === index
-                      ? colors.palette.primary100
-                      : colors.palette.neutral250,
-
+                  color: colors.palette.neutral250,
                   fontSize: spacing.medium,
                 }}
                 weight={getIndexFromKey(props.key) === index ? "semiBold" : "medium"}
               >
-                {props?.key.toUpperCase()}
+                {props?.key.charAt(0).toUpperCase() + props?.key.slice(1)}
               </Text>
             </View>
           </TouchableOpacity>
@@ -202,24 +197,6 @@ const Options = ({ user, reportUser }) => {
       anchor={<Icon onPress={showMenu} icon="more" size={28} color={colors.palette.neutral100} />}
       onRequestClose={hideMenu}
     >
-      {/* <MenuItem
-        onPress={() => {
-          onMessage()
-          hideMenu()
-        }}
-      >
-        <View style={[{ height: "100%", width: 100, alignItems: "center" }, $flexRow]}>
-          <Icon
-            containerStyle={{ marginHorizontal: spacing.extraSmall }}
-            color={colors.palette.neutral900}
-            icon="chatMessage"
-            size={22}
-          />
-          <Text text="Message" />
-        </View>
-      </MenuItem> */}
-      {/* <MenuDivider /> */}
-
       <MenuItem onPress={onReport}>
         <View
           style={[
@@ -285,7 +262,11 @@ const ProfileHeader = ({ user, isUser, onMessage, onProfileImagePress, onBannerP
 
   const reportUser = async (reason: string) => {
     if (reason?.trim()?.length === 0) {
-      Toast.show({ type: 'error', text1: 'Invalid Reason !', text2: 'Type in a reason to successfully report.' })
+      Toast.show({
+        type: "error",
+        text1: "Invalid Reason !",
+        text2: "Type in a reason to successfully report.",
+      })
       return
     }
     try {
@@ -347,21 +328,23 @@ const ProfileHeader = ({ user, isUser, onMessage, onProfileImagePress, onBannerP
   return (
     <View
       style={{
-        height: 260 + getParentHeightOffset() - (isUser ? 50 : 0),
+        height: 340 + getParentHeightOffset() - (isUser ? 50 : 0),
         backgroundColor: colors.palette.neutral100,
       }}
     >
-      <TouchableOpacity onPress={() => { if (user?.banner) onBannerPress() }}>
+      <TouchableOpacity
+        onPress={() => {
+          if (user?.banner) onBannerPress()
+        }}
+      >
         <FastImage
           source={
-            user?.banner
-              ? {
-                uri: user?.banner,
-              }
-              : require("../../../assets/images/mock_banner.png")
+            user?.banner && {
+              uri: user?.banner,
+            }
           }
-          style={$topContainer}
-          defaultSource={require("../../../assets/images/mock_banner.png")}
+          style={[$topContainer, { backgroundColor: colors.background }]}
+          defaultSource={BROKEN_BANNER}
         />
       </TouchableOpacity>
       <View style={$userDetailsContainer}>
@@ -542,7 +525,10 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
   const isUser = user?._id === _id
   const position = useRef(new Animated.Value(0))
   const [index, setIndex] = React.useState(0)
-  const [isImageViewVisible, setImageViewVisible] = React.useState<{ visible: boolean, type: 'picture' | 'banner' }>({ visible: false, type: 'picture' })
+  const [isImageViewVisible, setImageViewVisible] = React.useState<{
+    visible: boolean
+    type: "picture" | "banner"
+  }>({ visible: false, type: "picture" })
   const [routes] = React.useState([
     { key: "posts", title: "Posts" },
     { key: "topic", title: "Discussions" },
@@ -608,15 +594,16 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
       <CollapsibleHeaderTabView
         renderScrollHeader={() => (
           <ProfileHeader
-            onProfileImagePress={
-              () => {
-                setImageViewVisible({ visible: true, type: 'picture' })
-              }
-            } onBannerPress={
-              () => {
-                setImageViewVisible({ visible: true, type: 'banner' })
-              }
-            } user={user} isUser={isUser} onMessage={onMessage} />
+            onProfileImagePress={() => {
+              setImageViewVisible({ visible: true, type: "picture" })
+            }}
+            onBannerPress={() => {
+              setImageViewVisible({ visible: true, type: "banner" })
+            }}
+            user={user}
+            isUser={isUser}
+            onMessage={onMessage}
+          />
         )}
         enableSnap
         navigationState={{ index, routes }}
@@ -627,7 +614,14 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
         initialLayout={{ width: layout.width }}
       />
       <ImageView
-        images={[{ uri: (isImageViewVisible.type === 'picture' ? (user?.picture || defaultImages.profile) : user?.banner) }]}
+        images={[
+          {
+            uri:
+              isImageViewVisible.type === "picture"
+                ? user?.picture || defaultImages.profile
+                : user?.banner,
+          },
+        ]}
         imageIndex={0}
         visible={isImageViewVisible.visible}
         swipeToCloseEnabled
@@ -702,7 +696,7 @@ const $topContainer: ImageStyle = {
   backgroundColor: colors.palette.neutral100,
   alignItems: "center",
   paddingBottom: spacing.medium,
-  height: 120,
+  height: 200,
 }
 
 const $descriptionText: TextStyle = {

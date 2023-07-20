@@ -3,4 +3,6 @@ export const defaultImages = {
   noImage: "https://i.ibb.co/7vsc96f/washzone-placeholder.png",
 }
 
-export const BROKEN_IMAGE = require('../../assets/images/broken-image.png')
+export const BROKEN_IMAGE = require("../../assets/images/broken-image.png")
+
+export const BROKEN_BANNER = require("../../assets/images/broken-banner.png")

@@ -10,7 +10,7 @@ export type HomeTabParamList = {
   PostInfo: { post: any }
   Profile: { user: any; header?: boolean }
   PostList: { user: any }
-  FollowerFollowing: { initialTab: "followers" | "following"; user: any }
+  FollowerFollowing: { initialTab?: "followers" | "following"; user: any }
 }
 
 export type HomeTabProps<T extends keyof HomeTabParamList> = StackScreenProps<HomeTabParamList, T>

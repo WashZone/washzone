@@ -143,20 +143,16 @@ const StoryComponent = ({ item, index }: StoryComponentProps) => {
           </View>
         )}
         {item?.followId?.blueTick && (
-          <Icon
-            icon="verifiedTick"
-            size={18}
-            containerStyle={$blueTick}
-          />
+          <Icon icon="verifiedTick" size={24} containerStyle={$blueTick} />
         )}
         <Text
           text={formatName(item?.followId?.name)}
           style={[
             $name,
             item?.unreadCount !== 0 &&
-            item?.unreadCount !== -1 && {
-              textShadowRadius: spacing.tiny,
-            },
+              item?.unreadCount !== -1 && {
+                textShadowRadius: spacing.tiny,
+              },
           ]}
           numberOfLines={1}
         />
@@ -219,11 +215,10 @@ const $container: ViewStyle = {
   backgroundColor: colors.palette.neutral100,
   flexDirection: "row",
   alignItems: "center",
-  marginBottom: 10,
 }
 
-const $blueTick :ViewStyle ={
-  position:'absolute',
-  top: 25,
-  right: 0,
+const $blueTick: ViewStyle = {
+  position: "absolute",
+  top: 3,
+  right: -3,
 }

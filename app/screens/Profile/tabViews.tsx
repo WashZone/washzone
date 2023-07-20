@@ -11,7 +11,6 @@ import Loading from "../../components/Loading"
 import { VideoBlockFullWidth } from "../Playlist"
 import ImageView from "react-native-fast-image-viewing"
 
-import { ImageViewConfigType } from "../Feed"
 import { EmptyTabState } from "./emptyTabComponent"
 
 const GalleryItem = ({ uri, onPress }) => {

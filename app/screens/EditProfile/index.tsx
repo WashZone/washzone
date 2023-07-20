@@ -92,6 +92,7 @@ export const EditProfile: FC<AppStackScreenProps<"EditProfile">> = function Edit
         titleStyle={$titleStyle}
         onLeftPress={() => navigation.goBack()}
         leftIconColor={colors.palette.neutral600}
+        backgroundColor={colors.palette.neutral100}
       />
       <Screen contentContainerStyle={$container}>
         <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>

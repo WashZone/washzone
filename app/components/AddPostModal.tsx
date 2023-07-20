@@ -23,7 +23,7 @@ export const AddPostModal = () => {
   return (
     <>
       <Button style={$addButton} onPress={() => setVisible(true)}>
-        <Icon icon={"plus"} size={40} color={colors.palette.primary300} />
+        <Icon icon={"addBold"} size={40} color={colors.palette.primary100} />
       </Button>
 
       <BottomModal
@@ -54,7 +54,7 @@ export const BottomModalContent = ({ hide, setLoading, loading }) => {
   const sharedValDiscuss = useSharedValue(0)
   const [expanded, setExpanded] = useState<"post" | "discuss" | undefined>(undefined)
 
-  // this is to change the progress according to the fact whether the images are present or not 
+  // this is to change the progress according to the fact whether the images are present or not
   const [discussionImage, setDiscussionImage] = useState<any>({ height: 1, width: 1 })
   const [selectedPostImages, setSelectedPostImages] = useState<Array<any>>([])
 
@@ -87,7 +87,7 @@ export const BottomModalContent = ({ hide, setLoading, loading }) => {
       backgroundColor: interpolateColor(
         sharedValPost.value,
         [0, 0.5],
-        [colors.palette.primary300, colors.transparent],
+        [colors.palette.primary100, colors.transparent],
       ),
     }
   })
@@ -99,7 +99,7 @@ export const BottomModalContent = ({ hide, setLoading, loading }) => {
       backgroundColor: interpolateColor(
         sharedValDiscuss.value,
         [0, 0.5],
-        [colors.palette.primary300, colors.transparent],
+        [colors.palette.primary100, colors.transparent],
       ),
     }
   })
@@ -145,23 +145,25 @@ export const BottomModalContent = ({ hide, setLoading, loading }) => {
         weight="medium"
       />
 
+      {/* DISCUSS Button */}
       <AnimatedTouchable
         disabled={expanded === "discuss"}
         style={[$button, $discussButtonAnimated]}
         onPress={expandDiscuss}
       >
-        <Animated.View style={[$flexRow, $animatedDiscussComponent]}>
-          <Icon icon='topics' size={20} />
+        <Animated.View style={[$flexRow, $animatedDiscussComponent, $contentCenter]}>
+          <Icon icon="topics" size={18} containerStyle={{ marginRight: spacing.extraSmall }} />
           <Animated.Text
-            style={[$baseTextStyle, { color: colors.palette.neutral100 }, $animatedDiscussComponent]}
+            style={[
+              $baseTextStyle,
+              { color: colors.palette.neutral100 },
+              $animatedDiscussComponent,
+            ]}
           >
-            DISCUSS
+            Start a Discussion
           </Animated.Text>
         </Animated.View>
-        <Animated.View
-          // eslint-disable-next-line react-native/no-inline-styles
-          style={[{ width: "100%", position: "absolute" }, $animatedCreateTopicContainer]}
-        >
+        <Animated.View style={[$absoluteWidthFull, $animatedCreateTopicContainer]}>
           <CreateTopic
             hideModal={hide}
             loading={loading}
@@ -172,23 +174,22 @@ export const BottomModalContent = ({ hide, setLoading, loading }) => {
           />
         </Animated.View>
       </AnimatedTouchable>
+
+      {/* POST Button */}
       <AnimatedTouchable
         disabled={expanded === "post"}
         style={[$button, $postButtonAnimated]}
         onPress={expandPost}
       >
-        <Animated.View style={[$flexRow, $animatedPostComponent]}>
-          <Icon icon='classifieds' size={20} />
+        <Animated.View style={[$flexRow, $animatedPostComponent, $contentCenter]}>
+          <Icon icon="topics" size={18} containerStyle={{ marginRight: spacing.extraSmall }} />
           <Animated.Text
             style={[$baseTextStyle, { color: colors.palette.neutral100 }, $animatedPostComponent]}
           >
-            POST
+            Create a Post
           </Animated.Text>
         </Animated.View>
-        <Animated.View
-          // eslint-disable-next-line react-native/no-inline-styles
-          style={[{ width: "100%", position: "absolute" }, $animatedCreatePostContainer]}
-        >
+        <Animated.View style={[$absoluteWidthFull, $animatedCreatePostContainer]}>
           <CreatePost
             hideModal={hide}
             loading={loading}
@@ -200,36 +201,50 @@ export const BottomModalContent = ({ hide, setLoading, loading }) => {
           />
         </Animated.View>
       </AnimatedTouchable>
-      <Button
-        text="CLASSIFIED"
-        textColor={colors.palette.neutral100}
-        style={[$button, { backgroundColor: colors.palette.primary300 }]}
+
+      {/* CLASSIFIED Button */}
+      <TouchableOpacity
+        style={[$flexRow, $button, $contentCenter]}
         onPress={() => {
-          if (!loading) { hide(); setTimeout(() => navigation.navigate('AddAClassified'), 200) }
+          if (!loading) {
+            hide()
+            setTimeout(() => navigation.navigate("AddAClassified"), 200)
+          }
         }}
-      />
-      {/* <Button
-        text="CANCEL"
-        textColor={colors.palette.primary300}
-        style={$button}
+      >
+        <Icon icon="classifieds" size={18} containerStyle={{ marginRight: spacing.extraSmall }} />
+        <Text text="Post a Classified" style={$baseTextStyle} color={colors.palette.neutral100} />
+      </TouchableOpacity>
+
+      {/* CANCEL Button */}
+      <TouchableOpacity
         onPress={() => {
           !loading && hide()
         }}
-      /> */}
-      <TouchableOpacity>
-        <Text  text="CANCEL"/>
+        style={[
+          $button,
+          {
+            backgroundColor: colors.transparent,
+            borderColor: colors.transparent,
+            margin: spacing.zero,
+          },
+        ]}
+      >
+        <Text text="CANCEL" style={$baseTextStyle} color={colors.palette.neutral500} />
       </TouchableOpacity>
     </View>
   )
 }
 
+const $absoluteWidthFull: ViewStyle = { width: "100%", position: "absolute" }
+
 const $addButton: ViewStyle = {
   padding: 12,
   margin: 12,
-  width: 80,
-  height: 50,
+  width: 56,
+  height: 56,
   borderRadius: 30,
-  borderColor: colors.palette.primary300,
+  borderColor: colors.palette.primary100,
   borderWidth: 1,
 }
 
@@ -242,7 +257,8 @@ const $button: ViewStyle = {
   padding: 12,
   margin: 12,
   borderRadius: 30,
-  borderColor: colors.palette.primary300,
+  borderColor: colors.palette.primary100,
+  backgroundColor: colors.palette.primary100,
   borderWidth: 1,
   ...$contentCenter,
 }
