@@ -179,7 +179,7 @@ const $activityDot: ViewStyle = {
   height: 18,
   width: 18,
   borderRadius: 10,
-  backgroundColor: colors.palette.primary300,
+  backgroundColor: colors.palette.angry100,
   position: "absolute",
   bottom: 25,
   right: 0,

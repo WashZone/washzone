@@ -147,7 +147,7 @@ export const AddAClassified: FC<AppStackScreenProps<"AddAClassified">> = functio
       safeAreaEdges={["bottom"]}
     >
       <Header
-        leftIcon="caretLeft"
+        leftIcon='caretLeft'
         title={en.headerTitle.addClassfied}
         titleStyle={$titleStyle}
         onLeftPress={() => navigation.goBack()}

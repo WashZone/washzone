@@ -69,7 +69,7 @@ const renderTabBar = (
       labelStyle={$label}
       activeColor={colors.palette.primary300}
       indicatorStyle={$indicator}
-      scrollEnabled
+      // scrollEnabled
       renderTabBarItem={(props) => {
         return (
           <TouchableOpacity
@@ -328,7 +328,7 @@ const ProfileHeader = ({ user, isUser, onMessage, onProfileImagePress, onBannerP
   return (
     <View
       style={{
-        height: 340 + getParentHeightOffset() - (isUser ? 50 : 0),
+        height: 390 + getParentHeightOffset() - (isUser ? 50 : 0),
         backgroundColor: colors.palette.neutral100,
       }}
     >
@@ -696,7 +696,7 @@ const $topContainer: ImageStyle = {
   backgroundColor: colors.palette.neutral100,
   alignItems: "center",
   paddingBottom: spacing.medium,
-  height: 200,
+  height: 250,
 }
 
 const $descriptionText: TextStyle = {

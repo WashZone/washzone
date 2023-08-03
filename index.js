@@ -44,6 +44,7 @@ function IgniteApp() {
     const { data } = remoteMessage
     const { type, receiver, roomId } = data
     const { name, _id, setter } = JSON.parse(receiver)
+    console.log("INCOMING CALL DETECTED , ", data)
 
     if (setter) {
       return
@@ -66,7 +67,6 @@ function IgniteApp() {
           const res = await getRoomById(roomId)
           const receiverData = await getUserById(_id)
 
-
           navigateVideo(res, roomId, receiverData)
           setTimeout(() => {
             if (navigationRef.current.getCurrentRoute()?.name === "VideoCall") {
@@ -77,7 +77,6 @@ function IgniteApp() {
                 roomId,
               })
             } else {
-
               navigationRef.navigate("VideoCall", {
                 offer: res?.offer,
                 receiver: receiverData,

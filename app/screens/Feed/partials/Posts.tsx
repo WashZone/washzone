@@ -215,7 +215,7 @@ export const PostComponent = ({
   }
 
   const onAttachmentsPress = () => {
-    const images = postDetails.attachmentUrl.map((i, index) => {
+    const images = postDetails.attachmentUrl?.map((i, index) => {
       return { id: index, uri: i }
     })
     setImageViewConfig({
@@ -297,7 +297,7 @@ export const PostComponent = ({
 
           <Pagination
             activeDotIndex={currentIndex}
-            dotsLength={postDetails.attachmentUrl.length}
+            dotsLength={postDetails.attachmentUrl?.length}
             renderDots={(activeIndex, total) => {
               return (
                 <View

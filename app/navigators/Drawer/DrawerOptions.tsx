@@ -57,7 +57,7 @@ export const DrawerOptions = observer(function DrawerOptions({
       icon: "people",
       label: "DrawerNavigator.followerFollowing",
       onPress() {
-        navigatonHome.navigate('FollowerFollowing')
+        navigatonHome.navigate("FollowerFollowing")
       },
     },
     {
@@ -116,7 +116,7 @@ export const DrawerOptions = observer(function DrawerOptions({
           closeDrawer()
           setTimeout(onPress, 50)
         }}
-        style={getActionContainerStyle(!["notifications", "logout"].includes(icon))}
+        style={getActionContainerStyle(!["notifications", "logout", "people"].includes(icon))}
       >
         <View>
           <Icon icon={icon} size={22} style={$actionIcon} />
@@ -129,7 +129,13 @@ export const DrawerOptions = observer(function DrawerOptions({
 
   return (
     <View style={$container}>
-      <TouchableOpacity onPress={() => {closeDrawer(); navigatonHome.navigate('Profile', { user: userStore })}} style={$userProfileContainer}>
+      <TouchableOpacity
+        onPress={() => {
+          closeDrawer()
+          navigatonHome.navigate("Profile", { user: userStore })
+        }}
+        style={$userProfileContainer}
+      >
         <Image
           source={{
             uri: userStore.picture,
@@ -139,17 +145,22 @@ export const DrawerOptions = observer(function DrawerOptions({
         />
         <Text text={userStore.name} style={$userName} weight="bold" numberOfLines={1} />
       </TouchableOpacity>
-      <View style={$notificationContainer}>
-        <ActionComponent key={drawerOptions[0].icon} action={drawerOptions[0]} />
-        <Toggle
-          variant="radio"
-          editable
-          value={notifications}
-          onValueChange={() => setNotifications(!notifications)}
-        />
+      <View 
+      // eslint-disable-next-line react-native/no-inline-styles
+      style={{ height: Dimensions.get("screen").height * 0.3, justifyContent: "center" }}>
+        <View style={$notificationContainer}>
+          <ActionComponent key={drawerOptions[0].icon} action={drawerOptions[0]} />
+          <Toggle
+            variant="radio"
+            editable
+            value={notifications}
+            onValueChange={() => setNotifications(!notifications)}
+          />
+        </View>
+        <ActionComponent key={drawerOptions[1].icon.toString()} action={drawerOptions[1]} />
       </View>
       {drawerOptions
-        .slice(1, 7)
+        .slice(2, 8)
         .map((m) => useMemo(() => <ActionComponent key={m.icon.toString()} action={m} />, []))}
     </View>
   )
@@ -230,8 +241,6 @@ const getActionContainerStyle = (withBorder: boolean) => {
 }
 
 const $notificationContainer: ViewStyle = {
-  height: Dimensions.get("screen").height * 0.2,
-  alignItems: "center",
   flexDirection: "row",
   justifyContent: "space-between",
 }

@@ -138,12 +138,6 @@ export const BottomModalContent = ({ hide, setLoading, loading }) => {
       // eslint-disable-next-line react-native/no-inline-styles
       style={{ height: "auto" }}
     >
-      <Text
-        text="Would you like to post or discuss?"
-        numberOfLines={2}
-        style={$headerText}
-        weight="medium"
-      />
 
       {/* DISCUSS Button */}
       <AnimatedTouchable
@@ -255,7 +249,8 @@ const $headerText: TextStyle = {
 
 const $button: ViewStyle = {
   padding: 12,
-  margin: 12,
+  marginHorizontal: 12,
+  marginVertical:6,
   borderRadius: 30,
   borderColor: colors.palette.primary100,
   backgroundColor: colors.palette.primary100,

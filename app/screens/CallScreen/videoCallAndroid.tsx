@@ -21,7 +21,7 @@ import {
   RTCView,
   mediaDevices,
 } from "react-native-webrtc"
-import { AppStackScreenProps, goBack, navigationRef } from "../../navigators"
+import { AppStackScreenProps, goBack } from "../../navigators"
 import { observer } from "mobx-react-lite"
 import { CallTypes, useHooks } from "../hooks"
 import { colors, spacing } from "../../theme"
@@ -33,8 +33,8 @@ import { Ring } from "./partials/RInger"
 import { IncomingCallHook } from "../../utils/incomingCall"
 
 const STUN_SERVER = "stun:stun.l.google.com:19302"
-const TURN_SERVER = "turn:18.219.176.209:3478?transport=tcp"
-let sessionConstraints = {
+// const TURN_SERVER = "turn:18.219.176.209:3478?transport=tcp"
+const sessionConstraints = {
   mandatory: {
     OfferToReceiveAudio: true,
     OfferToReceiveVideo: true,
@@ -80,18 +80,17 @@ export const VideoCallAndroid: FC<AppStackScreenProps<"VideoCallAndroid">> = obs
 
       const handleInit = async () => {
         setTimeout(
-          () =>
-            role === Role.initiator &&
-            Alert.alert(
-              "Call " + receiver?.name + " ?",
-              "Are you sure you want to initiate a call?",
-              [
-                { text: "Yes", onPress: onCall, style: "default" },
-                { text: "No", onPress: handleLeave, style: "destructive" },
-              ],
-              { cancelable: false },
-            ),
-          1000,
+          () => role === Role.initiator && onCall(),
+          // Alert.alert(
+          //   "Call " + receiver?.name + " ?",
+          //   "Are you sure you want to initiate a call?",
+          //   [
+          //     { text: "Yes", onPress: onCall, style: "default" },
+          //     { text: "No", onPress: handleLeave, style: "destructive" },
+          //   ],
+          //   { cancelable: false },
+          // ),
+          2000,
         )
       }
 
@@ -420,7 +419,7 @@ export const VideoCallAndroid: FC<AppStackScreenProps<"VideoCallAndroid">> = obs
           <RTCView
             zOrder={2}
             streamURL={localStream.toURL()}
-            style={[$localVideo, {  marginTop: safeArea.top }]}
+            style={[$localVideo, { marginTop: safeArea.top }]}
             objectFit="cover"
           />
         </View>
@@ -431,14 +430,17 @@ export const VideoCallAndroid: FC<AppStackScreenProps<"VideoCallAndroid">> = obs
           }}
           role={role}
           status={status}
-          acceptCall={handleOffer}
+          acceptCall={() => {
+            handleOffer()
+            setTimeout(acceptCall, 500)
+          }}
           setMute={setMute}
           setSpeaker={setSpeaker}
           mute={mute}
           speaker={speaker}
         />
 
-        <Modal isVisible={incomingCall && !callActive}>
+        <Modal isVisible={false}>
           <View
             style={{
               backgroundColor: "white",

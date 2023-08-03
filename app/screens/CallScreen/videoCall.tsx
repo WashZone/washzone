@@ -42,492 +42,502 @@ const sessionConstraints = {
   },
 }
 
-export const VideoCall: FC<AppStackScreenProps<"VideoCall">> = observer(
-  function CallScreen(props) {
-    const { receiver, offer, answer, role, roomId, cancelled } = props.route.params
-    const { endAllCall } = IncomingCallHook()
-    const { sendSilentAlert } = useHooks()
-    const [testOffer, setTestOffer] = useState("")
-    const [mute, setMute] = useState(false)
-    const [speaker, setSpeaker] = useState(true)
-    const [status, setStatus] = useState<CallStatus>(CallStatus.processing)
-    const [localStream, setLocalStream] = useState<any>({ toURL: () => null })
-    const [remoteStream, setRemoteStream] = useState<any>({ toURL: () => null })
-    const safeArea = useSafeAreaInsets()
-    console.log("OFFER FROM ", receiver, offer)
-    console.log("MODE MODE ", receiver?.name)
+export const VideoCall: FC<AppStackScreenProps<"VideoCall">> = observer(function CallScreen(props) {
+  const { receiver, offer, answer, role, roomId, cancelled } = props.route.params
+  const { endAllCall } = IncomingCallHook()
+  const { sendSilentAlert } = useHooks()
+  const [testOffer, setTestOffer] = useState("")
+  const [mute, setMute] = useState(false)
+  const [speaker, setSpeaker] = useState(true)
+  const [status, setStatus] = useState<CallStatus>(CallStatus.processing)
+  const [localStream, setLocalStream] = useState<any>({ toURL: () => null })
+  const [remoteStream, setRemoteStream] = useState<any>({ toURL: () => null })
+  const safeArea = useSafeAreaInsets()
+  console.log("OFFER FROM ", receiver, offer)
+  console.log("MODE MODE ", receiver?.name)
+  console.log("VIDEO CALL IOS : ")
 
-    useEffect(() => {
-      if (offer) {
-        setTestOffer(offer)
-        // setTimeout(() => handleOffer(), 300)
-      }
-    }, [offer])
+  useEffect(() => {
+    if (offer) {
+      setTestOffer(offer)
+      // setTimeout(() => handleOffer(), 300)
+    }
+  }, [offer])
 
-    useEffect(() => {
-      console.log("GOT AN ANSWER FROM PARAMS", "UPDATED PARAMS", props.route.params)
-      console.log("GOT AN TEST ANSWER", "UPDATED PARAMS", props.route.params)
-      answer && handleAnswer()
-    }, [answer])
+  useEffect(() => {
+    console.log("GOT AN ANSWER FROM PARAMS", "UPDATED PARAMS", props.route.params)
+    console.log("GOT AN TEST ANSWER", "UPDATED PARAMS", props.route.params)
+    answer && handleAnswer()
+  }, [answer])
 
-    // Fetching Receiver From Incoming Call Author's ID
-    useEffect(() => {
-      // InCallManager.start({ media: mode })
+  // Fetching Receiver From Incoming Call Author's ID
+  useEffect(() => {
+    // InCallManager.start({ media: mode })
 
-      if (role === Role.receiver) {
-        setStatus(CallStatus.ringing)
-      }
-
-      const handleInit = async () => {
-        setTimeout(
-          () =>
-            role === Role.initiator &&
-            Alert.alert(
-              "Call " + receiver?.name + " ?",
-              "Are you sure you want to initiate a call?",
-              [
-                { text: "Yes", onPress: onCall, style: "default" },
-                { text: "No", onPress: handleLeave, style: "destructive" },
-              ],
-              { cancelable: false },
-            ),
-          1000,
-        )
-      }
-
-      registerPeerEvents()
-      initLocalVideo()
-
-      handleInit()
-      return () => {
-        setStatus(CallStatus.processing)
-      }
-    }, [])
-
-    useEffect(() => {
-      console.log(":MUTING", status)
-      console.log(":localStream", localStream)
-      if (localStream && status !== CallStatus.processing) {
-        if (localStream?.getTracks) localStream.getTracks()[0].enabled = !mute
-      }
-    }, [mute, status])
-
-    useEffect(() => {
-      InCallManager.start()
-      // InCallManager.setKeepScreenOn(true)
-      InCallManager.setSpeakerphoneOn(speaker)
-      InCallManager.setKeepScreenOn(true)
-      return () => {
-        InCallManager.stop()
-      }
-    }, [])
-
-    useEffect(() => {
-      status !== CallStatus.processing && InCallManager.setForceSpeakerphoneOn(speaker)
-    }, [speaker, status])
-
-    const hangUp = async () => {
-      await sendSilentAlert(receiver?.notificationToken, CallTypes.hangup, roomId, {
-        offer: "",
-        answer: "",
-      })
-      setStatus(CallStatus.cancelled)
+    if (role === Role.receiver) {
+      setStatus(CallStatus.ringing)
     }
 
-    // Defining RTCConnection
-    const yourConn = useRef(
-      new RTCPeerConnection({
-        iceServers: [
-          {
-            urls: STUN_SERVER,
-          },
-        ],
-      }),
-    )
-
-    const [callActive, setCallActive] = useState(false)
-    const [incomingCall, setIncomingCall] = useState(false)
-    const [otherId, setOtherId] = useState("")
-    const connectedUser = useRef(null)
-    const offerRef = useRef(null)
-
-    useEffect(() => {
-      cancelled && handleLeave()
-    }, [cancelled])
-
-    const registerPeerEvents = () => {
-      yourConn.current.addEventListener("connectionstatechange", (event) => {
-        switch (yourConn.current.connectionState) {
-          case "closed":
-            // You can handle the call being disconnected here.
-
-            break
-        }
-      })
-
-      yourConn.current.addEventListener("icecandidate", (event) => {
-        // When you find a null candidate then there are no more candidates.
-        // Gathering of candidates has finished.
-        if (!event.candidate) {
-          return
-        }
-
-        // Send the event.candidate onto the person you're calling.
-        // Keeping to Trickle ICE Standards, you should send the candidates immediately.
-      })
-
-      yourConn.current.addEventListener("icecandidateerror", (event) => {
-        // You can ignore some candidate errors.
-        // Connections can still be made even when errors occur.
-      })
-
-      yourConn.current.addEventListener("iceconnectionstatechange", (event) => {
-        switch (yourConn.current.iceConnectionState) {
-          case "connected":
-          case "completed":
-            // You can handle the call being connected here.
-            // Like setting the video streams to visible.
-
-            break
-        }
-      })
-
-      yourConn.current.addEventListener("negotiationneeded", (event) => {
-        // You can start the offer stages here.
-        // Be careful as this event can be called multiple times.
-      })
-
-      yourConn.current.addEventListener("signalingstatechange", (event) => {
-        switch (yourConn.current.signalingState) {
-          case "closed":
-            // You can handle the call being disconnected here.
-
-            break
-        }
-      })
-
-      yourConn.current.addEventListener("track", (event) => {
-        // Grab the remote track from the connected participant.
-        // console.log("track:track",event )
-        // const  remoteMediaStream = remoteStream || new MediaStream();
-        // remoteMediaStream.addTrack( event?.stream, remoteMediaStream );
-        setRemoteStream(event?.streams[0])
-      })
-
-      // // Add our stream to the peer connection.
-      // localMediaStream.getTracks().forEach(
-      //   track => peerConnection.addTrack( track, localMediaStream );
-      // );
-      yourConn.current.onaddstream = (event) => {
-        console.log("On Add Remote Stream")
-        // setRemoteStream(event.stream)
-      }
-      yourConn.current.onicecandidate = (event) => {
-        if (event.candidate) {
-          console.log("event.candidate", event.candidate)
-        }
-      }
+    const handleInit = async () => {
+      setTimeout(
+        () =>
+          role === Role.initiator &&
+          onCall(),
+          // Alert.alert(
+          //   "Call " + receiver?.name + " ?",
+          //   "Are you sure you want to initiate a call?",
+          //   [
+          //     { text: "Yes", onPress: onCall, style: "default" },
+          //     { text: "No", onPress: handleLeave, style: "destructive" },
+          //   ],
+          //   { cancelable: false },
+          // ),
+        2000,
+      )
     }
 
-    const initLocalVideo = async () => {
-      const mediaConstraints = {
-        audio: true,
-        video: {
-          frameRate: 50,
-          facingMode: "user",
+    registerPeerEvents()
+    initLocalVideo()
+
+    handleInit()
+    return () => {
+      setStatus(CallStatus.processing)
+    }
+  }, [])
+
+  useEffect(() => {
+    console.log(":MUTING", status)
+    console.log(":localStream", localStream)
+    if (localStream && status !== CallStatus.processing) {
+      if (localStream?.getTracks) localStream.getTracks()[0].enabled = !mute
+    }
+  }, [mute, status])
+
+  useEffect(() => {
+    InCallManager.start()
+    // InCallManager.setKeepScreenOn(true)
+    InCallManager.setSpeakerphoneOn(speaker)
+    InCallManager.setKeepScreenOn(true)
+    return () => {
+      InCallManager.stop()
+    }
+  }, [])
+
+  useEffect(() => {
+    status !== CallStatus.processing && InCallManager.setForceSpeakerphoneOn(speaker)
+  }, [speaker, status])
+
+  const hangUp = async () => {
+    await sendSilentAlert(receiver?.notificationToken, CallTypes.hangup, roomId, {
+      offer: "",
+      answer: "",
+    })
+    setStatus(CallStatus.cancelled)
+  }
+
+  // Defining RTCConnection
+  const yourConn = useRef(
+    new RTCPeerConnection({
+      iceServers: [
+        {
+          urls: STUN_SERVER,
         },
+      ],
+    }),
+  )
+
+  const [callActive, setCallActive] = useState(false)
+  const [incomingCall, setIncomingCall] = useState(false)
+  const [otherId, setOtherId] = useState("")
+  const connectedUser = useRef(null)
+  const offerRef = useRef(null)
+
+  useEffect(() => {
+    cancelled && handleLeave()
+  }, [cancelled])
+
+  const registerPeerEvents = () => {
+    yourConn.current.addEventListener("connectionstatechange", (event) => {
+      switch (yourConn.current.connectionState) {
+        case "closed":
+          // You can handle the call being disconnected here.
+
+          break
+      }
+    })
+
+    yourConn.current.addEventListener("icecandidate", (event) => {
+      // When you find a null candidate then there are no more candidates.
+      // Gathering of candidates has finished.
+      if (!event.candidate) {
+        return
       }
 
-      // let localMediaStream;
-      // let remoteMediaStream;
-      // let isVoiceOnly = false;
+      // Send the event.candidate onto the person you're calling.
+      // Keeping to Trickle ICE Standards, you should send the candidates immediately.
+    })
 
-      try {
-        const mediaStream = await mediaDevices.getUserMedia(mediaConstraints)
+    yourConn.current.addEventListener("icecandidateerror", (event) => {
+      // You can ignore some candidate errors.
+      // Connections can still be made even when errors occur.
+    })
 
-        // if ( isVoiceOnly ) {
-        const videoTrack = mediaStream.getVideoTracks()[0]
-        videoTrack.enabled = true
-        // };
+    yourConn.current.addEventListener("iceconnectionstatechange", (event) => {
+      switch (yourConn.current.iceConnectionState) {
+        case "connected":
+        case "completed":
+          // You can handle the call being connected here.
+          // Like setting the video streams to visible.
 
-        setLocalStream(mediaStream)
-        mediaStream.getTracks().forEach((track) => yourConn.current.addTrack(track, mediaStream))
-      } catch (err) {
-        // Handle Error
+          break
       }
+    })
 
-      // mediaDevices
-      //   .getUserMedia({
-      //     audio: true,
-      //     video: {
-      //       mandatory: {
-      //         minWidth: 500, // Provide your own width, height and frame rate here
-      //         minHeight: 300,
-      //         minFrameRate: 45,
-      //       },
-      //       facingMode: "user",
-      //     },
-      //   })
-      //   .then((stream) => {
-      //     setLocalStream(stream)
-      //     yourConn.current.addStream(stream)
-      //   })
-      //   .catch((error) => {
-      //     Alert.alert(JSON.stringify(error))
-      //     handleLeave()
-      //     navigationRef.goBack()
-      //   })
-    }
+    yourConn.current.addEventListener("negotiationneeded", (event) => {
+      // You can start the offer stages here.
+      // Be careful as this event can be called multiple times.
+    })
 
-    const onCall = () => {
-      sendCall(true)
-      setTimeout(() => {
-        sendCall(false)
-        setStatus(CallStatus.ringing)
-      }, 500)
-    }
+    yourConn.current.addEventListener("signalingstatechange", (event) => {
+      switch (yourConn.current.signalingState) {
+        case "closed":
+          // You can handle the call being disconnected here.
 
-    const sendCall = (setter: boolean) => {
-      const otherUser = receiver?.name
-      connectedUser.current = otherUser
-      console.log("Calling to", otherUser)
-      // create an offer
-      yourConn.current.createOffer(sessionConstraints).then((offer) => {
-        yourConn.current.setLocalDescription(offer).then(() => {
-          console.log("Sending Ofer")
-          console.log("OFFER", JSON.stringify(offer))
-          setTestOffer(JSON.stringify(offer))
-          sendSilentAlert(
-            receiver?.notificationToken,
-            CallTypes.videoOffer,
-            roomId,
-            {
-              offer: JSON.stringify(offer),
-            },
-            setter,
-          )
-        })
-      })
-    }
-
-    // when somebody sends us an offer
-    const handleOffer = async () => {
-      console.log("TEST OFFER", testOffer)
-      console.log(receiver?.name + " is calling you.")
-      connectedUser.current = receiver?.name
-      offerRef.current = { name: receiver?.name, offer: testOffer }
-      setIncomingCall(true)
-      setOtherId(receiver?.name)
-    }
-
-    const acceptCall = async () => {
-      const name = offerRef.current.name
-      const offer = JSON.parse(testOffer)
-      setIncomingCall(false)
-      setCallActive(true)
-      console.log("Accepting CALL", name, offer)
-      yourConn.current
-        .setRemoteDescription(new RTCSessionDescription(offer))
-        .then(async function () {
-          connectedUser.current = name
-          const ans = await yourConn.current.createAnswer()
-          return ans
-        })
-        .then(function (answer) {
-          console.log("ANSWER", JSON.stringify(answer))
-          yourConn.current.setLocalDescription(answer)
-          setStatus(CallStatus.connected)
-          sendSilentAlert(receiver?.notificationToken, CallTypes.answer, roomId, {
-            answer: JSON.stringify(answer),
-          })
-        })
-    }
-
-    // when we got an answer from a remote user
-    const handleAnswer = () => {
-      console.log("handleAnswer:handleAnswer", answer)
-      setCallActive(true)
-      yourConn.current.setRemoteDescription(new RTCSessionDescription(JSON.parse(answer)))
-      setStatus(CallStatus.connected)
-    }
-
-    const handleLeave = () => {
-      // InCallManager.stop({ media: mode })
-      // navigationRef.setParams({ answer: null, offer: null })
-      setIncomingCall(false)
-      setCallActive(false)
-      offerRef.current = null
-      connectedUser.current = null
-      connectedUser.current = null
-      yourConn.current.onicecandidate = null
-      yourConn.current.ontrack = null
-      yourConn.current.close()
-      resetPeer()
-      // initLocalVideo()
-      endAllCall()
-      if (localStream) {
-        if (localStream?.getTracks) {
-          localStream.getTracks().forEach((t) => t.stop())
-          localStream.release()
-        }
+          break
       }
-      setTimeout(() => goBack(), 500)
+    })
+
+    yourConn.current.addEventListener("track", (event) => {
+      // Grab the remote track from the connected participant.
+      // console.log("track:track",event )
+      // const  remoteMediaStream = remoteStream || new MediaStream();
+      // remoteMediaStream.addTrack( event?.stream, remoteMediaStream );
+      setRemoteStream(event?.streams[0])
+    })
+
+    // // Add our stream to the peer connection.
+    // localMediaStream.getTracks().forEach(
+    //   track => peerConnection.addTrack( track, localMediaStream );
+    // );
+    yourConn.current.onaddstream = (event) => {
+      console.log("On Add Remote Stream")
+      // setRemoteStream(event.stream)
+    }
+    yourConn.current.onicecandidate = (event) => {
+      if (event.candidate) {
+        console.log("event.candidate", event.candidate)
+      }
+    }
+  }
+
+  const initLocalVideo = async () => {
+    const mediaConstraints = {
+      audio: true,
+      video: {
+        frameRate: 50,
+        facingMode: "user",
+      },
     }
 
-    const resetPeer = () => {
-      yourConn.current = new RTCPeerConnection({
-        iceServers: [
+    // let localMediaStream;
+    // let remoteMediaStream;
+    // let isVoiceOnly = false;
+
+    try {
+      const mediaStream = await mediaDevices.getUserMedia(mediaConstraints)
+
+      // if ( isVoiceOnly ) {
+      const videoTrack = mediaStream.getVideoTracks()[0]
+      videoTrack.enabled = true
+      // };
+
+      setLocalStream(mediaStream)
+      mediaStream.getTracks().forEach((track) => yourConn.current.addTrack(track, mediaStream))
+    } catch (err) {
+      // Handle Error
+    }
+
+    // mediaDevices
+    //   .getUserMedia({
+    //     audio: true,
+    //     video: {
+    //       mandatory: {
+    //         minWidth: 500, // Provide your own width, height and frame rate here
+    //         minHeight: 300,
+    //         minFrameRate: 45,
+    //       },
+    //       facingMode: "user",
+    //     },
+    //   })
+    //   .then((stream) => {
+    //     setLocalStream(stream)
+    //     yourConn.current.addStream(stream)
+    //   })
+    //   .catch((error) => {
+    //     Alert.alert(JSON.stringify(error))
+    //     handleLeave()
+    //     navigationRef.goBack()
+    //   })
+  }
+
+  const onCall = () => {
+    sendCall(true)
+    setTimeout(() => {
+      sendCall(false)
+      setStatus(CallStatus.ringing)
+    }, 500)
+  }
+
+  const sendCall = (setter: boolean) => {
+    const otherUser = receiver?.name
+    connectedUser.current = otherUser
+    console.log("Calling to", otherUser)
+    // create an offer
+    yourConn.current.createOffer(sessionConstraints).then((offer) => {
+      yourConn.current.setLocalDescription(offer).then(() => {
+        console.log("Sending Ofer")
+        console.log("OFFER", JSON.stringify(offer))
+        setTestOffer(JSON.stringify(offer))
+        sendSilentAlert(
+          receiver?.notificationToken,
+          CallTypes.videoOffer,
+          roomId,
           {
-            urls: STUN_SERVER,
+            offer: JSON.stringify(offer),
           },
-        ],
+          setter,
+        )
       })
+    })
+  }
 
-      registerPeerEvents()
-      // Setup ice handling
+  // when somebody sends us an offer
+  const handleOffer = async () => {
+    console.log("TEST OFFER", testOffer)
+    console.log(receiver?.name + " is calling you.")
+    connectedUser.current = receiver?.name
+    offerRef.current = { name: receiver?.name, offer: testOffer }
+    setIncomingCall(true)
+    setOtherId(receiver?.name)
+  }
+
+  const acceptCall = async () => {
+    const name = offerRef.current.name
+    const offer = JSON.parse(testOffer)
+    setIncomingCall(false)
+    setCallActive(true)
+    console.log("Accepting CALL", name, offer)
+    yourConn.current
+      .setRemoteDescription(new RTCSessionDescription(offer))
+      .then(async function () {
+        connectedUser.current = name
+        const ans = await yourConn.current.createAnswer()
+        return ans
+      })
+      .then(function (answer) {
+        console.log("ANSWER", JSON.stringify(answer))
+        yourConn.current.setLocalDescription(answer)
+        setStatus(CallStatus.connected)
+        sendSilentAlert(receiver?.notificationToken, CallTypes.answer, roomId, {
+          answer: JSON.stringify(answer),
+        })
+      })
+  }
+
+  // when we got an answer from a remote user
+  const handleAnswer = () => {
+    console.log("handleAnswer:handleAnswer", answer)
+    setCallActive(true)
+    yourConn.current.setRemoteDescription(new RTCSessionDescription(JSON.parse(answer)))
+    setStatus(CallStatus.connected)
+  }
+
+  const handleLeave = () => {
+    // InCallManager.stop({ media: mode })
+    // navigationRef.setParams({ answer: null, offer: null })
+    setIncomingCall(false)
+    setCallActive(false)
+    offerRef.current = null
+    connectedUser.current = null
+    connectedUser.current = null
+    yourConn.current.onicecandidate = null
+    yourConn.current.ontrack = null
+    yourConn.current.close()
+    resetPeer()
+    // initLocalVideo()
+    endAllCall()
+    if (localStream) {
+      if (localStream?.getTracks) {
+        localStream.getTracks().forEach((t) => t.stop())
+        localStream.release()
+      }
     }
+    setTimeout(() => goBack(), 500)
+  }
 
-    /**
-     * Calling Stuff Ends
-     */
-    return (
-      <ScrollView style={styles.root}>
-        <View style={$localVideoContainer}>
-          {remoteStream?.toURL() ? (
-            <RTCView
-              zOrder={1}
-              streamURL={remoteStream ? remoteStream.toURL() : ""}
-              style={$scaleFull}
-              objectFit="cover"
-            />
-          ) : (
-            <ImageBackground
-              source={{ uri: receiver?.picture }}
-              style={[$scaleFull, $contentCenter, $flex1]}
-              resizeMode="cover"
-              blurRadius={20}
-            >
-              {status !== CallStatus.connected && (
-                <>
-                  <Ring delay={0} />
-                  <Ring delay={1000} />
-                  <Ring delay={2000} />
-                  <Ring delay={3000} />
-                </>
-              )}
-              <FastImage source={{ uri: receiver?.picture }} style={$receiverProfilePicture} />
-            </ImageBackground>
-          )}
+  const resetPeer = () => {
+    yourConn.current = new RTCPeerConnection({
+      iceServers: [
+        {
+          urls: STUN_SERVER,
+        },
+      ],
+    })
 
+    registerPeerEvents()
+    // Setup ice handling
+  }
+
+  /**
+   * Calling Stuff Ends
+   */
+  return (
+    <ScrollView style={styles.root}>
+      <View style={$localVideoContainer}>
+        {remoteStream?.toURL() ? (
           <RTCView
-            zOrder={2}
-            streamURL={localStream.toURL()}
-            style={[$localVideo, {  marginTop: safeArea.top }]}
+            zOrder={1}
+            streamURL={remoteStream ? remoteStream.toURL() : ""}
+            style={$scaleFull}
             objectFit="cover"
           />
-        </View>
-        <Actions
-          onHangUp={() => {
-            hangUp()
-            handleLeave()
-          }}
-          role={role}
-          status={status}
-          acceptCall={handleOffer}
-          setMute={setMute}
-          setSpeaker={setSpeaker}
-          mute={mute}
-          speaker={speaker}
-        />
-
-        <Modal isVisible={incomingCall && !callActive}>
-          <View
-            style={{
-              backgroundColor: "white",
-              padding: 22,
-              justifyContent: "center",
-              alignItems: "center",
-              borderRadius: 4,
-              borderColor: "rgba(0, 0, 0, 0.1)",
-            }}
+        ) : (
+          <ImageBackground
+            source={{ uri: receiver?.picture }}
+            style={[$scaleFull, $contentCenter, $flex1]}
+            resizeMode="cover"
+            blurRadius={20}
           >
-            <Text
-              text={"Incoming " + "Video" + " call !"}
-              weight="medium"
-              style={{ marginBottom: spacing.small, textAlign: "center" }}
+            {status !== CallStatus.connected && (
+              <>
+                <Ring delay={0} />
+                <Ring delay={1000} />
+                <Ring delay={2000} />
+                <Ring delay={3000} />
+              </>
+            )}
+            <FastImage source={{ uri: receiver?.picture }} style={$receiverProfilePicture} />
+          </ImageBackground>
+        )}
+        <RTCView
+          zOrder={2}
+          streamURL={localStream.toURL()}
+          style={[$localVideo, { marginTop: safeArea.top }]}
+          objectFit="cover"
+        />
+      </View>
+      <Actions
+        onHangUp={() => {
+          hangUp()
+          handleLeave()
+        }}
+        role={role}
+        status={status}
+        acceptCall={() => {
+          handleOffer()
+          setTimeout(acceptCall, 500)
+        }}        setMute={setMute}
+        setSpeaker={setSpeaker}
+        mute={mute}
+        speaker={speaker}
+      />
+
+      <Modal isVisible={false}>
+        <View
+          // eslint-disable-next-line react-native/no-inline-styles, react-native/no-color-literals
+          style={{
+            backgroundColor: "white",
+            padding: 22,
+            justifyContent: "center",
+            alignItems: "center",
+            borderRadius: 4,
+            borderColor: "rgba(0, 0, 0, 0.1)",
+          }}
+        >
+          <Text
+            text={"Incoming " + "Video" + " call !"}
+            weight="medium"
+            // eslint-disable-next-line react-native/no-inline-styles
+            style={{ marginBottom: spacing.small, textAlign: "center" }}
+          />
+          <Text
+            text={otherId}
+            weight="semiBold"
+            // eslint-disable-next-line react-native/no-inline-styles
+            style={{ textAlign: "center" }}
+            size="lg"
+          />
+          <View style={[$flexRow, { marginTop: spacing.medium }]}>
+            <Button
+              onPress={() => {
+                handleLeave()
+                hangUp()
+              }}
+              text={"Reject"}
+              style={{
+                marginHorizontal: spacing.small,
+                paddingVertical: spacing.small,
+                paddingHorizontal: spacing.medium,
+                backgroundColor: colors.palette.angry500,
+              }}
+              preset="reversed"
             />
-            <Text text={otherId} weight="semiBold" style={{ textAlign: "center" }} size="lg" />
-            <View style={[$flexRow, { marginTop: spacing.medium }]}>
-              <Button
-                onPress={() => {
-                  handleLeave()
-                  hangUp()
-                }}
-                text={"Reject"}
-                style={{
-                  marginHorizontal: spacing.small,
-                  paddingVertical: spacing.small,
-                  paddingHorizontal: spacing.medium,
-                  backgroundColor: colors.palette.angry500,
-                }}
-                preset="reversed"
-              />
-              <Button
-                onPress={() => setTimeout(() => acceptCall(), 500)}
-                text={"Accept"}
-                style={{
-                  marginHorizontal: spacing.small,
-                  paddingVertical: spacing.small,
-                  paddingHorizontal: spacing.medium,
-                  backgroundColor: colors.palette.success100,
-                }}
-                preset="reversed"
-              />
-            </View>
+            <Button
+              onPress={() => setTimeout(() => acceptCall(), 500)}
+              text={"Accept"}
+              style={{
+                marginHorizontal: spacing.small,
+                paddingVertical: spacing.small,
+                paddingHorizontal: spacing.medium,
+                backgroundColor: colors.palette.success100,
+              }}
+              preset="reversed"
+            />
           </View>
-        </Modal>
-      </ScrollView>
-    )
-  },
-)
+        </View>
+      </Modal>
+    </ScrollView>
+  )
+})
 
 export default VideoCall
 
 const styles = StyleSheet.create({
+  inputField: {
+    flexDirection: "column",
+    marginBottom: 10,
+  },
+  // eslint-disable-next-line react-native/no-color-literals
+  localVideo: {
+    height: "100%",
+    width: "100%",
+  },
+  localVideos: {
+    height: 100,
+    marginBottom: 10,
+  },
+  // eslint-disable-next-line react-native/no-color-literals
+  remoteVideo: {
+    backgroundColor: "#f2f2f2",
+    height: "100%",
+    width: "100%",
+  },
+  remoteVideos: {
+    height: 400,
+  },
+  // eslint-disable-next-line react-native/no-color-literals
   root: {
     backgroundColor: "#000",
     flex: 1,
-  },
-  inputField: {
-    marginBottom: 10,
-    flexDirection: "column",
   },
   videoContainer: {
     flex: 1,
     minHeight: 450,
   },
   videos: {
-    width: "100%",
-
-    position: "relative",
-    overflow: "hidden",
     borderRadius: 6,
-  },
-  localVideos: {
-    height: 100,
-    marginBottom: 10,
-  },
-  remoteVideos: {
-    height: 400,
-  },
-  localVideo: {
-    backgroundColor: "#f2f2f2",
-    height: "100%",
-    width: "100%",
-  },
-  remoteVideo: {
-    backgroundColor: "#f2f2f2",
-    height: "100%",
+    overflow: "hidden",
+    position: "relative",
     width: "100%",
   },
 })
