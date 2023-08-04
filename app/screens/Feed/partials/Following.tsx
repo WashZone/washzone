@@ -212,6 +212,7 @@ const $name: TextStyle = {
 const $container: ViewStyle = {
   width: "100%",
   height: 120,
+  marginBottom:6,
   backgroundColor: colors.palette.neutral100,
   flexDirection: "row",
   alignItems: "center",

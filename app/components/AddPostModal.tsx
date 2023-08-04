@@ -29,7 +29,7 @@ export const AddPostModal = () => {
       <BottomModal
         disableUnMount={loading}
         avoidKeyboard
-        keyboardOffset={-170}
+        keyboardOffset={-90}
         isVisible={isVisible}
         setVisible={setVisible}
         backgroundColor={colors.palette.neutral100}
@@ -138,6 +138,34 @@ export const BottomModalContent = ({ hide, setLoading, loading }) => {
       // eslint-disable-next-line react-native/no-inline-styles
       style={{ height: "auto" }}
     >
+      {/* POST Button */}
+      <AnimatedTouchable
+        disabled={expanded === "post"}
+        style={[$button, $postButtonAnimated]}
+        onPress={expandPost}
+      >
+        <Animated.View style={[$flexRow, $animatedPostComponent, $contentCenter]}>
+          <Icon icon="topics" size={18} containerStyle={{ marginRight: spacing.extraSmall }} />
+          <Animated.Text
+            style={[$baseTextStyle, { color: colors.palette.neutral100 }, $animatedPostComponent]}
+          >
+            Create a Post
+          </Animated.Text>
+        </Animated.View>
+        <Animated.View style={[$absoluteWidthFull, $animatedCreatePostContainer]}>
+          <CreatePost
+            hideModal={hide}
+            loading={loading}
+            selectedImages={selectedPostImages}
+            setSelectedImages={setSelectedPostImages}
+            focused={false}
+            progress={sharedValPost}
+            setLoading={setLoading}
+          />
+        </Animated.View>
+      </AnimatedTouchable>
+
+
 
       {/* DISCUSS Button */}
       <AnimatedTouchable
@@ -169,32 +197,7 @@ export const BottomModalContent = ({ hide, setLoading, loading }) => {
         </Animated.View>
       </AnimatedTouchable>
 
-      {/* POST Button */}
-      <AnimatedTouchable
-        disabled={expanded === "post"}
-        style={[$button, $postButtonAnimated]}
-        onPress={expandPost}
-      >
-        <Animated.View style={[$flexRow, $animatedPostComponent, $contentCenter]}>
-          <Icon icon="topics" size={18} containerStyle={{ marginRight: spacing.extraSmall }} />
-          <Animated.Text
-            style={[$baseTextStyle, { color: colors.palette.neutral100 }, $animatedPostComponent]}
-          >
-            Create a Post
-          </Animated.Text>
-        </Animated.View>
-        <Animated.View style={[$absoluteWidthFull, $animatedCreatePostContainer]}>
-          <CreatePost
-            hideModal={hide}
-            loading={loading}
-            selectedImages={selectedPostImages}
-            setSelectedImages={setSelectedPostImages}
-            focused={false}
-            progress={sharedValPost}
-            setLoading={setLoading}
-          />
-        </Animated.View>
-      </AnimatedTouchable>
+
 
       {/* CLASSIFIED Button */}
       <TouchableOpacity

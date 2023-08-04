@@ -291,7 +291,7 @@ export const VideosTabScreen = ({
       style={$screenContainer}
       data={userVideos}
       showsVerticalScrollIndicator={false}
-      ListHeaderComponent={<View style={{ height: spacing.homeScreen }} />}
+      ListHeaderComponent={<View style={{ height: spacing.homeScreen, }} />}
       renderItem={({ item, index }) => (
         <View style={$videoBlockContainer} key={index}>
           <VideoBlockFullWidth videoDetails={item} />

@@ -794,8 +794,8 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
         ${typeof resultSelector === "function" ? resultSelector(new UserModelSelector()).toString() : resultSelector}
       } }`, variables, optimisticUpdate)
     },
-    mutateCreateUserTopic(variables: { tagTopicUser: InputtopicTaguser[], title: string, attachmentUrl?: (string | null), attachmentType?: (string | null), topicContent: string, commentId?: (string | null), userId: string }, resultSelector: string | ((qb: TopicDetailModelSelector) => TopicDetailModelSelector) = topicDetailModelPrimitives.toString(), optimisticUpdate?: () => void) {
-      return self.mutate<{ createUserTopic: TopicDetailModelType}>(`mutation createUserTopic($tagTopicUser: [InputtopicTaguser!]!, $title: String!, $attachmentUrl: String, $attachmentType: String, $topicContent: String!, $commentId: String, $userId: String!) { createUserTopic(tagTopicUser: $tagTopicUser, title: $title, attachmentUrl: $attachmentUrl, attachmentType: $attachmentType, topicContent: $topicContent, commentId: $commentId, userId: $userId) {
+    mutateCreateUserTopic(variables: { tagTopicUser?: InputtopicTaguser[], title: string, attachmentUrl?: (string | null), attachmentType?: (string | null), topicContent: string, commentId?: (string | null), userId: string }, resultSelector: string | ((qb: TopicDetailModelSelector) => TopicDetailModelSelector) = topicDetailModelPrimitives.toString(), optimisticUpdate?: () => void) {
+      return self.mutate<{ createUserTopic: TopicDetailModelType}>(`mutation createUserTopic($tagTopicUser: [InputtopicTaguser!], $title: String!, $attachmentUrl: String, $attachmentType: String, $topicContent: String!, $commentId: String, $userId: String!) { createUserTopic(tagTopicUser: $tagTopicUser, title: $title, attachmentUrl: $attachmentUrl, attachmentType: $attachmentType, topicContent: $topicContent, commentId: $commentId, userId: $userId) {
         ${typeof resultSelector === "function" ? resultSelector(new TopicDetailModelSelector()).toString() : resultSelector}
       } }`, variables, optimisticUpdate)
     },

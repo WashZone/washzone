@@ -103,8 +103,6 @@ const renderTabBar = (
                     getIndexFromKey(props.key) === index
                       ? colors.palette.primary300
                       : colors.palette.primary100,
-                  borderTopRightRadius: spacing.tiny,
-                  borderTopLeftRadius: spacing.tiny,
                 },
               ]}
             >
