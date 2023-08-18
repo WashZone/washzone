@@ -20,6 +20,8 @@ const palette = {
   primary600: "#A54F31",
 
   primaryOverlay15: "rgba(0,131,226,0.15)",
+  primaryOverlay05: "rgba(0,131,226,0.05)",
+  primaryOverlay10: "rgba(0,131,226,0.10)",
   primaryOverlay80: "rgba(0,131,226,0.8)",
 
   secondary100: "#DCDDE9",

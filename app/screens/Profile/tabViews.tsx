@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react"
-import { View, ViewStyle, Dimensions, ImageStyle, TouchableOpacity } from "react-native"
+import { View, ViewStyle, Dimensions, TouchableOpacity, Platform } from "react-native"
 import { colors, spacing } from "../../theme"
 import { useHooks } from "../hooks"
 import { ClassifiedComponent } from "../ClassifiedsFeed"
 import { TopicComponent } from "../TopicsFeed"
-import { AutoImage } from "../../components"
+import { useAutoImage } from "../../components"
 import { HFlatList, HScrollView } from "react-native-head-tab-view"
 import { PostComponent } from "../Feed/partials"
 import Loading from "../../components/Loading"
@@ -12,16 +12,30 @@ import { VideoBlockFullWidth } from "../Playlist"
 import ImageView from "react-native-fast-image-viewing"
 
 import { EmptyTabState } from "./emptyTabComponent"
-
+import ShimmerPlaceholder from "react-native-shimmer-placeholder"
+import LinearGradient from "react-native-linear-gradient"
+import FastImage, { ImageStyle } from "react-native-fast-image"
+const maxGalleryItemDimension = Dimensions.get("window").width / 2 - 30
+console.log('maxGalleryItemDimension', maxGalleryItemDimension)
 const GalleryItem = ({ uri, onPress }) => {
+  const [aspectRatio, setAspectRatio] = useState(1)
+  const [loaded, setLoaded] = useState(false)
   return (
-    <TouchableOpacity onPress={onPress}>
-      <AutoImage
-        source={{ uri }}
-        maxWidth={Dimensions.get("screen").width / 2 - 30}
-        style={$marginAutoImage}
-      />
-    </TouchableOpacity>
+    <ShimmerPlaceholder
+      LinearGradient={LinearGradient}
+      visible={loaded}
+      shimmerStyle={{ width: maxGalleryItemDimension, height: maxGalleryItemDimension }}
+    >
+      <TouchableOpacity onPress={onPress}>
+        <FastImage
+          source={{ uri }}
+          onLoad={s => setAspectRatio(s.nativeEvent.height / s.nativeEvent.width)}
+          onLoadEnd={() => setLoaded(true)}
+          style={[$marginAutoImage, { width: maxGalleryItemDimension, height: maxGalleryItemDimension * aspectRatio }]}
+        />
+      </TouchableOpacity>
+    </ShimmerPlaceholder>
+
   )
 }
 
@@ -122,7 +136,11 @@ export const HomePostsTabScreen = ({
 
     setLoading(false)
   }
-  const [imageViewConfig, setImageViewConfig] = useState({show:false, images:[], currentIndex:0})
+  const [imageViewConfig, setImageViewConfig] = useState({
+    show: false,
+    images: [],
+    currentIndex: 0,
+  })
 
   useEffect(() => {
     fetchUserPosts()
@@ -152,7 +170,9 @@ export const HomePostsTabScreen = ({
         images={imageViewConfig.images}
         imageIndex={imageViewConfig.currentIndex}
         visible={imageViewConfig.show}
-        onRequestClose={() => {setImageViewConfig({...imageViewConfig , show:false})}}
+        onRequestClose={() => {
+          setImageViewConfig({ ...imageViewConfig, show: false })
+        }}
       />
     </>
   )
@@ -291,7 +311,7 @@ export const VideosTabScreen = ({
       style={$screenContainer}
       data={userVideos}
       showsVerticalScrollIndicator={false}
-      ListHeaderComponent={<View style={{ height: spacing.homeScreen, }} />}
+      ListHeaderComponent={<View style={{ height: spacing.homeScreen }} />}
       renderItem={({ item, index }) => (
         <View style={$videoBlockContainer} key={index}>
           <VideoBlockFullWidth videoDetails={item} />

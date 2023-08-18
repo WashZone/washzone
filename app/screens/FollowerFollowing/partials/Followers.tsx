@@ -17,8 +17,10 @@ export const FollowersList = ({ user }) => {
   }
 
   const syncFollowers = async () => {
+    console.log(' SYNCING FOLLOWERS')
     try {
       const res = await getFollowers(user?._id)
+      console.log('syncFollowers : ', user?._id, ' : ', res)
       setData(res)
 
     } catch (err) {
@@ -34,11 +36,11 @@ export const FollowersList = ({ user }) => {
   if (loading) {
     return <Loading />
   }
-  
+
   if (data?.length === 0) {
-    return <Text weight='medium' 
-            // eslint-disable-next-line react-native/no-inline-styles
-            style={{textAlign:'center' , marginTop:spacing.massive} } text={user?.first_name +` isn't followed by anyone.`}/>
+    return <Text weight='medium'
+      // eslint-disable-next-line react-native/no-inline-styles
+      style={{ textAlign: 'center', marginTop: spacing.massive }} text={user?.first_name + ` isn't followed by anyone.`} />
   }
 
   return (

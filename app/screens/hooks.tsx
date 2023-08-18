@@ -304,8 +304,9 @@ export function useHooks() {
       {
         followId: id,
       },
-      { fetchPolicy: "no-cache" },
+      { fetchPolicy: 'network-only' },
     )
+    console.log("FOLLOWERS : ", id, res)
     return res.getfollower
   }
 
@@ -347,6 +348,7 @@ export function useHooks() {
   }) => {
     if (content?.length === 0 && attachments?.length === 0) return
     setUploadProgress(`0/${attachments?.length}`)
+    console.log('tagUser', tagUser)
     const imageUrls = []
     if (attachments?.length > 0) {
       for (let i = 0; i < attachments.length; i++) {
@@ -1219,7 +1221,7 @@ export function useHooks() {
       console.log(error)
     }
   }
-  
+
   const setNotificationStatus = async (b: boolean) => {
     try {
       await mutateSetNotificationStatus({
@@ -1304,6 +1306,15 @@ export function useHooks() {
     syncAllChats()
     userStore.removeFromBlocked(id)
   }
+
+  // const getPostCommentById = async (id: string) => {
+  //   await mutateUnblockUserId({
+  //     blockUserById: id,
+  //     userId: userStore?._id,
+  //   })
+  //   syncAllChats()
+  //   userStore.removeFromBlocked(id)
+  // }
 
   return {
     blockUser,

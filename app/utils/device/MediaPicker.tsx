@@ -40,9 +40,9 @@ export const MediaPicker = async (props?: { selectionLimit?: number }) => {
   const options: ImageLibraryOptions = {
     mediaType: "photo",
     selectionLimit: props?.selectionLimit || 1,
-    maxWidth: 1920,
-    maxHeight: 1080,
-    quality: 1,
+    maxWidth: 1280,
+    maxHeight: 720,
+    quality: 0.8,
   }
 
   let image: any

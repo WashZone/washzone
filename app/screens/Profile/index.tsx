@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useRef, useState } from "react"
+import React, { FC, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react"
 import {
   TextStyle,
   ViewStyle,
@@ -7,6 +7,7 @@ import {
   Alert,
   Animated,
   View,
+  Dimensions,
 } from "react-native"
 import { Menu, MenuItem, MenuDivider } from "react-native-material-menu"
 import FastImage, { ImageStyle } from "react-native-fast-image"
@@ -36,6 +37,8 @@ import { toastMessages } from "../../utils/toastMessages"
 import { showAlertYesNo } from "../../utils/helpers"
 import Loading from "../../components/Loading"
 import { BROKEN_BANNER, defaultImages } from "../../utils"
+import LinearGradient from "react-native-linear-gradient"
+import ShimmerPlaceholder from "react-native-shimmer-placeholder"
 
 const getIndexFromKey = (key: string) => {
   switch (key) {
@@ -52,75 +55,96 @@ const getIndexFromKey = (key: string) => {
     }
   }
 }
+const MAX_WIDTH = Dimensions.get('window').width
+const TAB_WIDTH = MAX_WIDTH / 4
 
 const renderTabBar = (
   props: SceneRendererProps & {
     navigationState: NavigationState<any>
   },
-  position: { current: Animated.AnimatedInterpolation },
   setIndex: (n: number) => void,
   index: number,
 ) => {
-  position.current = props.position
+  console.log("PROPS.POSITION", props.position)
+  const inputRange = props.navigationState.routes.map((x, i) => i);
+
+  const opacity = props.position.interpolate({
+    inputRange,
+    outputRange: inputRange.map((inputIndex) =>
+      inputIndex *  TAB_WIDTH
+    ),
+  });
 
   return (
-    <TabBar
-      style={$tab}
-      labelStyle={$label}
-      activeColor={colors.palette.primary300}
-      indicatorStyle={$indicator}
-      // scrollEnabled
-      renderTabBarItem={(props) => {
-        return (
-          <TouchableOpacity
-            onPress={() => {
-              switch (props.key) {
-                case "posts": {
-                  setIndex(0)
-                  break
+    <View
+      // eslint-disable-next-line react-native/no-inline-styles
+      style={{ backgroundColor: colors.palette.primary100, width: '100%' }}>
+      <TabBar
+        style={$tab}
+        labelStyle={$label}
+        activeColor={colors.palette.primary300}
+        indicatorStyle={$indicator}
+        // scrollEnabled
+        renderTabBarItem={({ key, defaultTabWidth, }) => {
+          const opacity = props.position.interpolate({
+            inputRange,
+            outputRange: inputRange.map((inputIndex) =>
+              inputIndex === getIndexFromKey(key) ? 1 : 0.5
+            ),
+          });
+          return (
+            <TouchableOpacity
+              onPress={() => {
+                switch (key) {
+                  case "posts": {
+                    setIndex(0)
+                    break
+                  }
+                  case "topic": {
+                    setIndex(1)
+                    break
+                  }
+                  case "classified": {
+                    setIndex(2)
+                    break
+                  }
+                  case "gallery": {
+                    setIndex(3)
+                    break
+                  }
                 }
-                case "topic": {
-                  setIndex(1)
-                  break
-                }
-                case "classified": {
-                  setIndex(2)
-                  break
-                }
-                case "gallery": {
-                  setIndex(3)
-                  break
-                }
-              }
-            }}
-          >
-            <View
-              style={[
-                $tabBarItem,
-                {
-                  width: props?.defaultTabWidth,
-                  backgroundColor:
-                    getIndexFromKey(props.key) === index
-                      ? colors.palette.primary300
-                      : colors.palette.primary100,
-                },
-              ]}
+              }}
             >
-              <Text
-                style={{
-                  color: colors.palette.neutral250,
-                  fontSize: spacing.medium,
-                }}
-                weight={getIndexFromKey(props.key) === index ? "semiBold" : "medium"}
+              <Animated.View
+                style={[
+                  $tabBarItem,
+                  {
+                    width: defaultTabWidth,
+                    backgroundColor: getIndexFromKey(key) === index ? colors.palette.primary300
+                      : colors.palette.primary100,
+                  },
+                ]}
               >
-                {props?.key.charAt(0).toUpperCase() + props?.key.slice(1)}
-              </Text>
-            </View>
-          </TouchableOpacity>
-        )
-      }}
-      {...props}
-    />
+                {/* <Animated.Text style={{ opacity }}>{route.title}</Animated.Text> */}
+                <Animated.Text
+                  style={{
+                    color: colors.palette.neutral250,
+                    fontSize: spacing.medium,
+                    opacity
+                  }}
+                // weight={getIndexFromKey(key) === index ? "semiBold" : "medium"}
+                >
+                  {key.charAt(0).toUpperCase() + key.slice(1)}
+                </Animated.Text>
+                {/* <Animated.View style={{left}}/> */}
+              </Animated.View>
+            </TouchableOpacity>
+          )
+        }}
+        {...props}
+      />
+      {/* <Animated.View style={{  position:'absolute',width: left}} /> */}
+    </View>
   )
 }
 
@@ -246,7 +270,7 @@ const ProfileHeader = ({ user, isUser, onMessage, onProfileImagePress, onBannerP
     following: false,
   })
   const [descriptionLineCount, setDescriptionLineCount] = useState(undefined)
-
+  const [bannerLoaded, setBannerLoaded] = useState(false)
   const syncProfile = async () => {
     const resProfile = await getProfileDetails(user?._id)
     setProfileDetails({ ...resProfile })
@@ -323,6 +347,7 @@ const ProfileHeader = ({ user, isUser, onMessage, onProfileImagePress, onBannerP
 
   const navigationHome = useNavigation<NavigationProp<HomeTabParamList>>()
 
+
   return (
     <View
       style={{
@@ -335,15 +360,23 @@ const ProfileHeader = ({ user, isUser, onMessage, onProfileImagePress, onBannerP
           if (user?.banner) onBannerPress()
         }}
       >
-        <FastImage
-          source={
-            user?.banner && {
-              uri: user?.banner,
+        <ShimmerPlaceholder
+          visible={bannerLoaded}
+          shimmerStyle={$topContainer}
+          LinearGradient={LinearGradient}
+          duration={2000}
+          width={Dimensions.get('screen').width}
+        >
+          <FastImage
+            source={
+              user?.banner ? {
+                uri: user?.banner,
+              } : BROKEN_BANNER
             }
-          }
-          style={[$topContainer, { backgroundColor: colors.background }]}
-          defaultSource={BROKEN_BANNER}
-        />
+            style={[$topContainer, { backgroundColor: colors.background }]}
+            onLoad={() => setBannerLoaded(true)}
+          />
+        </ShimmerPlaceholder>
       </TouchableOpacity>
       <View style={$userDetailsContainer}>
         <View style={$flexRow}>
@@ -521,7 +554,7 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
   } = useStores()
   const [loading, setLoading] = useState(Object.keys(user)?.length === 1)
   const isUser = user?._id === _id
-  const position = useRef(new Animated.Value(0))
+
   const [index, setIndex] = React.useState(0)
   const [isImageViewVisible, setImageViewVisible] = React.useState<{
     visible: boolean
@@ -606,7 +639,7 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
         enableSnap
         navigationState={{ index, routes }}
         renderScene={renderScene}
-        renderTabBar={(props) => renderTabBar(props, position, setIndex, index)}
+        renderTabBar={(props) => renderTabBar(props, setIndex, index)}
         onIndexChange={setIndex}
         style={$flex1}
         initialLayout={{ width: layout.width }}
@@ -675,7 +708,6 @@ const $tabBarItem: ViewStyle = {
 }
 
 const $tab: TextStyle = {
-  backgroundColor: colors.palette.primary100,
   fontSize: 14,
 }
 
@@ -695,6 +727,7 @@ const $topContainer: ImageStyle = {
   alignItems: "center",
   paddingBottom: spacing.medium,
   height: 250,
+  width: '100%'
 }
 
 const $descriptionText: TextStyle = {

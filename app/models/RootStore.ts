@@ -34,7 +34,7 @@ export const RootStoreModel = types
     userStore: types.optional(UserStoreModel, {}),
     feedStore: types.optional(FeedStoreModel, {}),
     topics: types.optional(TopicsStoreModel, {}),
-    allChats: types.optional(ChatRoomStoreModel, { unreadCount: 0 , myUserId:''}),
+    allChats: types.optional(ChatRoomStoreModel, { unreadCount: 0, myUserId: '' }),
     classfieds: types.optional(ClassifiedStoreModel, {}),
     videos: types.optional(VideosStoreModel, {}),
     saved: types.optional(SavedStoreModel, {}),
@@ -58,7 +58,7 @@ export const RootStoreModel = types
         { userId: self.userStore._id },
         usersChatModelPrimitives
           .roomId("_id")
-          .authorId("_id")
+          .authorId("_id banner first_name last_name picture")
           .metaData("metaDataType data classifiedId")
           .toString(),
         // Handling New Message Arrival
@@ -85,6 +85,6 @@ export const RootStoreModel = types
     },
   }))
 
-export interface RootStore extends Instance<typeof RootStoreModel> {}
+export interface RootStore extends Instance<typeof RootStoreModel> { }
 
-export interface RootStoreSnapshot extends SnapshotOut<typeof RootStoreModel> {}
+export interface RootStoreSnapshot extends SnapshotOut<typeof RootStoreModel> { }

@@ -11,6 +11,7 @@ import { fromNow } from "../../../utils/agoFromNow"
 import { formatName } from "../../../utils/formatName"
 import { toastMessages } from "../../../utils/toastMessages"
 import Toast from "react-native-toast-message"
+import { $flex1, $flexRow } from "../../styles"
 
 export const P2PUserComponent = observer(function p2PUserComponent({
   data,
@@ -34,13 +35,19 @@ export const P2PUserComponent = observer(function p2PUserComponent({
   }
   const latestMessage = getLatestMessageForRoom(data?._id)
   const [isRead, setIsRead] = useState(false)
-
+  console.log('LATEST MESSAGE', latestMessage)
+  console.log('rooms[data?._id]', rooms[data?._id])
   useEffect(() => {
-    if (rooms[data?._id] === latestMessage?.id&& latestMessage.authorId !==myId ) setIsRead(true)
-    else {
-      setIsRead(false)
+    if (latestMessage.authorId) {
+      if (rooms[data?._id] === latestMessage?.id && latestMessage.authorId !== myId) {
+        setIsRead(true)
+      }
+      else {
+        if (latestMessage.authorId !== myId) { setIsRead(false) } else { setIsRead(true) }
+      }
     }
   }, [latestMessage])
+
   if (latestMessage?.isEmpty) return null
 
   return (
@@ -66,13 +73,20 @@ export const P2PUserComponent = observer(function p2PUserComponent({
           <Text text={formatName(receiver?.name)} weight="semiBold" size="md" />
           <Text size="xxs" text={fromNow(latestMessage.time)} />
         </View>
-        <Text
-          text={latestMessage.message}
-          numberOfLines={1}
-          size="sm"
-          weight={isRead ? "normal" : "medium"}
-          style={{ color: colors.palette.neutral700 }}
-        />
+        <View
+          // eslint-disable-next-line react-native/no-inline-styles
+          style={[$flexRow, { alignItems: 'center' }]}>
+          <Text
+            text={latestMessage.message}
+            numberOfLines={1}
+            size="sm"
+            weight={isRead ? "normal" : "medium"}
+            style={[{ color: colors.palette.neutral700, }, $flex1]}
+          />
+          {!isRead && <View
+            // eslint-disable-next-line react-native/no-inline-styles
+            style={{ height: 10, width: 10, borderRadius: 5, backgroundColor: colors.palette.primary100 }} />}
+        </View>
       </View>
     </ListItem>
   )

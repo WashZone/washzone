@@ -57,7 +57,7 @@ export const DrawerOptions = observer(function DrawerOptions({
       icon: "people",
       label: "DrawerNavigator.followerFollowing",
       onPress() {
-        navigatonHome.navigate("FollowerFollowing")
+        navigatonHome.navigate("FollowerFollowing", { user: { _id:userStore._id} })
       },
     },
     {
@@ -145,9 +145,9 @@ export const DrawerOptions = observer(function DrawerOptions({
         />
         <Text text={userStore.name} style={$userName} weight="bold" numberOfLines={1} />
       </TouchableOpacity>
-      <View 
-      // eslint-disable-next-line react-native/no-inline-styles
-      style={{ height: Dimensions.get("screen").height * 0.3, justifyContent: "center" }}>
+      <View
+        // eslint-disable-next-line react-native/no-inline-styles
+        style={{ height: Dimensions.get("screen").height * 0.3, justifyContent: "center" }}>
         <View style={$notificationContainer}>
           <ActionComponent key={drawerOptions[0].icon} action={drawerOptions[0]} />
           <Toggle

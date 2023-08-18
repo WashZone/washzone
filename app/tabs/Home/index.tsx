@@ -6,8 +6,8 @@ import { Feed, Profile, PostInfo, FollowerFollowing, PostList } from "../../scre
 
 export type HomeTabParamList = {
   Feed: { focused?: boolean }
-  TopicInfo: { topic: any }
-  PostInfo: { post: any }
+  TopicInfo: { topic: any, highlightedComment?: any }
+  PostInfo: { post: any, highlightedComment?: any }
   Profile: { user: any; header?: boolean }
   PostList: { user: any }
   FollowerFollowing: { initialTab?: "followers" | "following"; user: any }

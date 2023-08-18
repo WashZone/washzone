@@ -16,20 +16,20 @@ import React, { useEffect } from "react"
 import { initialWindowMetrics, SafeAreaProvider } from "react-native-safe-area-context"
 import * as Linking from "expo-linking"
 import { useInitialRootStore } from "./models"
-import { AppNavigator, useNavigationPersistence } from "./navigators"
+import { AppNavigator, navigationRef, useNavigationPersistence } from "./navigators"
 import { ErrorBoundary } from "./screens/ErrorScreen/ErrorBoundary"
 import * as storage from "./utils/storage"
-import { customFontsToLoad } from "./theme"
+import { colors, customFontsToLoad } from "./theme"
 import { setupReactotron } from "./services/reactotron"
 import Config from "./config"
-import { Platform } from "react-native"
+import { Platform, View } from "react-native"
 import AppLovinMAX from "react-native-applovin-max"
 import { useHooks } from "./screens/hooks"
-import Toast from "react-native-toast-message"
+import Toast, { BaseToast } from "react-native-toast-message"
 import { notificationHandler } from "./utils"
 import RNCallKeep from "react-native-callkeep"
-import { ShareModal } from "./components"
-import { GestureHandlerRootView } from "react-native-gesture-handler"
+import FastImage from "react-native-fast-image"
+import { $contentCenter } from "./screens/styles"
 
 const options = {
   ios: {
@@ -44,11 +44,11 @@ const options = {
     additionalPermissions: [],
   },
 }
+
 RNCallKeep.setup(options).then((res) => console.log("RNCALLKEEPRESPOK OK", res))
 // RNCallKeep.setAvailable(true)
 
 // configureNotifications()
-
 // Set up Reactotron, which is a free desktop app for inspecting and debugging
 // React Native apps. Learn more here: https://github.com/infinitered/reactotron
 setupReactotron({
@@ -108,7 +108,7 @@ function App(props: AppProps) {
         // Failed to initialize SDK
       })
 
-    setTimeout(hideSplashScreen, 2300)
+    setTimeout(hideSplashScreen, 2800)
   }, [])
 
   const prefix = Linking.createURL("/")
@@ -123,27 +123,52 @@ function App(props: AppProps) {
 
   const { rehydrated } = useInitialRootStore(() => onBoot())
 
-  if (!rehydrated || !isNavigationStateRestored || !areFontsLoaded || !AppLovinSDKRegistered)
-    return null
-
   const linking = {
     prefixes: [prefix],
     config,
   }
 
+  if (!rehydrated || !isNavigationStateRestored || !areFontsLoaded || !AppLovinSDKRegistered)
+    return null
+
   // otherwise, we're ready to render the app
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
       <ErrorBoundary catchErrors={Config.catchErrors}>
-          <AppNavigator
-            linking={linking}
-            initialState={initialNavigationState}
-            onStateChange={onNavigationStateChange}
-          />
-        <Toast />
+        <AppNavigator
+          linking={linking}
+          initialState={initialNavigationState}
+          onStateChange={onNavigationStateChange}
+        />
+        <Toast config={toastConfig} />
       </ErrorBoundary>
     </SafeAreaProvider>
   )
+}
+
+const toastConfig = {
+  message: (props) => {
+    const { receiver, roomId, picture } = props.props
+
+    return (
+      <BaseToast
+        {...props}
+        onPress={() => {props.hide() ;navigationRef.navigate('P2PChat', { receiver, roomId })}}
+        text2Style={{ color: colors.palette.neutral800 }}
+        text1Style={{ color: colors.palette.neutral800 }}
+        style={{ borderLeftColor: colors.palette.primary300 }}
+        contentContainerStyle={{ paddingHorizontal: 15 }}
+        renderLeadingIcon={() => (
+          <View style={[$contentCenter, { marginLeft: 10 }]}>
+            <FastImage
+              source={{ uri: picture }}
+              style={{ height: 40, width: 40, borderRadius: 20 }}
+            />
+          </View>
+        )}
+      />
+    )
+  },
 }
 
 export default App

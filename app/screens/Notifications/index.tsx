@@ -1,6 +1,6 @@
 import React, { FC, useEffect } from "react"
 import { FlatList, TextStyle, TouchableOpacity, View, ViewStyle } from "react-native"
-import { EmptyState, Header, Screen, Text } from "../../components"
+import { EmptyState, Header, ParsedTextComp, Screen, Text } from "../../components"
 import { colors, spacing } from "../../theme"
 
 import { AppStackParamList, AppStackScreenProps, goBack } from "../../navigators"
@@ -34,6 +34,7 @@ export const Notifications: FC<AppStackScreenProps<"Notifications">> = observer(
     const navigationVideo = useNavigation<NavigationProp<VideosTabParamList>>()
     useEffect(() => {
       fetchNotifications().then(() => {
+        console.log("ALL NOTIFICATIONS", notifications)
         notifications?.length > 0 && setLastRead(notifications[0]?.updatedAt)
       })
     }, [])
@@ -72,7 +73,27 @@ export const Notifications: FC<AppStackScreenProps<"Notifications">> = observer(
   },
 )
 
-const UIComponent = ({ name, onPress, imageUri, count, module, type, updatedAt }) => {
+const UIComponent = ({
+  name,
+  onPress,
+  imageUri,
+  count,
+  module,
+  type,
+  updatedAt,
+  text,
+  parsedText,
+}: {
+  name?: string
+  parsedText?: string
+  onPress: () => void
+  imageUri: string
+  count?: number
+  module?: string
+  type?: string
+  updatedAt: Date
+  text?: string
+}) => {
   return (
     <TouchableOpacity
       style={$itemContainer}
@@ -90,19 +111,23 @@ const UIComponent = ({ name, onPress, imageUri, count, module, type, updatedAt }
         <View style={[$flex1, { paddingVertical: spacing.tiny, paddingRight: spacing.extraSmall }]}>
           <Text
             text={
-              type === "liked"
+              text ||
+              (type === "liked"
                 ? count > 0
                   ? `${name} and ${count} others ${type} your ${module}.`
                   : `${name} ${type} your ${module}.`
                 : count > 0
-                ? `${name} and others made a total of ${count + 1} comments on your ${module}.`
-                : `${name} commented on your ${module}.`
+                  ? `${name} and others made a total of ${count + 1} comments on your ${module}.`
+                  : `${name} commented on your ${module}.`)
             }
             size="xxs"
             weight="medium"
             numberOfLines={2}
             style={$flex1}
           />
+          {parsedText && (
+            <ParsedTextComp shouldNavigateBack text={parsedText} size="xxs" numberOfLines={5} ellipsizeMode="tail" />
+          )}
           <Text
             weight="medium"
             text={fromNow(updatedAt)}
@@ -128,26 +153,28 @@ const NotificationComponent = ({
     case NotificationType.likeOnPost:
     case NotificationType.likeOnTopic:
     case NotificationType.likeOnVideo: {
+      console.log("likeOnPost ITEM", item)
+
       const details =
         item?.notificationType === NotificationType.likeOnPost
           ? {
-              onPress: () =>
-                navigationHome.navigate("PostInfo", { post: item?.HomePageId[0]?._id }),
-              module: "post",
-              image: item?.HomePageId[0]?.attachmentUrl[0],
-            }
+            onPress: () =>
+              navigationHome.navigate("PostInfo", { post: item?.HomePageId[0]?._id }),
+            module: "post",
+            image: item?.HomePageId[0]?.attachmentUrl[0] || item?.userId?.picture,
+          }
           : item?.notificationType === NotificationType.likeOnTopic
-          ? {
+            ? {
               onPress: () =>
                 navigationTopic.navigate("TopicInfo", { topic: item?.TopicId[0]?._id }),
               module: "discussion",
-              image: item?.TopicId[0]?.attachmentUrl,
+              image: item?.TopicId[0]?.attachmentUrl || item?.userId?.picture,
             }
-          : {
+            : {
               onPress: () =>
                 navigationVideo.navigate("VideoDetails", { data: item?.videoId[0]?._id }),
               module: "video",
-              image: item?.videoId[0]?.thumbnailUrl,
+              image: item?.videoId[0]?.thumbnailUrl || item?.userId?.picture,
             }
 
       return (
@@ -167,17 +194,17 @@ const NotificationComponent = ({
       const details =
         item?.notificationType === NotificationType.commentOnPost
           ? {
-              onPress: () =>
-                navigationHome.navigate("PostInfo", { post: item?.HomePageId[0]?._id }),
-              module: "post",
-              image: item?.HomePageId[0]?.attachmentUrl,
-            }
+            onPress: () =>
+              navigationHome.navigate("PostInfo", { post: item?.HomePageId[0]?._id }),
+            module: "post",
+            image: item?.HomePageId[0]?.attachmentUrl || item?.userId?.picture,
+          }
           : {
-              onPress: () =>
-                navigationTopic.navigate("TopicInfo", { topic: item?.TopicId[0]?._id }),
-              module: "discussion",
-              image: item?.TopicId[0]?.attachmentUrl,
-            }
+            onPress: () =>
+              navigationTopic.navigate("TopicInfo", { topic: item?.TopicId[0]?._id }),
+            module: "discussion",
+            image: item?.TopicId[0]?.attachmentUrl || item?.userId?.picture,
+          }
 
       return (
         <UIComponent
@@ -205,15 +232,17 @@ const NotificationComponent = ({
           }}
         >
           <View style={$flexRow}>
-            <FastImage source={{ uri: data?.image }} style={$notificationImage} />
+            <FastImage
+              source={{ uri: data?.image || item?.userId?.picture }}
+              style={$notificationImage}
+            />
 
             <View
               style={[$flex1, { paddingVertical: spacing.tiny, paddingRight: spacing.extraSmall }]}
             >
               <Text
-                text={`${formatName(author?.name)} offered ${
-                  item?.metaData?.currency + item?.metaData?.amount
-                } on ${data?.title}.`}
+                text={`${formatName(author?.name)} offered ${item?.metaData?.currency + item?.metaData?.amount
+                  } on ${data?.title}.`}
                 size="xxs"
                 weight="medium"
                 style={$flex1}
@@ -229,6 +258,76 @@ const NotificationComponent = ({
             </View>
           </View>
         </TouchableOpacity>
+      )
+    }
+    case NotificationType.follow: {
+      console.log("FOLLOW NOTI ITEM", item)
+      return (
+        <UIComponent
+          imageUri={item?.userId?.picture}
+          text={`${formatName(item?.userId?.name)} started following you.`}
+          updatedAt={item?.updatedAt}
+          onPress={() => navigationHome.navigate("Profile", { user: item?.userId })}
+        />
+      )
+    }
+    case NotificationType.taggedInPost: {
+      console.log("taggedInPost ITEM", item)
+      return (
+        <UIComponent
+          imageUri={item?.userId?.picture}
+          text={`${formatName(item?.userId?.name)} mentioned you in a post.`}
+          updatedAt={item?.updatedAt}
+          onPress={() => navigationHome.navigate("PostInfo", { post: item?.homePageId })}
+          parsedText={item?.Discription}
+        />
+      )
+    }
+    case NotificationType.taggedInPostComment: {
+      console.log("taggedInPostComment ITEM", item)
+
+      return (
+        <UIComponent
+          imageUri={item?.HomePageId?.[0]?.attachmentUrl?.[0] || item?.userId?.picture}
+          text={`${formatName(item?.userId?.name)} tagged you under a post.`}
+          updatedAt={item?.updatedAt}
+          onPress={() =>
+            navigationHome.navigate("PostInfo", {
+              post: item?.HomePageId?.[0]?._id,
+              highlightedComment: {
+                ...item,
+                HomePageId: item?.HomePageId?.[0]?._id,
+                _id: item?.commentId,
+                userId: item?.userId?._id,
+                users: item?.userId,
+              },
+            })
+          }
+          parsedText={item?.comment}
+        />
+      )
+    }
+    case NotificationType.taggedInTopicComment: {
+      console.log("taggedInTopicComment ITEM", item)
+      return (
+        <UIComponent
+          imageUri={item?.TopicId?.[0]?.attachmentUrl || item?.userId?.picture}
+          text={`${formatName(item?.userId?.name)} tagged you under a discussion.`}
+          updatedAt={item?.updatedAt}
+          onPress={() =>
+            navigationTopic.navigate("TopicInfo", {
+              topic: item?.TopicId?.[0]?._id,
+              highlightedComment: {
+                ...item,
+                TopicId: item?.TopicId?.[0]?._id,
+                _id: item?.commentId,
+                userId: item?.userId?._id,
+                users: item?.userId,
+              },
+            })
+          }
+          parsedText={item?.comment}
+        />
       )
     }
     default:
@@ -249,7 +348,7 @@ const $itemContainer: ViewStyle = {
   // paddingVertical: spacing.extraSmall,
   borderBottomWidth: 1,
   borderColor: colors.separator,
-  height: 68,
+  // height: 68,
   backgroundColor: colors.palette.neutral100,
 }
 

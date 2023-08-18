@@ -40,7 +40,7 @@ import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
 import { DrawerNavigator } from "./Drawer/DrawerNavigator"
 import { useHooks } from "../screens/hooks"
 import { BlockedUserModal } from "../components/BlockedUserModal"
-import  ShareModal  from "../components/ShareModal"
+import ShareModal from "../components/ShareModal"
 
 export type AppStackParamList = {
   Login: undefined
@@ -69,7 +69,7 @@ export type AppStackParamList = {
     answer?: any
     cancelled?: boolean
   }
-  VideoCallAndroid:{
+  VideoCallAndroid: {
     receiver: any
     role: Role
     roomId: string
@@ -85,7 +85,7 @@ export type AppStackParamList = {
     answer?: any
     cancelled?: boolean
   }
-  BlockedUsers:undefined
+  BlockedUsers: undefined
   TestNotification: undefined
 }
 
@@ -105,6 +105,7 @@ const AppStack = observer(function AppStack() {
   const { onLoggedInBoot } = useHooks()
 
   useEffect(() => {
+
     isAuthenticated && onLoggedInBoot()
   }, [isAuthenticated])
 
@@ -137,7 +138,7 @@ const AppStack = observer(function AppStack() {
               component={VideoCall}
               options={{ presentation: "containedModal" }}
             />
-              <Stack.Screen
+            <Stack.Screen
               name="VideoCallAndroid"
               component={VideoCallAndroid}
               options={{ presentation: "containedModal" }}
@@ -175,7 +176,8 @@ const AppStack = observer(function AppStack() {
   )
 })
 
-interface NavigationProps extends Partial<React.ComponentProps<typeof NavigationContainer>> { }
+interface NavigationProps extends Partial<React.ComponentProps<typeof NavigationContainer>> {
+}
 
 export const AppNavigator = observer(function AppNavigator(props: NavigationProps) {
   const colorScheme = useColorScheme()
@@ -188,7 +190,7 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
       theme={colorScheme === "dark" ? DarkTheme : DefaultTheme}
       {...props}
     >
-      <AppStack />
+      <AppStack  />
       <ShareModal />
 
     </NavigationContainer>

@@ -1,5 +1,5 @@
-import React, { FC, useEffect, useState } from "react"
-import { FlatList,  ViewStyle } from "react-native"
+import React, { FC, useEffect, useRef, useState } from "react"
+import { FlatList, LayoutChangeEvent, ViewStyle } from "react-native"
 import { CommentInput, Screen } from "../../components"
 import { HomeTabProps } from "../../tabs/Home"
 import { PostComponent } from "../Feed/partials"
@@ -12,9 +12,13 @@ import { ImageViewConfigType } from ".."
 import { Host } from "react-native-portalize"
 
 export const PostInfo: FC<HomeTabProps<"PostInfo">> = function PostInfo(props) {
-  const { post } = props.route.params
-  const [imageViewConfig, setImageViewConfig] = useState<ImageViewConfigType>({ images: [], currentIndex: 0, show: false })
-
+  const { post, highlightedComment } = props.route.params
+  const [imageViewConfig, setImageViewConfig] = useState<ImageViewConfigType>({
+    images: [],
+    currentIndex: 0,
+    show: false,
+  })
+const scrollRef = useRef<FlatList>()
   const [comments, setComments] = useState<Array<any>>([])
 
   const [postDetails, setPostDetails] = useState<any>(post)
@@ -38,13 +42,21 @@ export const PostInfo: FC<HomeTabProps<"PostInfo">> = function PostInfo(props) {
       setLoading(false)
     }
   }
+  const onPostLayout = (e: LayoutChangeEvent) => {
+    const  {height } = e.nativeEvent.layout;
+    highlightedComment && scrollRef.current.scrollToOffset({ offset: height })
+  }
 
   useEffect(() => {
     handelPost()
   }, [post])
 
   async function syncComments(id: string) {
-    const data = await getCommentsOnHomePagePost(id)
+    let data = await getCommentsOnHomePagePost(id)
+    if (highlightedComment?._id) {
+      data = data.filter((i) => i._id !== highlightedComment._id)
+    }
+    console.log("DATA syncComments", data)
     setComments(data || [])
   }
 
@@ -60,10 +72,23 @@ export const PostInfo: FC<HomeTabProps<"PostInfo">> = function PostInfo(props) {
     <Screen preset="fixed" keyboardOffset={-180} contentContainerStyle={$container}>
       <Host>
         <FlatList
+        ref={scrollRef}
           data={comments}
           renderItem={({ item }) => <CommentComponent comment={item} key={item?._id} />}
           style={$contentContainer}
-          ListHeaderComponent={<PostComponent setImageViewConfig={setImageViewConfig} post={postDetails} index={0} />}
+          ListHeaderComponent={
+
+            <PostComponent
+              additionalChildComponent={
+                highlightedComment && <CommentComponent highlighted comment={highlightedComment} key={highlightedComment?._id} />
+              }
+              onLayout={onPostLayout}
+              setImageViewConfig={setImageViewConfig}
+              post={postDetails}
+              index={0}
+            />
+
+          }
         />
 
         <CommentInput createComment={onComment} />
@@ -78,7 +103,6 @@ export const PostInfo: FC<HomeTabProps<"PostInfo">> = function PostInfo(props) {
   )
 }
 
-
 const $container: ViewStyle = {
   flex: 1,
 }
@@ -86,4 +110,3 @@ const $container: ViewStyle = {
 const $contentContainer: ViewStyle = {
   flex: 1,
 }
-

@@ -15,6 +15,7 @@ import { useStores } from "../../models"
 export const FollowerFollowing: FC<HomeTabProps<"FollowerFollowing">> = observer(
   function FollowerFollowing(props) {
     const params = props.route.params
+
     const navigation = useNavigation<NavigationProp<HomeTabParamList>>()
     const { userStore } = useStores()
     const [index, setIndex] = React.useState(params?.initialTab === 'following' ? 1 : 0)

@@ -11,7 +11,7 @@ import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { HomeTabParamList } from "../../tabs"
 const windowWidth = Dimensions.get("window").width
 
-export const CommentComponent = ({ comment }: { comment: any }) => {
+export const CommentComponent = ({ comment, highlighted }: { comment: any, highlighted?: boolean }) => {
   const [loaded, setLoaded] = useState(false)
   const navigationHome = useNavigation<NavigationProp<HomeTabParamList>>()
   const [attachmentDimensions, setAttachmentDimensions] = useState({
@@ -20,7 +20,7 @@ export const CommentComponent = ({ comment }: { comment: any }) => {
   })
   return (
     <>
-      <View style={$commentContainer}>
+      <View style={[$commentContainer, highlighted && { backgroundColor: colors.palette.primaryOverlay10 }]}>
         <TouchableOpacity
           onPress={() => navigationHome.navigate("Profile", { user: comment?.users?._id })}
         >
@@ -31,9 +31,9 @@ export const CommentComponent = ({ comment }: { comment: any }) => {
             }}
           />
         </TouchableOpacity>
-        <View 
-        // eslint-disable-next-line react-native/no-inline-styles
-        style={{ justifyContent: "space-around" }}>
+        <View
+          // eslint-disable-next-line react-native/no-inline-styles
+          style={{ justifyContent: "space-around" }}>
           <View style={$nameView}>
             <Text text={formatName(comment?.users?.name)} style={$publisherName} weight="medium" />
             <Text text={fromNow(comment?.createdAt)} style={$fromNow} />

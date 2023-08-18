@@ -9,10 +9,14 @@ export enum Interaction {
 }
 
 export enum NotificationType {
-  classified ='ClassifiedMessage',
-  commentOnTopic='CommentOnTopic',
-  commentOnPost='CommentOnPost',
-  likeOnVideo='LikeOnVideo',
-  likeOnPost='LikeOnPost',
-  likeOnTopic='LikeOnTopic',
+  classified = 'ClassifiedMessage',
+  commentOnTopic = 'CommentOnTopic',
+  commentOnPost = 'CommentOnPost',
+  likeOnVideo = 'LikeOnVideo',
+  likeOnPost = 'LikeOnPost',
+  likeOnTopic = 'LikeOnTopic',
+  taggedInPost = 'TaggedInPost',
+  taggedInPostComment = 'TaggedInPostComment',
+  taggedInTopicComment = 'TaggedInTopicComment',
+  follow = 'follow'
 }

@@ -1,6 +1,9 @@
 import { Instance, SnapshotOut, types } from "mobx-state-tree"
 import { withSetPropAction } from "./helpers/withSetPropAction"
 import moment from "moment"
+import Toast from "react-native-toast-message"
+import { formatName } from "../utils/formatName"
+import { navigationRef } from "../navigators"
 
 export const ChatRoomStoreModel = types
   .model("ChatRoomStore")
@@ -75,6 +78,28 @@ export const ChatRoomStoreModel = types
     async addToMessages(props: { roomId: string; message: any }) {
       // if (self.chatMessages[props.roomId].length > 0) {
       const temp = { ...self.chatMessages }
+      const receiver = self.allChatRooms.filter(i => i._id === props.roomId)?.[0]?.membersId.filter(i => i._id !== self.myUserId)?.[0]
+      console.log('receiverreceiverreceiver', receiver)
+      const navigationState = navigationRef.getCurrentRoute()
+      if (
+        navigationState.name !== 'P2PChat'
+        ||
+        (navigationState.name === 'P2PChat' && navigationState.params?.roomId !== props.roomId)) {
+        Toast.show({
+          text1: formatName(receiver?.name),
+          text2: props.message.text,
+          type: 'message',
+          props: { picture: receiver?.picture, receiver, roomId: props.roomId }
+        })
+      }
+      // if (receiver?._id && receiver?._id !== props.message?.authorId?._id) {
+      //   Toast.show({
+      //     text1: formatName(receiver?.name),
+      //     text2: props.message.text,
+      //     type: 'message',
+      //     picture: receiver?.picture
+      //   })
+      // }
       temp[props.roomId] = [props.message, ...(self.chatMessages?.[props.roomId] || [])]
       self.setProp("chatMessages", temp)
       this.syncUnreadCount()

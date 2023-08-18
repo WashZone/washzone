@@ -76,89 +76,58 @@ export const Search: FC<AppStackScreenProps<"Search">> = observer(function Searc
       title: "Topics",
       data: searchResults.topics,
       renderItem: ({ item }) => (
-        <TouchableOpacity
+        <ResultItem
           onPress={() => {
             navigation.goBack()
             navigationTopics.navigate("TopicInfo", { topic: item?._id })
           }}
-          style={$resultContainer}
-        >
-          <Text
-            text={item?.topicContent}
-            style={$resultText}
-            numberOfLines={1}
-            ellipsizeMode="tail"
-            weight="semiBold"
-          />
-        </TouchableOpacity>
+          text={item?.topicContent}
+        />
       ),
     },
     {
       title: "Classifieds",
       data: searchResults.classifieds,
       renderItem: ({ item }) => (
-        <TouchableOpacity
-          style={$resultContainer}
+        <ResultItem
+          text={item?.title}
           onPress={() =>
             navigationClassifieds.navigate("ClassifiedsDetails", { classified: item?._id })
           }
-        >
-          <Text
-            text={item?.title}
-            weight="semiBold"
-            style={$resultText}
-            numberOfLines={1}
-            ellipsizeMode="tail"
-          />
-        </TouchableOpacity>
+        />
       ),
     },
     {
       title: "Users",
       data: searchResults.users,
       renderItem: ({ item }) => (
-        <TouchableOpacity
+        <ResultItem
+          text={formatName(item?.name)}
           onPress={() => navigationHome.navigate("Profile", { user: item })}
-          style={$resultContainer}
-        >
-          <Text
-            text={formatName(item?.name)}
-            weight="semiBold"
-            style={$resultText}
-            numberOfLines={1}
-            ellipsizeMode="tail"
-          />
-        </TouchableOpacity>
+        />
       ),
     },
     {
       title: "Videos",
       data: searchResults.videos,
       renderItem: ({ item }) => (
-        <TouchableOpacity
+        <ResultItem
+          text={item?.videoHeading}
           onPress={() => navigationVideos.navigate("VideoDetails", { data: item })}
-          style={$resultContainer}
-        >
-          <Text
-            text={item?.videoHeading}
-            weight="semiBold"
-            style={$resultText}
-            numberOfLines={1}
-            ellipsizeMode="tail"
-          />
-        </TouchableOpacity>
+        />
       ),
     },
   ]
 
   return (
-    <View  style={$container}>
+    <View style={$container}>
       <Header
         leftIcon="caretLeft"
         title="Search"
         titleStyle={$titleStyle}
         onLeftPress={() => navigation.goBack()}
         leftIconColor={colors.palette.neutral600}
+        backgroundColor={colors.palette.neutral100}
       />
       <View style={$content}>
         <View style={$justifyCenter}>
@@ -217,6 +186,20 @@ export const Search: FC<AppStackScreenProps<"Search">> = observer(function Searc
   )
 })
 
+const ResultItem = ({ onPress, text }: { text: string; onPress: () => void }) => {
+  return (
+    <TouchableOpacity onPress={onPress} style={$resultContainer}>
+      <Text
+        text={text}
+        style={$resultText}
+        numberOfLines={1}
+        ellipsizeMode="tail"
+        weight="semiBold"
+      />
+    </TouchableOpacity>
+  )
+}
+
 const $resetText: TextStyle = {
   color: colors.palette.neutral100,
 }
@@ -270,7 +253,8 @@ const $container: ViewStyle = {
 }
 
 const $content: ViewStyle = {
-  marginHorizontal: spacing.extraLarge,
-  marginVertical: spacing.medium,
+  paddingHorizontal: spacing.extraLarge,
+  paddingVertical: spacing.medium,
   flex: 1,
+  backgroundColor: colors.background,
 }

@@ -7,6 +7,7 @@ import {
   Dimensions,
   TouchableOpacity,
   Alert,
+  LayoutChangeEvent,
 } from "react-native"
 import { CustomFlatlist, Icon, LikesModal, Screen, Text } from "../../components"
 import FastImage, { ImageStyle } from "react-native-fast-image"
@@ -129,7 +130,7 @@ const Actions = observer(function ActionButtons({
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
                 share({
                   message: item?.topicContent || '',
-                  title:item?.title || '',
+                  title: item?.title || '',
                   url: `washzone://shared-topic/${item?._id}`,
                   type: messageMetadataType.sharedDiscussion,
                   attachment: item?.attachmentUrl || ''
@@ -234,7 +235,7 @@ export const TopicComponent = observer(({ topic, index }: { topic: any; index: n
   )
 })
 
-export const TopicComponentFullView = ({ topic }) => {
+export const TopicComponentFullView = ({ topic, additionalChildComponent, onLayout }: { topic: any, additionalChildComponent?: React.ReactElement, onLayout?: (e: LayoutChangeEvent) => void }) => {
   const [loaded, setLoaded] = useState(false)
   const windowWidth = Dimensions.get("window").width
 
@@ -263,7 +264,7 @@ export const TopicComponentFullView = ({ topic }) => {
 
   return (
     <>
-      <View style={[$postContainer, $postParentContainer]}>
+      <View style={[$postContainer, $postParentContainer]} onLayout={onLayout}>
         <View style={$flex1}>
           <View style={$publisherInfoContainer}>
             <TouchableOpacity
@@ -321,6 +322,7 @@ export const TopicComponentFullView = ({ topic }) => {
         )}
         <Actions item={topic} />
       </View>
+      {additionalChildComponent}
       <NativeAdView />
     </>
   )

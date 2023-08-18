@@ -1,21 +1,23 @@
-import React, { FC, useEffect, useState } from "react"
-import { FlatList, ViewStyle } from "react-native"
+import React, { FC, useEffect, useRef, useState } from "react"
+import { FlatList, LayoutChangeEvent, View, ViewStyle } from "react-native"
 import { Host } from "react-native-portalize"
 
-import { CommentInput, Screen } from "../../components"
+import { CommentInput } from "../../components"
 import { HomeTabProps } from "../../tabs/Home"
 import { useHooks } from "../hooks"
 import { CommentComponent } from "./Comments"
 import { useStores } from "../../models"
 import { TopicComponentFullView } from "../TopicsFeed"
 import Loading from "../../components/Loading"
+import { $flex1 } from "../styles"
 
 export const TopicInfo: FC<HomeTabProps<"TopicInfo">> = function PostInfo(props) {
-  const { topic } = props.route.params
+  const { topic, highlightedComment } = props.route.params
   const { postComment, getCommentsOnPost } = useHooks()
   const [comments, setComments] = useState<Array<any>>([])
   const [topicDetails, setTopicDetails] = useState<any>(topic)
   const [loading, setLoading] = useState<boolean>(typeof topic === "string")
+  const scrollRef = useRef<FlatList>()
   const {
     userStore: { _id },
     api: { mutateGetTopicById },
@@ -35,12 +37,21 @@ export const TopicInfo: FC<HomeTabProps<"TopicInfo">> = function PostInfo(props)
     }
   }
 
+
+  const onTopicLayout = (e: LayoutChangeEvent) => {
+    const  {height } = e.nativeEvent.layout;
+    highlightedComment && scrollRef.current.scrollToOffset({ offset: height })
+  }
+
   useEffect(() => {
     handleTopic()
   }, [topic])
 
   async function syncComments(id: string) {
-    const data = await getCommentsOnPost(id)
+    let data = await getCommentsOnPost(id)
+    if (highlightedComment?._id) {
+      data = data.filter((i) => i?._id !== highlightedComment._id)
+    }
     setComments(data || [])
   }
 
@@ -54,17 +65,32 @@ export const TopicInfo: FC<HomeTabProps<"TopicInfo">> = function PostInfo(props)
   }
 
   return (
-    <Screen preset="fixed" keyboardOffset={-180} contentContainerStyle={$container}>
-      <Host>
-      <FlatList
-        data={comments}
-        renderItem={({ item }) => <CommentComponent comment={item} key={item?._id} />}
-        style={$contentContainer}
-        ListHeaderComponent={<TopicComponentFullView topic={topicDetails} />}
-      />
-      <CommentInput createComment={onComment} />
+    <View style={$container}>
+      <Host style={$flex1}>
+        <FlatList
+          data={comments}
+          ref={scrollRef}
+          renderItem={({ item }) => <CommentComponent comment={item} key={item?._id} />}
+          style={$contentContainer}
+          ListHeaderComponent={
+            <TopicComponentFullView
+              onLayout={onTopicLayout}
+              additionalChildComponent={
+                highlightedComment && (
+                  <CommentComponent
+                    highlighted
+                    comment={highlightedComment}
+                    key={highlightedComment?._id}
+                  />
+                )
+              }
+              topic={topicDetails}
+            />
+          }
+        />
+        <CommentInput createComment={onComment} />
       </Host>
-    </Screen>
+    </View>
   )
 }
 

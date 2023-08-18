@@ -3,7 +3,7 @@ import { CompositeScreenProps, NavigationProp, useNavigation } from "@react-navi
 import React, { useEffect } from "react"
 import { ImageStyle, TextStyle, ViewStyle } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
-import { AddPostModal, EmptyState, Icon } from "../components"
+import { AddPostModal, Icon } from "../components"
 import { translate } from "../i18n"
 import {
   Home,

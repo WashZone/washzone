@@ -7,7 +7,7 @@ import { $fontWeightStyles, TextProps } from "."
 import { isRTL, translate } from "../i18n"
 import { colors } from "../theme"
 import ParsedText from 'react-native-parsed-text';
-import { NavigationProp, useNavigation } from "@react-navigation/native"
+import { NavigationProp, StackActions, useNavigation } from "@react-navigation/native"
 import { HomeTabParamList } from "../tabs"
 
 type Presets = keyof typeof $presets
@@ -25,9 +25,12 @@ const renderText = (matchingString) => {
     return `@${match[1]}`;
 }
 
+interface ParsedTextProps extends TextProps {
+    shouldNavigateBack?: boolean
+}
 
-export function ParsedTextComp(props: TextProps) {
-    const navigation  = useNavigation<NavigationProp<HomeTabParamList>>()
+export function ParsedTextComp(props: ParsedTextProps) {
+    const navigation = useNavigation<NavigationProp<HomeTabParamList>>()
     const {
         weight,
         size,
@@ -37,6 +40,7 @@ export function ParsedTextComp(props: TextProps) {
         children,
         style: $styleOverride,
         color,
+        shouldNavigateBack = false,
         ...rest
     } = props
 
@@ -53,10 +57,12 @@ export function ParsedTextComp(props: TextProps) {
         color && { color },
     ]
 
-const handleUserTagPress = (text:string) => {
-    const match = text.match(userTagRegEx);
-    navigation.navigate('Profile', {user:{_id :match[2].trim()}})
-}
+    const handleUserTagPress = (text: string) => {
+        const match = text.match(userTagRegEx);
+        shouldNavigateBack && navigation.goBack()
+        navigation.dispatch(StackActions.push("Profile", { user: { _id: match[2].trim() } }))
+
+    }
 
     return (
         <ParsedText
@@ -67,13 +73,13 @@ const handleUserTagPress = (text:string) => {
                     // { type: 'phone', style: styles.phone, onPress: this.handlePhonePress },
                     // { type: 'email', style: styles.email, onPress: this.handleEmailPress },
                     // { pattern: /Bob|David/, style: styles.name, onPress: this.handleNamePress },
-                    { pattern:userTagRegEx, style: $userTag, onPress: handleUserTagPress, renderText },
+                    { pattern: userTagRegEx, style: $userTag, onPress: handleUserTagPress, renderText  },
                     // { pattern: /42/, style: styles.magicNumber },
                     // { pattern: /#(\w+)/, style: styles.hashTag },
                 ]
             }
             childrenProps={{ allowFontScaling: false, ...rest }}
-
+            {...rest}
         >
             {content}
         </ParsedText>

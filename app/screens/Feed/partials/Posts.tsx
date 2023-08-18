@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react"
-import { Alert, Dimensions, Pressable, TextStyle, View, ViewStyle, TouchableOpacity } from "react-native"
+import { Alert, Dimensions, Pressable, TextStyle, View, ViewStyle, TouchableOpacity, LayoutChangeEvent } from "react-native"
 import {
   CustomFlatlist,
   Icon,
@@ -35,6 +35,8 @@ export interface PostComponentProps {
   index: number
   numberOfLines?: number
   setImageViewConfig: (t: ImageViewConfigType) => void
+  additionalChildComponent?: React.ReactElement
+  onLayout?: (e: LayoutChangeEvent) => void
 }
 const Actions = observer(function ActionButtons({
   item,
@@ -188,6 +190,8 @@ export const PostComponent = ({
   index,
   numberOfLines,
   setImageViewConfig,
+  onLayout,
+  additionalChildComponent
 }: PostComponentProps) => {
   const SCREEN_WIDTH = Dimensions.get("screen").width
 
@@ -241,7 +245,7 @@ export const PostComponent = ({
 
   return (
     <>
-      <View style={$postContainer}>
+      <View style={$postContainer} onLayout={onLayout}>
         <Pressable onPress={onContainerPress} style={$publisherInfoContainer}>
           <TouchableOpacity onPress={() => navigation.navigate("Profile", { user: post?.userId })}>
             <FastImage
@@ -269,14 +273,16 @@ export const PostComponent = ({
           />
         </Pressable>
         {showMore && tempNumberOfLines && (
-          <Text
-            size="xxs"
-            weight="bold"
-            style={{ marginLeft: spacing.homeScreen }}
-            color={colors.palette.primary100}
-            text={"Read More"}
-            onPress={() => setTempNumberOfLines(undefined)}
-          />
+          <TouchableOpacity onPress={() => setTempNumberOfLines(undefined)}
+          >
+            <Text
+              size="xxs"
+              weight="bold"
+              style={{ marginLeft: spacing.homeScreen }}
+              color={colors.palette.primary100}
+              text={"Read More"}
+            />
+          </TouchableOpacity>
         )}
         <View style={{ backgroundColor: colors.palette.overlayNeutral50 }}>
           <Carousel
@@ -342,6 +348,7 @@ export const PostComponent = ({
         </View>
         <Actions item={post} />
       </View>
+      {additionalChildComponent}
       {index % 5 === 0 && (
         <>
           <NativeAdView />
@@ -408,7 +415,7 @@ const $postContainer: ViewStyle = {
   backgroundColor: colors.palette.neutral100,
   // backgroundColor:'red',
   // marginTop: 6,
-  marginBottom:6,
+  marginBottom: 6,
   width: "100%",
   justifyContent: "space-between",
 }
