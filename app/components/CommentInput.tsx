@@ -57,7 +57,7 @@ export const CommentInput = ({
   }
 
   const onAddImage = async () => {
-    const res = await MediaPicker()
+    const res = await MediaPicker({})
     res && setSelectedMedia(res)
   }
 

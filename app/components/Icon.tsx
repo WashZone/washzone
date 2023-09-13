@@ -173,6 +173,10 @@ export const iconRegistry = {
   editPhoto: require("../../assets/icons/photo.png"),
   addBold: require("../../assets/icons/plus-bold.png"),
   people: require("../../assets/icons/people.png"),
+  edit: require("../../assets/icons/edit.png"),
+
+  play: require("../../assets/icons/play-circle.png"),
+
 }
 
 const $imageStyle: ImageStyle = {

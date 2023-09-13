@@ -21,7 +21,6 @@ import { CommentInput, Text, Screen } from "../../components"
 import { AppStackScreenProps } from "../../navigators"
 import { $flex1 } from "../styles"
 
-
 const getColorFromType = (type: any) => {
   switch (type) {
     case messageMetadataType.incomingCallOfferAudio:
@@ -47,8 +46,7 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
   const { receiver, roomId } = props.route.params
   const {
     userStore,
-    allChats: {  getRoomMessages, setLastReadId, getRoomDetails, },
-    
+    allChats: { getRoomMessages, setLastReadId, getRoomDetails },
   } = useStores()
   const { syncChatMessages, sendTextMessage, getMoreChatMessages, sendAttachment } = useHooks()
   // const [optionsModalVisible, setOptionsModalVisible] = useState(false)
@@ -70,7 +68,7 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
     if (message.type === "file") {
       try {
         await FileViewer.open(message.uri, { showOpenWithDialog: true })
-      } catch { }
+      } catch {}
     }
   }
 
@@ -87,7 +85,7 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
   }, [])
 
   const onAttachmentPress = async () => {
-    const res = await MediaPicker()
+    const res = await MediaPicker({})
     if (res) {
       setIsAttachmentUploading(true)
       await sendAttachment({ roomId, attachment: res, receiverId: receiver._id })
@@ -133,10 +131,23 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
     const { child, message, nextMessageInGroup } = payload
 
     const isAuthorMe = message?.author?.id === userStore._id
-    const isImage = message?.type === "image" || [messageMetadataType.sharedClassified, messageMetadataType.sharedDiscussion, messageMetadataType.sharedPost, messageMetadataType.sharedVideo].includes(message?.metaData?.metaDataType)
+    const isImage =
+      message?.type === "image" ||
+      [
+        messageMetadataType.sharedClassified,
+        messageMetadataType.sharedDiscussion,
+        messageMetadataType.sharedPost,
+        messageMetadataType.sharedVideo,
+      ].includes(message?.metaData?.metaDataType)
     const isLog =
       message?.type === "custom" &&
-      [messageMetadataType.classifiedOffer, messageMetadataType.sharedClassified, messageMetadataType.sharedDiscussion, messageMetadataType.sharedPost, messageMetadataType.sharedVideo].includes(message?.metaData?.metaDataType)
+      [
+        messageMetadataType.classifiedOffer,
+        messageMetadataType.sharedClassified,
+        messageMetadataType.sharedDiscussion,
+        messageMetadataType.sharedPost,
+        messageMetadataType.sharedVideo,
+      ].includes(message?.metaData?.metaDataType)
     return (
       <>
         <View
@@ -145,8 +156,8 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
             backgroundColor: isLog
               ? getColorFromType(message?.metaData?.metaDataType)
               : isAuthorMe
-                ? colors.palette.messageAuthor
-                : colors.palette.messageReceiver,
+              ? colors.palette.messageAuthor
+              : colors.palette.messageReceiver,
             padding: isImage ? 0 : spacing.tiny,
             paddingHorizontal: isImage ? 0 : spacing.extraSmall,
             borderRadius: isLog ? 8 : 10,
@@ -209,7 +220,7 @@ export const P2PChat: FC<AppStackScreenProps<"P2PChat">> = observer(function P2P
   return (
     <Host>
       <Screen contentContainerStyle={$flex1}>
-        <P2PHeader data={receiver} roomId={roomId} />
+        <P2PHeader data={receiver} roomId={roomId} blocked={getRoomDetails(roomId)?.blocked} />
         <Chat
           showUserNames
           renderImageMessage={renderImageMessage}

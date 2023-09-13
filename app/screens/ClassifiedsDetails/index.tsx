@@ -16,7 +16,7 @@ import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { ActivityIndicator } from "react-native-paper"
 import { Rating } from "react-native-ratings"
 import Toast from "react-native-toast-message"
-import ImageView from "react-native-fast-image-viewing"
+import ImageView from "react-native-image-viewing"
 
 
 import { useHooks } from "../hooks"

@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   Linking,
 } from "react-native"
+
 import { TxKeyPath } from "../../i18n"
 import { colors } from "../../theme"
 import { Icon, IconTypes, Text, Toggle } from "../../components"

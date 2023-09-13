@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useState } from "react"
 import { observer } from "mobx-react-lite"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
-import ImageView from "react-native-fast-image-viewing"
+import ImageView from "react-native-image-viewing"
 
 import Loading from "../../components/Loading"
 import { $flex1 } from "../styles"

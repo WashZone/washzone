@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react"
-import { TextStyle, TouchableOpacity, View, ViewStyle } from "react-native"
+import React, { useCallback, useEffect, useState } from "react"
+import { TouchableOpacity, View, ViewStyle } from "react-native"
 import { colors, spacing } from "../theme"
 import { Text, Button, BottomModal, Icon, $baseTextStyle } from "."
 
@@ -16,14 +16,97 @@ import { CreatePost } from "../screens/Feed/partials"
 import { CreateTopic } from "../screens/TopicsFeed/CreateTopic"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { AppStackParamList } from "../navigators"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
+import { useHooks } from "../screens/hooks"
+import { getTaggedIds } from "../utils/helpers"
+import Toast from "react-native-toast-message"
+import ShimmerPlaceholder from "react-native-shimmer-placeholder"
+import LinearGradient from "react-native-linear-gradient"
+
+export type TOnPost = ({ postContent, files }: { postContent: string; files: any[] }) => void
+
+const AnimatedShimmer = Animated.createAnimatedComponent(ShimmerPlaceholder)
 
 export const AddPostModal = () => {
+  const [uploading, setUploding] = useState(false)
   const [isVisible, setVisible] = useState(false)
   const [loading, setLoading] = useState(false)
+  const { bottom } = useSafeAreaInsets()
+  const { createPost } = useHooks()
+
+  const uploadProgress = useSharedValue(0)
+
+  const $uploadShimmerStyle = useAnimatedStyle(() => {
+    return {
+      width: interpolate(uploadProgress.value, [0, 1], [5.6, 56]),
+      height: 100,
+    }
+  })
+
+  const setUploadProgress = useCallback(
+    (val: number) => {
+      uploadProgress.value = withTiming(val, { duration: 500 })
+    },
+    [uploadProgress],
+  )
+
+  const onPost = async ({ postContent, files }) => {
+    setUploding(true)
+    try {
+      await createPost({
+        tagUser: getTaggedIds(postContent),
+        attachments: files,
+        content: postContent,
+        setUploadProgress,
+      })
+    } catch (error) {
+      console.log("Create Post", error)
+    } finally {
+      setTimeout(() => {
+        setUploding(false)
+        Toast.show({ text1: "Posted Successfully !" })
+      }, 500)
+    }
+  }
+
   return (
-    <>
-      <Button style={$addButton} onPress={() => setVisible(true)}>
-        <Icon icon={"addBold"} size={40} color={colors.palette.primary100} />
+    <View>
+      <Button
+        disabled={uploading}
+        style={[
+          $addButton,
+          {
+            // bottom: bottom + 72,
+            backgroundColor: uploading ? colors.palette.neutral500 : colors.palette.primary100,
+          },
+        ]}
+        onPress={() => setVisible(true)}
+      >
+        {uploading && (
+          <View
+            // eslint-disable-next-line react-native/no-inline-styles
+            style={{
+              alignItems: "flex-start",
+              width: "100%",
+            }}
+          >
+            <AnimatedShimmer
+              LinearGradient={LinearGradient}
+              // eslint-disable-next-line react-native/no-inline-styles
+              shimmerStyle={{ innerHeight: "100%", width: "100%" }}
+              style={$uploadShimmerStyle}
+              shimmerColors={[colors.palette.primary100, colors.palette.primary200]}
+              visible={false}
+            ></AnimatedShimmer>
+          </View>
+        )}
+        <Icon
+          icon={"addBold"}
+          size={40}
+          color={uploading ? colors.palette.neutral300 : colors.palette.neutral100}
+          // eslint-disable-next-line react-native/no-inline-styles
+          containerStyle={{ position: "absolute" }}
+        />
       </Button>
 
       <BottomModal
@@ -37,18 +120,29 @@ export const AddPostModal = () => {
         propagateSwipe
       >
         <BottomModalContent
+          onPost={onPost}
           hide={() => setVisible(false)}
           loading={loading}
           setLoading={setLoading}
         />
       </BottomModal>
-    </>
+    </View>
   )
 }
 
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity)
 
-export const BottomModalContent = ({ hide, setLoading, loading }) => {
+export const BottomModalContent = ({
+  hide,
+  setLoading,
+  loading,
+  onPost,
+}: {
+  hide: () => void
+  setLoading: (b: boolean) => void
+  loading: boolean
+  onPost: TOnPost
+}) => {
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
   const sharedValPost = useSharedValue(0)
   const sharedValDiscuss = useSharedValue(0)
@@ -154,6 +248,7 @@ export const BottomModalContent = ({ hide, setLoading, loading }) => {
         </Animated.View>
         <Animated.View style={[$absoluteWidthFull, $animatedCreatePostContainer]}>
           <CreatePost
+            onPost={onPost}
             hideModal={hide}
             loading={loading}
             selectedImages={selectedPostImages}
@@ -164,8 +259,6 @@ export const BottomModalContent = ({ hide, setLoading, loading }) => {
           />
         </Animated.View>
       </AnimatedTouchable>
-
-
 
       {/* DISCUSS Button */}
       <AnimatedTouchable
@@ -196,8 +289,6 @@ export const BottomModalContent = ({ hide, setLoading, loading }) => {
           />
         </Animated.View>
       </AnimatedTouchable>
-
-
 
       {/* CLASSIFIED Button */}
       <TouchableOpacity
@@ -236,24 +327,23 @@ export const BottomModalContent = ({ hide, setLoading, loading }) => {
 const $absoluteWidthFull: ViewStyle = { width: "100%", position: "absolute" }
 
 const $addButton: ViewStyle = {
-  padding: 12,
   margin: 12,
+top:6,
   width: 56,
   height: 56,
   borderRadius: 30,
-  borderColor: colors.palette.primary100,
-  borderWidth: 1,
-}
-
-const $headerText: TextStyle = {
-  marginVertical: spacing.medium,
-  textAlign: "center",
+  // position: "absolute",
+  // right: 0,
+  paddingHorizontal: 0,
+  alignItems: "flex-start",
+  borderColor: colors.palette.neutral100,
+  ...$contentCenter,
 }
 
 const $button: ViewStyle = {
   padding: 12,
   marginHorizontal: 12,
-  marginVertical:6,
+  marginVertical: 6,
   borderRadius: 30,
   borderColor: colors.palette.primary100,
   backgroundColor: colors.palette.primary100,

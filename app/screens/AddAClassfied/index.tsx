@@ -37,7 +37,7 @@ const data = [
 const MediaHandlerComponent = ({ selectedMedia, setSelectedMedia }) => {
   const [loading, setLoading] = useState(true)
   const selectClassifiedMedia = async () => {
-    const res = await MediaPicker()
+    const res = await MediaPicker({})
     setSelectedMedia(res)
   }
   return (

@@ -1,13 +1,6 @@
 import { observer } from "mobx-react-lite"
 import React, { FC, useMemo, useRef, useState } from "react"
-import {
-  ActivityIndicator,
-  Pressable,
-  TextInput,
-  TextStyle,
-  View,
-  ViewStyle,
-} from "react-native"
+import { ActivityIndicator, Pressable, TextInput, TextStyle, View, ViewStyle } from "react-native"
 import {
   Button,
   Icon,
@@ -29,10 +22,10 @@ import {
 } from "../../utils/validate"
 import Toast from "react-native-toast-message"
 import { $contentCenter, $flexRow } from "../styles"
-import * as Linking from 'expo-linking'
+import * as Linking from "expo-linking"
 import { toastMessages } from "../../utils/toastMessages"
 
-interface SignupProps extends AppStackScreenProps<"Signup"> { }
+interface SignupProps extends AppStackScreenProps<"Signup"> {}
 
 export const SignupScreen: FC<SignupProps> = observer(function LoginScreen(_props) {
   const passwordInput = useRef<TextInput>()
@@ -51,7 +44,7 @@ export const SignupScreen: FC<SignupProps> = observer(function LoginScreen(_prop
   const {
     authenticationStore: { setAuthToken },
     userStore: { setUser },
-    allChats:{setMyUserId},
+    allChats: { setMyUserId },
     api: { mutateCreateUser },
   } = useStores()
 
@@ -78,7 +71,7 @@ export const SignupScreen: FC<SignupProps> = observer(function LoginScreen(_prop
           email,
           name,
           picture: defaultImages.profile,
-          username: ""
+          username: "",
         })
         setUser({
           name: res.createUser.name,
@@ -87,6 +80,7 @@ export const SignupScreen: FC<SignupProps> = observer(function LoginScreen(_prop
           last_name: res.createUser.last_name,
           picture: res.createUser.picture,
           socialId: res.createUser.socialId,
+          banner: res.createUser.banner,
           type: "",
           isSocialLogin: false,
           _id: res.createUser._id,
@@ -140,7 +134,7 @@ export const SignupScreen: FC<SignupProps> = observer(function LoginScreen(_prop
         onChangeText={setName}
         containerStyle={$textField}
         autoCapitalize="none"
-        autoComplete="email"
+        autoComplete="name"
         autoCorrect={false}
         keyboardType="default"
         placeholderTx="loginScreen.nameLabel"
@@ -189,7 +183,6 @@ export const SignupScreen: FC<SignupProps> = observer(function LoginScreen(_prop
         onChangeText={setConfirmPassword}
         containerStyle={$textField}
         autoCapitalize="none"
-        autoComplete="email"
         autoCorrect={false}
         keyboardType="email-address"
         placeholderTx="loginScreen.confirmPasswordLabel"
@@ -214,7 +207,7 @@ export const SignupScreen: FC<SignupProps> = observer(function LoginScreen(_prop
         <Text
           color={colors.palette.glow100}
           weight="semiBold"
-          onPress={() => Linking.openURL('http://admin.washzoneapp.com/Eula')}
+          onPress={() => Linking.openURL("http://admin.washzoneapp.com/Eula")}
           style={{}}
           tx="loginScreen.tncLink1"
           size="xxs"

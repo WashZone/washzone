@@ -3,7 +3,7 @@ import { HomeTabProps } from "../../tabs/Home"
 import { Posts } from "./partials/Posts"
 import { Screen } from "../../components"
 import { ViewStyle } from "react-native"
-import ImageView from "react-native-fast-image-viewing"
+import ImageView from "react-native-image-viewing"
 
 import { ImageSource } from "react-native-image-viewing/dist/@types"
 

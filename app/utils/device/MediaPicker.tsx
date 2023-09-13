@@ -1,6 +1,6 @@
 // eslint-disable-next-line react-native/split-platform-components
 import { PermissionsAndroid, Platform } from "react-native"
-import { ImageLibraryOptions } from "react-native-image-picker"
+import { ImageLibraryOptions, MediaType, PhotoQuality } from "react-native-image-picker"
 const ImagePicker = require("react-native-image-picker")
 
 export const Capture = async () => {
@@ -36,24 +36,38 @@ export const Capture = async () => {
   }
 }
 
-export const MediaPicker = async (props?: { selectionLimit?: number }) => {
+export const MediaPicker = async ({
+  selectionLimit = 1,
+  mediaType = "photo",
+  maxWidth = 1280,
+  maxHeight = 720,
+  quality = 0.8,
+}: {
+  selectionLimit?: number
+  mediaType?: MediaType
+  maxWidth?: number
+  maxHeight?: number
+  quality?: PhotoQuality
+}) => {
   const options: ImageLibraryOptions = {
-    mediaType: "photo",
-    selectionLimit: props?.selectionLimit || 1,
-    maxWidth: 1280,
-    maxHeight: 720,
-    quality: 0.8,
+    mediaType,
+    selectionLimit: selectionLimit || 1,
+    maxWidth,
+    maxHeight,
+    quality,
   }
 
   let image: any
+
   await ImagePicker.launchImageLibrary(
     options,
     (response: { didCancel: any; errorMessage: any; assets: any[] }) => {
       if (response.errorMessage) return undefined
       if (!response.didCancel && !response?.errorMessage && response?.assets) {
-        image = props?.selectionLimit ? response?.assets : response?.assets?.[0]
+        image = selectionLimit > 1 ? response?.assets : response?.assets?.[0]
       }
     },
   )
+
   return image
 }

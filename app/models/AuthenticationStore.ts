@@ -1,4 +1,5 @@
 import { Instance, SnapshotOut, types } from "mobx-state-tree"
+import { GoogleSignin } from "@react-native-google-signin/google-signin"
 
 export const AuthenticationStoreModel = types
   .model("AuthenticationStore")
@@ -46,6 +47,10 @@ export const AuthenticationStoreModel = types
       store.authToken = undefined
       store.authEmail = ""
       store.authPassword = ""
+      if (GoogleSignin.isSignedIn) {
+        GoogleSignin.revokeAccess()
+        GoogleSignin.signOut()
+      }
     },
   }))
 

@@ -71,7 +71,6 @@ export interface ButtonProps extends PressableProps {
    * Text Color.
    */
   textColor?: ColorValue
-
 }
 
 /**
@@ -109,8 +108,7 @@ export function Button(props: ButtonProps) {
       $textPresets[preset],
       $textStyleOverride,
       !!pressed && [$pressedTextPresets[preset], $pressedTextStyleOverride],
-      textColor && { color: textColor }
-
+      textColor && { color: textColor },
     ]
   }
 
@@ -121,7 +119,13 @@ export function Button(props: ButtonProps) {
           {!!LeftAccessory && <LeftAccessory style={$leftAccessoryStyle} pressableState={state} />}
 
           {text && (
-            <Text weight="semiBold" tx={tx} text={text} txOptions={txOptions} style={$textStyle(state)}></Text>
+            <Text
+              weight="semiBold"
+              tx={tx}
+              text={text}
+              txOptions={txOptions}
+              style={$textStyle(state)}
+            ></Text>
           )}
           {children}
 
@@ -183,9 +187,9 @@ const $textPresets: Record<Presets, StyleProp<TextStyle>> = {
 
 const $pressedViewPresets: Record<Presets, StyleProp<ViewStyle>> = {
   default: {
-opacity :  0.8
+    opacity: 0.8,
   },
-  
+
   filled: { backgroundColor: colors.palette.neutral400 },
   reversed: { backgroundColor: colors.palette.neutral700 },
 }

@@ -1,7 +1,7 @@
 import { BottomTabScreenProps, createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import { CompositeScreenProps, NavigationProp, useNavigation } from "@react-navigation/native"
-import React, { useEffect } from "react"
-import { ImageStyle, TextStyle, ViewStyle } from "react-native"
+import React, { useCallback, useEffect, useState } from "react"
+import { ImageStyle, TextStyle, View, ViewStyle } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { AddPostModal, Icon } from "../components"
 import { translate } from "../i18n"
@@ -17,6 +17,10 @@ import {
 import { colors, spacing, typography } from "../theme"
 import { AppStackParamList, AppStackScreenProps } from "./AppNavigator"
 import * as Linking from "expo-linking"
+import { useSharedValue } from "react-native-reanimated"
+import { useHooks } from "../screens/hooks"
+import { getTaggedIds } from "../utils/helpers"
+import Toast from "react-native-toast-message"
 
 export type TabParamList = {
   Home: undefined
@@ -36,7 +40,6 @@ export const Tab = createBottomTabNavigator<TabParamList>()
 export function TabNavigator() {
   const { bottom } = useSafeAreaInsets()
 
-  const navigation = useNavigation<NavigationProp<TabParamList>>()
   const navigationTopic = useNavigation<NavigationProp<TopicsTabParamList>>()
   const navigationClassified = useNavigation<NavigationProp<ClassifiedsTabParamList>>()
   const navigationVideo = useNavigation<NavigationProp<VideosTabParamList>>()
@@ -46,15 +49,12 @@ export function TabNavigator() {
     if (!url) return
     if (/shared-classified/.test(linkUrl)) {
       // navigation.navigate("Classifieds")
-      setTimeout(
-        () => {
-          navigationClassified.navigate("ClassifiedsDetails", {
-            classified: linkUrl?.split("/")[linkUrl?.split("/").length - 1],
-          });
-          Linking.openURL('')
-        },
-        200,
-      )
+      setTimeout(() => {
+        navigationClassified.navigate("ClassifiedsDetails", {
+          classified: linkUrl?.split("/")[linkUrl?.split("/").length - 1],
+        })
+        Linking.openURL("")
+      }, 200)
     }
     if (/shared-topic/.test(linkUrl)) {
       // navigation.navigate("Topics")
@@ -62,112 +62,108 @@ export function TabNavigator() {
         navigationTopic.navigate("TopicInfo", {
           topic: linkUrl?.split("/")[linkUrl?.split("/").length - 1],
         })
-        Linking.openURL('')
+        Linking.openURL("")
       }, 200)
-
     }
     if (/shared-video/.test(linkUrl)) {
-      setTimeout(
-        () => {
-          // navigation.navigate("Videos")
-          navigationVideo.navigate("VideoDetails", {
-            data: linkUrl?.split("/")[linkUrl?.split("/").length - 1],
-          })
-          Linking.openURL('')
-        },
-        200,
-      )
-
+      setTimeout(() => {
+        // navigation.navigate("Videos")
+        navigationVideo.navigate("VideoDetails", {
+          data: linkUrl?.split("/")[linkUrl?.split("/").length - 1],
+        })
+        Linking.openURL("")
+      }, 200)
     }
   }
 
   useEffect(() => handleStoryURL(url), [url])
 
   return (
-    <Tab.Navigator
-      initialRouteName={"Home"}
-      screenOptions={{
-        lazy: false,
-        headerShown: false,
-        tabBarHideOnKeyboard: true,
-        tabBarStyle: [$tabBar, { height: bottom + 70 }],
-        tabBarInactiveTintColor: colors.palette.neutral100,
-        tabBarActiveTintColor: colors.tint,
-        tabBarLabelStyle: $tabBarLabel,
-        tabBarItemStyle: $tabBarItem,
-      }}
-    >
-      <Tab.Screen
-        name="Home"
-        component={Home}
-        options={{
-          tabBarLabel: translate("TabNavigator.homeTab"),
-          tabBarIcon: ({ focused }) => (
-            <Icon
-              icon="home"
-              size={26}
-              color={focused ? colors.tint : colors.palette.neutral100}
-              style={$iconStyle}
-            />
-          ),
+    <>
+      <Tab.Navigator
+        initialRouteName={"Home"}
+        screenOptions={{
+          lazy: false,
+          headerShown: false,
+          tabBarHideOnKeyboard: true,
+          tabBarStyle: [$tabBar, { height: bottom + 70 }],
+          tabBarInactiveTintColor: colors.palette.neutral100,
+          tabBarActiveTintColor: colors.tint,
+          tabBarLabelStyle: $tabBarLabel,
+          tabBarItemStyle: $tabBarItem,
         }}
-      />
+      >
+        <Tab.Screen
+          name="Home"
+          component={Home}
+          options={{
+            tabBarLabel: translate("TabNavigator.homeTab"),
+            tabBarIcon: ({ focused }) => (
+              <Icon
+                icon="home"
+                size={26}
+                color={focused ? colors.tint : colors.palette.neutral100}
+                style={$iconStyle}
+              />
+            ),
+          }}
+        />
 
-      <Tab.Screen
-        name="Topics"
-        component={Topics}
-        options={{
-          tabBarLabel: translate("TabNavigator.discussTab"),
-          tabBarIcon: ({ focused }) => (
-            <Icon
-              icon="topics"
-              size={24}
-              color={focused ? colors.tint : colors.palette.neutral100}
-              style={$iconStyle}
-            />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Add"
-        component={() => <></>}
-        options={{
-          tabBarButton :  () => (<AddPostModal />),
-        }}
-      />
-      <Tab.Screen
-        name="Classifieds"
-        component={Classifieds}
-        options={{
-          tabBarLabel: translate("TabNavigator.ClassifiedsTab"),
-          tabBarIcon: ({ focused }) => (
-            <Icon
-              icon="classifieds"
-              size={26}
-              color={focused ? colors.tint : colors.palette.neutral100}
-              style={$iconStyle}
-            />
-          ),
-        }}
-      />
+        <Tab.Screen
+          name="Topics"
+          component={Topics}
+          options={{
+            tabBarLabel: translate("TabNavigator.discussTab"),
+            tabBarIcon: ({ focused }) => (
+              <Icon
+                icon="topics"
+                size={24}
+                color={focused ? colors.tint : colors.palette.neutral100}
+                style={$iconStyle}
+              />
+            ),
+          }}
+        />
+        <Tab.Screen name="Add" component={EmptyComp} options={{ tabBarButton: AddPostModal }} />
+        {/* <AddPostModal /> */}
+        <Tab.Screen
+          name="Classifieds"
+          component={Classifieds}
+          options={{
+            tabBarLabel: translate("TabNavigator.ClassifiedsTab"),
+            tabBarIcon: ({ focused }) => (
+              <Icon
+                icon="classifieds"
+                size={26}
+                color={focused ? colors.tint : colors.palette.neutral100}
+                style={$iconStyle}
+              />
+            ),
+          }}
+        />
 
-      <Tab.Screen
-        name="Videos"
-        component={Videos}
-        options={{
-          tabBarLabel: translate("TabNavigator.videosTab"),
-          tabBarIcon: ({ focused }) => (
-            <Icon
-              icon="videos"
-              size={28}
-              color={focused ? colors.tint : colors.palette.neutral100}
-              style={$iconStyle}
-            />
-          ),
-        }}
-      />
-    </Tab.Navigator>
+        <Tab.Screen
+          name="Videos"
+          component={Videos}
+          options={{
+            tabBarLabel: translate("TabNavigator.videosTab"),
+            tabBarIcon: ({ focused }) => (
+              <Icon
+                icon="videos"
+                size={28}
+                color={focused ? colors.tint : colors.palette.neutral100}
+                style={$iconStyle}
+              />
+            ),
+          }}
+        />
+      </Tab.Navigator>
+    </>
   )
+}
+
+const EmptyComp = () => {
+  return <View />
 }
 
 const $iconStyle: ImageStyle = {

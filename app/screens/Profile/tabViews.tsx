@@ -1,22 +1,21 @@
 import React, { useEffect, useState } from "react"
-import { View, ViewStyle, Dimensions, TouchableOpacity, Platform } from "react-native"
+import { View, ViewStyle, Dimensions, TouchableOpacity } from "react-native"
 import { colors, spacing } from "../../theme"
 import { useHooks } from "../hooks"
 import { ClassifiedComponent } from "../ClassifiedsFeed"
 import { TopicComponent } from "../TopicsFeed"
-import { useAutoImage } from "../../components"
 import { HFlatList, HScrollView } from "react-native-head-tab-view"
 import { PostComponent } from "../Feed/partials"
 import Loading from "../../components/Loading"
 import { VideoBlockFullWidth } from "../Playlist"
-import ImageView from "react-native-fast-image-viewing"
+import ImageView from "react-native-image-viewing"
 
 import { EmptyTabState } from "./emptyTabComponent"
 import ShimmerPlaceholder from "react-native-shimmer-placeholder"
 import LinearGradient from "react-native-linear-gradient"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 const maxGalleryItemDimension = Dimensions.get("window").width / 2 - 30
-console.log('maxGalleryItemDimension', maxGalleryItemDimension)
+
 const GalleryItem = ({ uri, onPress }) => {
   const [aspectRatio, setAspectRatio] = useState(1)
   const [loaded, setLoaded] = useState(false)

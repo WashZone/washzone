@@ -96,21 +96,23 @@ export const showAlertYesNo = ({
     },
   )
 
-
 export const getTaggedIds = (content: string) => {
-  const regex = /@\[([^[\]]+)\]\(([^)]+)\)/g;
-  const matchedSubstrings = [];
-  let match;
+  const regex = /@\[([^[\]]+)\]\(([^)]+)\)/g
+  const matchedSubstrings = []
+  let match
 
   while ((match = regex.exec(content)) !== null) {
-    matchedSubstrings.push(match[0]);
+    matchedSubstrings.push(match[0])
   }
 
-
-  const ids = matchedSubstrings.map(i => {
-    const match = i.match(userTagRegEx);
+  const ids = matchedSubstrings.map((i) => {
+    const match = i.match(userTagRegEx)
     return match[2]
   })
   return ids
-
 }
+
+export const isRemoteUrl = (url: string) => {
+  return url.startsWith("http") || url.startsWith("data")
+}
+ 

@@ -8,13 +8,7 @@ import {
   Pressable,
   ActivityIndicator,
 } from "react-native"
-import {
-  Icon,
-  iconRegistry,
-  Text,
-  Button,
-  TagInput,
-} from "../../../components"
+import { Icon, iconRegistry, Text, Button, TagInput, TOnPost } from "../../../components"
 import { colors, spacing } from "../../../theme"
 import { useStores } from "../../../models"
 import FastImage, { ImageStyle } from "react-native-fast-image"
@@ -25,63 +19,53 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
 } from "react-native-reanimated"
-import { useHooks } from "../../hooks"
 import { observer } from "mobx-react-lite"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { HomeTabParamList } from "../../../tabs"
 import DraggableFlatList, { ScaleDecorator } from "react-native-draggable-flatlist"
 import { $contentCenter, $flexRow } from "../../styles"
-import { getTaggedIds } from "../../../utils/helpers"
-import Toast from "react-native-toast-message"
+import { ResizeMode, Video } from "expo-av"
+import ShimmerPlaceholder from "react-native-shimmer-placeholder"
+import LinearGradient from "react-native-linear-gradient"
 
 export const CreatePost = observer(function CreatePost({
   progress,
   focused,
   setLoading,
   loading,
-  hideModal, selectedImages, setSelectedImages
+  hideModal,
+  selectedImages,
+  setSelectedImages,
+  onPost,
 }: {
   focused: boolean
   loading: boolean
   progress: SharedValue<number>
   setLoading: (b: boolean) => void
   hideModal: () => void
+  onPost: TOnPost
   selectedImages: Array<any>
   setSelectedImages: (s: Array<any>) => void
 }) {
-  const { createPost } = useHooks()
   const { userStore } = useStores()
   const [postContent, setPostContent] = useState<string>("")
-  const [uploadProgress, setUploadProgress] = useState<string>("0/0")
   const inputRef = useRef<TextInput>()
-  // const [selectedImages, setSelectedImages] = useState<Array<any>>([])
   const navigation = useNavigation<NavigationProp<HomeTabParamList>>()
 
   useEffect(() => {
     focused && inputRef.current.focus()
   }, [focused])
 
-  const onPost = async () => {
+  const handlePost = async () => {
     if (postContent?.trim()?.length === 0 && selectedImages?.length === 0) return
     setLoading(true)
-    try {
-      await createPost({
-        tagUser: getTaggedIds(postContent),
-        attachments: selectedImages,
-        content: postContent,
-        setUploadProgress,
-      })
-    } catch (error) {
-      console.log("Create Post", error)
-    } finally {
-      setLoading(false)
-      progress.value = withTiming(0, { duration: 400 })
-      setSelectedImages([])
-      setPostContent("")
-      inputRef.current.blur()
-      Toast.show({ text1: 'Posted Successfully !' })
-      hideModal()
-    }
+    onPost({ files: selectedImages, postContent })
+    progress.value = withTiming(0, { duration: 400 })
+    setSelectedImages([])
+    setPostContent("")
+    inputRef.current.blur()
+    hideModal()
+    setLoading(false)
   }
 
   const onFocus = () => {
@@ -90,36 +74,25 @@ export const CreatePost = observer(function CreatePost({
     }
   }
 
-  useEffect(
-    () => () => {
-      progress.value = withTiming(0, { duration: 200 })
-    },
-    [],
-  )
+  useEffect(() => {
+    progress.value = withTiming(0, { duration: 200 })
+  }, [])
 
   const onGalleryPress = async () => {
     try {
-      const images = await MediaPicker({ selectionLimit: 5 - selectedImages.length })
+      const images = await MediaPicker({
+        selectionLimit: 5 - selectedImages.length,
+        mediaType: "mixed",
+      })
       if (images?.length > 0) {
         setSelectedImages([...selectedImages, ...images])
+
+        /* A 100ms timeout so that the user actually views the animation post selecting media */
         setTimeout(() => {
           progress.value = withTiming(1, { duration: 300 })
         }, 100)
       }
-    } catch (e) { }
-  }
-
-  const onAddMoreImages = async () => {
-    try {
-      const images = await MediaPicker({ selectionLimit: 5 - selectedImages.length })
-      // console.log(images)
-      if (images?.length > 0) {
-        setSelectedImages([...selectedImages, ...images])
-        // setTimeout(() => {
-        //   progress.value = withTiming(1, { duration: 300 })
-        // }, 100)
-      }
-    } catch (e) { }
+    } catch (e) {}
   }
 
   const onDeletePress = (item) => {
@@ -195,14 +168,17 @@ export const CreatePost = observer(function CreatePost({
   })
 
   return (
-    <View
-    >
+    <View>
       <View style={$container}>
         <FastImage source={{ uri: userStore?.picture }} style={$picture} resizeMode="cover" />
         <View style={$contentContainer}>
           <TagInput
             value={postContent}
-            onChange={(e) => { if (!loading) { setPostContent(e) } }}
+            onChange={(e) => {
+              if (!loading) {
+                setPostContent(e)
+              }
+            }}
             inputRef={inputRef}
             onFocus={onFocus}
             onBlur={() => {
@@ -227,32 +203,74 @@ export const CreatePost = observer(function CreatePost({
           ListFooterComponent={
             selectedImages?.length < 5 &&
             selectedImages?.length > 0 && (
-              <Button style={$addImagesButton} onPress={onAddMoreImages}>
+              <Button style={$addImagesButton} onPress={onGalleryPress}>
                 <Icon icon="plus" size={28} color={colors.palette.neutral100} />
               </Button>
             )
           }
-          renderItem={({ item, drag, isActive }) => (
-            <ScaleDecorator >
-              <Pressable onLongPress={drag} disabled={isActive}
-                // eslint-disable-next-line react-native/no-inline-styles
-                style={{ width: 120, marginVertical: spacing.extraSmall }} >
-                <Animated.View style={animatedPreviewContainer(item)}>
-                  <FastImage source={{ uri: item?.uri }} style={previewImage(item)} />
-                </Animated.View>
+          renderItem={({ item, drag, isActive }) => {
+            const videoRef = useRef<Video>()
+            const isVideo = item.type.startsWith("video")
+            const [loaded, setLoaded] = useState(false)
+            return (
+              <ScaleDecorator>
+                <Pressable
+                  onLongPress={drag}
+                  disabled={isActive}
+                  // onPress={() =>  }
+                  // eslint-disable-next-line react-native/no-inline-styles
+                  style={{ width: 120, marginVertical: spacing.extraSmall }}
+                >
+                  <Animated.View style={animatedPreviewContainer(item)}>
+                    {isVideo ? (
+                      <ShimmerPlaceholder
+                        shimmerStyle={previewImage(item)}
+                        LinearGradient={LinearGradient}
+                        visible={loaded}
+                      >
+                        <Video
+                          ref={videoRef}
+                          onReadyForDisplay={() => setLoaded(true)}
+                          shouldPlay
+                          source={{ uri: item?.uri || item?.url }}
+                          style={previewImage(item)}
+                          resizeMode={ResizeMode.COVER}
+                        />
+                      </ShimmerPlaceholder>
+                    ) : (
+                      <FastImage source={{ uri: item?.uri }} style={previewImage(item)} />
+                    )}
+                  </Animated.View>
 
-                <Icon icon="x" size={item.uri ? 22 : 0.0001} containerStyle={$deleteIcon} onPress={() => onDeletePress(item)} />
-
-              </Pressable>
-            </ScaleDecorator>
-          )}
+                  <Icon
+                    icon="x"
+                    size={item.uri ? 22 : 0.0001}
+                    containerStyle={$deleteIcon}
+                    onPress={() => onDeletePress(item)}
+                  />
+                  {isVideo && (
+                    <Icon
+                      icon="play"
+                      size={item.uri ? 27 : 0.0001}
+                      containerStyle={$playIcon}
+                      onPress={() => videoRef.current.presentFullscreenPlayer()}
+                    />
+                  )}
+                </Pressable>
+              </ScaleDecorator>
+            )
+          }}
           keyExtractor={function (item: any): string {
             return item?.uri
           }}
         />
-        <View style={[$bottomActionContainer,
-          // eslint-disable-next-line react-native/no-inline-styles
-          { zIndex: -1 }]}>
+        <View
+          style={[
+            $bottomActionContainer,
+            // eslint-disable-next-line react-native/no-inline-styles
+            { zIndex: -1 },
+          ]}
+        >
           <View style={$actionButtonsContainer}>
             <Pressable onPress={onGalleryPress}>
               {useMemo(
@@ -263,17 +281,17 @@ export const CreatePost = observer(function CreatePost({
               )}
             </Pressable>
           </View>
-          <AnimatedPressable disabled={loading} onPress={onPost} style={animatedPostButton}>
+          <AnimatedPressable disabled={loading} onPress={handlePost} style={animatedPostButton}>
             {loading ? (
               <View style={$flexRow}>
-                {selectedImages?.length > 0 && (
+                {/* {selectedImages?.length > 0 && (
                   <Text
                     text={uploadProgress}
                     color={colors.palette.neutral100}
                     weight="medium"
                     size="xs"
                   />
-                )}
+                )} */}
                 <ActivityIndicator
                   color={colors.palette.neutral100}
                   style={$loadingIndicator}
@@ -297,7 +315,7 @@ const $addImagesButton: ViewStyle = {
   marginLeft: 30,
   marginRight: 40,
   backgroundColor: colors.palette.primary300,
-  marginVertical: spacing.extraSmall
+  marginVertical: spacing.extraSmall,
 }
 
 const $loadingIndicator: ViewStyle = {
@@ -306,8 +324,6 @@ const $loadingIndicator: ViewStyle = {
 }
 
 const $deleteIcon: ViewStyle = {
-
-
   justifyContent: "center",
   alignItems: "center",
   borderRadius: 8,
@@ -315,7 +331,13 @@ const $deleteIcon: ViewStyle = {
   position: "absolute",
   top: -5,
   left: 85,
-  ...$contentCenter
+  ...$contentCenter,
+}
+
+const $playIcon: ViewStyle = {
+  position: "absolute",
+  left: 46,
+  top: 28,
 }
 
 const $actionButtonsContainer: ViewStyle = {

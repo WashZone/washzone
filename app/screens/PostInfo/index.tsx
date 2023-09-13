@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useRef, useState } from "react"
-import { FlatList, LayoutChangeEvent, ViewStyle } from "react-native"
+import { FlatList, LayoutChangeEvent, ViewStyle, Alert } from "react-native"
 import { CommentInput, Screen } from "../../components"
 import { HomeTabProps } from "../../tabs/Home"
 import { PostComponent } from "../Feed/partials"
@@ -7,19 +7,20 @@ import { useHooks } from "../hooks"
 import { useStores } from "../../models"
 import { CommentComponent } from "../TopicInfo/Comments"
 import Loading from "../../components/Loading"
-import ImageView from "react-native-fast-image-viewing"
+import ImageView from "react-native-image-viewing"
 import { ImageViewConfigType } from ".."
 import { Host } from "react-native-portalize"
+import { colors } from "../../theme"
 
 export const PostInfo: FC<HomeTabProps<"PostInfo">> = function PostInfo(props) {
   const { post, highlightedComment } = props.route.params
-  const [imageViewConfig, setImageViewConfig] = useState<ImageViewConfigType>({
+  const [imageViewConfig, setImageViewConfig] = useState<Omit<ImageViewConfigType, "show">>({
     images: [],
     currentIndex: 0,
-    show: false,
   })
-const scrollRef = useRef<FlatList>()
+  const scrollRef = useRef<FlatList>()
   const [comments, setComments] = useState<Array<any>>([])
+  const [showImageView, setShowImageView] = useState<boolean>(false)
 
   const [postDetails, setPostDetails] = useState<any>(post)
   const [loading, setLoading] = useState<boolean>(typeof post === "string")
@@ -31,19 +32,27 @@ const scrollRef = useRef<FlatList>()
 
   const handelPost = async () => {
     setLoading(true)
-    if (typeof post === "string") {
-      const res = await mutateGetHomePagesById({ homePageId: post, callerId: _id })
-      const topicData = res.getHomePagesById?.data.length === 1 && res.getHomePagesById?.data[0]
-      setPostDetails(topicData)
-      await syncComments(topicData?._id)
-      setLoading(false)
-    } else {
-      await syncComments(postDetails?._id)
-      setLoading(false)
+    try {
+      if (typeof post === "string") {
+        const res = await mutateGetHomePagesById({ homePageId: post, callerId: _id })
+        const topicData = res.getHomePagesById?.data.length === 1 && res.getHomePagesById?.data[0]
+        setPostDetails(topicData)
+        await syncComments(topicData?._id)
+        setLoading(false)
+      } else {
+        await syncComments(postDetails?._id)
+        setLoading(false)
+      }
+    } catch (err) {
+      Alert.alert(
+        "Post Not Found",
+        " We apologize, but the requested post is currently unavailable.",
+        [{ text: "Go Back", onPress: props.navigation.goBack }],
+      )
     }
   }
   const onPostLayout = (e: LayoutChangeEvent) => {
-    const  {height } = e.nativeEvent.layout;
+    const { height } = e.nativeEvent.layout
     highlightedComment && scrollRef.current.scrollToOffset({ offset: height })
   }
 
@@ -68,26 +77,39 @@ const scrollRef = useRef<FlatList>()
   if (loading) {
     return <Loading />
   }
+
+  const handleImageViewConfig = (args: ImageViewConfigType) => {
+    const { show, ...rest } = args
+    if (show) {
+      setImageViewConfig(rest)
+      setTimeout(() => setShowImageView(true), 100)
+    }
+  }
+
   return (
     <Screen preset="fixed" keyboardOffset={-180} contentContainerStyle={$container}>
       <Host>
         <FlatList
-        ref={scrollRef}
+          ref={scrollRef}
           data={comments}
           renderItem={({ item }) => <CommentComponent comment={item} key={item?._id} />}
           style={$contentContainer}
           ListHeaderComponent={
-
             <PostComponent
               additionalChildComponent={
-                highlightedComment && <CommentComponent highlighted comment={highlightedComment} key={highlightedComment?._id} />
+                highlightedComment && (
+                  <CommentComponent
+                    highlighted
+                    comment={highlightedComment}
+                    key={highlightedComment?._id}
+                  />
+                )
               }
               onLayout={onPostLayout}
-              setImageViewConfig={setImageViewConfig}
+              setImageViewConfig={handleImageViewConfig}
               post={postDetails}
               index={0}
             />
-
           }
         />
 
@@ -95,8 +117,8 @@ const scrollRef = useRef<FlatList>()
         <ImageView
           images={imageViewConfig.images}
           imageIndex={imageViewConfig.currentIndex}
-          visible={imageViewConfig.show}
-          onRequestClose={() => setImageViewConfig({ ...imageViewConfig, show: false })}
+          visible={showImageView}
+          onRequestClose={() => setShowImageView(false)}
         />
       </Host>
     </Screen>
@@ -105,6 +127,7 @@ const scrollRef = useRef<FlatList>()
 
 const $container: ViewStyle = {
   flex: 1,
+  backgroundColor: colors.background,
 }
 
 const $contentContainer: ViewStyle = {

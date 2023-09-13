@@ -45,7 +45,7 @@ const options = {
   },
 }
 
-RNCallKeep.setup(options).then((res) => console.log("RNCALLKEEPRESPOK OK", res))
+RNCallKeep.setup(options)
 // RNCallKeep.setAvailable(true)
 
 // configureNotifications()
@@ -148,12 +148,15 @@ function App(props: AppProps) {
 
 const toastConfig = {
   message: (props) => {
-    const { receiver, roomId, picture } = props.props
+    const { sender, roomId, picture } = props.props
 
     return (
       <BaseToast
         {...props}
-        onPress={() => {props.hide() ;navigationRef.navigate('P2PChat', { receiver, roomId })}}
+        onPress={() => {
+          props.hide()
+          navigationRef.navigate("P2PChat", { receiver: sender, roomId })
+        }}
         text2Style={{ color: colors.palette.neutral800 }}
         text1Style={{ color: colors.palette.neutral800 }}
         style={{ borderLeftColor: colors.palette.primary300 }}

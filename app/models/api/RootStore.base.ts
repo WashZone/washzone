@@ -69,6 +69,8 @@ import { HomePageDetailModel, HomePageDetailModelType } from "./HomePageDetailMo
 import { homePageDetailModelPrimitives, HomePageDetailModelSelector } from "./HomePageDetailModel.base"
 import { UserTagListModel, UserTagListModelType } from "./UserTagListModel"
 import { userTagListModelPrimitives, UserTagListModelSelector } from "./UserTagListModel.base"
+import { AttachmentUrlsModel, AttachmentUrlsModelType } from "./AttachmentUrlsModel"
+import { attachmentUrlsModelPrimitives, AttachmentUrlsModelSelector } from "./AttachmentUrlsModel.base"
 import { LikeHomePagesModel, LikeHomePagesModelType } from "./LikeHomePagesModel"
 import { likeHomePagesModelPrimitives, LikeHomePagesModelSelector } from "./LikeHomePagesModel.base"
 import { HomePageIdArrayModel, HomePageIdArrayModelType } from "./HomePageIdArrayModel"
@@ -145,6 +147,11 @@ export type InputClassified = {
   prize?: (string | null)
   title?: (string | null)
   condition?: (string | null)
+}
+export type InputattachmentUrls = {
+  url?: (string | null)
+  thumbnailUrl?: (string | null)
+  type?: (string | null)
 }
 export type InputUserTagList = {
   tagId?: (string | null)
@@ -413,7 +420,7 @@ mutateOpenActivity="mutateOpenActivity"
 */
 export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
   .named("RootStore")
-  .extend(configureStoreMixin([['UserRating', () => UserRatingModel], ['classifiedFeed', () => ClassifiedFeedModel], ['CommentsDetail', () => CommentsDetailModel], ['topicCommentTag', () => TopicCommentTagModel], ['likeTopics', () => LikeTopicsModel], ['TopicIdArray', () => TopicIdArrayModel], ['TopicDetail', () => TopicDetailModel], ['topicTaguser', () => TopicTaguserModel], ['likeVideos', () => LikeVideosModel], ['VideoLikeArray', () => VideoLikeArrayModel], ['VideoPlaylist', () => VideoPlaylistModel], ['VideoUploadPlaylist', () => VideoUploadPlaylistModel], ['VideoUpload', () => VideoUploadModel], ['User', () => UserModel], ['BloackedUserList', () => BloackedUserListModel], ['SigninUser', () => SigninUserModel], ['Legalities', () => LegalitiesModel], ['saveVideo', () => SaveVideoModel], ['storyViewerUser', () => StoryViewerUserModel], ['saveClassified', () => SaveClassifiedModel], ['blockUser', () => BlockUserModel], ['MetaData', () => MetaDataModel], ['Notification', () => NotificationModel], ['usersChat', () => UsersChatModel], ['roomChat', () => RoomChatModel], ['Users', () => UsersModel], ['CallMetaData', () => CallMetaDataModel], ['CallNotification', () => CallNotificationModel], ['Homecomments', () => HomecommentsModel], ['homeCommentTagList', () => HomeCommentTagListModel], ['HomePageDetail', () => HomePageDetailModel], ['UserTagList', () => UserTagListModel], ['likeHomePages', () => LikeHomePagesModel], ['HomePageIdArray', () => HomePageIdArrayModel], ['flags', () => FlagsModel], ['reportUser', () => ReportUserModel], ['followUser', () => FollowUserModel], ['friendlist', () => FriendlistModel], ['reciverIdArray', () => ReciverIdArrayModel], ['lastRead', () => LastReadModel]], [], "js"))
+  .extend(configureStoreMixin([['UserRating', () => UserRatingModel], ['classifiedFeed', () => ClassifiedFeedModel], ['CommentsDetail', () => CommentsDetailModel], ['topicCommentTag', () => TopicCommentTagModel], ['likeTopics', () => LikeTopicsModel], ['TopicIdArray', () => TopicIdArrayModel], ['TopicDetail', () => TopicDetailModel], ['topicTaguser', () => TopicTaguserModel], ['likeVideos', () => LikeVideosModel], ['VideoLikeArray', () => VideoLikeArrayModel], ['VideoPlaylist', () => VideoPlaylistModel], ['VideoUploadPlaylist', () => VideoUploadPlaylistModel], ['VideoUpload', () => VideoUploadModel], ['User', () => UserModel], ['BloackedUserList', () => BloackedUserListModel], ['SigninUser', () => SigninUserModel], ['Legalities', () => LegalitiesModel], ['saveVideo', () => SaveVideoModel], ['storyViewerUser', () => StoryViewerUserModel], ['saveClassified', () => SaveClassifiedModel], ['blockUser', () => BlockUserModel], ['MetaData', () => MetaDataModel], ['Notification', () => NotificationModel], ['usersChat', () => UsersChatModel], ['roomChat', () => RoomChatModel], ['Users', () => UsersModel], ['CallMetaData', () => CallMetaDataModel], ['CallNotification', () => CallNotificationModel], ['Homecomments', () => HomecommentsModel], ['homeCommentTagList', () => HomeCommentTagListModel], ['HomePageDetail', () => HomePageDetailModel], ['UserTagList', () => UserTagListModel], ['attachmentUrls', () => AttachmentUrlsModel], ['likeHomePages', () => LikeHomePagesModel], ['HomePageIdArray', () => HomePageIdArrayModel], ['flags', () => FlagsModel], ['reportUser', () => ReportUserModel], ['followUser', () => FollowUserModel], ['friendlist', () => FriendlistModel], ['reciverIdArray', () => ReciverIdArrayModel], ['lastRead', () => LastReadModel]], [], "js"))
   .props({
 
   })
@@ -908,8 +915,8 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     mutateDeleteClassfied(variables: { classifiedFeedId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ deleteClassfied: boolean }>(`mutation deleteClassfied($classifiedFeedId: String!) { deleteClassfied(ClassifiedFeedId: $classifiedFeedId) }`, variables, optimisticUpdate)
     },
-    mutateCreateUserHomePages(variables: { discription: string, attachmentUrl?: string[], tagUser: InputUserTagList[], attachmentType?: (string | null), commentId?: (string | null), userId: string }, resultSelector: string | ((qb: HomePageDetailModelSelector) => HomePageDetailModelSelector) = homePageDetailModelPrimitives.toString(), optimisticUpdate?: () => void) {
-      return self.mutate<{ createUserHomePages: HomePageDetailModelType}>(`mutation createUserHomePages($discription: String!, $attachmentUrl: [String!], $tagUser: [InputUserTagList!]!, $attachmentType: String, $commentId: String, $userId: String!) { createUserHomePages(Discription: $discription, attachmentUrl: $attachmentUrl, tagUser: $tagUser, attachmentType: $attachmentType, commentId: $commentId, userId: $userId) {
+    mutateCreateUserHomePages(variables: { discription: string, attachmentUrl?: InputattachmentUrls[], tagUser: InputUserTagList[], attachmentType?: (string | null), commentId?: (string | null), userId: string }, resultSelector: string | ((qb: HomePageDetailModelSelector) => HomePageDetailModelSelector) = homePageDetailModelPrimitives.toString(), optimisticUpdate?: () => void) {
+      return self.mutate<{ createUserHomePages: HomePageDetailModelType}>(`mutation createUserHomePages($discription: String!, $attachmentUrl: [InputattachmentUrls!], $tagUser: [InputUserTagList!]!, $attachmentType: String, $commentId: String, $userId: String!) { createUserHomePages(Discription: $discription, attachmentUrl: $attachmentUrl, tagUser: $tagUser, attachmentType: $attachmentType, commentId: $commentId, userId: $userId) {
         ${typeof resultSelector === "function" ? resultSelector(new HomePageDetailModelSelector()).toString() : resultSelector}
       } }`, variables, optimisticUpdate)
     },

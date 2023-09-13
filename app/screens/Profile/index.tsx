@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react"
+import React, { FC, useCallback, useEffect, useState } from "react"
 import {
   TextStyle,
   ViewStyle,
@@ -16,7 +16,7 @@ import { NavigationState, SceneRendererProps, TabBar } from "react-native-tab-vi
 import { observer } from "mobx-react-lite"
 import { ActivityIndicator } from "react-native-paper"
 import { NavigationProp, StackActions, useNavigation } from "@react-navigation/native"
-import ImageView from "react-native-fast-image-viewing"
+import ImageView from "react-native-image-viewing"
 
 import { colors, spacing } from "../../theme"
 import { HomeTabParamList, HomeTabProps } from "../../tabs"
@@ -55,8 +55,6 @@ const getIndexFromKey = (key: string) => {
     }
   }
 }
-const MAX_WIDTH = Dimensions.get('window').width
-const TAB_WIDTH = MAX_WIDTH / 4
 
 const renderTabBar = (
   props: SceneRendererProps & {
@@ -66,32 +64,26 @@ const renderTabBar = (
   index: number,
 ) => {
   console.log("PROPS.POSITION", props.position)
-  const inputRange = props.navigationState.routes.map((x, i) => i);
-
-  const opacity = props.position.interpolate({
-    inputRange,
-    outputRange: inputRange.map((inputIndex) =>
-      inputIndex *  TAB_WIDTH
-    ),
-  });
+  const inputRange = props.navigationState.routes.map((x, i) => i)
 
   return (
     <View
       // eslint-disable-next-line react-native/no-inline-styles
-      style={{ backgroundColor: colors.palette.primary100, width: '100%' }}>
+      style={{ backgroundColor: colors.palette.primary100, width: "100%" }}
+    >
       <TabBar
         style={$tab}
         labelStyle={$label}
         activeColor={colors.palette.primary300}
         indicatorStyle={$indicator}
         // scrollEnabled
-        renderTabBarItem={({ key, defaultTabWidth, }) => {
+        renderTabBarItem={({ key, defaultTabWidth }) => {
           const opacity = props.position.interpolate({
             inputRange,
             outputRange: inputRange.map((inputIndex) =>
-              inputIndex === getIndexFromKey(key) ? 1 : 0.5
+              inputIndex === getIndexFromKey(key) ? 1 : 0.5,
             ),
-          });
+          })
           return (
             <TouchableOpacity
               onPress={() => {
@@ -120,8 +112,10 @@ const renderTabBar = (
                   $tabBarItem,
                   {
                     width: defaultTabWidth,
-                    backgroundColor: getIndexFromKey(key) === index ? colors.palette.primary300
-                      : colors.palette.primary100,
+                    backgroundColor:
+                      getIndexFromKey(key) === index
+                        ? colors.palette.primary300
+                        : colors.palette.primary100,
                   },
                 ]}
               >
@@ -130,9 +124,9 @@ const renderTabBar = (
                   style={{
                     color: colors.palette.neutral250,
                     fontSize: spacing.medium,
-                    opacity
+                    opacity,
                   }}
-                // weight={getIndexFromKey(key) === index ? "semiBold" : "medium"}
+                  // weight={getIndexFromKey(key) === index ? "semiBold" : "medium"}
                 >
                   {key.charAt(0).toUpperCase() + key.slice(1)}
                 </Animated.Text>
@@ -347,7 +341,6 @@ const ProfileHeader = ({ user, isUser, onMessage, onProfileImagePress, onBannerP
 
   const navigationHome = useNavigation<NavigationProp<HomeTabParamList>>()
 
-
   return (
     <View
       style={{
@@ -365,13 +358,16 @@ const ProfileHeader = ({ user, isUser, onMessage, onProfileImagePress, onBannerP
           shimmerStyle={$topContainer}
           LinearGradient={LinearGradient}
           duration={2000}
-          width={Dimensions.get('screen').width}
+          width={Dimensions.get("screen").width}
         >
           <FastImage
+
             source={
-              user?.banner ? {
-                uri: user?.banner,
-              } : BROKEN_BANNER
+              user?.banner
+                ? {
+                    uri: user?.banner,
+                  }
+                : BROKEN_BANNER
             }
             style={[$topContainer, { backgroundColor: colors.background }]}
             onLoad={() => setBannerLoaded(true)}
@@ -570,9 +566,17 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
   const syncUser = async () => {
     setLoading(true)
 
-    const res = await getUserById(user?._id)
-    navigation.setParams({ user: res })
-    setLoading(false)
+    try {
+      const res = await getUserById(user?._id)
+      navigation.setParams({ user: res })
+      setLoading(false)
+    } catch (err) {
+      Alert.alert(
+        "Error fetching User",
+        "We apologize, but the requested user's information is currently unavailable.",
+        [{ text: "Go Back", onPress: navigation.goBack }],
+      )
+    }
   }
 
   useEffect(() => {
@@ -727,7 +731,7 @@ const $topContainer: ImageStyle = {
   alignItems: "center",
   paddingBottom: spacing.medium,
   height: 250,
-  width: '100%'
+  width: Dimensions.get('screen').width,
 }
 
 const $descriptionText: TextStyle = {

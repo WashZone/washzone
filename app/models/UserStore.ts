@@ -14,7 +14,7 @@ export const UserStoreModel = types
     isSocialLogin: types.optional(types.boolean, false),
     type: null || "facebook" || "google",
     blockedUser: types.maybe(types.frozen([])),
-    banner:types.optional(types.string, ""),
+    banner: types.optional(types.string, ""),
   })
   .actions((store) => ({
     setName(firstName?: string, lastName?: string) {
@@ -70,9 +70,6 @@ export const UserStoreModel = types
     isBlocked(id: string) {
       return store.blockedUser?.includes(id)
     },
-  })
-
-
-  )
-export interface UserStore extends Instance<typeof UserStoreModel> { }
-export interface UsertoreSnapshot extends SnapshotOut<typeof UserStoreModel> { }
+  }))
+export interface UserStore extends Instance<typeof UserStoreModel> {}
+export interface UsertoreSnapshot extends SnapshotOut<typeof UserStoreModel> {}

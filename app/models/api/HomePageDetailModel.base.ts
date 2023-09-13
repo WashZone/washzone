@@ -5,6 +5,8 @@
 import { types } from "mobx-state-tree"
 import { QueryBuilder } from "mst-gql"
 import { ModelBase } from "./ModelBase"
+import { AttachmentUrlsModel, AttachmentUrlsModelType } from "./AttachmentUrlsModel"
+import { AttachmentUrlsModelSelector } from "./AttachmentUrlsModel.base"
 import { HomecommentsModel, HomecommentsModelType } from "./HomecommentsModel"
 import { HomecommentsModelSelector } from "./HomecommentsModel.base"
 import { UserModel, UserModelType } from "./UserModel"
@@ -30,7 +32,7 @@ export const HomePageDetailModelBase = ModelBase
     tagUser: types.union(types.undefined, types.null, types.array(types.late((): any => UserTagListModel))),
     Discription: types.union(types.undefined, types.null, types.string),
     attachmentType: types.union(types.undefined, types.null, types.string),
-    attachmentUrl: types.union(types.undefined, types.null, types.array(types.string)),
+    attachmentUrl: types.union(types.undefined, types.null, types.array(types.late((): any => AttachmentUrlsModel))),
     status: types.union(types.undefined, types.null, types.string),
     likeviews: types.union(types.undefined, types.null, types.integer),
     dislikeviews: types.union(types.undefined, types.null, types.integer),
@@ -47,16 +49,16 @@ export class HomePageDetailModelSelector extends QueryBuilder {
   get updatedAt() { return this.__attr(`updatedAt`) }
   get Discription() { return this.__attr(`Discription`) }
   get attachmentType() { return this.__attr(`attachmentType`) }
-  get attachmentUrl() { return this.__attr(`attachmentUrl`) }
   get status() { return this.__attr(`status`) }
   get likeviews() { return this.__attr(`likeviews`) }
   get dislikeviews() { return this.__attr(`dislikeviews`) }
   userId(builder: string | UserModelSelector | ((selector: UserModelSelector) => UserModelSelector) | undefined) { return this.__child(`userId`, UserModelSelector, builder) }
   commentId(builder: string | HomecommentsModelSelector | ((selector: HomecommentsModelSelector) => HomecommentsModelSelector) | undefined) { return this.__child(`commentId`, HomecommentsModelSelector, builder) }
   tagUser(builder: string | UserTagListModelSelector | ((selector: UserTagListModelSelector) => UserTagListModelSelector) | undefined) { return this.__child(`tagUser`, UserTagListModelSelector, builder) }
+  attachmentUrl(builder: string | AttachmentUrlsModelSelector | ((selector: AttachmentUrlsModelSelector) => AttachmentUrlsModelSelector) | undefined) { return this.__child(`attachmentUrl`, AttachmentUrlsModelSelector, builder) }
 }
 export function selectFromHomePageDetail() {
   return new HomePageDetailModelSelector()
 }
 
-export const homePageDetailModelPrimitives = selectFromHomePageDetail()._id.createdAt.updatedAt.Discription.attachmentType.attachmentUrl.status.likeviews.dislikeviews
+export const homePageDetailModelPrimitives = selectFromHomePageDetail()._id.createdAt.updatedAt.Discription.attachmentType.status.likeviews.dislikeviews

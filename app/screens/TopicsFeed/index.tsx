@@ -28,11 +28,7 @@ import NativeAdView from "../../utils/NativeAd"
 import * as Haptics from "expo-haptics"
 import { Host } from "react-native-portalize"
 
-const Actions = observer(function ActionButtons({
-  item,
-}: {
-  item: any
-}) {
+const Actions = observer(function ActionButtons({ item }: { item: any }) {
   const [loading, setLoading] = useState<boolean>(false)
   const [isLikesModalVisible, setLikesModalVisible] = useState(false)
   const { interactWithTopic } = useHooks()
@@ -129,11 +125,11 @@ const Actions = observer(function ActionButtons({
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
                 share({
-                  message: item?.topicContent || '',
-                  title: item?.title || '',
+                  message: item?.topicContent || "",
+                  title: item?.title || "",
                   url: `washzone://shared-topic/${item?._id}`,
                   type: messageMetadataType.sharedDiscussion,
-                  attachment: item?.attachmentUrl || ''
+                  attachment: item?.attachmentUrl || "",
                 })
               }}
             />
@@ -186,9 +182,13 @@ export const TopicComponent = observer(({ topic, index }: { topic: any; index: n
                   style={$picture}
                 />
               </TouchableOpacity>
-              <View style={[$textContainer,
-                // eslint-disable-next-line react-native/no-inline-styles
-                { justifyContent: "center" }]}>
+              <View
+                style={[
+                  $textContainer,
+                  // eslint-disable-next-line react-native/no-inline-styles
+                  { justifyContent: "center" },
+                ]}
+              >
                 <Text
                   text={formatName(topicDetails.first_name + " " + topicDetails.last_name)}
                   preset="subheading2"
@@ -229,13 +229,20 @@ export const TopicComponent = observer(({ topic, index }: { topic: any; index: n
         </View>
         <Actions item={topic} />
       </Pressable>
-      {index % 5 === 0 && <NativeAdView />}
-
+      {index !== 0 && (index === 4 || (index - 4) % 15 === 0) && <NativeAdView />}
     </>
   )
 })
 
-export const TopicComponentFullView = ({ topic, additionalChildComponent, onLayout }: { topic: any, additionalChildComponent?: React.ReactElement, onLayout?: (e: LayoutChangeEvent) => void }) => {
+export const TopicComponentFullView = ({
+  topic,
+  additionalChildComponent,
+  onLayout,
+}: {
+  topic: any
+  additionalChildComponent?: React.ReactElement
+  onLayout?: (e: LayoutChangeEvent) => void
+}) => {
   const [loaded, setLoaded] = useState(false)
   const windowWidth = Dimensions.get("window").width
 
@@ -277,9 +284,14 @@ export const TopicComponentFullView = ({ topic, additionalChildComponent, onLayo
                 style={$picture}
               />
             </TouchableOpacity>
-            <View style={[$textContainer, $flexRow,
-              // eslint-disable-next-line react-native/no-inline-styles
-              { alignItems: "center" }]}>
+            <View
+              style={[
+                $textContainer,
+                $flexRow,
+                // eslint-disable-next-line react-native/no-inline-styles
+                { alignItems: "center" },
+              ]}
+            >
               <Text
                 text={formatName(topicDetails.first_name + " " + topicDetails.last_name)}
                 preset="subheading2"

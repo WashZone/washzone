@@ -10,7 +10,7 @@ import FastImage, { ImageStyle } from "react-native-fast-image"
 import { formatName } from "../../../utils/formatName"
 import { Role } from "../../CallScreen/audioCall"
 
-export const P2PHeader = ({ data, roomId }) => {
+export const P2PHeader = ({ data, roomId , blocked }) => {
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
   const safeArea = useSafeAreaInsets()
 
@@ -44,7 +44,7 @@ export const P2PHeader = ({ data, roomId }) => {
             </View>
           </TouchableOpacity>
         </View>
-        <View style={[$flexRow, $contentCenter]}>
+       {!blocked && <View style={[$flexRow, $contentCenter]}>
           <TouchableOpacity
             onPress={() => {
               navigation.navigate("AudioCall", {
@@ -72,7 +72,7 @@ export const P2PHeader = ({ data, roomId }) => {
               containerStyle={{ marginHorizontal: spacing.medium }}
             />
           </TouchableOpacity>
-        </View>
+        </View>}
       </View>
     </View>
   )

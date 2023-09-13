@@ -1,13 +1,13 @@
-import React, { FC, useState } from "react"
+import React, { FC, useEffect, useState } from "react"
 import {
   ActivityIndicator,
-  ImageBackground,
+  Dimensions,
   TextStyle,
   TouchableOpacity,
   View,
   ViewStyle,
 } from "react-native"
-import { Header, Screen, TextField, Button, Icon } from "../../components"
+import { Header, Screen, TextField, Button, Icon, Text } from "../../components"
 import { colors, spacing } from "../../theme"
 
 import { AppStackParamList, AppStackScreenProps } from "../../navigators"
@@ -17,32 +17,56 @@ import { MediaPicker } from "../../utils/device/MediaPicker"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { useHooks } from "../hooks"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
+import ShimmerPlaceholder from "react-native-shimmer-placeholder"
+import { BROKEN_BANNER } from "../../utils"
+import LinearGradient from "react-native-linear-gradient"
+import { $contentCenter, $flex1, $flexRow } from "../styles"
+import { formatName } from "../../utils/formatName"
 
 const maxBioLength = 280
 
 export const EditProfile: FC<AppStackScreenProps<"EditProfile">> = function EditProfile() {
   const { userStore } = useStores()
+  console.log("userStore", userStore)
   const { updateProfile } = useHooks()
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
   const [firstName, setFirstName] = useState(userStore.first_name)
   const [lastName, setLastName] = useState(userStore.last_name)
   const [bio, setBio] = useState(userStore?.description || "")
   const [picture, setPicture] = useState({ uri: userStore.picture })
-  const [banner, setBanner] = useState({ uri: userStore?.banner })
+  const [banner, setBanner] = useState({ uri: userStore.banner })
   const [buttonLoading, setButtonLoading] = useState<boolean>(false)
   const [justOverflowed, setJustOverflowed] = useState<boolean>(false)
+  const [bannerLoaded, setBannerLoaded] = useState<boolean>(false)
+  const { getProfileDetails } = useHooks()
+  const [profileDetails, setProfileDetails] = useState({
+    blocked: false,
+    data: { followercount: 0, followingCount: 0 },
+    following: false,
+  })
+
+  const syncProfile = async () => {
+    const resProfile = await getProfileDetails(userStore?._id)
+    setProfileDetails({ ...resProfile })
+  }
+
+  // const [followLoading, setFollowLoading] = useState(false)
+
+  useEffect(() => {
+    syncProfile()
+  }, [userStore])
 
   const isActive = firstName !== "" && lastName !== ""
 
   const onEditPP = async () => {
-    const res = await MediaPicker()
+    const res = await MediaPicker({})
     if (res) {
       setPicture(res)
     }
   }
 
   const onEditBanner = async () => {
-    const res = await MediaPicker()
+    const res = await MediaPicker({})
     if (res) {
       setBanner(res)
     }
@@ -96,7 +120,128 @@ export const EditProfile: FC<AppStackScreenProps<"EditProfile">> = function Edit
       />
       <Screen contentContainerStyle={$container}>
         <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
-          <ImageBackground
+          <View
+            // eslint-disable-next-line react-native/no-inline-styles
+            style={{ height: 350, backgroundColor: colors.palette.neutral100 }}
+          >
+            <TouchableOpacity onPress={onEditBanner}>
+              <ShimmerPlaceholder
+                visible={bannerLoaded}
+                shimmerStyle={$topContainer}
+                LinearGradient={LinearGradient}
+                duration={2000}
+                width={Dimensions.get("screen").width}
+              >
+                <FastImage
+                  source={banner?.uri ? banner : BROKEN_BANNER}
+                  style={[$topContainer, { backgroundColor: colors.background }]}
+                  onLoad={() => setBannerLoaded(true)}
+                />
+                <Icon
+                  icon="editPhoto"
+                  color={colors.palette.neutral100}
+                  // eslint-disable-next-line react-native/no-inline-styles
+                  containerStyle={{
+                    position: "absolute",
+                    height: 32,
+                    width: 32,
+                    borderRadius: 16,
+                    backgroundColor: colors.palette.primaryOverlay80,
+                    right: 10,
+                    top: 10,
+                    ...$contentCenter,
+                  }}
+                  size={16}
+                />
+              </ShimmerPlaceholder>
+            </TouchableOpacity>
+            <View style={$userDetailsContainer}>
+              <View style={$flexRow}>
+                <TouchableOpacity onPress={onEditPP}>
+                  <FastImage style={$profileImage} source={picture} />
+                  <Icon
+                    icon="edit"
+                    // eslint-disable-next-line react-native/no-inline-styles
+                    containerStyle={{
+                      position: "absolute",
+                      right: -2,
+                      bottom: -2,
+                      ...$contentCenter,
+                    }}
+                    size={20}
+                  />
+                </TouchableOpacity>
+                <View
+                  style={[
+                    $flexRow,
+                    $flex1,
+                    // eslint-disable-next-line react-native/no-inline-styles
+                    {
+                      justifyContent: "space-around",
+                      paddingHorizontal: spacing.medium,
+                    },
+                  ]}
+                >
+                  <View
+                    // eslint-disable-next-line react-native/no-inline-styles
+                    style={{ alignItems: "center" }}
+                  >
+                    <Text
+                      text="Followers"
+                      weight="semiBold"
+                      size="xxs"
+                      color={colors.palette.neutral400}
+                    />
+                    <Text
+                      text={profileDetails?.data?.followercount.toString()}
+                      size="lg"
+                      weight="semiBold"
+                      color={colors.palette.primary100}
+                    />
+                  </View>
+                  <View
+                    // eslint-disable-next-line react-native/no-inline-styles
+                    style={{ alignItems: "center" }}
+                  >
+                    <Text
+                      text="Following"
+                      weight="semiBold"
+                      size="xxs"
+                      color={colors.palette.neutral400}
+                    />
+                    <Text
+                      text={profileDetails?.data?.followingCount.toString()}
+                      size="lg"
+                      weight="semiBold"
+                      color={colors.palette.primary100}
+                    />
+                  </View>
+                </View>
+              </View>
+              <View
+                style={[
+                  $flexRow,
+                  // eslint-disable-next-line react-native/no-inline-styles
+                  { alignItems: "center", marginTop: spacing.tiny },
+                ]}
+              >
+                <Text
+                  text={formatName(formatName(firstName + " " + lastName))}
+                  numberOfLines={1}
+                  style={$publisherName}
+                  weight="semiBold"
+                />
+                {/* {userStore?.blueTick && (
+                  <Icon
+                    icon="verifiedTick"
+                    size={20}
+                    containerStyle={{ marginLeft: spacing.extraSmall }}
+                  />
+                )} */}
+              </View>
+            </View>
+          </View>
+          {/* <ImageBackground
             style={{ backgroundColor: colors.palette.primary400, marginBottom: spacing.medium }}
             source={{ uri: banner?.uri }}
           >
@@ -117,7 +262,7 @@ export const EditProfile: FC<AppStackScreenProps<"EditProfile">> = function Edit
             <TouchableOpacity onPress={onEditPP} style={$pictureWrapper}>
               <FastImage source={{ uri: picture?.uri }} style={$picture} />
             </TouchableOpacity>
-          </ImageBackground>
+          </ImageBackground> */}
           <View style={$content}>
             <TextField
               value={firstName}
@@ -186,6 +331,36 @@ export const EditProfile: FC<AppStackScreenProps<"EditProfile">> = function Edit
   )
 }
 
+const $userDetailsContainer: ViewStyle = {
+  marginHorizontal: spacing.medium,
+  backgroundColor: colors.palette.neutral100,
+  borderTopRightRadius: 10,
+  borderTopLeftRadius: 10,
+  top: -40,
+  height: 180,
+  padding: spacing.medium,
+}
+
+const $topContainer: ImageStyle = {
+  backgroundColor: colors.palette.neutral100,
+  alignItems: "center",
+  paddingBottom: spacing.medium,
+  height: 250,
+  width: "100%",
+}
+
+const $publisherName: TextStyle = {
+  fontSize: 16,
+  textAlign: "center",
+}
+
+const $profileImage: ImageStyle = {
+  height: 60,
+  width: 60,
+  borderRadius: 30,
+  alignSelf: "center",
+}
+
 const $bioHeight: ViewStyle = { height: 150 }
 
 const $indicator: ViewStyle = { position: "absolute", right: 20 }
@@ -204,20 +379,6 @@ const $submitButton: ViewStyle = {
   marginTop: spacing.small,
 }
 
-
-const $picture: ImageStyle = {
-  height: 100,
-  width: 100,
-  borderRadius: 50,
-}
-
-const $pictureWrapper: ViewStyle = {
-  alignSelf: "center",
-  borderRadius: 50,
-  backgroundColor: "red",
-  marginVertical: 30,
-}
-
 const $titleStyle: TextStyle = {
   color: colors.palette.primary100,
   textAlign: "left",
@@ -226,6 +387,7 @@ const $titleStyle: TextStyle = {
 
 const $container: ViewStyle = {
   flex: 1,
+  backgroundColor: colors.palette.neutral100,
 }
 
 const $content: ViewStyle = {

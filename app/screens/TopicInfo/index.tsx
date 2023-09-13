@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useRef, useState } from "react"
-import { FlatList, LayoutChangeEvent, View, ViewStyle } from "react-native"
+import { Alert, FlatList, LayoutChangeEvent, View, ViewStyle } from "react-native"
 import { Host } from "react-native-portalize"
 
 import { CommentInput } from "../../components"
@@ -10,6 +10,7 @@ import { useStores } from "../../models"
 import { TopicComponentFullView } from "../TopicsFeed"
 import Loading from "../../components/Loading"
 import { $flex1 } from "../styles"
+import { colors } from "../../theme"
 
 export const TopicInfo: FC<HomeTabProps<"TopicInfo">> = function PostInfo(props) {
   const { topic, highlightedComment } = props.route.params
@@ -25,21 +26,28 @@ export const TopicInfo: FC<HomeTabProps<"TopicInfo">> = function PostInfo(props)
 
   const handleTopic = async () => {
     setLoading(true)
-    if (typeof topic === "string") {
-      const res = await mutateGetTopicById({ topicId: topic, callerId: _id })
-      const topicData = res.getTopicById?.data.length === 1 && res.getTopicById?.data[0]
-      setTopicDetails(topicData)
-      await syncComments(topicData?._id)
-      setLoading(false)
-    } else {
-      await syncComments(topicDetails?._id)
-      setLoading(false)
+    try {
+      if (typeof topic === "string") {
+        const res = await mutateGetTopicById({ topicId: topic, callerId: _id })
+        const topicData = res.getTopicById?.data.length === 1 && res.getTopicById?.data[0]
+        setTopicDetails(topicData)
+        await syncComments(topicData?._id)
+        setLoading(false)
+      } else {
+        await syncComments(topicDetails?._id)
+        setLoading(false)
+      }
+    } catch (err) {
+      Alert.alert(
+        "Topic Not Found",
+        "We apologize, but the requested topic is currently unavailable.",
+        [{ text: "Go Back", onPress: props.navigation.goBack }],
+      )
     }
   }
 
-
   const onTopicLayout = (e: LayoutChangeEvent) => {
-    const  {height } = e.nativeEvent.layout;
+    const { height } = e.nativeEvent.layout
     highlightedComment && scrollRef.current.scrollToOffset({ offset: height })
   }
 
@@ -96,6 +104,7 @@ export const TopicInfo: FC<HomeTabProps<"TopicInfo">> = function PostInfo(props)
 
 const $container: ViewStyle = {
   flex: 1,
+  backgroundColor: colors.background,
 }
 
 const $contentContainer: ViewStyle = {

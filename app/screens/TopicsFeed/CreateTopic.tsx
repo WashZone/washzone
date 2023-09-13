@@ -90,7 +90,7 @@ export const CreateTopic = observer(function CreateTopic({
 
   const onGalleryPress = async () => {
     try {
-      const image = await MediaPicker()
+      const image = await MediaPicker({})
       if (image?.uri) {
         setSelectedImage(image)
         setTimeout(() => {

@@ -1,12 +1,16 @@
-import React, { useCallback, useEffect, useState } from "react"
-import { Alert, Dimensions, Pressable, TextStyle, View, ViewStyle, TouchableOpacity, LayoutChangeEvent } from "react-native"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import {
-  CustomFlatlist,
-  Icon,
-  LikesModal,
-  ParsedTextComp,
-  Text,
-} from "../../../components"
+  Alert,
+  Dimensions,
+  Pressable,
+  TextStyle,
+  View,
+  ViewStyle,
+  TouchableOpacity,
+  LayoutChangeEvent,
+  ActivityIndicator,
+} from "react-native"
+import { CustomFlatlist, Icon, LikesModal, ParsedTextComp, Text } from "../../../components"
 import { colors, spacing } from "../../../theme"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { formatName } from "../../../utils/formatName"
@@ -17,7 +21,7 @@ import { observer } from "mobx-react-lite"
 import { useHooks } from "../../hooks"
 import { useStores } from "../../../models"
 import { Stories } from "./Following"
-import { $flex1, $flexRow } from "../../styles"
+import { $contentCenter, $flex1, $flexRow } from "../../styles"
 import ShimmerPlaceHolder from "react-native-shimmer-placeholder"
 import { getIconForInteraction, showAlertYesNo } from "../../../utils/helpers"
 import * as Haptics from "expo-haptics"
@@ -29,6 +33,8 @@ import { defaultImages, messageMetadataType } from "../../../utils"
 import { ImageViewConfigType } from ".."
 import LinearGradient from "react-native-linear-gradient"
 
+import { AVPlaybackStatus, Video } from "expo-av"
+
 export interface PostComponentProps {
   post: any
   navigateOnPress?: boolean
@@ -37,14 +43,10 @@ export interface PostComponentProps {
   setImageViewConfig: (t: ImageViewConfigType) => void
   additionalChildComponent?: React.ReactElement
   onLayout?: (e: LayoutChangeEvent) => void
+  isViewable?: boolean
 }
-const Actions = observer(function ActionButtons({
-  item,
 
-}: {
-  item: any
-
-}) {
+const Actions = observer(function ActionButtons({ item }: { item: any }) {
   const [loading, setLoading] = useState<boolean>(false)
   const { interactWithHomePost } = useHooks()
   const [dynamicData, setDynamicData] = useState({
@@ -142,11 +144,11 @@ const Actions = observer(function ActionButtons({
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
                 share({
-                  message: item?.content || '',
-                  title: '',
+                  message: item?.content || "",
+                  title: "",
                   url: `washzone://shared-post/${item?._id}`,
                   type: messageMetadataType.sharedPost,
-                  attachment: item?.attachmentUrl?.[0] || ''
+                  attachment: item?.attachmentUrl?.[0] || "",
                 })
               }}
             />
@@ -167,23 +169,99 @@ const Actions = observer(function ActionButtons({
   )
 })
 
-
-const CourouselItem = ({ item, index, onAttachmentsPress }) => {
+const CourouselItem = ({ item, index, onAttachmentsPress, inViewPort }) => {
+  const isVideo = item?.type?.startsWith("video")
   const [isLoaded, setLoaded] = useState(false)
+  const [playing, setPlaying] = useState<boolean>(false)
+  const [overLayIcon, setOverLayIcon] = useState<"play" | "reload" | "loading" | null>(null)
+
+  const onPlay = () => setPlaying(true)
+
+  const videoRef = useRef<Video>(null)
+
+  const onError = (error) => {
+    Alert.alert("An Error Occured", error)
+  }
+
+  const onPlayBackStatusUpdate = (status: AVPlaybackStatus) => {
+    console.log("playback Status", status)
+    if (!status.isLoaded) {
+      // Update your UI for the unloaded state
+      setOverLayIcon(null)
+    } else {
+      // setLoaded(true)
+
+      // Update your UI for the loaded state
+
+      if (status.isPlaying) {
+        setOverLayIcon(null)
+
+        // Update your UI for the playing state
+      } else {
+        setOverLayIcon("play")
+      }
+
+      if (status.isBuffering) {
+        setOverLayIcon("loading")
+      }
+    }
+  }
+
   return (
-    <Pressable key={index} onPress={onAttachmentsPress}>
-      <ShimmerPlaceHolder visible={isLoaded} shimmerStyle={$carouselItem} LinearGradient={LinearGradient}>
-        <FastImage
-          onLoadEnd={() => { setLoaded(true); }}
-          source={{ uri: item }}
-          style={$carouselItem}
-          resizeMode="contain"
-        />
+    <Pressable key={index} style={$carouselItem} onPress={isVideo ? onPlay : onAttachmentsPress}>
+      <ShimmerPlaceHolder
+        visible={isLoaded}
+        shimmerStyle={$carouselItem}
+        LinearGradient={LinearGradient}
+        contentStyle={$contentCenter}
+      >
+        {isVideo ? (
+          <>
+            <Video
+              ref={(el) => (videoRef.current = el)} // Store reference
+              onError={onError} // Callback when video cannot be loaded
+              onLoad={(status) => {
+                setLoaded(status.isLoaded)
+              }}
+              isLooping
+              onPlaybackStatusUpdate={onPlayBackStatusUpdate}
+              useNativeControls
+              style={$flexFull}
+              shouldPlay={inViewPort}
+              usePoster
+              posterSource={{ uri: item.thumbnailUrl }}
+              source={{
+                uri: item?.url,
+              }}
+            />
+            {(!inViewPort || !isLoaded) &&
+              overLayIcon &&
+              (overLayIcon === "loading" ? (
+                <ActivityIndicator color={colors.palette.neutral100} />
+              ) : (
+                <Icon
+                  icon={overLayIcon}
+                  size={48}
+                  containerStyle={$playIcon}
+                  color={colors.palette.neutral100}
+                />
+              ))}
+          </>
+        ) : (
+          <FastImage
+            onLoadEnd={() => {
+              setLoaded(true)
+            }}
+            source={{ uri: item.url }}
+            style={$flexFull}
+            resizeMode="contain"
+          />
+        )}
       </ShimmerPlaceHolder>
-      {/* <FastImage source={{ uri: item.imgUrl }} resizeMode={"cover"} style={{ width: SCREEN_WIDTH, height: 240 }} /> */}
     </Pressable>
   )
 }
+
 export const PostComponent = ({
   post,
   navigateOnPress,
@@ -191,14 +269,14 @@ export const PostComponent = ({
   numberOfLines,
   setImageViewConfig,
   onLayout,
-  additionalChildComponent
+  additionalChildComponent,
+  isViewable,
 }: PostComponentProps) => {
   const SCREEN_WIDTH = Dimensions.get("screen").width
 
   const [currentIndex, setCurrentIndex] = useState(0)
   const [showMore, setShowMore] = useState(undefined)
   const [tempNumberOfLines, setTempNumberOfLines] = useState(undefined)
-
 
   const navigation = useNavigation<NavigationProp<HomeTabParamList>>()
   const onContainerPress = () => {
@@ -222,6 +300,7 @@ export const PostComponent = ({
     const images = postDetails.attachmentUrl?.map((i, index) => {
       return { id: index, uri: i }
     })
+
     setImageViewConfig({
       images,
       currentIndex,
@@ -240,8 +319,6 @@ export const PostComponent = ({
         setShowMore(e.nativeEvent.lines.length > numberOfLines)
     }
   }, [])
-
-
 
   return (
     <>
@@ -273,8 +350,7 @@ export const PostComponent = ({
           />
         </Pressable>
         {showMore && tempNumberOfLines && (
-          <TouchableOpacity onPress={() => setTempNumberOfLines(undefined)}
-          >
+          <TouchableOpacity onPress={() => setTempNumberOfLines(undefined)}>
             <Text
               size="xxs"
               weight="bold"
@@ -288,15 +364,18 @@ export const PostComponent = ({
           <Carousel
             pagingEnabled
             pinchGestureEnabled
-            //  ref={(c) => { this._carousel = c; }}
-            data={postDetails.attachmentUrl}
+            data={post.attachmentUrl}
             firstItem={0}
-            // autoplay={true}
             layout={"default"}
-            // loop={true}
-            renderItem={({ item, index }) => <CourouselItem onAttachmentsPress={onAttachmentsPress} item={item} index={index} />}
+            renderItem={({ item, index }) => (
+              <CourouselItem
+                inViewPort={isViewable && currentIndex === index}
+                onAttachmentsPress={onAttachmentsPress}
+                item={item}
+                index={index}
+              />
+            )}
             onSnapToItem={(ind) => setCurrentIndex(ind)}
-            //  loopClonesPerSide={bannersDataLength}
             sliderWidth={SCREEN_WIDTH}
             itemWidth={SCREEN_WIDTH}
           />
@@ -349,12 +428,11 @@ export const PostComponent = ({
         <Actions item={post} />
       </View>
       {additionalChildComponent}
-      {index % 5 === 0 && (
+      {index !== 0 && (index === 4 || (index - 4) % 15 === 0) && (
         <>
           <NativeAdView />
         </>
       )}
-
     </>
   )
 }
@@ -365,6 +443,12 @@ export const Posts = observer(
       feedStore: { homeFeed },
     } = useStores()
     const { refreshHomeFeed, loadMoreHomeFeed, getActivities } = useHooks()
+
+    const [viewableIndexes, setViewableIndexes] = useState([])
+
+    const onViewableItemsChanged = useCallback(({ viewableItems }) => {
+      setViewableIndexes(viewableItems.map((item) => item.index))
+    }, [])
 
     useEffect(() => {
       refreshHomeFeed()
@@ -383,6 +467,12 @@ export const Posts = observer(
           onEndReached={loadMoreHomeFeed}
           data={homeFeed}
           removeClippedSubviews
+          viewabilityConfig={{
+            waitForInteraction: false,
+            // viewAreaCoveragePercentThreshold: 60,
+            itemVisiblePercentThreshold: 90,
+          }}
+          onViewableItemsChanged={onViewableItemsChanged}
           renderItem={({ item, index }) => (
             <PostComponent
               setImageViewConfig={setImageViewConfig}
@@ -391,6 +481,7 @@ export const Posts = observer(
               post={item}
               navigateOnPress={true}
               index={index}
+              isViewable={viewableIndexes.includes(index)}
             />
           )}
         />
@@ -399,7 +490,24 @@ export const Posts = observer(
   },
 )
 
-const $carouselItem: ImageStyle = { width: Dimensions.get("window").width, height: 300 }
+const $flexFull = { height: "100%", width: "100%" }
+
+const $playIcon: ViewStyle = {
+  width: 56,
+  height: 56,
+  borderRadius: 28,
+  position: "absolute",
+  shadowColor: colors.palette.overlayNeutral10050,
+  backgroundColor: colors.palette.primary100,
+  shadowOpacity: 1,
+  shadowOffset: { height: 4, width: 2 },
+  ...$contentCenter,
+}
+
+const $carouselItem = {
+  width: Dimensions.get("window").width,
+  height: 300,
+}
 
 const $postContent: TextStyle = {
   marginHorizontal: spacing.homeScreen,
@@ -428,16 +536,16 @@ const $publisherInfoContainer: ViewStyle = {
   padding: spacing.homeScreen,
 }
 
+const $textContainer: ViewStyle = {
+  justifyContent: "space-around",
+  height: "90%",
+}
+
 const $picture: ImageStyle = {
   height: 40,
   width: 40,
   borderRadius: 20,
   marginRight: spacing.homeScreen,
-}
-
-const $textContainer: ViewStyle = {
-  justifyContent: "space-around",
-  height: "90%",
 }
 
 const $actionContainer: ViewStyle = {

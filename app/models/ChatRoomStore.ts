@@ -12,7 +12,7 @@ export const ChatRoomStoreModel = types
     chatMessages: types.frozen({}),
     rooms: types.frozen({}),
     unreadCount: types.number,
-    myUserId: types.string
+    myUserId: types.string,
   })
   .actions(withSetPropAction)
   .actions((self) => ({
@@ -20,7 +20,7 @@ export const ChatRoomStoreModel = types
       self.myUserId = id
     },
     getChatRooms() {
-      const res = self.allChatRooms.filter(i => !this.getLatestMessageForRoom(i?._id).isEmpty)
+      const res = self.allChatRooms.filter((i) => !this.getLatestMessageForRoom(i?._id).isEmpty)
       return res
     },
     setChatRooms(chatRooms: any) {
@@ -36,13 +36,13 @@ export const ChatRoomStoreModel = types
       if (self.chatMessages) {
         const parsedMessages = this.roomChatsAvailable({ roomId: props.roomId })
           ? self.chatMessages[props.roomId].map((i: any) => {
-            return {
-              ...i,
-              id: i._id,
-              author: { ...i?.authorId, id: i?.authorId?._id, imageUrl: i?.authorId?.picture },
-              type: i?.messageType || "text",
-            }
-          })
+              return {
+                ...i,
+                id: i._id,
+                author: { ...i?.authorId, id: i?.authorId?._id, imageUrl: i?.authorId?.picture },
+                type: i?.messageType || "text",
+              }
+            })
           : []
         return parsedMessages
       }
@@ -65,7 +65,12 @@ export const ChatRoomStoreModel = types
       let count = 0
       Object.keys(rooms).forEach((key) => {
         const latestMessage = this.getLatestMessageForRoom(key)
-        if (latestMessage.id !== rooms[key] && !latestMessage.isEmpty && latestMessage.authorId !== self.myUserId) count++
+        if (
+          latestMessage.id !== rooms[key] &&
+          !latestMessage.isEmpty &&
+          latestMessage.authorId !== self.myUserId
+        )
+          count++
       })
       return count
     },
@@ -78,18 +83,21 @@ export const ChatRoomStoreModel = types
     async addToMessages(props: { roomId: string; message: any }) {
       // if (self.chatMessages[props.roomId].length > 0) {
       const temp = { ...self.chatMessages }
-      const receiver = self.allChatRooms.filter(i => i._id === props.roomId)?.[0]?.membersId.filter(i => i._id !== self.myUserId)?.[0]
-      console.log('receiverreceiverreceiver', receiver)
+      const sender = self.allChatRooms
+        .filter((i) => i._id === props.roomId)?.[0]
+        ?.membersId.filter((i) => i._id !== self.myUserId)?.[0]
       const navigationState = navigationRef.getCurrentRoute()
       if (
-        navigationState.name !== 'P2PChat'
-        ||
-        (navigationState.name === 'P2PChat' && navigationState.params?.roomId !== props.roomId)) {
+        navigationState.name !== "P2PChat" ||
+        (navigationState.name === "P2PChat" &&
+          navigationState.params?.roomId !== props.roomId &&
+          sender._id !== self.myUserId)
+      ) {
         Toast.show({
-          text1: formatName(receiver?.name),
+          text1: formatName(sender?.name),
           text2: props.message.text,
-          type: 'message',
-          props: { picture: receiver?.picture, receiver, roomId: props.roomId }
+          type: "message",
+          props: { picture: sender?.picture, sender, roomId: props.roomId },
         })
       }
       // if (receiver?._id && receiver?._id !== props.message?.authorId?._id) {
@@ -134,7 +142,7 @@ export const ChatRoomStoreModel = types
         message: room?.latestMessage?.text || "sent a media !",
         time: new Date(room?.latestMessage?.createdAt),
         isEmpty: room?.latestMessage?.membersId?.length === 0,
-        authorId: room?.latestMessage?.authorId
+        authorId: room?.latestMessage?.authorId,
       }
 
       // If we have never opened the room, then just return the latest message from the Room Object
@@ -146,7 +154,7 @@ export const ChatRoomStoreModel = types
         message: self.chatMessages[roomId][0]?.text,
         time: new Date(self.chatMessages[roomId][0]?.createdAt),
         isEmpty: false,
-        authorId: self.chatMessages[roomId][0]?.authorId?._id
+        authorId: self.chatMessages[roomId][0]?.authorId?._id,
       }
 
       // return whichever message is the latest
@@ -166,10 +174,10 @@ export const ChatRoomStoreModel = types
       return store.allChatRooms
     },
     getRoomDetails(id: string) {
-      const res = store.allChatRooms.filter(i => i?._id === id)
+      const res = store.allChatRooms.filter((i) => i?._id === id)
       return res?.[0]
     },
   }))
 
-export interface ChatRoomStore extends Instance<typeof ChatRoomStoreModel> { }
-export interface ChatRoomStoreSnapshot extends SnapshotOut<typeof ChatRoomStoreModel> { }
+export interface ChatRoomStore extends Instance<typeof ChatRoomStoreModel> {}
+export interface ChatRoomStoreSnapshot extends SnapshotOut<typeof ChatRoomStoreModel> {}
