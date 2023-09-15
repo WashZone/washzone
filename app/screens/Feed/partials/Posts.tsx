@@ -178,11 +178,11 @@ const Actions = observer(function ActionButtons({ item }: { item: any }) {
   )
 })
 
-const CourouselItem = ({ item, index, onAttachmentsPress, inViewPort }) => {
+const CourouselItem = ({ item, index, onAttachmentsPress, inViewPort, currentItemActive }) => {
   const isVideo = item?.type?.startsWith("video")
   const [isLoaded, setLoaded] = useState(false)
   const [playing, setPlaying] = useState<boolean>(false)
-  const [overLayIcon, setOverLayIcon] = useState<"play" | "reload" | "loading" | null>(null)
+  const [overLayIcon, setOverLayIcon] = useState<"play" | "loading" | null>(null)
 
   const onPlay = () => setPlaying(true)
 
@@ -193,9 +193,15 @@ const CourouselItem = ({ item, index, onAttachmentsPress, inViewPort }) => {
   }
 
   const onPlayBackStatusUpdate = (status: AVPlaybackStatus) => {
+    if (!currentItemActive) {
+      videoRef.current.stopAsync()
+
+    }
     if (!status.isLoaded) {
+      console.log('isNotLoaded')
+
       // Update your UI for the unloaded state
-      setOverLayIcon(null)
+      setOverLayIcon('loading')
     } else {
       // setLoaded(true)
 
@@ -210,6 +216,7 @@ const CourouselItem = ({ item, index, onAttachmentsPress, inViewPort }) => {
       }
 
       if (status.isBuffering) {
+        console.log('isBuffering', status.isBuffering)
         setOverLayIcon("loading")
       }
     }
@@ -245,13 +252,16 @@ const CourouselItem = ({ item, index, onAttachmentsPress, inViewPort }) => {
             {(!inViewPort || !isLoaded) &&
               overLayIcon &&
               (overLayIcon === "loading" ? (
-                <ActivityIndicator color={colors.palette.neutral100} />
+                <View style={$playIcon}>
+                  <ActivityIndicator color={colors.palette.neutral100} />
+                </View>
               ) : (
                 <Icon
                   icon={overLayIcon}
-                  size={48}
+                  size={32}
                   containerStyle={$playIcon}
                   color={colors.palette.neutral100}
+                  onPress={() => videoRef.current.playAsync()}
                 />
               ))}
           </>
@@ -404,10 +414,11 @@ export const PostComponent = ({
             layout={"default"}
             renderItem={({ item, index }) => (
               <CourouselItem
-                inViewPort={isViewable && currentIndex === index}
+                inViewPort={isViewable}
                 onAttachmentsPress={onAttachmentsPress}
                 item={item}
                 index={index}
+                currentItemActive={currentIndex === index}
               />
             )}
             onSnapToItem={(ind) => setCurrentIndex(ind)}
@@ -539,9 +550,9 @@ export const Posts = observer(
 const $flexFull = { height: "100%", width: "100%" }
 
 const $playIcon: ViewStyle = {
-  width: 56,
-  height: 56,
-  borderRadius: 28,
+  width: 54,
+  height: 54,
+  borderRadius: 27,
   position: "absolute",
   shadowColor: colors.palette.overlayNeutral10050,
   backgroundColor: colors.palette.primary100,

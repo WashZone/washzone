@@ -73,7 +73,7 @@ export const CreatePost = observer(function CreatePost({
           progress.value = withTiming(1, { duration: 300 })
         }, 100)
       }
-    } catch (e) {}
+    } catch (e) { }
   }
 
   const onDeletePress = (item) => {
@@ -229,6 +229,7 @@ export const CreatePost = observer(function CreatePost({
                       icon="play"
                       size={item.uri ? 27 : 0.0001}
                       containerStyle={$playIcon}
+                      color={colors.palette.neutral100}
                       onPress={() => videoRef.current.presentFullscreenPlayer()}
                     />
                   )}
@@ -308,6 +309,14 @@ const $deleteIcon: ViewStyle = {
 
 const $playIcon: ViewStyle = {
   position: "absolute",
+  // Android
+  elevation: 5,
+  // iOS
+  shadowColor: colors.palette.neutral900,
+  shadowOffset: { width: 0, height: 0 },
+  shadowOpacity: 1,
+  shadowRadius:4,
+
   left: 46,
   top: 28,
 }
