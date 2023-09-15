@@ -17,6 +17,7 @@ import { withSetPropAction } from "./helpers/withSetPropAction"
 import { CallStoreModel } from "./CallStore"
 import { NotificationStoreModel } from "./NotificationStore"
 import { ShareStoreModel } from "./ShareStore"
+import { EditStateModel } from "./EditState"
 
 const baseURL = "https://api.washzoneapp.com"
 
@@ -43,6 +44,7 @@ export const RootStoreModel = types
     api: types.optional(APIRootStore, {}),
     searchStore: types.optional(SearchStoreModel, {}),
     share: types.optional(ShareStoreModel, {}),
+    edit: types.optional(EditStateModel, {}),
     notificationStore: types.optional(NotificationStoreModel, { lastReadDate: "" }),
     callStore: types.optional(CallStoreModel, {
       ongoingCall: false,

@@ -11,7 +11,7 @@ const Handle = () => {
 
 interface CustomModalProps {
   isVisible: boolean
-  setVisible: (b: boolean) => void
+  setVisible?: (b: boolean) => void
   children: React.ReactNode
   title?: string
   propagateSwipe?: boolean
@@ -20,6 +20,7 @@ interface CustomModalProps {
   backgroundColor?: ColorValue
   keyboardOffset?: number
   disableUnMount?: boolean
+  overrideCloseModal?: () => void
 }
 
 export const BottomModal = ({
@@ -33,30 +34,27 @@ export const BottomModal = ({
   keyboardOffset = 0,
   showIndicator = true,
   disableUnMount = false,
+  overrideCloseModal,
 }: CustomModalProps) => {
   const safeArea = useSafeAreaInsets()
-  const closeModal = () => setVisible(false)
-  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  const closeModal = () => {
+    overrideCloseModal ? overrideCloseModal() : setVisible(false)
+  }
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false)
 
   useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener(
-      'keyboardWillShow',
-      () => {
-        setKeyboardVisible(true); // or some other action
-      }
-    );
-    const keyboardDidHideListener = Keyboard.addListener(
-      'keyboardWillHide',
-      () => {
-        setKeyboardVisible(false); // or some other action
-      }
-    );
+    const keyboardDidShowListener = Keyboard.addListener("keyboardWillShow", () => {
+      setKeyboardVisible(true) // or some other action
+    })
+    const keyboardDidHideListener = Keyboard.addListener("keyboardWillHide", () => {
+      setKeyboardVisible(false) // or some other action
+    })
 
     return () => {
-      keyboardDidHideListener.remove();
-      keyboardDidShowListener.remove();
-    };
-  }, []);
+      keyboardDidHideListener.remove()
+      keyboardDidShowListener.remove()
+    }
+  }, [])
   return (
     <Modal
       propagateSwipe={propagateSwipe}
@@ -64,12 +62,17 @@ export const BottomModal = ({
       style={$modal}
       avoidKeyboard={avoidKeyboard}
       swipeDirection={disableUnMount ? [] : ["down"]}
-      onSwipeComplete={() => { !disableUnMount && closeModal() }}
-      onBackdropPress={() => { !disableUnMount && closeModal() }}
+      onSwipeComplete={() => {
+        !disableUnMount && closeModal()
+      }}
+      onBackdropPress={() => {
+        !disableUnMount && closeModal()
+      }}
     >
       <View
         // eslint-disable-next-line react-native/no-inline-styles
-        style={{ marginBottom: isKeyboardVisible ? keyboardOffset : 0 }}>
+        style={{ marginBottom: isKeyboardVisible ? keyboardOffset : 0 }}
+      >
         {showIndicator && <Handle />}
         <View
           style={[

@@ -9,7 +9,16 @@ import {
   Alert,
   LayoutChangeEvent,
 } from "react-native"
-import { CustomFlatlist, Icon, LikesModal, Screen, Text } from "../../components"
+import {
+  $verticalAbsoluteTop,
+  CustomFlatlist,
+  Icon,
+  LikesModal,
+  Menu,
+  Screen,
+  ShimmingImage,
+  Text,
+} from "../../components"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { HomeTabParamList, TopicsTabParamList, TopicsTabProps } from "../../tabs"
 import { colors, spacing } from "../../theme"
@@ -28,7 +37,13 @@ import NativeAdView from "../../utils/NativeAd"
 import * as Haptics from "expo-haptics"
 import { Host } from "react-native-portalize"
 
-const Actions = observer(function ActionButtons({ item }: { item: any }) {
+const Actions = observer(function ActionButtons({
+  item,
+  children,
+}: {
+  item: any
+  children?: React.ReactNode
+}) {
   const [loading, setLoading] = useState<boolean>(false)
   const [isLikesModalVisible, setLikesModalVisible] = useState(false)
   const { interactWithTopic } = useHooks()
@@ -135,7 +150,10 @@ const Actions = observer(function ActionButtons({ item }: { item: any }) {
             />
           </View>
         </View>
-        <Icon icon="flag" size={20} onPress={flagTopic} />
+        <View style={[$flexRow, $contentCenter]}>
+          {children}
+          <Icon icon="flag" size={20} onPress={flagTopic} />
+        </View>
       </View>
       <LikesModal
         likesCount={dynamicData?.likeviews}
@@ -149,107 +167,175 @@ const Actions = observer(function ActionButtons({ item }: { item: any }) {
   )
 })
 
-export const TopicComponent = observer(({ topic, index }: { topic: any; index: number }) => {
-  const [loaded, setLoaded] = useState(false)
-  const navigation = useNavigation<NavigationProp<TopicsTabParamList>>()
-  const navigationHome = useNavigation<NavigationProp<HomeTabParamList>>()
-  const topicDetails = {
-    picture: topic?.userId?.picture,
-    first_name: topic?.userId?.first_name,
-    last_name: topic?.userId?.last_name,
-    attachmentUrl: topic?.attachmentUrl,
-    createdAt: topic?.createdAt,
-    content: topic?.topicContent,
-    title: topic?.title,
-  }
+export const TopicComponent = observer(
+  ({ topic, index, refreshParent }: { topic: any; index: number; refreshParent?: () => void }) => {
+    const [loaded, setLoaded] = useState(false)
+    const [menuVisible, setMenuVisible] = useState(false)
+    const {
+      userStore: { _id },
+      api: { mutateDeleteDetailTopicId },
+      topics: { removeFromTopics },
+      edit: { editTopic },
+    } = useStores()
+    const navigation = useNavigation<NavigationProp<TopicsTabParamList>>()
+    const navigationHome = useNavigation<NavigationProp<HomeTabParamList>>()
+    const topicDetails = {
+      picture: topic?.userId?.picture,
+      first_name: topic?.userId?.first_name,
+      last_name: topic?.userId?.last_name,
+      attachmentUrl: topic?.attachmentUrl,
+      createdAt: topic?.createdAt,
+      content: topic?.topicContent,
+      title: topic?.title,
+    }
+    const isAuthorUser = topic?.userId?._id === _id
 
-  return (
-    <>
-      <Pressable
-        style={[$postContainer, $postParentContainer]}
-        onPress={() => navigation.navigate("TopicInfo", { topic })}
-      >
-        <View style={$flexRow}>
-          <View style={$flex1}>
-            <View style={$publisherInfoContainer}>
-              <TouchableOpacity
-                onPress={() => navigationHome.navigate("Profile", { user: topic?.userId })}
-              >
-                <FastImage
-                  source={{
-                    uri: topicDetails?.picture || defaultImages.profile,
-                  }}
-                  style={$picture}
-                />
-              </TouchableOpacity>
-              <View
-                style={[
-                  $textContainer,
-                  // eslint-disable-next-line react-native/no-inline-styles
-                  { justifyContent: "center" },
-                ]}
-              >
-                <Text
-                  text={formatName(topicDetails.first_name + " " + topicDetails.last_name)}
-                  preset="subheading2"
-                />
-                <Text
-                  text={fromNow(topicDetails.createdAt)}
-                  size="xxs"
-                  color={colors.palette.neutral500}
-                />
+    const onDelete = () => {
+      setMenuVisible(false)
+
+      showAlertYesNo({
+        message: "Are you sure you want to delete this discussion?",
+        description: "This action cannot be undone.",
+        onYesPress: async () => {
+          const topicId = topic?._id
+
+          mutateDeleteDetailTopicId({ topicId }, () => {
+            removeFromTopics(topicId)
+            refreshParent && refreshParent()
+          })
+        },
+      })
+    }
+    const onEdit = () => {
+      setMenuVisible(false)
+      setTimeout(() => editTopic(topic), 0)
+    }
+
+    return (
+      <>
+        <Pressable
+          style={[$postContainer, $postParentContainer]}
+          onPress={() => navigation.navigate("TopicInfo", { topic })}
+        >
+          <View style={$flexRow}>
+            <View style={$flex1}>
+              <View style={$publisherInfoContainer}>
+                <TouchableOpacity
+                  onPress={() => navigationHome.navigate("Profile", { user: topic?.userId })}
+                >
+                  <ShimmingImage
+                    source={{
+                      uri: topicDetails?.picture || defaultImages.profile,
+                    }}
+                    style={$picture}
+                  />
+                </TouchableOpacity>
+                <View
+                  style={[
+                    $textContainer,
+                    // eslint-disable-next-line react-native/no-inline-styles
+                    { justifyContent: "center" },
+                  ]}
+                >
+                  <Text
+                    text={formatName(topicDetails.first_name + " " + topicDetails.last_name)}
+                    preset="subheading2"
+                  />
+                  <Text
+                    text={fromNow(topicDetails.createdAt)}
+                    size="xxs"
+                    color={colors.palette.neutral500}
+                  />
+                </View>
               </View>
+              <Text
+                style={$postContent}
+                text={topicDetails.title}
+                numberOfLines={1}
+                weight="medium"
+              />
+              <Text style={$postContent} text={topicDetails.content} numberOfLines={3} size="xs" />
             </View>
-            <Text
-              style={$postContent}
-              text={topicDetails.title}
-              numberOfLines={1}
-              weight="medium"
-            />
-            <Text style={$postContent} text={topicDetails.content} numberOfLines={3} size="xs" />
+            {topic?.attachmentUrl && (
+              <View style={$contentCenter}>
+                <ShimmerPlaceholder
+                  visible={loaded}
+                  shimmerStyle={$attachment}
+                  LinearGradient={LinearGradient}
+                >
+                  <FastImage
+                    style={$attachment}
+                    source={{
+                      uri: topic?.attachmentUrl,
+                    }}
+                    onLoadEnd={() => setLoaded(true)}
+                    resizeMode="cover"
+                  />
+                </ShimmerPlaceholder>
+              </View>
+            )}
           </View>
-          {topic?.attachmentUrl && (
-            <View style={$contentCenter}>
-              <ShimmerPlaceholder
-                visible={loaded}
-                shimmerStyle={$attachment}
-                LinearGradient={LinearGradient}
-              >
-                <FastImage
-                  style={$attachment}
-                  source={{
-                    uri: topic?.attachmentUrl,
-                  }}
-                  onLoadEnd={() => setLoaded(true)}
-                  resizeMode="cover"
-                />
-              </ShimmerPlaceholder>
-            </View>
-          )}
-        </View>
-        <Actions item={topic} />
-      </Pressable>
-      {index !== 0 && (index === 4 || (index - 4) % 15 === 0) && <NativeAdView />}
-    </>
-  )
-})
+          <Actions item={topic}>
+            {isAuthorUser && (
+              <Menu
+                data={[
+                  {
+                    title: "Edit",
+                    icon: "note-edit",
+                    onPress: onEdit,
+                  },
+                  {
+                    title: "Delete",
+                    icon: "delete",
+                    onPress: onDelete,
+                  },
+                ]}
+                setVisible={setMenuVisible}
+                visible={menuVisible}
+                anchorColor={colors.palette.neutral900}
+                anchorIconSize={20}
+                anchorContainer={{
+                  height: 20,
+                  width: 20,
+                  marginRight: spacing.homeScreen,
+                  transform: [{ rotate: "90deg" }],
+                }}
+              />
+            )}
+          </Actions>
+        </Pressable>
+        {index !== 0 && (index === 4 || (index - 4) % 15 === 0) && <NativeAdView />}
+      </>
+    )
+  },
+)
 
 export const TopicComponentFullView = ({
   topic,
   additionalChildComponent,
   onLayout,
+  refreshParent,
 }: {
   topic: any
   additionalChildComponent?: React.ReactElement
   onLayout?: (e: LayoutChangeEvent) => void
+  refreshParent?: () => void
 }) => {
   const [loaded, setLoaded] = useState(false)
+  const [menuVisible, setMenuVisible] = useState(false)
   const windowWidth = Dimensions.get("window").width
+  const {
+    userStore: { _id },
+    api: { mutateDeleteDetailTopicId },
+    topics: { removeFromTopics },
+    edit: { editTopic },
+  } = useStores()
 
   const [attachmentDimensions, setAttachmentDimensions] = useState({
     width: windowWidth,
     height: (windowWidth * 9) / 16,
   })
+
   const navigationHome = useNavigation<NavigationProp<HomeTabParamList>>()
   const topicDetails = {
     picture: topic?.userId?.picture,
@@ -261,13 +347,36 @@ export const TopicComponentFullView = ({
     title: topic?.title,
     userID: topic?.userId?._id,
   }
+  const isAuthorUser = topicDetails.userID === _id
+
   const nativeAdViewRef = useRef<any>()
 
   useEffect(() => {
-    if (nativeAdViewRef?.current) {
-      nativeAdViewRef.current?.loadAd()
+    if (nativeAdViewRef.current) {
+      nativeAdViewRef.current.loadAd()
     }
   }, [nativeAdViewRef.current])
+
+  const onDelete = () => {
+    setMenuVisible(false)
+    showAlertYesNo({
+      message: "Are you sure you want to delete this topic?",
+      description: "This action cannot be undone.",
+      onYesPress: async () => {
+        const topicId = topic?._id
+        mutateDeleteDetailTopicId({ topicId }, () => {
+          removeFromTopics(topicId)
+          navigationHome.goBack()
+          refreshParent && refreshParent()
+        })
+      },
+    })
+  }
+
+  const onEdit = () => {
+    setMenuVisible(false)
+    setTimeout(() => editTopic(topic), 0)
+  }
 
   return (
     <>
@@ -287,9 +396,9 @@ export const TopicComponentFullView = ({
             <View
               style={[
                 $textContainer,
-                $flexRow,
+                !isAuthorUser && $flexRow,
                 // eslint-disable-next-line react-native/no-inline-styles
-                { alignItems: "center" },
+                !isAuthorUser && { alignItems: "center" },
               ]}
             >
               <Text
@@ -336,6 +445,26 @@ export const TopicComponentFullView = ({
       </View>
       {additionalChildComponent}
       <NativeAdView />
+
+      {isAuthorUser && (
+        <Menu
+          data={[
+            {
+              title: "Edit",
+              icon: "note-edit",
+              onPress: onEdit,
+            },
+            {
+              title: "Delete",
+              icon: "delete",
+              onPress: onDelete,
+            },
+          ]}
+          setVisible={setMenuVisible}
+          visible={menuVisible}
+          containerStyle={$verticalAbsoluteTop}
+        />
+      )}
     </>
   )
 }

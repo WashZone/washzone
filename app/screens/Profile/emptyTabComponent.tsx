@@ -11,7 +11,6 @@ const EmptyTabPresets = {
         button: "emptyStateComponent.emptyPosts.button",
     },
     emptyDiscussions: {
-
         heading: "emptyStateComponent.emptyDiscussions.heading",
         content: "emptyStateComponent.emptyDiscussions.content",
         button: "emptyStateComponent.emptyDiscussions.button",

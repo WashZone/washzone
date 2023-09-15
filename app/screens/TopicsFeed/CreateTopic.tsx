@@ -1,14 +1,6 @@
-import React, { useEffect, useMemo, useRef, useState } from "react"
-import {
-  Image,
-  TextInput,
-  TextStyle,
-  View,
-  ViewStyle,
-  Pressable,
-  ActivityIndicator,
-} from "react-native"
-import { $fontWeightStyles, Icon, iconRegistry, Text, TextField } from "../../components"
+import React, { useEffect, useMemo, useState } from "react"
+import { Image, TextStyle, View, ViewStyle, Pressable, ActivityIndicator } from "react-native"
+import { $fontWeightStyles, Icon, iconRegistry, Text, TextField, TOnTopic } from "../../components"
 import { colors, spacing } from "../../theme"
 import { useStores } from "../../models"
 import FastImage, { ImageStyle } from "react-native-fast-image"
@@ -19,29 +11,33 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
 } from "react-native-reanimated"
-import { useHooks } from "../hooks"
 import Toast from "react-native-toast-message"
 import { toastMessages } from "../../utils/toastMessages"
 import { observer } from "mobx-react-lite"
 
 export const CreateTopic = observer(function CreateTopic({
-  progress, loading, setLoading, hideModal, selectedImage, setSelectedImage
+  inputFocused = false,
+  defaultTopic,
+  progress,
+  selectedImage,
+  setSelectedImage,
+  onTopic,
 }: {
+  inputFocused?: boolean
   progress: SharedValue<number>
-  loading: boolean
-  setLoading: (b: boolean) => void
-  hideModal: () => void
+  defaultTopic?: any
   selectedImage: any
   setSelectedImage: (a: any) => void
+  onTopic: TOnTopic
 }) {
   const { userStore } = useStores()
-  const [topicDescription, setTopicDescription] = useState<string>("")
-  const [topicTitle, setTopicTitle] = useState<string>("")
-  const inputRef = useRef<TextInput>()
-  const inputTitleRef = useRef<TextInput>()
-  const { createTopic, refreshTopics } = useHooks()
+  const [topicDescription, setTopicDescription] = useState(
+    defaultTopic ? defaultTopic.topicContent : "",
+  )
+  const [topicTitle, setTopicTitle] = useState(defaultTopic ? defaultTopic.title : "")
+  const [loading, setLoading] = useState(false)
 
-  const onPost = async () => {
+  const handleCreate = async () => {
     setLoading(true)
     if (topicTitle.replace(/\s/g, "")?.length === 0) {
       Toast.show(toastMessages.inputTitle)
@@ -54,24 +50,17 @@ export const CreateTopic = observer(function CreateTopic({
       return
     }
     try {
-      await createTopic({
-        content: topicDescription.trim(),
-        attachment: selectedImage,
+      onTopic({
         title: topicTitle.trim(),
-        tagTopicUser: [],
+        topicContent: topicDescription.trim(),
+        file: selectedImage,
+        topicId: defaultTopic?._id,
       })
-      refreshTopics()
     } catch (error) {
     } finally {
-      inputRef.current.clear()
-      inputTitleRef.current.clear()
-      inputTitleRef.current.blur()
-      inputRef.current.blur()
       setLoading(false)
       progress.value = withTiming(0, { duration: 400 })
-      setSelectedImage({ height: 1, windth: 1 })
-      Toast.show({ text1: 'Posted !', text2: 'Your discussion was successfully posted!' })
-      hideModal()
+      setSelectedImage({ height: 1, width: 1 })
     }
   }
 
@@ -97,7 +86,7 @@ export const CreateTopic = observer(function CreateTopic({
           progress.value = withTiming(1, { duration: 300 })
         }, 100)
       }
-    } catch (e) { }
+    } catch (e) {}
   }
 
   const onDeletePress = () => {
@@ -110,7 +99,7 @@ export const CreateTopic = observer(function CreateTopic({
 
   const previewImage: ImageStyle = {
     height: selectedImage.uri ? 80 : 0,
-    width: selectedImage.uri ? (80 * selectedImage?.width) / selectedImage?.height : 0,
+    width: 80,
     alignItems: "center",
     borderRadius: 10,
   }
@@ -122,7 +111,7 @@ export const CreateTopic = observer(function CreateTopic({
 
     return {
       height,
-      width: (80 * selectedImage?.width) / selectedImage?.height,
+      width: 80,
       marginHorizontal: 20,
       justifyContent: "center",
       marginBottom,
@@ -164,25 +153,20 @@ export const CreateTopic = observer(function CreateTopic({
       height,
       width: "100%",
       justifyContent: "center",
-
     }
   })
 
   return (
-    <View
-      style={{
-      }}
-    >
+    <View>
       <View style={$container}>
-
         <FastImage source={{ uri: userStore?.picture }} style={$picture} resizeMode="cover" />
 
         <View style={$contentContainer}>
           <TextField
             value={topicTitle}
             onChangeText={setTopicTitle}
-            ref={inputTitleRef}
             onFocus={onFocus}
+            autoFocus={inputFocused}
             containerStyle={$inputContainerTitle}
             inputWrapperStyle={$inputWrapper}
             style={[$inputText, $fontWeightStyles.medium]}
@@ -192,7 +176,6 @@ export const CreateTopic = observer(function CreateTopic({
           <TextField
             value={topicDescription}
             onChangeText={setTopicDescription}
-            ref={inputRef}
             onFocus={onFocus}
             containerStyle={$inputContainer}
             inputWrapperStyle={$inputWrapper}
@@ -226,7 +209,7 @@ export const CreateTopic = observer(function CreateTopic({
               )}
             </Pressable>
           </View>
-          <AnimatedPressable disabled={loading} onPress={onPost} style={animatedPostButton}>
+          <AnimatedPressable disabled={loading} onPress={handleCreate} style={animatedPostButton}>
             {loading ? (
               <ActivityIndicator
                 color={colors.palette.neutral100}
@@ -234,7 +217,11 @@ export const CreateTopic = observer(function CreateTopic({
                 animating
               />
             ) : (
-              <Text text="Create" style={$postTextStyle} weight="semiBold" />
+              <Text
+                text={defaultTopic ? "Update" : "Create"}
+                style={$postTextStyle}
+                weight="semiBold"
+              />
             )}
           </AnimatedPressable>
         </View>

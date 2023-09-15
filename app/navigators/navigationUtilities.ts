@@ -13,13 +13,13 @@ import { AppStackParamList } from "./AppNavigator"
 
 /* eslint-disable */
 export const RootNavigation = {
-  navigate(_name: string, _params?: any) { },
-  goBack() { },
-  resetRoot(_state?: PartialState<NavigationState> | NavigationState) { },
+  navigate(_name: string, _params?: any) {},
+  goBack() {},
+  resetRoot(_state?: PartialState<NavigationState> | NavigationState) {},
   getRootState(): NavigationState {
     return {} as any
   },
-  dispatch(_action: NavigationAction) { },
+  dispatch(_action: NavigationAction) {},
 }
 /* eslint-enable */
 
@@ -154,7 +154,7 @@ export function useNavigationPersistence(storage: any, persistenceKey: string) {
  */
 export function navigate(name: any, params?: any) {
   if (navigationRef.isReady()) {
-    navigationRef.navigate(name as never, params as never)
+    navigationRef.navigate(name, params)
   }
 }
 

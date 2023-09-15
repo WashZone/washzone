@@ -1,9 +1,4 @@
-import {
-  DarkTheme,
-  DefaultTheme,
-  NavigationContainer,
-
-} from "@react-navigation/native"
+import { DarkTheme, DefaultTheme, NavigationContainer } from "@react-navigation/native"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import { StackScreenProps } from "@react-navigation/stack"
 import { observer } from "mobx-react-lite"
@@ -34,13 +29,14 @@ import {
   VideoCall,
   Profile,
   BlockedUsers,
-  VideoCallAndroid
+  VideoCallAndroid,
 } from "../screens"
 import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
 import { DrawerNavigator } from "./Drawer/DrawerNavigator"
 import { useHooks } from "../screens/hooks"
 import { BlockedUserModal } from "../components/BlockedUserModal"
 import ShareModal from "../components/ShareModal"
+import { EditModule } from "../components/EditModule"
 
 export type AppStackParamList = {
   Login: undefined
@@ -54,12 +50,12 @@ export type AppStackParamList = {
   VerifyOTP: { email: string }
   Saved: undefined
   UploadVideo: undefined
-  AddAClassified: undefined
+  AddAClassified: { classifiedToEdit?: any }
   Search: undefined
   Legal: undefined
   Support: undefined
   AllChats: undefined
-  UserProfile: { user: any, header?: boolean },
+  UserProfile: { user: any; header?: boolean }
   P2PChat: { receiver: any; roomId: string | undefined }
   AudioCall: {
     receiver: any
@@ -105,7 +101,6 @@ const AppStack = observer(function AppStack() {
   const { onLoggedInBoot } = useHooks()
 
   useEffect(() => {
-
     isAuthenticated && onLoggedInBoot()
   }, [isAuthenticated])
 
@@ -152,12 +147,12 @@ const AppStack = observer(function AppStack() {
             <Stack.Screen
               name="UploadVideo"
               component={UploadVideo}
-            // options={{ presentation: 'modal' }}
+              // options={{ presentation: 'modal' }}
             />
             <Stack.Screen
               name="AddAClassified"
               component={AddAClassified}
-            // options={{ presentation: "containedModal" }}
+              // options={{ presentation: "containedModal" }}
             />
           </>
         ) : (
@@ -167,17 +162,16 @@ const AppStack = observer(function AppStack() {
             <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
             <Stack.Screen name="VerifyOTP" component={VerifyOTP} />
             <Stack.Screen name="Legal" component={Legal} />
-
           </>
         )}
       </Stack.Navigator>
+      <EditModule />
       <BlockedUserModal isVisible={isBlocked} />
     </>
   )
 })
 
-interface NavigationProps extends Partial<React.ComponentProps<typeof NavigationContainer>> {
-}
+interface NavigationProps extends Partial<React.ComponentProps<typeof NavigationContainer>> {}
 
 export const AppNavigator = observer(function AppNavigator(props: NavigationProps) {
   const colorScheme = useColorScheme()
@@ -190,9 +184,8 @@ export const AppNavigator = observer(function AppNavigator(props: NavigationProp
       theme={colorScheme === "dark" ? DarkTheme : DefaultTheme}
       {...props}
     >
-      <AppStack  />
+      <AppStack />
       <ShareModal />
-
     </NavigationContainer>
   )
 })

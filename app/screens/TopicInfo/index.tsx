@@ -24,16 +24,23 @@ export const TopicInfo: FC<HomeTabProps<"TopicInfo">> = function PostInfo(props)
     api: { mutateGetTopicById },
   } = useStores()
 
+  const syncTopic = async (topicId: string) => {
+    const res = await mutateGetTopicById({ topicId, callerId: _id })
+    const topicData = res.getTopicById?.data.length === 1 && res.getTopicById?.data[0]
+    setTopicDetails(topicData)
+    return topicData
+  }
+
   const handleTopic = async () => {
     setLoading(true)
     try {
       if (typeof topic === "string") {
-        const res = await mutateGetTopicById({ topicId: topic, callerId: _id })
-        const topicData = res.getTopicById?.data.length === 1 && res.getTopicById?.data[0]
-        setTopicDetails(topicData)
+        const topicData = await syncTopic(topic)
         await syncComments(topicData?._id)
         setLoading(false)
       } else {
+        // need to shift this check to BACKEND 
+        setTopicDetails(topic)
         await syncComments(topicDetails?._id)
         setLoading(false)
       }

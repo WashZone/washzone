@@ -11,6 +11,7 @@ import ImageView from "react-native-image-viewing"
 import { ImageViewConfigType } from ".."
 import { Host } from "react-native-portalize"
 import { colors } from "../../theme"
+import { navigationRef } from "../../navigators"
 
 export const PostInfo: FC<HomeTabProps<"PostInfo">> = function PostInfo(props) {
   const { post, highlightedComment } = props.route.params
@@ -30,16 +31,21 @@ export const PostInfo: FC<HomeTabProps<"PostInfo">> = function PostInfo(props) {
   } = useStores()
   const { getCommentsOnHomePagePost, postCommentOnHomePagePost } = useHooks()
 
+  const syncPost = async (postId: string) => {
+    const res = await mutateGetHomePagesById({ homePageId: postId, callerId: _id })
+    const postData = res.getHomePagesById?.data.length === 1 && res.getHomePagesById?.data[0]
+    setPostDetails(postData)
+    return postData
+  }
   const handelPost = async () => {
     setLoading(true)
     try {
       if (typeof post === "string") {
-        const res = await mutateGetHomePagesById({ homePageId: post, callerId: _id })
-        const topicData = res.getHomePagesById?.data.length === 1 && res.getHomePagesById?.data[0]
-        setPostDetails(topicData)
-        await syncComments(topicData?._id)
+        const postData = await syncPost(post)
+        await syncComments(postData?._id)
         setLoading(false)
       } else {
+        setPostDetails(post)
         await syncComments(postDetails?._id)
         setLoading(false)
       }
@@ -74,16 +80,16 @@ export const PostInfo: FC<HomeTabProps<"PostInfo">> = function PostInfo(props) {
     await syncComments(postDetails?._id)
   }
 
-  if (loading) {
-    return <Loading />
-  }
-
   const handleImageViewConfig = (args: ImageViewConfigType) => {
     const { show, ...rest } = args
     if (show) {
       setImageViewConfig(rest)
       setTimeout(() => setShowImageView(true), 100)
     }
+  }
+
+  if (loading) {
+    return <Loading />
   }
 
   return (
@@ -105,6 +111,7 @@ export const PostInfo: FC<HomeTabProps<"PostInfo">> = function PostInfo(props) {
                   />
                 )
               }
+              refreshParent={navigationRef.goBack}
               onLayout={onPostLayout}
               setImageViewConfig={handleImageViewConfig}
               post={postDetails}

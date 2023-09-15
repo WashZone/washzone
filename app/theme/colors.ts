@@ -51,6 +51,9 @@ const palette = {
   greyOverlay100: "rgba(180,180,180,0.5)",
 
   overlayNeutral50: "rgba(255,255,255,0.5)",
+  overlayNeutral70: "rgba(255,255,255,0.7)",
+  overlayNeutral80: "rgba(255,255,255,0.8)",
+  overlayNeutral90: "rgba(255,255,255,0.9)",
   overlayNeutral10050: "rgba(0,0,0,0.5)",
 
   glow100: "#4EFFDF",

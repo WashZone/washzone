@@ -10,7 +10,15 @@ import {
   LayoutChangeEvent,
   ActivityIndicator,
 } from "react-native"
-import { CustomFlatlist, Icon, LikesModal, ParsedTextComp, Text } from "../../../components"
+import {
+  CustomFlatlist,
+  Icon,
+  LikesModal,
+  Menu,
+  ParsedTextComp,
+  Text,
+  $verticalAbsoluteTop,
+} from "../../../components"
 import { colors, spacing } from "../../../theme"
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { formatName } from "../../../utils/formatName"
@@ -44,6 +52,7 @@ export interface PostComponentProps {
   additionalChildComponent?: React.ReactElement
   onLayout?: (e: LayoutChangeEvent) => void
   isViewable?: boolean
+  refreshParent?: (id?: string) => void
 }
 
 const Actions = observer(function ActionButtons({ item }: { item: any }) {
@@ -184,7 +193,6 @@ const CourouselItem = ({ item, index, onAttachmentsPress, inViewPort }) => {
   }
 
   const onPlayBackStatusUpdate = (status: AVPlaybackStatus) => {
-    console.log("playback Status", status)
     if (!status.isLoaded) {
       // Update your UI for the unloaded state
       setOverLayIcon(null)
@@ -271,12 +279,21 @@ export const PostComponent = ({
   onLayout,
   additionalChildComponent,
   isViewable,
+  refreshParent,
 }: PostComponentProps) => {
+  const {
+    userStore,
+    api: { mutateDeleteDetailHomePageId },
+    feedStore: { removeFromHomeFeed },
+    edit: { editPost },
+  } = useStores()
+  const isAuthorUser = post?.userId?._id === userStore._id
   const SCREEN_WIDTH = Dimensions.get("screen").width
 
   const [currentIndex, setCurrentIndex] = useState(0)
   const [showMore, setShowMore] = useState(undefined)
   const [tempNumberOfLines, setTempNumberOfLines] = useState(undefined)
+  const [optionsVisible, setOptionsVisible] = useState(false)
 
   const navigation = useNavigation<NavigationProp<HomeTabParamList>>()
   const onContainerPress = () => {
@@ -319,6 +336,24 @@ export const PostComponent = ({
         setShowMore(e.nativeEvent.lines.length > numberOfLines)
     }
   }, [])
+
+  const onEdit = () => {
+    setOptionsVisible(false)
+    setTimeout(() => editPost(post), 0)
+  }
+
+  const onDelete = () => {
+    setOptionsVisible(false)
+    showAlertYesNo({
+      message: "Are you sure you want to delete this post?",
+      description: "This action cannot be undone.",
+      onYesPress: async () => {
+        const postId = post?._id
+        removeFromHomeFeed(postId)
+        await mutateDeleteDetailHomePageId({ homePageId: postId }, refreshParent && refreshParent)
+      },
+    })
+  }
 
   return (
     <>
@@ -432,6 +467,17 @@ export const PostComponent = ({
         <>
           <NativeAdView />
         </>
+      )}
+      {isAuthorUser && (
+        <Menu
+          visible={optionsVisible}
+          setVisible={setOptionsVisible}
+          data={[
+            { title: "Edit", onPress: onEdit, icon: "note-edit" },
+            { title: "Delete", onPress: onDelete, icon: "delete" },
+          ]}
+          containerStyle={$verticalAbsoluteTop}
+        />
       )}
     </>
   )

@@ -159,7 +159,6 @@ export type InputUserTagList = {
 export type InputHomePage = {
   Discription?: (string | null)
   attachmentType?: (string | null)
-  attachmentUrl?: (string | null)
   status?: (string | null)
 }
 export type InputUsers = {
@@ -935,8 +934,8 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     mutateDeleteDetailHomePageId(variables: { homePageId: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ DeleteDetailHomePageId: any }>(`mutation DeleteDetailHomePageId($homePageId: String!) { DeleteDetailHomePageId(HomePageId: $homePageId) }`, variables, optimisticUpdate)
     },
-    mutateUpdateUserHomePages(variables: { usersHomePagesDetail: InputHomePage, homePageId: string }, resultSelector: string | ((qb: HomePageDetailModelSelector) => HomePageDetailModelSelector) = homePageDetailModelPrimitives.toString(), optimisticUpdate?: () => void) {
-      return self.mutate<{ updateUserHomePages: HomePageDetailModelType}>(`mutation updateUserHomePages($usersHomePagesDetail: InputHomePage!, $homePageId: String!) { updateUserHomePages(UsersHomePagesDetail: $usersHomePagesDetail, HomePageId: $homePageId) {
+    mutateUpdateUserHomePages(variables: { attachmentUrl?: InputattachmentUrls[], usersHomePagesDetail: InputHomePage, homePageId: string }, resultSelector: string | ((qb: HomePageDetailModelSelector) => HomePageDetailModelSelector) = homePageDetailModelPrimitives.toString(), optimisticUpdate?: () => void) {
+      return self.mutate<{ updateUserHomePages: HomePageDetailModelType}>(`mutation updateUserHomePages($attachmentUrl: [InputattachmentUrls!], $usersHomePagesDetail: InputHomePage!, $homePageId: String!) { updateUserHomePages(attachmentUrl: $attachmentUrl, UsersHomePagesDetail: $usersHomePagesDetail, HomePageId: $homePageId) {
         ${typeof resultSelector === "function" ? resultSelector(new HomePageDetailModelSelector()).toString() : resultSelector}
       } }`, variables, optimisticUpdate)
     },

@@ -1,6 +1,7 @@
 const en = {
   headerTitle: {
     addClassfied: "Add a Classified",
+    editClassfied: "Edit Classified",
     uploadVideo: "Add a Video",
   },
   common: {
@@ -10,6 +11,7 @@ const en = {
     logOut: "Log Out",
     add: "Add",
     submit: "Submit",
+    update: "Update",
   },
   welcomeScreen: {
     postscript:

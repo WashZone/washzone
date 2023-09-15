@@ -14,6 +14,9 @@ export const ClassifiedStoreModel = types
     addToClassfieds(classifieds: any) {
       self.classifieds = [...self.classifieds, ...classifieds]
     },
+    removeFromClassfieds(classifiedId: any) {
+      self.classifieds = self.classifieds.filter((c) => c._id !== classifiedId)
+    },
     clear() {
       self.classifieds = []
     },
@@ -24,5 +27,5 @@ export const ClassifiedStoreModel = types
     },
   }))
 
-export interface ClassifiedStore extends Instance<typeof ClassifiedStoreModel> { }
-export interface ClassifiedStoreSnapshot extends SnapshotOut<typeof ClassifiedStoreModel> { }
+export interface ClassifiedStore extends Instance<typeof ClassifiedStoreModel> {}
+export interface ClassifiedStoreSnapshot extends SnapshotOut<typeof ClassifiedStoreModel> {}

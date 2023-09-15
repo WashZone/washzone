@@ -1,6 +1,7 @@
 import { Alert } from "react-native"
 import { userTagRegEx } from "../components"
 import { Interaction } from "./enums"
+import { InputattachmentUrls } from "../models/api/RootStore.base"
 
 export const getIconForInteraction = (i: Interaction, buttonType: "liked" | "disliked") => {
   if (buttonType === "liked") {
@@ -115,4 +116,13 @@ export const getTaggedIds = (content: string) => {
 export const isRemoteUrl = (url: string) => {
   return url.startsWith("http") || url.startsWith("data")
 }
- 
+
+export const getImageUrlsFromPost = (attachments: InputattachmentUrls[]) => {
+  return attachments.map((i) => {
+    if (i.type.startsWith("video")) {
+      return i.thumbnailUrl
+    } else {
+      return i.url
+    }
+  })
+}

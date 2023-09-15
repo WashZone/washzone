@@ -20,8 +20,10 @@ export const FeedStoreModel = types
       })
       self.homeFeed = temp
     },
-    syncLocalRead(userId:string){
-      self.stories =  self.stories.map(i => i?.followId?._id ===userId? {...i, unreadCount:0} : i)
+    syncLocalRead(userId: string) {
+      self.stories = self.stories.map((i) =>
+        i?.followId?._id === userId ? { ...i, unreadCount: 0 } : i,
+      )
     },
     setTopics(topics: any) {
       self.topics = topics
@@ -29,11 +31,17 @@ export const FeedStoreModel = types
     addToTopics(topics: any) {
       self.topics = [...self.topics, ...topics]
     },
+    removeFromTopics(topicId: any) {
+      self.topics = self.topics.filter((c) => c._id !== topicId)
+    },
     setHomeFeed(homeFeed: any) {
       self.homeFeed = [...homeFeed]
     },
     addToHomeFeed(homeFeed: any) {
       self.homeFeed = [...self.homeFeed, ...homeFeed]
+    },
+    removeFromHomeFeed(postId: any) {
+      self.homeFeed = self.homeFeed.filter((c) => c._id !== postId)
     },
     clear() {
       self.topics = []

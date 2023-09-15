@@ -9,7 +9,8 @@ import {
   View,
   Dimensions,
 } from "react-native"
-import { Menu, MenuItem, MenuDivider } from "react-native-material-menu"
+// import { Menu, MenuItem, MenuDivider } from "react-native-material-menu"
+
 import FastImage, { ImageStyle } from "react-native-fast-image"
 import { CollapsibleHeaderTabView } from "react-native-tab-view-collapsible-header"
 import { NavigationState, SceneRendererProps, TabBar } from "react-native-tab-view"
@@ -20,7 +21,7 @@ import ImageView from "react-native-image-viewing"
 
 import { colors, spacing } from "../../theme"
 import { HomeTabParamList, HomeTabProps } from "../../tabs"
-import { Header, Screen, Text, Icon } from "../../components"
+import { Header, Screen, Text, Icon, Menu } from "../../components"
 import { formatName } from "../../utils/formatName"
 import {
   ClassifiedsTabScreen,
@@ -152,8 +153,6 @@ const Options = ({ user, reportUser }) => {
 
   const hideMenu = () => setVisible(false)
 
-  const showMenu = () => setVisible(true)
-
   const blockUser = () => {
     showAlertYesNo({
       message: `Block ${user?.first_name} ?`,
@@ -209,46 +208,17 @@ const Options = ({ user, reportUser }) => {
 
   return (
     <Menu
+      data={[
+        { title: "Report", icon: "report", onPress: onReport },
+        {
+          title: isBlocked(user?._id) ? "Unblock" : "Block",
+          icon: "block-helper",
+          onPress: isBlocked(user?._id) ? unblockUser : blockUser,
+        },
+      ]}
       visible={visible}
-      anchor={<Icon onPress={showMenu} icon="more" size={28} color={colors.palette.neutral100} />}
-      onRequestClose={hideMenu}
-    >
-      <MenuItem onPress={onReport}>
-        <View
-          style={[
-            // eslint-disable-next-line react-native/no-inline-styles
-            { height: "100%", width: 100, alignItems: "center" },
-            $flexRow,
-          ]}
-        >
-          <Icon
-            containerStyle={{ marginHorizontal: spacing.extraSmall }}
-            color={colors.palette.angry500}
-            icon="reportUser"
-            size={22}
-          />
-          <Text text="Report" />
-        </View>
-      </MenuItem>
-      <MenuDivider />
-      <MenuItem
-        onPress={() => {
-          hideMenu()
-          isBlocked(user?._id) ? unblockUser() : blockUser()
-        }}
-      >
-        <View
-          style={[
-            // eslint-disable-next-line react-native/no-inline-styles
-            { height: "100%", width: 100, alignItems: "center" },
-            $flexRow,
-          ]}
-        >
-          <Icon icon="block" size={22} containerStyle={{ marginHorizontal: spacing.extraSmall }} />
-          <Text text={isBlocked(user?._id) ? "UnBlock" : "Block"} />
-        </View>
-      </MenuItem>
-    </Menu>
+      setVisible={setVisible}
+    />
   )
 }
 
@@ -361,7 +331,6 @@ const ProfileHeader = ({ user, isUser, onMessage, onProfileImagePress, onBannerP
           width={Dimensions.get("screen").width}
         >
           <FastImage
-
             source={
               user?.banner
                 ? {
@@ -731,7 +700,7 @@ const $topContainer: ImageStyle = {
   alignItems: "center",
   paddingBottom: spacing.medium,
   height: 250,
-  width: Dimensions.get('screen').width,
+  width: Dimensions.get("screen").width,
 }
 
 const $descriptionText: TextStyle = {

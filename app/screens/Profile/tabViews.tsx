@@ -14,6 +14,7 @@ import { EmptyTabState } from "./emptyTabComponent"
 import ShimmerPlaceholder from "react-native-shimmer-placeholder"
 import LinearGradient from "react-native-linear-gradient"
 import FastImage, { ImageStyle } from "react-native-fast-image"
+import { getImageUrlsFromPost } from "../../utils/helpers"
 const maxGalleryItemDimension = Dimensions.get("window").width / 2 - 30
 
 const GalleryItem = ({ uri, onPress }) => {
@@ -28,13 +29,15 @@ const GalleryItem = ({ uri, onPress }) => {
       <TouchableOpacity onPress={onPress}>
         <FastImage
           source={{ uri }}
-          onLoad={s => setAspectRatio(s.nativeEvent.height / s.nativeEvent.width)}
+          onLoad={(s) => setAspectRatio(s.nativeEvent.height / s.nativeEvent.width)}
           onLoadEnd={() => setLoaded(true)}
-          style={[$marginAutoImage, { width: maxGalleryItemDimension, height: maxGalleryItemDimension * aspectRatio }]}
+          style={[
+            $marginAutoImage,
+            { width: maxGalleryItemDimension, height: maxGalleryItemDimension * aspectRatio },
+          ]}
         />
       </TouchableOpacity>
     </ShimmerPlaceholder>
-
   )
 }
 
@@ -126,13 +129,13 @@ export const HomePostsTabScreen = ({
     setUserPosts(res)
     const galleryImages = []
     res.forEach((i, index) => {
-      i?.attachmentUrl?.forEach((j: any, jIndex: string) => {
-        galleryImages.push({ uri: j, id: "topic" + index + "-" + jIndex })
+      const imageUrls = getImageUrlsFromPost(i?.attachmentUrl)
+      imageUrls?.forEach((j, jIndex) => {
+        galleryImages.push({ uri: j, id: "posts" + index + "-" + jIndex })
       })
     })
     const filteredImages = galleryImages.filter((i) => i?.uri)
     addToGallery(filteredImages)
-
     setLoading(false)
   }
   const [imageViewConfig, setImageViewConfig] = useState({

@@ -7,9 +7,19 @@ import { messageMetadataType } from "../utils"
 import messaging from "@react-native-firebase/messaging"
 import { RNS3 } from "react-native-upload-aws-s3"
 import { Alert } from "react-native"
-import { getInputInteraction, getTaggedIds, likeDislikeCountUpdater } from "../utils/helpers"
+import {
+  getInputInteraction,
+  getTaggedIds,
+  isRemoteUrl,
+  likeDislikeCountUpdater,
+} from "../utils/helpers"
 import * as Haptics from "expo-haptics"
-import { InputattachmentUrls } from "../models/api/RootStore.base"
+import {
+  InputClassified,
+  InputHomePage,
+  InputTopic,
+  InputattachmentUrls,
+} from "../models/api/RootStore.base"
 import { uploadFile } from "../utils/upload/uploadFile"
 
 export function useHooks() {
@@ -105,6 +115,9 @@ export function useHooks() {
       queryGetuserLikesonTopic,
       queryGetuserLikesonVideo,
       mutateUpdatelastreadPostId,
+      mutateUpdateUserClassified,
+      mutateUpdateUserHomePages,
+      mutateUpdateUserTopic,
     },
     userStore,
   } = useStores()
@@ -195,11 +208,87 @@ export function useHooks() {
         { userId: userStore._id, pageNumber: 1 },
         { fetchPolicy: "no-cache" },
       )
+      console.log(
+        "res.getAllTopicByPageNumberInteraction?.data",
+        res.getAllTopicByPageNumberInteraction?.data,
+      )
       setTopics(res.getAllTopicByPageNumberInteraction?.data)
       // await syncInteractedVideosAndTopics()
     } catch (err) {
       console.log(err)
     }
+  }
+
+  const updateClassified = async (
+    classifiedId: string,
+    classifiedFeed: Omit<InputClassified, "attachmentUrl" | "attachmentType">,
+    selectedMedia: { uri: string; type: string; fileName?: string },
+  ) => {
+    const updatedClassified: InputClassified = { ...classifiedFeed }
+
+    if (selectedMedia) {
+      const imageUrl = await uploadToS3({
+        uri: selectedMedia?.uri,
+        type: selectedMedia?.type,
+        name: selectedMedia?.fileName,
+      })
+      updatedClassified.attachmentUrl = imageUrl
+      updatedClassified.attachmentType = selectedMedia?.type
+    }
+
+    await mutateUpdateUserClassified({
+      classifiedFeed: updatedClassified,
+      classifiedId,
+    })
+  }
+
+  const updateTopic = async (
+    topicId: string,
+    topic: Omit<InputTopic, "attachmentUrl" | "attachmentType">,
+    attachment: { uri: string; type: string; fileName?: string },
+  ) => {
+    const updatedTopic: InputTopic = { ...topic }
+
+    const imageUrl = attachment?.uri
+      ? await uploadToS3({
+          uri: attachment?.uri,
+          type: attachment?.type,
+          name: attachment?.fileName,
+        })
+      : ""
+    updatedTopic.attachmentUrl = imageUrl
+    updatedTopic.attachmentType = attachment?.type
+
+    const res = await mutateUpdateUserTopic({
+      topicId,
+      usersTopicDetail: updatedTopic,
+    })
+    return res
+  }
+
+  const updatePost = async (
+    homePageId: string,
+    post: Omit<InputHomePage, "attachmentUrl" | "attachmentType">,
+    attachments: { uri: string; type: string; fileName?: string }[],
+  ) => {
+    const updatedPost: InputHomePage = { ...post }
+
+    const attachmentUrl = []
+
+
+    // Uploading assets here
+    for (let i = 0; i < attachments.length; i++) {
+      const res = await uploadFile(attachments[i])
+      attachmentUrl.push(res)
+    }
+   console.log('attachmentUrl',attachmentUrl)
+    const res = await mutateUpdateUserHomePages({
+      usersHomePagesDetail: updatedPost,
+      homePageId,
+      attachmentUrl,
+    })
+
+    return res
   }
 
   const postComment = async (comment: string, selectedMedia: any, topicId: string) => {
@@ -262,16 +351,18 @@ export function useHooks() {
     return res.getCommentsByHomePageId.length === 1 && res.getCommentsByHomePageId[0]?.comments
   }
 
-  const createTopic = async ({ content, attachment, title, tagTopicUser }) => {
+  const createTopic = async ({ content, attachment, title, tagTopicUser, setUploadProgress }) => {
     if (title.length === 0 || content?.length === 0) return
-    const imageUrl = attachment
+    console.log(";attachment", attachment)
+    setUploadProgress(0.1)
+    const imageUrl = attachment?.uri
       ? await uploadToS3({
           uri: attachment?.uri,
           type: attachment?.type,
           name: attachment?.fileName,
         })
       : undefined
-
+    setUploadProgress(0.7)
     try {
       await mutateCreateUserTopic({
         tagTopicUser,
@@ -281,7 +372,12 @@ export function useHooks() {
         userId: userStore._id,
         title,
       })
+      setUploadProgress(1)
+      refreshTopics().then(() => {
+        setUploadProgress(1)
+      })
     } catch (err) {
+      setUploadProgress(1)
       Alert.alert(err)
     }
   }
@@ -1202,6 +1298,8 @@ export function useHooks() {
       type,
     }
 
+    if (isRemoteUrl(uri)) return uri
+
     const options = {
       keyPrefix: "uploads/",
       bucket: "washzone-23",
@@ -1396,6 +1494,9 @@ export function useHooks() {
     getLikesOnPost,
     getLikesOnDiscussion,
     updateLastReadPost,
+    updateClassified,
+    updateTopic,
+    updatePost,
   }
 }
 

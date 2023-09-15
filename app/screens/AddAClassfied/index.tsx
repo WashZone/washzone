@@ -34,7 +34,7 @@ const data = [
   { label: "Poor", value: "Poor" },
 ]
 
-const MediaHandlerComponent = ({ selectedMedia, setSelectedMedia }) => {
+const MediaHandlerComponent = ({ selectedMedia, setSelectedMedia, disabled = false }) => {
   const [loading, setLoading] = useState(true)
   const selectClassifiedMedia = async () => {
     const res = await MediaPicker({})
@@ -42,6 +42,7 @@ const MediaHandlerComponent = ({ selectedMedia, setSelectedMedia }) => {
   }
   return (
     <TouchableOpacity
+      disabled={disabled}
       style={[
         $containerUploadMedia,
         !selectedMedia && {
@@ -84,52 +85,83 @@ const MediaHandlerComponent = ({ selectedMedia, setSelectedMedia }) => {
   )
 }
 
-export const AddAClassified: FC<AppStackScreenProps<"AddAClassified">> = function AddAClassified() {
+export const AddAClassified: FC<AppStackScreenProps<"AddAClassified">> = function AddAClassified(
+  props,
+) {
   const {
     userStore: { _id },
+    api: { mutateUpdateUserClassified },
   } = useStores()
+
+  const isModeUpdate = props.route.params?.classifiedToEdit !== undefined
+  const detailsToBeUpdated = props.route.params?.classifiedToEdit
+
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
   const [buttonLoading, setButtonLoading] = useState<boolean>(false)
-  const [selectedMedia, setSelectedMedia] = useState<any>(undefined)
+  const [selectedMedia, setSelectedMedia] = useState<any>(
+    isModeUpdate
+      ? {
+          uri: detailsToBeUpdated.attachmentUrl,
+          type: detailsToBeUpdated.attachmentType,
+        }
+      : {},
+  )
   const [isFocus, setIsFocus] = useState<boolean>(false)
-  const [TNCAccepted, setTNCAccepted] = useState<boolean>(false)
-  const [value, setValue] = useState("")
-  const [title, setTitle] = useState("")
-  const [price, setPrice] = useState("")
-  const [description, setDescription] = useState("")
-  const { createClassified, refreshClassifieds } = useHooks()
+  const [TNCAccepted, setTNCAccepted] = useState<boolean>(!!detailsToBeUpdated)
+  const [condition, setCondition] = useState(isModeUpdate ? detailsToBeUpdated.condition : "")
+  const [title, setTitle] = useState(isModeUpdate ? detailsToBeUpdated.title : "")
+  const [price, setPrice] = useState(isModeUpdate ? detailsToBeUpdated.prize : "")
+  const [description, setDescription] = useState(
+    isModeUpdate ? detailsToBeUpdated.classifiedDetail : "",
+  )
+  const { createClassified, refreshClassifieds, updateClassified } = useHooks()
 
   const handleCreatePress = async () => {
     if (title.trim().length === 0) {
-      Toast.show({ ...toastMessages.inputTitle })
+      Toast.show(toastMessages.inputTitle)
       return
     }
     if (description.trim().length === 0) {
-      Toast.show({ ...toastMessages.inputDescription })
+      Toast.show(toastMessages.inputDescription)
       return
     }
-    if (value.length === 0) {
-      Toast.show({ ...toastMessages.selectionCondition })
+    if (condition.length === 0) {
+      Toast.show(toastMessages.selectionCondition)
       return
     }
     if (!selectedMedia) {
-      Toast.show({ ...toastMessages.minimumOnePhotoRequired })
+      Toast.show(toastMessages.minimumOnePhotoRequired)
       return
     }
     if (!TNCAccepted) {
-      Toast.show({ ...toastMessages.acceptTNC })
+      Toast.show(toastMessages.acceptTNC)
       return
     }
     try {
       setButtonLoading(true)
-      await createClassified({
-        attachmentUrl: selectedMedia.uri,
-        type: selectedMedia.type,
-        title,
-        prize: price,
-        classifiedDetail: description.trim(),
-        condition: value,
-      })
+
+      if (isModeUpdate) {
+        await updateClassified(
+          detailsToBeUpdated._id,
+          {
+            title,
+            prize: price,
+            classifiedDetail: description.trim(),
+            condition,
+          },
+          selectedMedia,
+        )
+      } else {
+        await createClassified({
+          attachmentUrl: selectedMedia.uri,
+          type: selectedMedia.type,
+          title,
+          prize: price,
+          classifiedDetail: description.trim(),
+          condition,
+        })
+      }
+
       await refreshClassifieds()
       navigation.goBack()
       setButtonLoading(false)
@@ -147,8 +179,8 @@ export const AddAClassified: FC<AppStackScreenProps<"AddAClassified">> = functio
       safeAreaEdges={["bottom"]}
     >
       <Header
-        leftIcon='caretLeft'
-        title={en.headerTitle.addClassfied}
+        leftIcon="caretLeft"
+        title={en.headerTitle[isModeUpdate ? "editClassfied" : "addClassfied"]}
         titleStyle={$titleStyle}
         onLeftPress={() => navigation.goBack()}
         backgroundColor={colors.palette.neutral100}
@@ -157,6 +189,7 @@ export const AddAClassified: FC<AppStackScreenProps<"AddAClassified">> = functio
 
       <ScrollView showsVerticalScrollIndicator={false} style={$content}>
         <TextInput
+          disabled={buttonLoading}
           value={title}
           style={$inputContainer}
           onChangeText={setTitle}
@@ -167,6 +200,7 @@ export const AddAClassified: FC<AppStackScreenProps<"AddAClassified">> = functio
 
         <TextInput
           value={price}
+          disabled={buttonLoading}
           onChangeText={setPrice}
           style={$inputContainer}
           mode="outlined"
@@ -178,6 +212,7 @@ export const AddAClassified: FC<AppStackScreenProps<"AddAClassified">> = functio
         />
 
         <TextInput
+          disabled={buttonLoading}
           value={description}
           onChangeText={setDescription}
           style={[$inputContainer, $descriptionContainer]}
@@ -193,6 +228,7 @@ export const AddAClassified: FC<AppStackScreenProps<"AddAClassified">> = functio
         />
 
         <Dropdown
+          disable={buttonLoading}
           data={data}
           maxHeight={300}
           // eslint-disable-next-line react-native/no-inline-styles
@@ -204,23 +240,30 @@ export const AddAClassified: FC<AppStackScreenProps<"AddAClassified">> = functio
           selectedTextStyle={{ color: colors.palette.neutral900 }}
           placeholder={"Condition"}
           searchPlaceholder="Search..."
-          value={value}
+          value={condition}
           onFocus={() => setIsFocus(true)}
           onBlur={() => setIsFocus(false)}
           onChange={(item) => {
-            setValue(item.value)
+            setCondition(item.value)
             setIsFocus(false)
           }}
           renderLeftIcon={() => <Icon icon="arrowDown" />}
         />
 
-        <MediaHandlerComponent selectedMedia={selectedMedia} setSelectedMedia={setSelectedMedia} />
+        <MediaHandlerComponent
+          selectedMedia={selectedMedia}
+          setSelectedMedia={setSelectedMedia}
+          disabled={buttonLoading}
+        />
 
         <Pressable onPress={() => setTNCAccepted(!TNCAccepted)} style={$flexRow}>
           <Toggle onPress={() => setTNCAccepted(!TNCAccepted)} value={TNCAccepted} />
           <TouchableOpacity onPress={() => setTNCAccepted(!TNCAccepted)} style={$flexRow}>
             <Text style={$tnc} tx="addAVideo.iAgree" weight="medium" />
-            <TouchableOpacity onPress={() => navigation.navigate("Legal")} style={{ marginLeft: -spacing.tiny }}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("Legal")}
+              style={{ marginLeft: -spacing.tiny }}
+            >
               <Text
                 color={colors.palette.primary100}
                 style={$tnc}
@@ -244,7 +287,11 @@ export const AddAClassified: FC<AppStackScreenProps<"AddAClassified">> = functio
             />
           )}
         >
-          <Text tx="common.add" style={$submitText} weight="semiBold" />
+          <Text
+            tx={isModeUpdate ? "common.update" : "common.add"}
+            style={$submitText}
+            weight="semiBold"
+          />
         </Button>
       </ScrollView>
     </Screen>

@@ -1,13 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react"
-import {
-  Image,
-  TextInput,
-  TextStyle,
-  View,
-  ViewStyle,
-  Pressable,
-  ActivityIndicator,
-} from "react-native"
+import { Image, TextStyle, View, ViewStyle, Pressable, ActivityIndicator } from "react-native"
 import { Icon, iconRegistry, Text, Button, TagInput, TOnPost } from "../../../components"
 import { colors, spacing } from "../../../theme"
 import { useStores } from "../../../models"
@@ -20,8 +12,6 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated"
 import { observer } from "mobx-react-lite"
-import { NavigationProp, useNavigation } from "@react-navigation/native"
-import { HomeTabParamList } from "../../../tabs"
 import DraggableFlatList, { ScaleDecorator } from "react-native-draggable-flatlist"
 import { $contentCenter, $flexRow } from "../../styles"
 import { ResizeMode, Video } from "expo-av"
@@ -30,41 +20,32 @@ import LinearGradient from "react-native-linear-gradient"
 
 export const CreatePost = observer(function CreatePost({
   progress,
-  focused,
-  setLoading,
-  loading,
-  hideModal,
   selectedImages,
   setSelectedImages,
   onPost,
+  defaultPost,
+  inputFocused = false,
 }: {
-  focused: boolean
-  loading: boolean
+  inputFocused?: boolean
   progress: SharedValue<number>
-  setLoading: (b: boolean) => void
-  hideModal: () => void
   onPost: TOnPost
   selectedImages: Array<any>
   setSelectedImages: (s: Array<any>) => void
+  defaultPost?: any
+  shouldHidePostSubmit?: boolean
 }) {
   const { userStore } = useStores()
-  const [postContent, setPostContent] = useState<string>("")
-  const inputRef = useRef<TextInput>()
-  const navigation = useNavigation<NavigationProp<HomeTabParamList>>()
+  const [postContent, setPostContent] = useState<string>(defaultPost ? defaultPost.Discription : "")
 
-  useEffect(() => {
-    focused && inputRef.current.focus()
-  }, [focused])
+  const [loading, setLoading] = useState<boolean>(false)
 
   const handlePost = async () => {
     if (postContent?.trim()?.length === 0 && selectedImages?.length === 0) return
     setLoading(true)
-    onPost({ files: selectedImages, postContent })
+    onPost({ files: selectedImages, postContent, postId: defaultPost?._id })
     progress.value = withTiming(0, { duration: 400 })
     setSelectedImages([])
     setPostContent("")
-    inputRef.current.blur()
-    hideModal()
     setLoading(false)
   }
 
@@ -114,7 +95,7 @@ export const CreatePost = observer(function CreatePost({
     }
   }
 
-  const animatedPreviewContainer = (item) =>
+  const animatedPreviewContainer = () =>
     useAnimatedStyle(() => {
       const height = interpolate(progress.value, [0.5, 1], [0, 80])
       const opacity = interpolate(progress.value, [0.5, 1], [0, 1])
@@ -122,7 +103,7 @@ export const CreatePost = observer(function CreatePost({
 
       return {
         height,
-        width: (80 * item?.width) / item?.height,
+        width: 80,
         marginHorizontal: 20,
         justifyContent: "center",
         opacity,
@@ -163,7 +144,6 @@ export const CreatePost = observer(function CreatePost({
       height,
       width: "100%",
       justifyContent: "center",
-      // backgroundColor: colors.palette.neutral100,
     }
   })
 
@@ -173,17 +153,14 @@ export const CreatePost = observer(function CreatePost({
         <FastImage source={{ uri: userStore?.picture }} style={$picture} resizeMode="cover" />
         <View style={$contentContainer}>
           <TagInput
+            autoFocus={inputFocused}
             value={postContent}
             onChange={(e) => {
               if (!loading) {
                 setPostContent(e)
               }
             }}
-            inputRef={inputRef}
             onFocus={onFocus}
-            onBlur={() => {
-              if (focused) navigation.setParams({ focused: false })
-            }}
             containerStyle={$inputContainer}
             style={$inputText}
             multiline
@@ -217,11 +194,10 @@ export const CreatePost = observer(function CreatePost({
                 <Pressable
                   onLongPress={drag}
                   disabled={isActive}
-                  // onPress={() =>  }
                   // eslint-disable-next-line react-native/no-inline-styles
                   style={{ width: 120, marginVertical: spacing.extraSmall }}
                 >
-                  <Animated.View style={animatedPreviewContainer(item)}>
+                  <Animated.View style={animatedPreviewContainer()}>
                     {isVideo ? (
                       <ShimmerPlaceholder
                         shimmerStyle={previewImage(item)}
@@ -284,14 +260,6 @@ export const CreatePost = observer(function CreatePost({
           <AnimatedPressable disabled={loading} onPress={handlePost} style={animatedPostButton}>
             {loading ? (
               <View style={$flexRow}>
-                {/* {selectedImages?.length > 0 && (
-                  <Text
-                    text={uploadProgress}
-                    color={colors.palette.neutral100}
-                    weight="medium"
-                    size="xs"
-                  />
-                )} */}
                 <ActivityIndicator
                   color={colors.palette.neutral100}
                   style={$loadingIndicator}
@@ -299,7 +267,11 @@ export const CreatePost = observer(function CreatePost({
                 />
               </View>
             ) : (
-              <Text text="Post" style={$postTextStyle} weight="semiBold" />
+              <Text
+                text={defaultPost ? "Update" : "Post"}
+                style={$postTextStyle}
+                weight="semiBold"
+              />
             )}
           </AnimatedPressable>
         </View>

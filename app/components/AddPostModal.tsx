@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react"
 import { TouchableOpacity, View, ViewStyle } from "react-native"
 import { colors, spacing } from "../theme"
-import { Text, Button, BottomModal, Icon, $baseTextStyle } from "."
+import { Text, Button, BottomModal, Icon, $baseTextStyle, TOnPost, TOnTopic } from "."
 
 import Animated, {
   interpolate,
@@ -10,31 +10,28 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated"
+
 import { $contentCenter, $flexRow } from "../screens/styles"
 import { CreatePost } from "../screens/Feed/partials"
-
 import { CreateTopic } from "../screens/TopicsFeed/CreateTopic"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { AppStackParamList } from "../navigators"
-import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { useHooks } from "../screens/hooks"
 import { getTaggedIds } from "../utils/helpers"
 import Toast from "react-native-toast-message"
 import ShimmerPlaceholder from "react-native-shimmer-placeholder"
 import LinearGradient from "react-native-linear-gradient"
 
-export type TOnPost = ({ postContent, files }: { postContent: string; files: any[] }) => void
-
 const AnimatedShimmer = Animated.createAnimatedComponent(ShimmerPlaceholder)
 
 export const AddPostModal = () => {
   const [uploading, setUploding] = useState(false)
   const [isVisible, setVisible] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const { bottom } = useSafeAreaInsets()
-  const { createPost } = useHooks()
+  const { createPost, createTopic } = useHooks()
 
   const uploadProgress = useSharedValue(0)
+
+  const hideModal = () => setVisible(false)
 
   const $uploadShimmerStyle = useAnimatedStyle(() => {
     return {
@@ -51,6 +48,7 @@ export const AddPostModal = () => {
   )
 
   const onPost = async ({ postContent, files }) => {
+    hideModal()
     setUploding(true)
     try {
       await createPost({
@@ -65,6 +63,27 @@ export const AddPostModal = () => {
       setTimeout(() => {
         setUploding(false)
         Toast.show({ text1: "Posted Successfully !" })
+      }, 500)
+    }
+  }
+
+  const onTopic = async ({ topicContent, file, title }: Parameters<TOnTopic>[0]) => {
+    hideModal()
+    setUploding(true)
+    try {
+      await createTopic({
+        content: topicContent,
+        attachment: file,
+        title,
+        tagTopicUser: [],
+        setUploadProgress,
+      })
+    } catch (error) {
+      console.log("Create Topic", error)
+    } finally {
+      setTimeout(() => {
+        setUploding(false)
+        Toast.show({ text1: "Discussion Started Successfully !" })
       }, 500)
     }
   }
@@ -96,6 +115,7 @@ export const AddPostModal = () => {
               shimmerStyle={{ innerHeight: "100%", width: "100%" }}
               style={$uploadShimmerStyle}
               shimmerColors={[colors.palette.primary100, colors.palette.primary200]}
+              location={[0, 1]}
               visible={false}
             ></AnimatedShimmer>
           </View>
@@ -110,21 +130,14 @@ export const AddPostModal = () => {
       </Button>
 
       <BottomModal
-        disableUnMount={loading}
         avoidKeyboard
         keyboardOffset={-90}
         isVisible={isVisible}
         setVisible={setVisible}
         backgroundColor={colors.palette.neutral100}
-        // swipeDown={false}
         propagateSwipe
       >
-        <BottomModalContent
-          onPost={onPost}
-          hide={() => setVisible(false)}
-          loading={loading}
-          setLoading={setLoading}
-        />
+        <BottomModalContent onPost={onPost} onTopic={onTopic} hide={hideModal} />
       </BottomModal>
     </View>
   )
@@ -134,14 +147,12 @@ const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity)
 
 export const BottomModalContent = ({
   hide,
-  setLoading,
-  loading,
   onPost,
+  onTopic,
 }: {
   hide: () => void
-  setLoading: (b: boolean) => void
-  loading: boolean
   onPost: TOnPost
+  onTopic: TOnTopic
 }) => {
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
   const sharedValPost = useSharedValue(0)
@@ -153,11 +164,11 @@ export const BottomModalContent = ({
   const [selectedPostImages, setSelectedPostImages] = useState<Array<any>>([])
 
   const expandPost = () => {
-    !loading && setExpanded("post")
+    setExpanded("post")
   }
 
   const expandDiscuss = () => {
-    !loading && setExpanded("discuss")
+    setExpanded("discuss")
   }
 
   useEffect(() => {
@@ -249,13 +260,9 @@ export const BottomModalContent = ({
         <Animated.View style={[$absoluteWidthFull, $animatedCreatePostContainer]}>
           <CreatePost
             onPost={onPost}
-            hideModal={hide}
-            loading={loading}
             selectedImages={selectedPostImages}
             setSelectedImages={setSelectedPostImages}
-            focused={false}
             progress={sharedValPost}
-            setLoading={setLoading}
           />
         </Animated.View>
       </AnimatedTouchable>
@@ -280,10 +287,8 @@ export const BottomModalContent = ({
         </Animated.View>
         <Animated.View style={[$absoluteWidthFull, $animatedCreateTopicContainer]}>
           <CreateTopic
-            hideModal={hide}
-            loading={loading}
+            onTopic={onTopic}
             progress={sharedValDiscuss}
-            setLoading={setLoading}
             selectedImage={discussionImage}
             setSelectedImage={setDiscussionImage}
           />
@@ -294,10 +299,8 @@ export const BottomModalContent = ({
       <TouchableOpacity
         style={[$flexRow, $button, $contentCenter]}
         onPress={() => {
-          if (!loading) {
-            hide()
-            setTimeout(() => navigation.navigate("AddAClassified"), 200)
-          }
+          hide()
+          setTimeout(() => navigation.navigate("AddAClassified"), 200)
         }}
       >
         <Icon icon="classifieds" size={18} containerStyle={{ marginRight: spacing.extraSmall }} />
@@ -307,7 +310,7 @@ export const BottomModalContent = ({
       {/* CANCEL Button */}
       <TouchableOpacity
         onPress={() => {
-          !loading && hide()
+          hide()
         }}
         style={[
           $button,
@@ -328,7 +331,7 @@ const $absoluteWidthFull: ViewStyle = { width: "100%", position: "absolute" }
 
 const $addButton: ViewStyle = {
   margin: 12,
-top:6,
+  top: 6,
   width: 56,
   height: 56,
   borderRadius: 30,

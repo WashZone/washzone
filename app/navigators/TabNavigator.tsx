@@ -1,6 +1,6 @@
 import { BottomTabScreenProps, createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import { CompositeScreenProps, NavigationProp, useNavigation } from "@react-navigation/native"
-import React, { useCallback, useEffect, useState } from "react"
+import React, {  useEffect } from "react"
 import { ImageStyle, TextStyle, View, ViewStyle } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { AddPostModal, Icon } from "../components"
@@ -17,10 +17,7 @@ import {
 import { colors, spacing, typography } from "../theme"
 import { AppStackParamList, AppStackScreenProps } from "./AppNavigator"
 import * as Linking from "expo-linking"
-import { useSharedValue } from "react-native-reanimated"
-import { useHooks } from "../screens/hooks"
-import { getTaggedIds } from "../utils/helpers"
-import Toast from "react-native-toast-message"
+
 
 export type TabParamList = {
   Home: undefined

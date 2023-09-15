@@ -24,6 +24,9 @@ export const TopicsStoreModel = types
     addToTopics(topics: any) {
       self.topics = [...topics, ...self.topics]
     },
+    removeFromTopics(topicId: any) {
+      self.topics = self.topics.filter((c) => c._id !== topicId)
+    },
     clear() {
       self.topics = []
     },

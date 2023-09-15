@@ -1,6 +1,7 @@
 import { Alert } from "react-native"
 import { RNS3 } from "react-native-upload-aws-s3"
 import { createThumbnail } from "react-native-create-thumbnail"
+import { isRemoteUrl } from "../helpers"
 
 // TO be saved in secure storage
 const options = {
@@ -37,6 +38,13 @@ export async function uploadFile(inFile: any) {
   const uploads: { type: string; url?: string; thumbnailUrl?: string } = { type: file.type }
 
   if (isVideo) {
+    if (isRemoteUrl(file.uri) && inFile.thumbnailUrl) {
+      return {
+        type: file.type,
+        url: file.uri,
+        thumbnailUrl: inFile.thumbnailUrl,
+      }
+    }
     try {
       console.log("file.uri", file.uri)
       const thumbnail = await generateThumbnail(file.uri)
@@ -57,6 +65,13 @@ export async function uploadFile(inFile: any) {
       }
     } catch (err) {
       Alert.alert("Failed to process video.")
+    }
+  } else {
+    if (isRemoteUrl(file.uri)) {
+      return {
+        type: file.type,
+        url: file.uri,
+      }
     }
   }
 

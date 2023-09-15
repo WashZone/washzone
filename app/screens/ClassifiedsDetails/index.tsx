@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from "react"
+import React, { FC, useCallback, useEffect, useState } from "react"
 import {
   View,
   Pressable,
@@ -12,25 +12,25 @@ import {
 
 import { observer } from "mobx-react-lite"
 import FastImage, { ImageStyle } from "react-native-fast-image"
-import { NavigationProp, useNavigation } from "@react-navigation/native"
+import { NavigationProp, useFocusEffect, useNavigation } from "@react-navigation/native"
 import { ActivityIndicator } from "react-native-paper"
 import { Rating } from "react-native-ratings"
 import Toast from "react-native-toast-message"
 import ImageView from "react-native-image-viewing"
-
 
 import { useHooks } from "../hooks"
 import { useStores } from "../../models"
 import { RateUserModal } from "./RateUser"
 import { SendOfferModal } from "./SendOfferModal"
 import Loading from "../../components/Loading"
-import { Text, IconTypes, Icon, } from "../../components"
+import { Text, IconTypes, Icon, $verticalAbsoluteTop, Menu, ShimmingImage } from "../../components"
 import { ClassifiedsTabProps, HomeTabParamList } from "../../tabs"
 import { colors, spacing } from "../../theme"
 import { formatName } from "../../utils/formatName"
 import * as Haptics from "expo-haptics"
 import { showAlertYesNo } from "../../utils/helpers"
 import { messageMetadataType } from "../../utils"
+import { AppStackParamList } from "../../navigators"
 
 interface ActionProps {
   icon: IconTypes
@@ -200,28 +200,45 @@ const BottomActions = ({ classified }: { classified: any }) => {
 
 export const ClassifiedsDetails: FC<ClassifiedsTabProps<"ClassifiedsDetails">> = observer(
   function ClassifiedsDetails(props) {
-    const classified = props.route.params.classified
+    /* Assign create to Mode when not provided */
+    const { classified } = props.route.params
     const navigation = useNavigation()
     const [classifiedDetails, setClassifiedDetails] = useState<any>(classified)
+    const [optionsVisible, setOptionsVisible] = useState<boolean>(false)
     const [loading, setLoading] = useState<boolean>(typeof classified === "string")
     const [isImageViewVisible, setImageViewVisible] = useState<boolean>(false)
     const {
-      api: { mutateFlagsOnFeed, mutateGetClassifiedById },
+      api: { mutateFlagsOnFeed, mutateGetClassifiedById, mutateDeleteDetailClassifiedId },
       userStore: { _id },
+      classfieds: { removeFromClassfieds },
     } = useStores()
-
     const publisher = classifiedDetails?.UserId || classifiedDetails?.userId
-    const handleStringTypeClassified = async () => {
+    const isAuthorUser = publisher?._id === _id
+    const navigationApp = useNavigation<NavigationProp<AppStackParamList>>()
+
+    const syncClassfied = async (id: string) => {
       setLoading(true)
+      const res = await mutateGetClassifiedById({ classifiedId: id })
+      console.log("Classified : ", res)
+      setClassifiedDetails(res.getClassifiedById?.length === 1 && res.getClassifiedById[0])
+      setLoading(false)
+    }
+
+    const handleStringTypeClassified = async () => {
       if (typeof classified === "string") {
-        const res = await mutateGetClassifiedById({ classifiedId: classified })
-        setClassifiedDetails(res.getClassifiedById?.length === 1 && res.getClassifiedById[0])
-        setLoading(false)
+        await syncClassfied(classified)
       } else {
+        setLoading(true)
         setClassifiedDetails(classified)
         setLoading(false)
       }
     }
+
+    useFocusEffect(
+      useCallback(() => {
+        classifiedDetails?._id && syncClassfied(classifiedDetails?._id)
+      }, [classifiedDetails?._id]),
+    )
 
     useEffect(() => {
       handleStringTypeClassified()
@@ -246,7 +263,28 @@ export const ClassifiedsDetails: FC<ClassifiedsTabProps<"ClassifiedsDetails">> =
           }
         },
       })
+    }
 
+    const onEdit = () => {
+      setOptionsVisible(false)
+      navigationApp.navigate("AddAClassified", { classifiedToEdit: classifiedDetails })
+    }
+
+    const onDelete = () => {
+      setOptionsVisible(false)
+      showAlertYesNo({
+        message: "Are you sure you want to delete this classified?",
+        description: "This action cannot be undone.",
+        onYesPress: async () => {
+          const classifiedId = classifiedDetails?._id
+          const res = await mutateDeleteDetailClassifiedId({ classifiedId }, () => {
+            refreshParent && refreshParent()
+            removeFromClassfieds(classifiedId)
+            navigation.goBack()
+          })
+          console.log("Classfiied Delete", res)
+        },
+      })
     }
 
     if (loading) {
@@ -257,10 +295,10 @@ export const ClassifiedsDetails: FC<ClassifiedsTabProps<"ClassifiedsDetails">> =
       <View style={[$flex1, { backgroundColor: colors.palette.neutral100 }]}>
         <ScrollView style={$flex1}>
           <TouchableOpacity onPress={() => setImageViewVisible(true)}>
-            <FastImage
+            <ShimmingImage
+              shimmerProps={{ shimmerStyle: $posterImage }}
               source={{ uri: classifiedDetails?.attachmentUrl }}
               style={$posterImage}
-            // resizeMode="contain"
             />
           </TouchableOpacity>
           <PublisherDetails
@@ -268,6 +306,17 @@ export const ClassifiedsDetails: FC<ClassifiedsTabProps<"ClassifiedsDetails">> =
             publisher={classifiedDetails?.UserId || classifiedDetails?.userId}
           />
           <MoreDetails classified={classifiedDetails} flagClassfied={flagClassfied} />
+          {isAuthorUser && (
+            <Menu
+              visible={optionsVisible}
+              setVisible={setOptionsVisible}
+              data={[
+                { title: "Edit", onPress: onEdit, icon: "note-edit" },
+                { title: "Delete", onPress: onDelete, icon: "delete" },
+              ]}
+              containerStyle={$verticalAbsoluteTop}
+            />
+          )}
         </ScrollView>
         <Pressable style={$backContainer} onPress={() => navigation.goBack()}>
           <Icon icon="back" color={colors.palette.primary100} />

@@ -29,6 +29,7 @@ import Toast, { BaseToast } from "react-native-toast-message"
 import { notificationHandler } from "./utils"
 import RNCallKeep from "react-native-callkeep"
 import FastImage from "react-native-fast-image"
+import { Provider as PaperProvider } from "react-native-paper"
 import { $contentCenter } from "./screens/styles"
 
 const options = {
@@ -135,12 +136,14 @@ function App(props: AppProps) {
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
       <ErrorBoundary catchErrors={Config.catchErrors}>
-        <AppNavigator
-          linking={linking}
-          initialState={initialNavigationState}
-          onStateChange={onNavigationStateChange}
-        />
-        <Toast config={toastConfig} />
+        <PaperProvider>
+          <AppNavigator
+            linking={linking}
+            initialState={initialNavigationState}
+            onStateChange={onNavigationStateChange}
+          />
+          <Toast config={toastConfig} />
+        </PaperProvider>
       </ErrorBoundary>
     </SafeAreaProvider>
   )
