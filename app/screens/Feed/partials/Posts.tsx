@@ -24,14 +24,14 @@ import FastImage, { ImageStyle } from "react-native-fast-image"
 import { formatName } from "../../../utils/formatName"
 import { fromNow } from "../../../utils/agoFromNow"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
-import { HomeTabParamList } from "../../../tabs"
+import { Change, HomeTabParamList } from "../../../tabs"
 import { observer } from "mobx-react-lite"
 import { useHooks } from "../../hooks"
 import { useStores } from "../../../models"
 import { Stories } from "./Following"
 import { $contentCenter, $flex1, $flexRow } from "../../styles"
 import ShimmerPlaceHolder from "react-native-shimmer-placeholder"
-import { getIconForInteraction, showAlertYesNo } from "../../../utils/helpers"
+import { getIconForInteraction, handlingDeleteOnProfile, showAlertYesNo } from "../../../utils/helpers"
 import * as Haptics from "expo-haptics"
 import Carousel, { Pagination } from "react-native-snap-carousel"
 
@@ -42,6 +42,7 @@ import { ImageViewConfigType } from ".."
 import LinearGradient from "react-native-linear-gradient"
 
 import { AVPlaybackStatus, Video } from "expo-av"
+import { navigationRef } from "../../../navigators"
 
 export interface PostComponentProps {
   post: any
@@ -152,12 +153,14 @@ const Actions = observer(function ActionButtons({ item }: { item: any }) {
               size={20}
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
+                const thumbnailUrl = item.attachmentUrl[0].thumbnailUrl
+                const url = item.attachmentUrl[0].url
                 share({
                   message: item?.content || "",
                   title: "",
                   url: `washzone://shared-post/${item?._id}`,
                   type: messageMetadataType.sharedPost,
-                  attachment: item?.attachmentUrl?.[0] || "",
+                  attachment: thumbnailUrl ? thumbnailUrl : url || "",
                 })
               }}
             />
@@ -297,6 +300,7 @@ export const PostComponent = ({
     feedStore: { removeFromHomeFeed },
     edit: { editPost },
   } = useStores()
+
   const isAuthorUser = post?.userId?._id === userStore._id
   const SCREEN_WIDTH = Dimensions.get("screen").width
 
@@ -352,7 +356,8 @@ export const PostComponent = ({
     setTimeout(() => editPost(post), 0)
   }
 
-  const onDelete = () => {
+
+  const onDelete = async () => {
     setOptionsVisible(false)
     showAlertYesNo({
       message: "Are you sure you want to delete this post?",
@@ -360,6 +365,7 @@ export const PostComponent = ({
       onYesPress: async () => {
         const postId = post?._id
         removeFromHomeFeed(postId)
+        handlingDeleteOnProfile('post', postId)
         await mutateDeleteDetailHomePageId({ homePageId: postId }, refreshParent && refreshParent)
       },
     })
@@ -367,7 +373,7 @@ export const PostComponent = ({
 
   return (
     <>
-      <View style={$postContainer} onLayout={onLayout}>
+      <View key={post?._id} style={$postContainer} onLayout={onLayout}>
         <Pressable onPress={onContainerPress} style={$publisherInfoContainer}>
           <TouchableOpacity onPress={() => navigation.navigate("Profile", { user: post?.userId })}>
             <FastImage

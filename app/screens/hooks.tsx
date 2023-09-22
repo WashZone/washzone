@@ -251,10 +251,10 @@ export function useHooks() {
 
     const imageUrl = attachment?.uri
       ? await uploadToS3({
-          uri: attachment?.uri,
-          type: attachment?.type,
-          name: attachment?.fileName,
-        })
+        uri: attachment?.uri,
+        type: attachment?.type,
+        name: attachment?.fileName,
+      })
       : ""
     updatedTopic.attachmentUrl = imageUrl
     updatedTopic.attachmentType = attachment?.type
@@ -281,7 +281,7 @@ export function useHooks() {
       const res = await uploadFile(attachments[i])
       attachmentUrl.push(res)
     }
-   console.log('attachmentUrl',attachmentUrl)
+
     const res = await mutateUpdateUserHomePages({
       usersHomePagesDetail: updatedPost,
       homePageId,
@@ -357,10 +357,10 @@ export function useHooks() {
     setUploadProgress(0.1)
     const imageUrl = attachment?.uri
       ? await uploadToS3({
-          uri: attachment?.uri,
-          type: attachment?.type,
-          name: attachment?.fileName,
-        })
+        uri: attachment?.uri,
+        type: attachment?.type,
+        name: attachment?.fileName,
+      })
       : undefined
     setUploadProgress(0.7)
     try {
@@ -490,18 +490,18 @@ export function useHooks() {
         typeof attachment === "string"
           ? attachment
           : await uploadToS3({
-              uri: attachment?.uri,
-              type: attachment?.type,
-              name: attachment?.fileName,
-            })
+            uri: attachment?.uri,
+            type: attachment?.type,
+            name: attachment?.fileName,
+          })
       const bannerUrl =
         typeof banner === "string"
           ? banner
           : await uploadToS3({
-              uri: banner?.uri,
-              type: banner?.type,
-              name: banner?.fileName,
-            })
+            uri: banner?.uri,
+            type: banner?.type,
+            name: banner?.fileName,
+          })
       await mutateUpdateUser({
         user: {
           first_name: firstName,
@@ -661,7 +661,9 @@ export function useHooks() {
       userId,
       pageNumber: 1,
       callerId: userStore._id,
-    })
+    }, 
+    { fetchPolicy: 'network-only' }
+    )
 
     return res.getTopicByUsersId?.data
   }
@@ -762,7 +764,7 @@ export function useHooks() {
         status: inputInteraction,
       })
       updateVideoInteractionLocally(videoId, inputInteraction, newCount)
-    } catch (err) {}
+    } catch (err) { }
     return { interaction: inputInteraction, ...newCount }
   }
 
@@ -791,7 +793,7 @@ export function useHooks() {
         status: inputInteraction,
       })
       updateHomePostInteractionLocally(postId, inputInteraction, newCount)
-    } catch (err) {}
+    } catch (err) { }
     return { interaction: inputInteraction, ...newCount }
   }
 
@@ -820,7 +822,7 @@ export function useHooks() {
         userId: userStore._id,
         status: inputInteraction,
       })
-    } catch (err) {}
+    } catch (err) { }
     return { interaction: inputInteraction, ...newCount }
   }
 
@@ -926,7 +928,7 @@ export function useHooks() {
         userId: userStore._id,
         deviceId,
       })
-    } catch (err) {}
+    } catch (err) { }
   }
 
   const isUserBlocked = async () => {
@@ -940,7 +942,7 @@ export function useHooks() {
       if (res.getBlockedUser?.status) {
         setAuthToken(undefined)
       }
-    } catch (err) {}
+    } catch (err) { }
   }
 
   const rateUser = async (userId: string, rating: number) => {
@@ -951,7 +953,7 @@ export function useHooks() {
           ratingByUserId: userStore._id,
           ratingStar: rating,
         })
-      } catch (err) {}
+      } catch (err) { }
       const updatedRes = await queryGetratingOnUserId({ userId }, { fetchPolicy: "no-cache" })
       const avg =
         updatedRes?.getratingOnUserId?.data?.length > 0
@@ -1121,7 +1123,7 @@ export function useHooks() {
           data: "",
         },
       })
-    } catch (err) {}
+    } catch (err) { }
   }
 
   const shareToFriend = async (roomId: string, shareOptions: any, receiverId: string) => {
@@ -1153,7 +1155,7 @@ export function useHooks() {
           data: JSON.stringify(shareOptions),
         },
       })
-    } catch (err) {}
+    } catch (err) { }
   }
 
   const sendCallOffer = async (
@@ -1179,7 +1181,7 @@ export function useHooks() {
           data: JSON.stringify(offer),
         },
       })
-    } catch (err) {}
+    } catch (err) { }
   }
 
   const acceptCallOffer = async (roomId: string, receiverId: string, answer: string) => {
@@ -1197,7 +1199,7 @@ export function useHooks() {
           data: JSON.stringify(answer),
         },
       })
-    } catch (err) {}
+    } catch (err) { }
   }
 
   const hangUpCall = async (roomId: string, receiverId: string) => {
@@ -1215,7 +1217,7 @@ export function useHooks() {
           data: "",
         },
       })
-    } catch (err) {}
+    } catch (err) { }
   }
 
   const getUserById = async (userId: string) => {
@@ -1241,7 +1243,7 @@ export function useHooks() {
         })
 
         return res.getroomBymembers?.data[0]?._id
-      } catch (err) {}
+      } catch (err) { }
     }
   }
 
@@ -1266,7 +1268,7 @@ export function useHooks() {
           data: JSON.stringify(classifiedData),
         },
       })
-    } catch (err) {}
+    } catch (err) { }
   }
 
   const deleteChatRoom = async (roomId: string) => {
@@ -1275,7 +1277,7 @@ export function useHooks() {
         roomId,
       })
       syncAllChats()
-    } catch (err) {}
+    } catch (err) { }
   }
 
   const updateNotificationToken = async () => {

@@ -507,7 +507,8 @@ const ProfileHeader = ({ user, isUser, onMessage, onProfileImagePress, onBannerP
 }
 
 export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ route }) {
-  const { user, header } = route.params
+  const { user, header,change, } = route.params
+
   const [galleryItemsTopics, setGalleryItemsTopics] = useState([])
   const [galleryItemsClassifieds, setGalleryItemsClassifieds] = useState([])
   const [galleryItemsHomePosts, setGalleryItemsHomePosts] = useState([])
@@ -555,9 +556,9 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
   const renderScene = ({ route }) => {
     switch (route.key) {
       case "posts":
-        return <HomePostsTabScreen userId={user?._id} addToGallery={setGalleryItemsHomePosts} />
+        return <HomePostsTabScreen userId={user?._id} addToGallery={setGalleryItemsHomePosts} change={change}  />
       case "topic":
-        return <TopicsTabScreen userId={user?._id} addToGallery={setGalleryItemsTopics} />
+        return <TopicsTabScreen userId={user?._id} addToGallery={setGalleryItemsTopics}  change={change} />
       case "classified":
         return <ClassifiedsTabScreen userId={user?._id} addToGallery={setGalleryItemsClassifieds} />
       case "gallery":

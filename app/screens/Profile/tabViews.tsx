@@ -9,12 +9,13 @@ import { PostComponent } from "../Feed/partials"
 import Loading from "../../components/Loading"
 import { VideoBlockFullWidth } from "../Playlist"
 import ImageView from "react-native-image-viewing"
-
 import { EmptyTabState } from "./emptyTabComponent"
 import ShimmerPlaceholder from "react-native-shimmer-placeholder"
 import LinearGradient from "react-native-linear-gradient"
 import FastImage, { ImageStyle } from "react-native-fast-image"
-import { getImageUrlsFromPost } from "../../utils/helpers"
+import { getImageUrlsFromPost, updateModules } from "../../utils/helpers"
+import { observer } from "mobx-react-lite"
+
 const maxGalleryItemDimension = Dimensions.get("window").width / 2 - 30
 
 const GalleryItem = ({ uri, onPress }) => {
@@ -112,18 +113,19 @@ export const GalleryTabView = ({ galleryItems }: { galleryItems: Array<any> }) =
   )
 }
 
-export const HomePostsTabScreen = ({
+export const HomePostsTabScreen = observer(({
   userId,
   addToGallery,
+  change
 }: {
   userId: string
+  change: any
   addToGallery: (toAdd: Array<any>) => void
 }) => {
   const [loading, setLoading] = useState(true)
 
   const [userPosts, setUserPosts] = React.useState([])
   const { getUsersHomePosts } = useHooks()
-
   const fetchUserPosts = async () => {
     const res = await getUsersHomePosts(userId)
     setUserPosts(res)
@@ -145,10 +147,15 @@ export const HomePostsTabScreen = ({
   })
 
   useEffect(() => {
+    updateModules(userPosts, change, setUserPosts)
+  }, [change])
+
+  useEffect(() => {
     fetchUserPosts()
   }, [userId])
 
   if (loading) return <Loading />
+
 
   return (
     <>
@@ -178,12 +185,14 @@ export const HomePostsTabScreen = ({
       />
     </>
   )
-}
-export const TopicsTabScreen = ({
+})
+export const TopicsTabScreen = observer(({
   userId,
   addToGallery,
+  change
 }: {
   userId: string
+  change: any
   addToGallery: (toAdd: Array<any>) => void
 }) => {
   const [loading, setLoading] = useState(true)
@@ -194,10 +203,9 @@ export const TopicsTabScreen = ({
   const fetchUserTopics = async () => {
     const res = await getUserTopics(userId)
     setUserTopics(res)
-
-    // eslint-disable-next-line array-callback-return
     const galleryImages = res.map((i, index) => {
       if (i.attachmentUrl) return { uri: i?.attachmentUrl || "", id: "topic" + index }
+      return undefined
     })
     const filteredImages = galleryImages.filter((i) => i?.uri)
     addToGallery(filteredImages)
@@ -208,6 +216,10 @@ export const TopicsTabScreen = ({
     fetchUserTopics()
   }, [userId])
 
+  useEffect(() => {
+    updateModules(userTopics, change, setUserTopics)
+  }, [change])
+  
   if (loading) {
     return <Loading />
   }
@@ -223,7 +235,7 @@ export const TopicsTabScreen = ({
       renderItem={({ item, index }) => <TopicComponent topic={item} index={index} />}
     />
   )
-}
+})
 
 export const ClassifiedsTabScreen = ({
   userId,
@@ -324,8 +336,6 @@ export const VideosTabScreen = ({
 }
 
 const $videoBlockContainer: ViewStyle = {
-  // marginTop: spacing.medium,
-  // alignSelf: "center",
   zIndex: 100,
 }
 

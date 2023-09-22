@@ -49,7 +49,6 @@ const options = {
 RNCallKeep.setup(options)
 // RNCallKeep.setAvailable(true)
 
-// configureNotifications()
 // Set up Reactotron, which is a free desktop app for inspecting and debugging
 // React Native apps. Learn more here: https://github.com/infinitered/reactotron
 setupReactotron({

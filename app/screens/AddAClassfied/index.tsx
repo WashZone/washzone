@@ -104,7 +104,7 @@ export const AddAClassified: FC<AppStackScreenProps<"AddAClassified">> = functio
           uri: detailsToBeUpdated.attachmentUrl,
           type: detailsToBeUpdated.attachmentType,
         }
-      : {},
+      : ""
   )
   const [isFocus, setIsFocus] = useState<boolean>(false)
   const [TNCAccepted, setTNCAccepted] = useState<boolean>(!!detailsToBeUpdated)

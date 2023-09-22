@@ -2,6 +2,8 @@ import { Alert } from "react-native"
 import { userTagRegEx } from "../components"
 import { Interaction } from "./enums"
 import { InputattachmentUrls } from "../models/api/RootStore.base"
+import { Change } from "../tabs"
+import { navigationRef } from "../navigators"
 
 export const getIconForInteraction = (i: Interaction, buttonType: "liked" | "disliked") => {
   if (buttonType === "liked") {
@@ -125,4 +127,44 @@ export const getImageUrlsFromPost = (attachments: InputattachmentUrls[]) => {
       return i.url
     }
   })
+}
+
+export const updateModules = (prev: any[], change: Change, callback?: (a: any[]) => void) => {
+  /* update the previous modules as per the change passed */
+  if (change && prev.length > 0) {
+    const { data, action, moduleId } = change
+    let updated = []
+
+    if (action === "delete") {
+      updated = prev.filter((item) => item._id !== moduleId)
+    } else {
+      updated = prev.map((item) => {
+        if (item._id === change.data._id) {
+          return {
+            ...item,
+            ...data,
+          }
+        }
+        return item
+      })
+    }
+    callback && callback(updated)
+    
+    callback?.(updated)
+    return updated
+  }
+  return prev
+}
+
+export const handlingDeleteOnProfile = (moduleType: "post" | "topic", moduleId: string) => {
+  const targetRoute = "Profile"
+  const currentRoute = navigationRef.current?.getCurrentRoute()?.name
+  if (currentRoute === targetRoute) {
+    const change: Change = {
+      moduleType,
+      moduleId,
+      action: "delete",
+    }
+    navigationRef.current.setParams({ change })
+  }
 }

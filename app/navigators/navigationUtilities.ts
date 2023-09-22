@@ -10,20 +10,23 @@ import Config from "../config"
 import type { PersistNavigationConfig } from "../config/config.base"
 import { useIsMounted } from "../utils/useIsMounted"
 import { AppStackParamList } from "./AppNavigator"
+import { ClassifiedsTabParamList, HomeTabParamList, TopicsTabParamList, VideosTabParamList } from "../tabs"
 
 /* eslint-disable */
 export const RootNavigation = {
-  navigate(_name: string, _params?: any) {},
-  goBack() {},
-  resetRoot(_state?: PartialState<NavigationState> | NavigationState) {},
+  navigate(_name: string, _params?: any) { },
+  goBack() { },
+  resetRoot(_state?: PartialState<NavigationState> | NavigationState) { },
   getRootState(): NavigationState {
     return {} as any
   },
-  dispatch(_action: NavigationAction) {},
+  dispatch(_action: NavigationAction) { },
 }
 /* eslint-enable */
 
-export const navigationRef = createNavigationContainerRef<AppStackParamList>()
+type ParamLists = AppStackParamList & HomeTabParamList & TopicsTabParamList & VideosTabParamList & ClassifiedsTabParamList
+
+export const navigationRef = createNavigationContainerRef<ParamLists>()
 
 /**
  * Gets the current screen from any navigation state.

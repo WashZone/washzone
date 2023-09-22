@@ -13,14 +13,30 @@ import { useHooks } from "../screens/hooks"
 import { $loaderContainer } from "../screens/styles"
 import { View, ViewStyle } from "react-native"
 import { navigationRef } from "../navigators"
+import { Change } from "../tabs"
 
 const handlingReloadOnInfoComponents = (mode: "post" | "topic", updatedData: any) => {
   const detailRoute = mode === "post" ? "PostInfo" : "TopicInfo"
   const currentRoute = navigationRef.current?.getCurrentRoute()?.name
+  console.log("updatedData", currentRoute)
   const newParams = {}
   newParams[mode] = updatedData
+  console.log("newparam", newParams)
+
   if (currentRoute === detailRoute) {
     navigationRef.current?.setParams(newParams)
+  }
+}
+
+const handlingChangeOnProfile = (mode: "post" | "topic", updatedData: any) => {
+  const targetRoute = "Profile"
+  const currentRoute = navigationRef.current?.getCurrentRoute()?.name
+  if (currentRoute === targetRoute) {
+    const change: Change = {
+      moduleType: mode, moduleId: updatedData?._id, data: updatedData,
+      action: "update"
+    }
+    navigationRef.current.setParams({ change })
   }
 }
 
@@ -41,6 +57,10 @@ export const EditModule = observer(function EditModals() {
           ...data?.updateUserTopic,
           userId: moduleAuthor,
         })
+        handlingChangeOnProfile(mode, {
+          ...data?.updateUserTopic,
+          userId: moduleAuthor,
+        })
         refreshTopics()
         setIsUpdating(false)
         resetState()
@@ -55,14 +75,17 @@ export const EditModule = observer(function EditModals() {
 
   const onUpdatePost = ({ postContent, files, postId }: Parameters<TOnPost>[0]) => {
     setIsUpdating(true)
-    console.log('FILES',files)
+    console.log('FILES', files)
     updatePost(postId, { Discription: postContent }, files).then(
       async (data) => {
         handlingReloadOnInfoComponents(mode, {
           ...data?.updateUserHomePages,
           userId: moduleAuthor,
         })
-        console.log("updated post", data)
+        handlingChangeOnProfile(mode, {
+          ...data?.updateUserHomePages,
+          userId: moduleAuthor,
+        })
         refreshHomeFeed()
         setIsUpdating(false)
         resetState()

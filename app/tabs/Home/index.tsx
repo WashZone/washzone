@@ -4,11 +4,17 @@ import { StackScreenProps } from "@react-navigation/stack"
 import { observer } from "mobx-react-lite"
 import { Feed, Profile, PostInfo, FollowerFollowing, PostList } from "../../screens"
 
+export type Change = {
+  action: "update" | "delete"
+  moduleType: "post" | "topic"
+  moduleId: string
+  data?: any
+}
+
 export type HomeTabParamList = {
   Feed: { focused?: boolean }
-  TopicInfo: { topic: any, highlightedComment?: any }
-  PostInfo: { post: any, highlightedComment?: any }
-  Profile: { user: any; header?: boolean }
+  PostInfo: { post: any; highlightedComment?: any }
+  Profile: { user: any; header?: boolean; change?: Change }
   PostList: { user: any }
   FollowerFollowing: { initialTab?: "followers" | "following"; user: any }
 }

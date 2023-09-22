@@ -20,7 +20,7 @@ import {
   Text,
 } from "../../components"
 import FastImage, { ImageStyle } from "react-native-fast-image"
-import { HomeTabParamList, TopicsTabParamList, TopicsTabProps } from "../../tabs"
+import {  HomeTabParamList, TopicsTabParamList, TopicsTabProps } from "../../tabs"
 import { colors, spacing } from "../../theme"
 import { fromNow } from "../../utils/agoFromNow"
 import { formatName } from "../../utils/formatName"
@@ -29,7 +29,7 @@ import { useHooks } from "../hooks"
 import { observer } from "mobx-react-lite"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { $flex1, $flexRow } from "../styles"
-import { getIconForInteraction, showAlertYesNo } from "../../utils/helpers"
+import { getIconForInteraction, handlingDeleteOnProfile, showAlertYesNo } from "../../utils/helpers"
 import { defaultImages, messageMetadataType } from "../../utils"
 import LinearGradient from "react-native-linear-gradient"
 import ShimmerPlaceholder from "react-native-shimmer-placeholder"
@@ -167,6 +167,8 @@ const Actions = observer(function ActionButtons({
   )
 })
 
+
+
 export const TopicComponent = observer(
   ({ topic, index, refreshParent }: { topic: any; index: number; refreshParent?: () => void }) => {
     const [loaded, setLoaded] = useState(false)
@@ -175,7 +177,7 @@ export const TopicComponent = observer(
       userStore: { _id },
       api: { mutateDeleteDetailTopicId },
       topics: { removeFromTopics },
-      edit: { editTopic },
+      edit: { editTopic, mode },
     } = useStores()
     const navigation = useNavigation<NavigationProp<TopicsTabParamList>>()
     const navigationHome = useNavigation<NavigationProp<HomeTabParamList>>()
@@ -192,14 +194,14 @@ export const TopicComponent = observer(
 
     const onDelete = () => {
       setMenuVisible(false)
-
       showAlertYesNo({
         message: "Are you sure you want to delete this discussion?",
         description: "This action cannot be undone.",
         onYesPress: async () => {
           const topicId = topic?._id
 
-          mutateDeleteDetailTopicId({ topicId }, () => {
+        mutateDeleteDetailTopicId({ topicId }, () => {
+            handlingDeleteOnProfile('topic', topic)
             removeFromTopics(topicId)
             refreshParent && refreshParent()
           })
@@ -364,7 +366,7 @@ export const TopicComponentFullView = ({
       description: "This action cannot be undone.",
       onYesPress: async () => {
         const topicId = topic?._id
-        mutateDeleteDetailTopicId({ topicId }, () => {
+       await mutateDeleteDetailTopicId({ topicId }, () => {
           removeFromTopics(topicId)
           navigationHome.goBack()
           refreshParent && refreshParent()

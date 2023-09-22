@@ -33,6 +33,7 @@ export const EmptyTabState = ({
 
     preset?: keyof typeof EmptyTabPresets
 }) => {
+    
     return (
         <View style={$container}>
             <Text tx={EmptyTabPresets[preset].heading} weight='medium' />

@@ -82,7 +82,7 @@ export type AppStackParamList = {
     cancelled?: boolean
   }
   BlockedUsers: undefined
-  TestNotification: undefined
+  
 }
 
 const exitRoutes = Config.exitRoutes
@@ -91,6 +91,9 @@ export type AppStackScreenProps<T extends keyof AppStackParamList> = StackScreen
   AppStackParamList,
   T
 >
+
+
+
 
 const Stack = createNativeStackNavigator<AppStackParamList>()
 

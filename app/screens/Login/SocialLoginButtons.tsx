@@ -151,8 +151,8 @@ export function SocialLogin() {
             Toast.show(toastMessages.emailAlreadyExists)
           }
         }
-      },
-    )
+      }, 
+   )
     new GraphRequestManager().addRequest(profileRequest).start()
   }
 

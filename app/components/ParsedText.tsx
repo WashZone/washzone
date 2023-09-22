@@ -7,6 +7,7 @@ import ParsedText from "react-native-parsed-text"
 import { NavigationProp, StackActions, useNavigation } from "@react-navigation/native"
 import { HomeTabParamList } from "../tabs"
 import { formatName } from "../utils/formatName"
+import { AppStackParamList } from "../navigators"
 
 type Presets = keyof typeof $presets
 
@@ -28,7 +29,7 @@ interface ParsedTextProps extends TextProps {
 }
 
 export function ParsedTextComp(props: ParsedTextProps) {
-  const navigation = useNavigation<NavigationProp<HomeTabParamList>>()
+  const navigation = useNavigation<NavigationProp<AppStackParamList>>()
   const {
     weight,
     size,
@@ -58,7 +59,7 @@ export function ParsedTextComp(props: ParsedTextProps) {
   const handleUserTagPress = (text: string) => {
     const match = text.match(userTagRegEx)
     shouldNavigateBack && navigation.goBack()
-    navigation.dispatch(StackActions.push("Profile", { user: { _id: match[2].trim() } }))
+    navigation.dispatch(StackActions.push('UserProfile', { user: { _id: match[2].trim() }, header :true }))
   }
 
   return (
