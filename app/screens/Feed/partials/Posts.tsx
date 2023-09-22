@@ -31,7 +31,11 @@ import { useStores } from "../../../models"
 import { Stories } from "./Following"
 import { $contentCenter, $flex1, $flexRow } from "../../styles"
 import ShimmerPlaceHolder from "react-native-shimmer-placeholder"
-import { getIconForInteraction, handlingDeleteOnProfile, showAlertYesNo } from "../../../utils/helpers"
+import {
+  getIconForInteraction,
+  handlingDeleteOnProfile,
+  showAlertYesNo,
+} from "../../../utils/helpers"
 import * as Haptics from "expo-haptics"
 import Carousel, { Pagination } from "react-native-snap-carousel"
 
@@ -186,7 +190,7 @@ const CourouselItem = ({ item, index, onAttachmentsPress, inViewPort, currentIte
   const [isLoaded, setLoaded] = useState(false)
   const [playing, setPlaying] = useState<boolean>(false)
   const [overLayIcon, setOverLayIcon] = useState<"play" | "loading" | null>(null)
-
+  const fullScreenTimer = useRef<NodeJS.Timeout>()
   const onPlay = () => setPlaying(true)
 
   const videoRef = useRef<Video>(null)
@@ -196,15 +200,18 @@ const CourouselItem = ({ item, index, onAttachmentsPress, inViewPort, currentIte
   }
 
   const onPlayBackStatusUpdate = (status: AVPlaybackStatus) => {
+    if (!inViewPort) {
+      clearTimeout(fullScreenTimer.current)
+      fullScreenTimer.current = undefined
+    }
     if (!currentItemActive) {
       videoRef.current.stopAsync()
-
     }
     if (!status.isLoaded) {
-      console.log('isNotLoaded')
+      console.log("isNotLoaded")
 
       // Update your UI for the unloaded state
-      setOverLayIcon('loading')
+      setOverLayIcon("loading")
     } else {
       // setLoaded(true)
 
@@ -212,14 +219,18 @@ const CourouselItem = ({ item, index, onAttachmentsPress, inViewPort, currentIte
 
       if (status.isPlaying) {
         setOverLayIcon(null)
+        if (!fullScreenTimer.current)
+          fullScreenTimer.current = setTimeout(() => videoRef.current._setFullscreen(true), 2000)
 
         // Update your UI for the playing state
       } else {
         setOverLayIcon("play")
       }
-
+      if (status.didJustFinish) {
+        videoRef.current._setFullscreen(false)
+      }
       if (status.isBuffering) {
-        console.log('isBuffering', status.isBuffering)
+        console.log("isBuffering", status.isBuffering)
         setOverLayIcon("loading")
       }
     }
@@ -236,6 +247,7 @@ const CourouselItem = ({ item, index, onAttachmentsPress, inViewPort, currentIte
         {isVideo ? (
           <>
             <Video
+              key={item?.url + index}
               ref={(el) => (videoRef.current = el)} // Store reference
               onError={onError} // Callback when video cannot be loaded
               onLoad={(status) => {
@@ -356,7 +368,6 @@ export const PostComponent = ({
     setTimeout(() => editPost(post), 0)
   }
 
-
   const onDelete = async () => {
     setOptionsVisible(false)
     showAlertYesNo({
@@ -365,7 +376,7 @@ export const PostComponent = ({
       onYesPress: async () => {
         const postId = post?._id
         removeFromHomeFeed(postId)
-        handlingDeleteOnProfile('post', postId)
+        handlingDeleteOnProfile("post", postId)
         await mutateDeleteDetailHomePageId({ homePageId: postId }, refreshParent && refreshParent)
       },
     })
