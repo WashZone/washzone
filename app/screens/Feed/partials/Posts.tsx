@@ -189,7 +189,9 @@ const CourouselItem = ({ item, index, onAttachmentsPress, inViewPort, currentIte
   const isVideo = item?.type?.startsWith("video")
   const [isLoaded, setLoaded] = useState(false)
   const [playing, setPlaying] = useState<boolean>(false)
-  const [overLayIcon, setOverLayIcon] = useState<"play" | "loading" | null>(null)
+  const [videoStatus, setVideoStatus] = useState<
+    "not-playing" | "playing" | "buffering" | "notloaded"
+  >("notloaded")
   const fullScreenTimer = useRef<NodeJS.Timeout>()
   const onPlay = () => setPlaying(true)
 
@@ -206,35 +208,36 @@ const CourouselItem = ({ item, index, onAttachmentsPress, inViewPort, currentIte
     }
     if (!currentItemActive) {
       videoRef.current.stopAsync()
+      return
     }
     if (!status.isLoaded) {
-      console.log("isNotLoaded")
+      setVideoStatus("notloaded")
 
       // Update your UI for the unloaded state
-      setOverLayIcon("loading")
     } else {
       // setLoaded(true)
 
       // Update your UI for the loaded state
 
       if (status.isPlaying) {
-        setOverLayIcon(null)
+        setVideoStatus("playing")
         if (!fullScreenTimer.current)
-          fullScreenTimer.current = setTimeout(() => videoRef.current._setFullscreen(true), 2000)
+        fullScreenTimer.current = setTimeout(() => videoRef.current._setFullscreen(true), 2000)
 
         // Update your UI for the playing state
       } else {
-        setOverLayIcon("play")
+        setVideoStatus("not-playing")
       }
       if (status.didJustFinish) {
-        videoRef.current._setFullscreen(false)
+        // videoRef.current._setFullscreen(false)
       }
+
       if (status.isBuffering) {
-        console.log("isBuffering", status.isBuffering)
-        setOverLayIcon("loading")
+        setVideoStatus("buffering")
       }
     }
   }
+
 
   return (
     <Pressable key={index} style={$carouselItem} onPress={isVideo ? onPlay : onAttachmentsPress}>
@@ -264,21 +267,37 @@ const CourouselItem = ({ item, index, onAttachmentsPress, inViewPort, currentIte
                 uri: item?.url,
               }}
             />
-            {(!inViewPort || !isLoaded) &&
-              overLayIcon &&
-              (overLayIcon === "loading" ? (
-                <View style={$playIcon}>
-                  <ActivityIndicator color={colors.palette.neutral100} />
-                </View>
-              ) : (
+            {inViewPort ? (
+              <>
+                {videoStatus === "not-playing" && (
+                  <View style={$playIcon}>
+                    <Icon
+                      icon="play"
+                      size={32}
+                      containerStyle={$playIcon}
+                      color={colors.palette.neutral100}
+                      onPress={() => videoRef.current.playAsync()}
+                    />
+                  </View>
+                )}
+                {videoStatus === "notloaded" ||
+                  (videoStatus === "buffering" && (
+                    <View style={$playIcon}>
+                      <ActivityIndicator animating color={colors.palette.neutral100} />
+                    </View>
+                  ))}
+              </>
+            ) : (
+              <View style={$playIcon}>
                 <Icon
-                  icon={overLayIcon}
+                  icon="play"
                   size={32}
                   containerStyle={$playIcon}
                   color={colors.palette.neutral100}
                   onPress={() => videoRef.current.playAsync()}
                 />
-              ))}
+              </View>
+            )}
           </>
         ) : (
           <FastImage

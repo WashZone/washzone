@@ -55,6 +55,7 @@ export const MediaPicker = async ({
     maxWidth,
     maxHeight,
     quality,
+    videoQuality: Platform.OS === "ios" ? "medium" : "low",
   }
 
   let image: any

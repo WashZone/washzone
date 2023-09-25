@@ -121,7 +121,7 @@ export const AddPostModal = () => {
           </View>
         )}
         <Icon
-          icon={"addBold"}
+          icon={"plus"}
           size={40}
           color={uploading ? colors.palette.neutral300 : colors.palette.neutral100}
           // eslint-disable-next-line react-native/no-inline-styles
@@ -331,7 +331,6 @@ const $absoluteWidthFull: ViewStyle = { width: "100%", position: "absolute" }
 
 const $addButton: ViewStyle = {
   margin: 12,
-  top: 6,
   width: 56,
   height: 56,
   borderRadius: 30,

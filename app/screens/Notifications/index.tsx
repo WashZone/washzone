@@ -117,8 +117,8 @@ const UIComponent = ({
                   ? `${name} and ${count} others ${type} your ${module}.`
                   : `${name} ${type} your ${module}.`
                 : count > 0
-                  ? `${name} and others made a total of ${count + 1} comments on your ${module}.`
-                  : `${name} commented on your ${module}.`)
+                ? `${name} and others made a total of ${count + 1} comments on your ${module}.`
+                : `${name} commented on your ${module}.`)
             }
             size="xxs"
             weight="medium"
@@ -126,7 +126,13 @@ const UIComponent = ({
             style={$flex1}
           />
           {parsedText && (
-            <ParsedTextComp shouldNavigateBack text={parsedText} size="xxs" numberOfLines={5} ellipsizeMode="tail" />
+            <ParsedTextComp
+              shouldNavigateBack
+              text={parsedText}
+              size="xxs"
+              numberOfLines={5}
+              ellipsizeMode="tail"
+            />
           )}
           <Text
             weight="medium"
@@ -158,19 +164,21 @@ const NotificationComponent = ({
       const details =
         item?.notificationType === NotificationType.likeOnPost
           ? {
-            onPress: () =>
-              navigationHome.navigate("PostInfo", { post: item?.HomePageId[0]?._id }),
-            module: "post",
-            image: item?.HomePageId[0]?.attachmentUrl[0] || item?.userId?.picture,
-          }
+              onPress: () =>
+                navigationHome.navigate("PostInfo", { post: item?.HomePageId[0]?._id }),
+              module: "post",
+              image: item?.HomePageId[0]?.attachmentUrl[0]?.type?.startsWith("video")
+                ? item?.HomePageId[0]?.attachmentUrl[0]?.thumbnailUrl
+                : item?.HomePageId[0]?.attachmentUrl[0]?.url || item?.userId?.picture,
+            }
           : item?.notificationType === NotificationType.likeOnTopic
-            ? {
+          ? {
               onPress: () =>
                 navigationTopic.navigate("TopicInfo", { topic: item?.TopicId[0]?._id }),
               module: "discussion",
               image: item?.TopicId[0]?.attachmentUrl || item?.userId?.picture,
             }
-            : {
+          : {
               onPress: () =>
                 navigationVideo.navigate("VideoDetails", { data: item?.videoId[0]?._id }),
               module: "video",
@@ -194,17 +202,19 @@ const NotificationComponent = ({
       const details =
         item?.notificationType === NotificationType.commentOnPost
           ? {
-            onPress: () =>
-              navigationHome.navigate("PostInfo", { post: item?.HomePageId[0]?._id }),
-            module: "post",
-            image: item?.HomePageId[0]?.attachmentUrl || item?.userId?.picture,
-          }
+              onPress: () =>
+                navigationHome.navigate("PostInfo", { post: item?.HomePageId[0]?._id }),
+              module: "post",
+              image:item?.HomePageId[0]?.attachmentUrl[0]?.type?.startsWith("video")
+              ? item?.HomePageId[0]?.attachmentUrl[0]?.thumbnailUrl
+              : item?.HomePageId[0]?.attachmentUrl[0]?.url || item?.userId?.picture,
+            }
           : {
-            onPress: () =>
-              navigationTopic.navigate("TopicInfo", { topic: item?.TopicId[0]?._id }),
-            module: "discussion",
-            image: item?.TopicId[0]?.attachmentUrl || item?.userId?.picture,
-          }
+              onPress: () =>
+                navigationTopic.navigate("TopicInfo", { topic: item?.TopicId[0]?._id }),
+              module: "discussion",
+              image: item?.TopicId[0]?.attachmentUrl || item?.userId?.picture,
+            }
 
       return (
         <UIComponent
@@ -241,8 +251,9 @@ const NotificationComponent = ({
               style={[$flex1, { paddingVertical: spacing.tiny, paddingRight: spacing.extraSmall }]}
             >
               <Text
-                text={`${formatName(author?.name)} offered ${item?.metaData?.currency + item?.metaData?.amount
-                  } on ${data?.title}.`}
+                text={`${formatName(author?.name)} offered ${
+                  item?.metaData?.currency + item?.metaData?.amount
+                } on ${data?.title}.`}
                 size="xxs"
                 weight="medium"
                 style={$flex1}
@@ -344,11 +355,8 @@ const $notificationImage: ImageStyle = {
 }
 
 const $itemContainer: ViewStyle = {
-  // paddingHorizontal: spacing.medium,
-  // paddingVertical: spacing.extraSmall,
   borderBottomWidth: 1,
   borderColor: colors.separator,
-  // height: 68,
   backgroundColor: colors.palette.neutral100,
 }
 
@@ -361,3 +369,4 @@ const $titleStyle: TextStyle = {
 const $container: ViewStyle = {
   flex: 1,
 }
+

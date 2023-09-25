@@ -48,6 +48,7 @@ export const Menu = ({
             containerStyle={anchorContainer}
           />
         }
+        contentStyle={{backgroundColor: colors.palette.neutral200}}
       >
         {data.map((i) => (
           <PaperMenu.Item key={i.title} leadingIcon={i.icon} title={i.title} onPress={i.onPress} />
