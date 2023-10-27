@@ -15,13 +15,14 @@ interface LikesModalProps {
   isVisible: boolean
   setVisible: (b: boolean) => void
   likesCount: number
+  mode:string
 }
 
-export const LikesModal = ({ setVisible, isVisible, moduleId, module, likesCount }: LikesModalProps) => {
+export const LikesModal = ({ setVisible, isVisible, moduleId, module, likesCount,mode }: LikesModalProps) => {
   const [data, setData] = useState([])
   const { getLikesOnDiscussion, getLikesOnPost, getLikesOnVideo } = useHooks()
   const [loading, setLoading] = useState(false)
-
+console.log("likesCount",data)
   useEffect(() => {
     isVisible && syncData()
   }, [isVisible])
@@ -33,6 +34,7 @@ export const LikesModal = ({ setVisible, isVisible, moduleId, module, likesCount
         const res = await getLikesOnDiscussion(moduleId)
   
         setData(res?.data)
+        console.log("data----------",res.data)
         setLoading(false)
         break
       }
@@ -47,7 +49,7 @@ export const LikesModal = ({ setVisible, isVisible, moduleId, module, likesCount
       case "post": {
         setLoading(true)
         const res = await getLikesOnPost(moduleId)
-        setData(res?.data)
+        // setData(res?.data)
         setLoading(false)
         break
       }
@@ -63,7 +65,7 @@ export const LikesModal = ({ setVisible, isVisible, moduleId, module, likesCount
       setVisible={setVisible}
     >
       <Text
-        text="Likes"
+        text= {mode ==="Likes"?'Likes':'Dislikes'} 
         weight="semiBold"
         size="md"
         style={{ textAlign: "center", marginBottom: spacing.extraSmall }}
@@ -71,7 +73,7 @@ export const LikesModal = ({ setVisible, isVisible, moduleId, module, likesCount
       <View style={[$contentCenter, { height: (likesCount * (58) < Dimensions.get('screen').height * 0.7) ? likesCount * (58) : Dimensions.get('screen').height * 0.7 }]}>
         {loading ? <ActivityIndicator style={{}} color={colors.palette.primary100} /> : <FlatList
           data={data}
-          renderItem={({ item, index }) => <MiniUserComponent onPress={() => { setVisible(false); setTimeout(() => navigationHome.navigate('Profile', { user: item?.userId }), 400) }} key={index} item={item?.userId} />}
+          renderItem={({ item, index }) => <MiniUserComponent onPress={() => { setVisible(false);console.log("itemuserid",item.userId); setTimeout(() => navigationHome.navigate('Profile', { user: item?.userId }), 400) }} key={index} item={item?.userId} />}
         />}
       </View>
     </BottomModal>

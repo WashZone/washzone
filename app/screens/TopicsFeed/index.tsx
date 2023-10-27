@@ -20,7 +20,7 @@ import {
   Text,
 } from "../../components"
 import FastImage, { ImageStyle } from "react-native-fast-image"
-import {  HomeTabParamList, TopicsTabParamList, TopicsTabProps } from "../../tabs"
+import { HomeTabParamList, TopicsTabParamList, TopicsTabProps } from "../../tabs"
 import { colors, spacing } from "../../theme"
 import { fromNow } from "../../utils/agoFromNow"
 import { formatName } from "../../utils/formatName"
@@ -47,6 +47,7 @@ const Actions = observer(function ActionButtons({
   const [loading, setLoading] = useState<boolean>(false)
   const [isLikesModalVisible, setLikesModalVisible] = useState(false)
   const { interactWithTopic } = useHooks()
+  const [mode, setMode] = useState("")
   const [dynamicData, setDynamicData] = useState({
     interaction: item?.interaction,
     dislikeviews: item?.dislikeviews,
@@ -57,7 +58,7 @@ const Actions = observer(function ActionButtons({
     api: { mutateFlagsOnFeed },
     share: { share },
   } = useStores()
-
+  console.log("item-------", item._id)
   useEffect(() => {
     setDynamicData({
       interaction: item?.interaction,
@@ -109,7 +110,7 @@ const Actions = observer(function ActionButtons({
                 }
               }}
             />
-            <Text onPress={() => dynamicData?.likeviews > 0 && setLikesModalVisible(true)}>
+            <Text onPress={() => {dynamicData?.likeviews > 0 && setLikesModalVisible(true),setMode("Likes")}}>
               {dynamicData?.likeviews}
             </Text>
           </View>
@@ -131,7 +132,9 @@ const Actions = observer(function ActionButtons({
                 }
               }}
             />
-            <Text>{dynamicData?.dislikeviews}</Text>
+           <Text onPress={() => {dynamicData?.dislikeviews > 0 && setLikesModalVisible(true),setMode("Dislikes")}}>
+              {dynamicData?.dislikeviews}
+            </Text>
           </View>
           <View style={$actionContainer}>
             <Icon
@@ -156,7 +159,8 @@ const Actions = observer(function ActionButtons({
         </View>
       </View>
       <LikesModal
-        likesCount={dynamicData?.likeviews}
+        mode={mode}
+        likesCount={mode=='Likes' ?dynamicData?.likeviews:dynamicData?.dislikeviews}
         key={item?._id}
         module="discussion"
         moduleId={item?._id}
@@ -166,8 +170,6 @@ const Actions = observer(function ActionButtons({
     </>
   )
 })
-
-
 
 export const TopicComponent = observer(
   ({ topic, index, refreshParent }: { topic: any; index: number; refreshParent?: () => void }) => {
@@ -200,8 +202,8 @@ export const TopicComponent = observer(
         onYesPress: async () => {
           const topicId = topic?._id
 
-        mutateDeleteDetailTopicId({ topicId }, () => {
-            handlingDeleteOnProfile('topic', topic)
+          mutateDeleteDetailTopicId({ topicId }, () => {
+            handlingDeleteOnProfile("topic", topic)
             removeFromTopics(topicId)
             refreshParent && refreshParent()
           })
@@ -366,7 +368,7 @@ export const TopicComponentFullView = ({
       description: "This action cannot be undone.",
       onYesPress: async () => {
         const topicId = topic?._id
-       await mutateDeleteDetailTopicId({ topicId }, () => {
+        await mutateDeleteDetailTopicId({ topicId }, () => {
           removeFromTopics(topicId)
           navigationHome.goBack()
           refreshParent && refreshParent()

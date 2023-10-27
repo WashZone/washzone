@@ -7,6 +7,7 @@ import { formatName } from "../utils/formatName"
 import { TouchableOpacity } from "react-native-gesture-handler"
 
 export const MiniUserComponent = ({ onPress, item }: { onPress?: (a: any) => void; item: any }) => {
+  console.log("itemname",item)
   return (
     <TouchableOpacity onPress={() => {
       onPress(item)

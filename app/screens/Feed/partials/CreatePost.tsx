@@ -325,6 +325,7 @@ const $actionButtonsContainer: ViewStyle = {
   height: "100%",
   flexDirection: "row",
   alignItems: "center",
+ paddingLeft:5
 }
 
 const $postTextStyle: TextStyle = {

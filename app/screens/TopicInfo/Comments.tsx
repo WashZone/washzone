@@ -18,11 +18,13 @@ export const CommentComponent = ({ comment, highlighted }: { comment: any, highl
     height: Dimensions.get("window").width * 0.6,
     width: Dimensions.get("window").width,
   })
+
+  console.log("comment?.users?._id",comment?.users?._id)
   return (
     <>
       <View style={[$commentContainer, highlighted && { backgroundColor: colors.palette.primaryOverlay10 }]}>
         <TouchableOpacity
-          onPress={() => navigationHome.navigate("Profile", { user: comment?.users?._id })}
+          onPress={() => navigationHome.navigate("Profile", { user: comment?.users })}
         >
           <FastImage
             style={$profileImage}
