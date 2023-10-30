@@ -82,6 +82,6 @@ const styles = StyleSheet.create({
     stars: {
         display: 'flex',
         flexDirection: 'row',
-        backgroundColor: 'red'
+ 
     },
 });
