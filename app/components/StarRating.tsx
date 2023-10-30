@@ -4,8 +4,9 @@ import {
     View,
     TouchableWithoutFeedback,
     Animated,
+    Text,
 } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
+// import { MaterialIcons } from '@expo/vector-icons';
 import { colors } from '../theme';
 
 export const StarRating = ({ onPress, disabled, size, initialVal }: {
@@ -55,11 +56,12 @@ export const StarRating = ({ onPress, disabled, size, initialVal }: {
                     key={option}
                 >
                     <Animated.View style={animatedScaleStyle}>
-                        <MaterialIcons
+                        {/* <MaterialIcons
                             name={starRating >= option ? 'star' : 'star-border'}
                             size={size || 32}
                             style={starRating >= option ? styles.starSelected : styles.starUnselected}
-                        />
+                        /> */}
+                        <Text>STAR ICON</Text>
                     </Animated.View>
                 </TouchableWithoutFeedback>
             ))}
