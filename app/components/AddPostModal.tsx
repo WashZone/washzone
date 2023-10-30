@@ -89,7 +89,7 @@ export const AddPostModal = () => {
   }
 
   return (
-    <View>
+    <View style={{justifyContent:"center",alignItems:"center"}}>
       <Button
         disabled={uploading}
         style={[
@@ -158,17 +158,22 @@ export const BottomModalContent = ({
   const sharedValPost = useSharedValue(0)
   const sharedValDiscuss = useSharedValue(0)
   const [expanded, setExpanded] = useState<"post" | "discuss" | undefined>(undefined)
-
+  const [postModal, setPostmodal] = useState(false)
+  const [topicModal, setTopicmodal] = useState(false)
   // this is to change the progress according to the fact whether the images are present or not
   const [discussionImage, setDiscussionImage] = useState<any>({ height: 1, width: 1 })
   const [selectedPostImages, setSelectedPostImages] = useState<Array<any>>([])
 
   const expandPost = () => {
     setExpanded("post")
+    setPostmodal(true)
+    setTopicmodal(false)
   }
 
   const expandDiscuss = () => {
     setExpanded("discuss")
+    setTopicmodal(true)
+    setPostmodal(false)
   }
 
   useEffect(() => {
@@ -244,56 +249,50 @@ export const BottomModalContent = ({
       style={{ height: "auto" }}
     >
       {/* POST Button */}
-      <AnimatedTouchable
-        disabled={expanded === "post"}
-        style={[$button, $postButtonAnimated]}
-        onPress={expandPost}
-      >
-        <Animated.View style={[$flexRow, $animatedPostComponent, $contentCenter]}>
-          <Icon icon="topics" size={18} containerStyle={{ marginRight: spacing.extraSmall }} />
-          <Animated.Text
-            style={[$baseTextStyle, { color: colors.palette.neutral100 }, $animatedPostComponent]}
-          >
-            Create a Post
-          </Animated.Text>
-        </Animated.View>
-        <Animated.View style={[$absoluteWidthFull, $animatedCreatePostContainer]}>
+      {!postModal ? (
+        <TouchableOpacity disabled={expanded === "post"} style={[$button]} onPress={expandPost}>
+          <View style={[$flexRow, $contentCenter]}>
+            <Icon icon="topics" size={18} containerStyle={{ marginRight: spacing.extraSmall }} />
+            <Text style={[$baseTextStyle, { color: colors.palette.neutral100 }]}>
+              Create a Post
+            </Text>
+          </View>
+        </TouchableOpacity>
+      ) : (
+        <View style={[$absoluteWidthFull]}>
           <CreatePost
             onPost={onPost}
             selectedImages={selectedPostImages}
             setSelectedImages={setSelectedPostImages}
             progress={sharedValPost}
           />
-        </Animated.View>
-      </AnimatedTouchable>
+        </View>
+      )}
 
       {/* DISCUSS Button */}
-      <AnimatedTouchable
-        disabled={expanded === "discuss"}
-        style={[$button, $discussButtonAnimated]}
-        onPress={expandDiscuss}
-      >
-        <Animated.View style={[$flexRow, $animatedDiscussComponent, $contentCenter]}>
-          <Icon icon="topics" size={18} containerStyle={{ marginRight: spacing.extraSmall }} />
-          <Animated.Text
-            style={[
-              $baseTextStyle,
-              { color: colors.palette.neutral100 },
-              $animatedDiscussComponent,
-            ]}
-          >
-            Start a Discussion
-          </Animated.Text>
-        </Animated.View>
-        <Animated.View style={[$absoluteWidthFull, $animatedCreateTopicContainer]}>
+      {!topicModal ? (
+        <TouchableOpacity
+          disabled={expanded === "discuss"}
+          style={[$button]}
+          onPress={expandDiscuss}
+        >
+          <View style={[$flexRow, $contentCenter]}>
+            <Icon icon="topics" size={18} containerStyle={{ marginRight: spacing.extraSmall }} />
+            <Text style={[$baseTextStyle, { color: colors.palette.neutral100 }]}>
+              Start a Discussion
+            </Text>
+          </View>
+        </TouchableOpacity>
+      ) : (
+        <View style={[$absoluteWidthFull ,]}>
           <CreateTopic
             onTopic={onTopic}
             progress={sharedValDiscuss}
             selectedImage={discussionImage}
             setSelectedImage={setDiscussionImage}
           />
-        </Animated.View>
-      </AnimatedTouchable>
+        </View>
+      )}
 
       {/* CLASSIFIED Button */}
       <TouchableOpacity
@@ -327,7 +326,7 @@ export const BottomModalContent = ({
   )
 }
 
-const $absoluteWidthFull: ViewStyle = { width: "100%", position: "absolute" }
+const $absoluteWidthFull: ViewStyle = { width: "100%" }
 
 const $addButton: ViewStyle = {
   margin: 12,

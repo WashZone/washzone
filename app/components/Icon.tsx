@@ -174,7 +174,9 @@ export const iconRegistry = {
   addBold: require("../../assets/icons/plus-bold.png"),
   people: require("../../assets/icons/people.png"),
   edit: require("../../assets/icons/edit.png"),
-
+active: require("../../assets/icons/active.png"),
+inactive: require("../../assets/icons/inactive.png"),
+inblack: require("../../assets/icons/inblack.png"),
   play: require("../../assets/icons/play-circle.png"),
 
 }

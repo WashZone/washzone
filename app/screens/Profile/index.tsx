@@ -8,6 +8,8 @@ import {
   Animated,
   View,
   Dimensions,
+  ScrollView,
+  RefreshControl,
 } from "react-native"
 // import { Menu, MenuItem, MenuDivider } from "react-native-material-menu"
 
@@ -16,7 +18,7 @@ import { CollapsibleHeaderTabView } from "react-native-tab-view-collapsible-head
 import { NavigationState, SceneRendererProps, TabBar } from "react-native-tab-view"
 import { observer } from "mobx-react-lite"
 import { ActivityIndicator } from "react-native-paper"
-import { NavigationProp, StackActions, useNavigation } from "@react-navigation/native"
+import { NavigationProp, StackActions, useIsFocused, useNavigation } from "@react-navigation/native"
 import ImageView from "react-native-image-viewing"
 
 import { colors, spacing } from "../../theme"
@@ -227,7 +229,8 @@ const ProfileHeader = ({ user, isUser, onMessage, onProfileImagePress, onBannerP
     userStore: { _id },
     api: { mutateReportOnUser },
   } = useStores()
-  const { getProfileDetails, followUser, unfollowUser } = useHooks()
+  const navigation = useNavigation<NavigationProp<AppStackParamList>>()
+  const { getProfileDetails, followUser, unfollowUser, getUserById } = useHooks()
   const [profileDetails, setProfileDetails] = useState({
     blocked: false,
     data: { followercount: 0, followingCount: 0 },
@@ -235,16 +238,39 @@ const ProfileHeader = ({ user, isUser, onMessage, onProfileImagePress, onBannerP
   })
   const [descriptionLineCount, setDescriptionLineCount] = useState(undefined)
   const [bannerLoaded, setBannerLoaded] = useState(false)
+
   const syncProfile = async () => {
     const resProfile = await getProfileDetails(user?._id)
     setProfileDetails({ ...resProfile })
   }
 
   const [followLoading, setFollowLoading] = useState(false)
+  const [refreshing, setRefreshing] = useState(false)
+
+  const isFocus = useIsFocused()
 
   useEffect(() => {
-    syncProfile()
-  }, [user])
+    getProfileDetails(user?._id)
+  }, [user, isFocus])
+  const syncUser = async () => {
+    try {
+      const res = await getUserById(user?._id)
+      navigation.setParams({ user: res })
+      // setLoading(false)
+      console.log("res", user)
+    } catch (err) {}
+  }
+  const onRefresh = () => {
+    // You can add your refresh logic here, e.g., fetch new data from an API
+    // After fetching data, make sure to set refreshing to false.
+    // For now, let's simulate a delay using setTimeout.
+    syncUser()
+
+    console.log("USERRRRRR", user)
+    setTimeout(() => {
+      setRefreshing(false)
+    }, 2000)
+  }
 
   const reportUser = async (reason: string) => {
     if (reason?.trim()?.length === 0) {
@@ -312,202 +338,213 @@ const ProfileHeader = ({ user, isUser, onMessage, onProfileImagePress, onBannerP
   const navigationHome = useNavigation<NavigationProp<HomeTabParamList>>()
 
   return (
-    <View
-      style={{
-        height: 390 + getParentHeightOffset() - (isUser ? 50 : 0),
-        backgroundColor: colors.palette.neutral100,
-      }}
+    <ScrollView
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          tintColor={colors.palette.primary300}
+          titleColor={colors.palette.primary300}
+        />
+      }
     >
-      <TouchableOpacity
-        onPress={() => {
-          if (user?.banner) onBannerPress()
+      <View
+        style={{
+          height: 390 + getParentHeightOffset() - (isUser ? 50 : 0),
+          backgroundColor: colors.palette.neutral100,
         }}
       >
-        <ShimmerPlaceholder
-          visible={bannerLoaded}
-          shimmerStyle={$topContainer}
-          LinearGradient={LinearGradient}
-          duration={2000}
-          width={Dimensions.get("screen").width}
+        <TouchableOpacity
+          onPress={() => {
+            if (user?.banner) onBannerPress()
+          }}
         >
-          <FastImage
-            source={
-              user?.banner
-                ? {
-                    uri: user?.banner,
-                  }
-                : BROKEN_BANNER
-            }
-            style={[$topContainer, { backgroundColor: colors.background }]}
-            onLoad={() => setBannerLoaded(true)}
-          />
-        </ShimmerPlaceholder>
-      </TouchableOpacity>
-      <View style={$userDetailsContainer}>
-        <View style={$flexRow}>
-          <TouchableOpacity onPress={onProfileImagePress}>
-            <FastImage style={$profileImage} source={{ uri: user?.picture }} />
-          </TouchableOpacity>
+          <ShimmerPlaceholder
+            visible={bannerLoaded}
+            shimmerStyle={$topContainer}
+            LinearGradient={LinearGradient}
+            duration={2000}
+            width={Dimensions.get("screen").width}
+          >
+            <FastImage
+              source={
+                user?.banner
+                  ? {
+                      uri: user?.banner,
+                    }
+                  : BROKEN_BANNER
+              }
+              style={[$topContainer, { backgroundColor: colors.background }]}
+              onLoad={() => setBannerLoaded(true)}
+            />
+          </ShimmerPlaceholder>
+        </TouchableOpacity>
+        <View style={$userDetailsContainer}>
+          <View style={$flexRow}>
+            <TouchableOpacity onPress={onProfileImagePress}>
+              <FastImage style={$profileImage} source={{ uri: user?.picture }} />
+            </TouchableOpacity>
+            <View
+              style={[
+                $flexRow,
+                $flex1,
+                // eslint-disable-next-line react-native/no-inline-styles
+                {
+                  justifyContent: "space-around",
+                  paddingHorizontal: spacing.medium,
+                },
+              ]}
+            >
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={() =>
+                  navigationHome.dispatch(
+                    StackActions.push("FollowerFollowing", { user, initialTab: "followers" }),
+                  )
+                }
+                // eslint-disable-next-line react-native/no-inline-styles
+                style={{ alignItems: "center" }}
+              >
+                <Text
+                  text="Followers"
+                  weight="semiBold"
+                  size="xxs"
+                  color={colors.palette.neutral400}
+                />
+                <Text
+                  text={profileDetails?.data?.followercount.toString()}
+                  size="lg"
+                  weight="semiBold"
+                  color={colors.palette.primary100}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={() =>
+                  navigationHome.dispatch(
+                    StackActions.push("FollowerFollowing", { user, initialTab: "following" }),
+                  )
+                }
+                // eslint-disable-next-line react-native/no-inline-styles
+                style={{ alignItems: "center" }}
+              >
+                <Text
+                  text="Following"
+                  weight="semiBold"
+                  size="xxs"
+                  color={colors.palette.neutral400}
+                />
+                <Text
+                  text={profileDetails?.data?.followingCount.toString()}
+                  size="lg"
+                  weight="semiBold"
+                  color={colors.palette.primary100}
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
           <View
             style={[
               $flexRow,
-              $flex1,
               // eslint-disable-next-line react-native/no-inline-styles
-              {
-                justifyContent: "space-around",
-                paddingHorizontal: spacing.medium,
-              },
+              { alignItems: "center", marginTop: spacing.tiny },
             ]}
           >
-            <TouchableOpacity
-              activeOpacity={0.8}
-              onPress={() =>
-                navigationHome.dispatch(
-                  StackActions.push("FollowerFollowing", { user, initialTab: "followers" }),
-                )
-              }
-              // eslint-disable-next-line react-native/no-inline-styles
-              style={{ alignItems: "center" }}
-            >
-              <Text
-                text="Followers"
-                weight="semiBold"
-                size="xxs"
-                color={colors.palette.neutral400}
-              />
-              <Text
-                text={profileDetails?.data?.followercount.toString()}
-                size="lg"
-                weight="semiBold"
-                color={colors.palette.primary100}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              activeOpacity={0.8}
-              onPress={() =>
-                navigationHome.dispatch(
-                  StackActions.push("FollowerFollowing", { user, initialTab: "following" }),
-                )
-              }
-              // eslint-disable-next-line react-native/no-inline-styles
-              style={{ alignItems: "center" }}
-            >
-              <Text
-                text="Following"
-                weight="semiBold"
-                size="xxs"
-                color={colors.palette.neutral400}
-              />
-              <Text
-                text={profileDetails?.data?.followingCount.toString()}
-                size="lg"
-                weight="semiBold"
-                color={colors.palette.primary100}
-              />
-            </TouchableOpacity>
-          </View>
-        </View>
-        <View
-          style={[
-            $flexRow,
-            // eslint-disable-next-line react-native/no-inline-styles
-            { alignItems: "center", marginTop: spacing.tiny },
-          ]}
-        >
-          <Text
-            text={formatName(user?.name)}
-            numberOfLines={1}
-            style={$publisherName}
-            weight="semiBold"
-          />
-          {user?.blueTick && (
-            <Icon
-              icon="verifiedTick"
-              size={20}
-              containerStyle={{ marginLeft: spacing.extraSmall }}
+            <Text
+              text={formatName(user?.name)}
+              numberOfLines={1}
+              style={$publisherName}
+              weight="semiBold"
             />
+            {user?.blueTick && (
+              <Icon
+                icon="verifiedTick"
+                size={20}
+                containerStyle={{ marginLeft: spacing.extraSmall }}
+              />
+            )}
+          </View>
+          {user?.description + " " && (
+            <View>
+              <Text
+                onTextLayout={onTextLayout}
+                color={colors.palette.neutral900}
+                numberOfLines={
+                  descriptionLineCount && descriptionLineCount > 3 ? 3 : descriptionLineCount
+                }
+                weight="normal"
+                text={user?.description?.trim()}
+                style={$descriptionText}
+              />
+            </View>
+          )}
+          {!isUser && (
+            <View style={$flexRow}>
+              <TouchableOpacity
+                style={[
+                  $followContainer,
+                  { marginRight: spacing.extraSmall },
+                  profileDetails?.following && { backgroundColor: colors.palette.primary100 },
+                ]}
+                onPress={onFollowUnfollow}
+              >
+                {followLoading ? (
+                  <ActivityIndicator
+                    color={
+                      profileDetails?.following
+                        ? colors.palette.neutral100
+                        : colors.palette.primary100
+                    }
+                  />
+                ) : (
+                  <>
+                    <Icon
+                      containerStyle={{ marginRight: spacing.extraSmall }}
+                      size={22}
+                      color={
+                        profileDetails?.following
+                          ? colors.palette.neutral100
+                          : colors.palette.primary100
+                      }
+                      icon={profileDetails?.following ? "followed" : "follow"}
+                    />
+                    <Text
+                      weight="medium"
+                      color={
+                        profileDetails?.following
+                          ? colors.palette.neutral100
+                          : colors.palette.primary100
+                      }
+                      text={profileDetails?.following ? "Unfollow" : "Follow"}
+                    />
+                  </>
+                )}
+              </TouchableOpacity>
+              <TouchableOpacity style={$followContainer} onPress={onMessage}>
+                <Icon
+                  containerStyle={{ marginRight: spacing.extraSmall }}
+                  size={22}
+                  color={colors.palette.primary100}
+                  icon="chatMessage"
+                />
+                <Text weight="medium" color={colors.palette.primary100} text="Message" />
+              </TouchableOpacity>
+            </View>
           )}
         </View>
-        {user?.description + " " && (
-          <View>
-            <Text
-              onTextLayout={onTextLayout}
-              color={colors.palette.neutral900}
-              numberOfLines={
-                descriptionLineCount && descriptionLineCount > 3 ? 3 : descriptionLineCount
-              }
-              weight="normal"
-              text={user?.description?.trim()}
-              style={$descriptionText}
-            />
-          </View>
-        )}
+
         {!isUser && (
-          <View style={$flexRow}>
-            <TouchableOpacity
-              style={[
-                $followContainer,
-                { marginRight: spacing.extraSmall },
-                profileDetails?.following && { backgroundColor: colors.palette.primary100 },
-              ]}
-              onPress={onFollowUnfollow}
-            >
-              {followLoading ? (
-                <ActivityIndicator
-                  color={
-                    profileDetails?.following
-                      ? colors.palette.neutral100
-                      : colors.palette.primary100
-                  }
-                />
-              ) : (
-                <>
-                  <Icon
-                    containerStyle={{ marginRight: spacing.extraSmall }}
-                    size={22}
-                    color={
-                      profileDetails?.following
-                        ? colors.palette.neutral100
-                        : colors.palette.primary100
-                    }
-                    icon={profileDetails?.following ? "followed" : "follow"}
-                  />
-                  <Text
-                    weight="medium"
-                    color={
-                      profileDetails?.following
-                        ? colors.palette.neutral100
-                        : colors.palette.primary100
-                    }
-                    text={profileDetails?.following ? "Unfollow" : "Follow"}
-                  />
-                </>
-              )}
-            </TouchableOpacity>
-            <TouchableOpacity style={$followContainer} onPress={onMessage}>
-              <Icon
-                containerStyle={{ marginRight: spacing.extraSmall }}
-                size={22}
-                color={colors.palette.primary100}
-                icon="chatMessage"
-              />
-              <Text weight="medium" color={colors.palette.primary100} text="Message" />
-            </TouchableOpacity>
+          <View style={$verticalThreeDots}>
+            <Options reportUser={reportUser} user={user} />
           </View>
         )}
       </View>
-
-      {!isUser && (
-        <View style={$verticalThreeDots}>
-          <Options reportUser={reportUser} user={user} />
-        </View>
-      )}
-    </View>
+    </ScrollView>
   )
 }
 
 export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ route }) {
-  const { user, header,change, } = route.params
+  const { user, header, change } = route.params
 
   const [galleryItemsTopics, setGalleryItemsTopics] = useState([])
   const [galleryItemsClassifieds, setGalleryItemsClassifieds] = useState([])
@@ -520,12 +557,14 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
   } = useStores()
   const [loading, setLoading] = useState(Object.keys(user)?.length === 1)
   const isUser = user?._id === _id
-
+console.log("user",user)
   const [index, setIndex] = React.useState(0)
+
   const [isImageViewVisible, setImageViewVisible] = React.useState<{
     visible: boolean
     type: "picture" | "banner"
   }>({ visible: false, type: "picture" })
+
   const [routes] = React.useState([
     { key: "posts", title: "Posts" },
     { key: "topic", title: "Discussions" },
@@ -556,9 +595,21 @@ export const Profile: FC<HomeTabProps<"Profile">> = observer(function Profile({ 
   const renderScene = ({ route }) => {
     switch (route.key) {
       case "posts":
-        return <HomePostsTabScreen userId={user?._id} addToGallery={setGalleryItemsHomePosts} change={change}  />
+        return (
+          <HomePostsTabScreen
+            userId={user?._id}
+            addToGallery={setGalleryItemsHomePosts}
+            change={change}
+          />
+        )
       case "topic":
-        return <TopicsTabScreen userId={user?._id} addToGallery={setGalleryItemsTopics}  change={change} />
+        return (
+          <TopicsTabScreen
+            userId={user?._id}
+            addToGallery={setGalleryItemsTopics}
+            change={change}
+          />
+        )
       case "classified":
         return <ClassifiedsTabScreen userId={user?._id} addToGallery={setGalleryItemsClassifieds} />
       case "gallery":

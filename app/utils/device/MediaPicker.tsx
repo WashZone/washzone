@@ -3,6 +3,7 @@ import { PermissionsAndroid, Platform } from "react-native"
 import { ImageLibraryOptions, MediaType, PhotoQuality } from "react-native-image-picker"
 const ImagePicker = require("react-native-image-picker")
 
+
 export const Capture = async () => {
   const options = {
     storageOptions: {
@@ -38,10 +39,11 @@ export const Capture = async () => {
 
 export const MediaPicker = async ({
   selectionLimit = 1,
-  mediaType = "photo",
+  mediaType = "mixed",
   maxWidth = 1280,
   maxHeight = 720,
   quality = 0.8,
+  
 }: {
   selectionLimit?: number
   mediaType?: MediaType
@@ -56,6 +58,7 @@ export const MediaPicker = async ({
     maxHeight,
     quality,
     videoQuality: Platform.OS === "ios" ? "medium" : "low",
+
   }
 
   let image: any
@@ -69,6 +72,6 @@ export const MediaPicker = async ({
       }
     },
   )
-
+  console.log("image",image)
   return image
 }

@@ -69,7 +69,7 @@ const Actions = observer(function ActionButtons({ item }: { item: any }) {
     likeviews: item?.likeviews,
   })
   const [isLikesModalVisible, setLikesModalVisible] = useState(false)
-
+ const [mode,setMode]=useState('')
   const {
     api: { mutateFlagsOnFeed },
     userStore: { _id },
@@ -127,7 +127,7 @@ const Actions = observer(function ActionButtons({ item }: { item: any }) {
                 }
               }}
             />
-            <Text onPress={() => dynamicData?.likeviews > 0 && setLikesModalVisible(true)}>
+            <Text onPress={() => {dynamicData?.likeviews > 0 && setLikesModalVisible(true),setMode('Likes')}}>
               {dynamicData?.likeviews}
             </Text>
           </View>
@@ -149,7 +149,7 @@ const Actions = observer(function ActionButtons({ item }: { item: any }) {
                 }
               }}
             />
-            <Text>{dynamicData?.dislikeviews}</Text>
+            <Text onPress={() => {dynamicData?.dislikeviews > 0 && setLikesModalVisible(true),setMode('Dislikes')}}>{dynamicData?.dislikeviews}</Text>
           </View>
           <View style={$actionContainer}>
             <Icon
@@ -177,9 +177,10 @@ const Actions = observer(function ActionButtons({ item }: { item: any }) {
         key={item?._id}
         module="post"
         moduleId={item?._id}
-        likesCount={dynamicData?.likeviews}
+        likesCount={mode=='Likes' ?dynamicData?.likeviews:dynamicData?.dislikeviews}
         isVisible={isLikesModalVisible}
         setVisible={setLikesModalVisible}
+        mode={mode}
       />
     </>
   )
@@ -215,14 +216,12 @@ const CourouselItem = ({ item, index, onAttachmentsPress, inViewPort, currentIte
 
       // Update your UI for the unloaded state
     } else {
-      // setLoaded(true)
-
       // Update your UI for the loaded state
 
       if (status.isPlaying) {
         setVideoStatus("playing")
         if (!fullScreenTimer.current)
-        fullScreenTimer.current = setTimeout(() => videoRef.current._setFullscreen(true), 2000)
+          fullScreenTimer.current = setTimeout(() => videoRef.current._setFullscreen(true), 2000)
 
         // Update your UI for the playing state
       } else {
@@ -238,7 +237,6 @@ const CourouselItem = ({ item, index, onAttachmentsPress, inViewPort, currentIte
     }
   }
 
-
   return (
     <Pressable key={index} style={$carouselItem} onPress={isVideo ? onPlay : onAttachmentsPress}>
       <ShimmerPlaceHolder
@@ -249,6 +247,7 @@ const CourouselItem = ({ item, index, onAttachmentsPress, inViewPort, currentIte
       >
         {isVideo ? (
           <>
+      
             <Video
               key={item?.url + index}
               ref={(el) => (videoRef.current = el)} // Store reference
@@ -259,7 +258,7 @@ const CourouselItem = ({ item, index, onAttachmentsPress, inViewPort, currentIte
               isLooping
               onPlaybackStatusUpdate={onPlayBackStatusUpdate}
               useNativeControls
-              style={$flexFull}
+              style={$carouselItem}
               shouldPlay={inViewPort}
               usePoster
               posterSource={{ uri: item.thumbnailUrl }}
@@ -267,6 +266,7 @@ const CourouselItem = ({ item, index, onAttachmentsPress, inViewPort, currentIte
                 uri: item?.url,
               }}
             />
+     
             {inViewPort ? (
               <>
                 {videoStatus === "not-playing" && (
@@ -305,7 +305,7 @@ const CourouselItem = ({ item, index, onAttachmentsPress, inViewPort, currentIte
               setLoaded(true)
             }}
             source={{ uri: item.url }}
-            style={$flexFull}
+            style={$carouselItem}
             resizeMode="contain"
           />
         )}
@@ -360,7 +360,9 @@ export const PostComponent = ({
 
   const onAttachmentsPress = () => {
     const images = postDetails.attachmentUrl?.map((i, index) => {
-      return { id: index, uri: i }
+      const uri = i.type.startsWith("video") ? i.thumbnailUrl : i.url
+
+      return { id: "posts" + index + "-" + index, uri }
     })
 
     setImageViewConfig({
@@ -435,7 +437,7 @@ export const PostComponent = ({
             <Text
               size="xxs"
               weight="bold"
-              style={{ marginLeft: spacing.homeScreen }}
+              style={{ marginLeft: spacing.homeScreen ,}}
               color={colors.palette.primary100}
               text={"Read More"}
             />
@@ -470,7 +472,7 @@ export const PostComponent = ({
                 <View
                   style={[
                     $flexRow,
-
+ 
                     // eslint-disable-next-line react-native/no-inline-styles
                     {
                       padding: 5,
@@ -598,8 +600,10 @@ const $playIcon: ViewStyle = {
 }
 
 const $carouselItem = {
-  width: Dimensions.get("window").width,
+  
+  width: "100%",
   height: 300,
+
 }
 
 const $postContent: TextStyle = {

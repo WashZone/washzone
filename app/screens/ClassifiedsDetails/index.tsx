@@ -72,7 +72,7 @@ const PublisherDetails = ({ publisher, price }: { publisher: any; price: string 
                 ratingColor={colors.palette.primary100}
                 ratingTextColor={colors.palette.primary100}
                 ratingBackgroundColor={colors.palette.neutral400}
-                // style={{ backgroundColor: colors.palette.primary100 }}
+                style={{ backgroundColor: colors.palette.primary100 }}
                 startingValue={avgRating}
                 readonly
               />
