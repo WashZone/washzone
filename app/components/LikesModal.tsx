@@ -39,9 +39,9 @@ export const LikesModal = ({
       case "discussion": {
         setLoading(true)
         const res = await getLikesOnDiscussion(moduleId)
-
+        console.log("data----------",res.data)
         setData(res?.data)
-        console.log("data----------", res.data)
+     
         setLoading(false)
         break
       }
