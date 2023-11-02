@@ -156,6 +156,7 @@ const Options = ({ user, reportUser }) => {
   const hideMenu = () => setVisible(false)
 
   const blockUser = () => {
+    setVisible(false)
     showAlertYesNo({
       message: `Block ${user?.first_name} ?`,
       description: `Once you block someone, they won't be able to send you message or make offers on your Classifieds.`,
@@ -174,6 +175,7 @@ const Options = ({ user, reportUser }) => {
   }
 
   const unblockUser = () => {
+    setVisible(false)
     showAlertYesNo({
       message: `Unblock ${user?.first_name} ?`,
       description: `${user?.first_name} has been blocked by you. If you unblock them, they will now be able to send you messages or make offers on your Classifieds.`,
@@ -230,10 +232,10 @@ const ProfileHeader = ({ user, isUser, onMessage, onProfileImagePress, onBannerP
     api: { mutateReportOnUser },
   } = useStores()
   const navigation = useNavigation<NavigationProp<AppStackParamList>>()
-  const { getProfileDetails, followUser, unfollowUser, getUserById } = useHooks()
+  const { getProfileDetails, followUser, unfollowUser, getUserById, getFollowers } = useHooks()
   const [profileDetails, setProfileDetails] = useState({
     blocked: false,
-    data: { followercount: 0, followingCount: 0 },
+    data: { followercount: user.follower || 0, followingCount: user.following || 0 },
     following: false,
   })
   const [descriptionLineCount, setDescriptionLineCount] = useState(undefined)
@@ -243,7 +245,7 @@ const ProfileHeader = ({ user, isUser, onMessage, onProfileImagePress, onBannerP
     const resProfile = await getProfileDetails(user?._id)
     setProfileDetails({ ...resProfile })
   }
-
+  
   const [followLoading, setFollowLoading] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
 
@@ -295,7 +297,7 @@ const ProfileHeader = ({ user, isUser, onMessage, onProfileImagePress, onBannerP
       Toast.show(toastMessages.somethingWentWrong)
     }
   }
-
+ 
   const onFollowUnfollow = async () => {
     setFollowLoading(true)
     try {
@@ -311,7 +313,24 @@ const ProfileHeader = ({ user, isUser, onMessage, onProfileImagePress, onBannerP
       setFollowLoading(false)
     }
   }
+  const syncFollowers = async () => {
+    try {
+      const res = await getFollowers(user?._id)
+      const userIds = res.map((item) => item.userId._id)
+      if (userIds.includes(_id)) {
+        setProfileDetails((prevProfileDetails) => ({
+          ...prevProfileDetails,
+          following: true,
+        }));
+      }
+    } catch (err) {
+    } finally {
+    }
+  }
 
+  useEffect(() => {
+    syncFollowers()
+  }, [])
   const onTextLayout = useCallback((e) => {
     if (descriptionLineCount === undefined) {
       setDescriptionLineCount(e.nativeEvent.lines.length)

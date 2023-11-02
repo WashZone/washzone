@@ -66,7 +66,11 @@ export const BlockedUsers: FC<AppStackScreenProps<"BlockedUsers">> = observer(
       setLoading(true)
       try {
         const res = await queryGetBlockedByUserId({ userId: _id }, { fetchPolicy: "no-cache" })
-        setData(res.getBlockedByUserId?.data)
+        const filteredData = res.getBlockedByUserId.data.filter(
+          (item) => item.blockUserById._id !== _id,
+        )
+        console.log("res", filteredData)
+        setData(filteredData)
       } catch (err) {
         Alert.alert(err)
       }
